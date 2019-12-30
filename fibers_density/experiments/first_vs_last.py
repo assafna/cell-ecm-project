@@ -2,7 +2,6 @@ import os
 
 import numpy as np
 
-import libs.experiments.compute
 from plotting import save, scatter
 from libs.experiments.compute import normalized_fibers_density, fibers_density_cut_edges
 from libs.experiments import config, load, paths
@@ -69,6 +68,6 @@ def plot_all(_experiment, _experiment_fibers_density, _experiment_normalization)
 
 if __name__ == '__main__':
     for experiment in config.SINGLE_CELL:
-        experiment_fibers_density = load.experiment(experiment)
-        experiment_normalization = libs.experiments.compute.experiment(experiment)
+        experiment_fibers_density = load.experiment_fibers_densities(experiment)
+        experiment_normalization = load.experiment_normalization(experiment)
         plot_all(experiment, experiment_fibers_density, experiment_normalization)

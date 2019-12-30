@@ -1,6 +1,11 @@
-import libs.experiments.compute
+import os
+
+import numpy as np
+import seaborn
+
 from libs.experiments.compute import normalized_fibers_density, fibers_density_cut_edges
-from libs.experiments import config, load
+from libs.experiments import config, load, paths
+from plotting import heatmap, save
 
 
 def plot(_experiment, _series, _group, _z_group, _fibers_density, _normalization):
@@ -19,22 +24,22 @@ def plot(_experiment, _series, _group, _z_group, _fibers_density, _normalization
 
     _z_array = list(zip(*_z_array))
 
-    # _fig = heatmap.create_plot(
-    #     _x_labels=np.arange(start=0, stop=10000, step=15),
-    #     _y_labels=np.arange(start=0.0, stop=100.0, step=0.125),
-    #     _z_array=_z_array,
-    #     _x_axis_title='Time Since Imaging Start (minutes)',
-    #     _y_axis_title='Distance from Left Cell Center (cell size)',
-    #     _color_scale=seaborn.cubehelix_palette().as_hex(),
-    #     _show_scale=True,
-    #     _title=_experiment + ' - ' + _series + ' - ' + _group + ' - ' + _z_group + ' - All TPs'
-    # )
+    _fig = heatmap.create_plot(
+        _x_labels=np.arange(start=0, stop=10000, step=15),
+        _y_labels=np.arange(start=0.0, stop=100.0, step=0.125),
+        _z_array=_z_array,
+        _x_axis_title='Time Since Imaging Start (minutes)',
+        _y_axis_title='Distance from Left Cell Center (cell size)',
+        _color_scale=seaborn.cubehelix_palette().as_hex(),
+        _show_scale=True,
+        _title=_experiment + ' - ' + _series + ' - ' + _group + ' - ' + _z_group + ' - All TPs'
+    )
 
-    # save.save_plot(
-    #     _fig=_fig,
-    #     _path=os.path.join(os.path.join(os.path.join(paths.plots(_experiment), _series), _group), _z_group),
-    #     _filename='All TPs'
-    # )
+    save.to_html(
+        _fig=_fig,
+        _path=os.path.join(os.path.join(os.path.join(paths.plots(_experiment), _series), _group), _z_group),
+        _filename='All TPs'
+    )
 
 
 def plot_all(_experiment, _experiment_fibers_density, _experiment_normalization):
@@ -52,6 +57,6 @@ def plot_all(_experiment, _experiment_fibers_density, _experiment_normalization)
 
 if __name__ == '__main__':
     for experiment in config.PAIRS:
-        experiment_fibers_density = load.experiment(experiment)
-        experiment_normalization = libs.experiments.compute.experiment(experiment)
+        experiment_fibers_density = load.experiment_fibers_densities(experiment)
+        experiment_normalization = load.experiment_normalization(experiment)
         plot_all(experiment, experiment_fibers_density, experiment_normalization)

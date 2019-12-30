@@ -1,6 +1,5 @@
 import numpy as np
 
-import libs.experiments.compute
 from plotting import save, scatter
 from libs.experiments.compute import normalized_fibers_density, fibers_density_cut_left_edge
 from libs.experiments import config, load, paths
@@ -140,21 +139,11 @@ def plot_deltas_average(_experiment, _fibers_density_per_cell_averages):
                     _delta_data[_distance_index].append(_delta)
 
     _fig = scatter.create_error_bars_plot(
-        _x_array=[
-            np.arange(start=0.0, stop=100.0, step=0.125)[:len(_delta_data)]
-        ],
-        _y_array=[
-            _delta_data
-        ],
-        _names_array=[
-            'Deltas'
-        ],
-        _mode_array=[
-            'lines+markers'
-        ],
-        _dash_array=[
-            'solid'
-        ],
+        _x_array=[np.arange(start=0.0, stop=100.0, step=0.125)[:len(_delta_data)]],
+        _y_array=[_delta_data],
+        _names_array=['Deltas'],
+        _mode_array=['lines+markers'],
+        _dash_array=['solid'],
         _x_axis_title='Distance from Left Cell (cell size)',
         _y_axis_title='Normalized Fibers Density Change (%)',
         _title=_experiment + ' - TP First vs. Last - Deltas'
@@ -177,9 +166,9 @@ def plot_deltas_average(_experiment, _fibers_density_per_cell_averages):
 
 if __name__ == '__main__':
     for experiment in config.SINGLE_CELL:
-        experiment_fibers_density = load.experiment(experiment)
-        experiment_normalization = libs.experiments.compute.experiment(experiment)
+        experiment_fibers_density = load.experiment_fibers_densities(experiment)
+        experiment_normalization = load.experiment_normalization(experiment)
         fibers_density_per_cell = per_cell(experiment_fibers_density, experiment_normalization)
         fibers_density_per_cell_averages = all_directions_average(fibers_density_per_cell)
         plot_average(experiment, fibers_density_per_cell_averages)
-        # plot_deltas_average(experiment, fibers_density_per_cell_averages)
+        plot_deltas_average(experiment, fibers_density_per_cell_averages)
