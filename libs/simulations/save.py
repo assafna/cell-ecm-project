@@ -2,7 +2,7 @@ import gzip
 import os
 import pickle
 
-import paths
+from libs.simulations import paths
 
 
 def to_pickle(_object, _pickle_path):

@@ -2,8 +2,8 @@ import gzip
 import os
 import pickle
 
-import paths
-from configurations import CELLS_DIAMETERS_FILE_NAME, ELEMENTS_FILE_NAME, PROPERTIES_FILE_NAME
+from libs.simulations import paths
+from libs.simulations.config import CELLS_DIAMETERS_FILE_NAME
 
 
 def raw_files(_simulation):
@@ -90,3 +90,8 @@ def fibers_densities(_simulation, _time_point):
             _pickle.close()
     else:
         return {}
+
+
+def raw():
+    return [_simulation for _simulation in os.listdir(paths.RAW)
+            if os.path.isdir(os.path.join(paths.RAW, _simulation))]

@@ -2,19 +2,18 @@ import math
 import os
 import time
 
-import load_raw
-import load_simulation
-import paths
-from configurations import CELL_DIAMETER, NET_DIMENSIONS, ORIGIN_COORDINATES, \
+import libs.simulations.load
+from libs.simulations import load, paths
+from libs.simulations.config import CELL_DIAMETER, NET_DIMENSIONS, ORIGIN_COORDINATES, \
     ELEMENTS_FILE_NAME
-from save_simulation import to_pickle
+from libs.simulations.save import to_pickle
 
 
 def create_properties(_simulation):
     print(_simulation, 'Creating properties')
     _simulation_path = paths.raw(_simulation)
-    _cells_diameters = load_simulation.cells_diameters(_simulation)
-    _time_points = load_simulation.time_points(_simulation)
+    _cells_diameters = load.cells_diameters(_simulation)
+    _time_points = load.time_points(_simulation)
     _time_points_data = []
     if 'D_' in _simulation:
         _distance = float(_simulation.split('D')[0])
@@ -117,7 +116,7 @@ def process_simulation(_simulation, _overwrite=False):
         to_pickle(_elements, _elements_pickle_path)
 
     # time points
-    for _time_point in load_simulation.time_points(_simulation):
+    for _time_point in load.time_points(_simulation):
         _time_point_pickle_path = os.path.join(_simulation_structured_path, str(_time_point) + '.pkl')
         if not _overwrite and not os.path.isfile(_time_point_pickle_path):
             _time_point_data = create_time_point(_simulation, _time_point)
@@ -128,11 +127,11 @@ def process_simulation(_simulation, _overwrite=False):
     _simulation_fiber_lengths_path = paths.fibers_lengths(_simulation)
     os.makedirs(_simulation_fiber_lengths_path) if not os.path.isdir(_simulation_fiber_lengths_path) else None
     _elements = None
-    for _time_point in load_simulation.time_points(_simulation):
+    for _time_point in load.time_points(_simulation):
         _fiber_lengths_pickle_path = os.path.join(_simulation_fiber_lengths_path, str(_time_point) + '.pkl')
         if not _overwrite and not os.path.isfile(_fiber_lengths_pickle_path):
-            _elements = load_simulation.elements(_simulation) if _elements is None else _elements
-            _intersections = load_simulation.intersections(_simulation, _time_point)
+            _elements = load.elements(_simulation) if _elements is None else _elements
+            _intersections = load.intersections(_simulation, _time_point)
             _time_point_fiber_lengths = create_fiber_lengths(_elements, _intersections)
             print(_simulation, 'Pickling fiber lengths time-point:', _time_point)
             to_pickle(_time_point_fiber_lengths, _fiber_lengths_pickle_path)
@@ -146,7 +145,7 @@ def process_simulations(_simulations, _overwrite=False):
 
 
 def process_all_simulations(_overwrite=False):
-    process_simulations(load_raw.simulations(), _overwrite)
+    process_simulations(libs.simulations.load.raw(), _overwrite)
 
 
 # process_all_simulations()

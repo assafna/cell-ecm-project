@@ -22,7 +22,7 @@ def div_to_website(_div, _filepath):
         _html.close()
 
 
-def save(_fig, _path, _filename):
+def to_html(_fig, _path, _filename):
     os.makedirs(_path, exist_ok=True)
 
     _div = plotly.offline.plot(

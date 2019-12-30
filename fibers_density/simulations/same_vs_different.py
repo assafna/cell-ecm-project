@@ -1,11 +1,9 @@
 import numpy as np
 from scipy.stats import wilcoxon
 
-import computations
-import compute_simulation
-from configurations import ROI_WIDTH, ROI_HEIGHT
-import filter_simulations
-
+from libs import compute
+from libs.simulations import compute, filtering
+from libs.simulations.config import ROI_WIDTH, ROI_HEIGHT
 
 MINIMUM_TIME_POINTS = 51
 OFFSET_X = 0
@@ -17,15 +15,15 @@ DIRECTION = 'inside'
 
 def main():
     _simulations = ['3D_1', '3D_2', '3D_3', '3D_4', '3D_5']
-    _simulations = filter_simulations.by_time_points_amount(_simulations, MINIMUM_TIME_POINTS)
-    _simulations = filter_simulations.by_distance(_simulations, CELLS_DISTANCE)
+    _simulations = filtering.by_time_points_amount(_simulations, MINIMUM_TIME_POINTS)
+    _simulations = filtering.by_distance(_simulations, CELLS_DISTANCE)
     _same_correlations_array = []
     _different_correlations_array = []
     for _same_index in range(len(_simulations)):
         for _different_index in range(_same_index + 1, len(_simulations)):
             _same_simulation = _simulations[_same_index]
             _different_simulation = _simulations[_different_index]
-            _same_left_cell_fibers_densities = compute_simulation.roi_fibers_density_by_time(
+            _same_left_cell_fibers_densities = compute.roi_fibers_density_by_time(
                 _simulation=_same_simulation,
                 _length_x=ROI_WIDTH,
                 _length_y=ROI_HEIGHT,
@@ -35,7 +33,7 @@ def main():
                 _direction=DIRECTION,
                 _time_points=MINIMUM_TIME_POINTS
             )
-            _same_right_cell_fibers_densities = compute_simulation.roi_fibers_density_by_time(
+            _same_right_cell_fibers_densities = compute.roi_fibers_density_by_time(
                 _simulation=_same_simulation,
                 _length_x=ROI_WIDTH,
                 _length_y=ROI_HEIGHT,
@@ -45,7 +43,7 @@ def main():
                 _direction=DIRECTION,
                 _time_points=MINIMUM_TIME_POINTS
             )
-            _different_left_cell_fibers_densities = compute_simulation.roi_fibers_density_by_time(
+            _different_left_cell_fibers_densities = compute.roi_fibers_density_by_time(
                 _simulation=_different_simulation,
                 _length_x=ROI_WIDTH,
                 _length_y=ROI_HEIGHT,
@@ -55,13 +53,13 @@ def main():
                 _direction=DIRECTION,
                 _time_points=MINIMUM_TIME_POINTS
             )
-            _same_correlations_array.append(computations.correlation(
-                computations.derivative(_same_left_cell_fibers_densities, _n=DERIVATIVE),
-                computations.derivative(_same_right_cell_fibers_densities, _n=DERIVATIVE)
+            _same_correlations_array.append(compute.correlation(
+                compute.derivative(_same_left_cell_fibers_densities, _n=DERIVATIVE),
+                compute.derivative(_same_right_cell_fibers_densities, _n=DERIVATIVE)
             ))
-            _different_correlations_array.append(computations.correlation(
-                computations.derivative(_same_left_cell_fibers_densities, _n=DERIVATIVE),
-                computations.derivative(_different_left_cell_fibers_densities, _n=DERIVATIVE)
+            _different_correlations_array.append(compute.correlation(
+                compute.derivative(_same_left_cell_fibers_densities, _n=DERIVATIVE),
+                compute.derivative(_different_left_cell_fibers_densities, _n=DERIVATIVE)
             ))
 
     _same_minus_different = np.array(_same_correlations_array) - np.array(_different_correlations_array)
