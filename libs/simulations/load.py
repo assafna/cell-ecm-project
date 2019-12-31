@@ -95,3 +95,8 @@ def fibers_densities(_simulation, _time_point):
 def raw():
     return [_simulation for _simulation in os.listdir(paths.RAW)
             if os.path.isdir(os.path.join(paths.RAW, _simulation))]
+
+
+def structured():
+    return [_simulation for _simulation in os.listdir(paths.STRUCTURED)
+            if os.path.isdir(os.path.join(paths.STRUCTURED, _simulation))]

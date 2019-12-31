@@ -1,7 +1,7 @@
 import math
 
 from libs.simulations import save
-from libs.compute import two_lines_intersection, is_value_between_values
+from libs.compute_lib import two_lines_intersection, is_value_between_values
 from libs.simulations.config import CELL_DIAMETER, EPSILON
 from libs.simulations.load import elements, fibers_lengths, intersections, properties, fibers_densities
 
@@ -46,11 +46,11 @@ def roi_fibers_density_by_time(_simulation, _length_x, _length_y, _offset_x, _of
             (_cell_id, _direction) == ('left_cell', 'inside') or
             (_cell_id, _direction) == ('right_cell', 'outside') else 'left'
         )
-        print(_simulation, _cell_id, 'roi', _time_point_roi, 'direction', _direction, 'tp', _time_point)
         _time_point_fibers_densities = fibers_densities(_simulation, _time_point)
         if _time_point_roi in _time_point_fibers_densities:
             _fibers_densities.append(_time_point_fibers_densities[_time_point_roi])
         else:
+            print('Computing:', _simulation, _cell_id, 'roi', _time_point_roi, 'direction', _direction, 'tp', _time_point)
             _roi_fibers_density = roi_fibers_density(_simulation, _time_point, _time_point_roi)
             _time_point_fibers_densities[_time_point_roi] = _roi_fibers_density
             save.fibers_densities(_simulation, _time_point, _time_point_fibers_densities)

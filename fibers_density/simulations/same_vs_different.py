@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.stats import wilcoxon
 
-from libs import compute
+from libs import compute_lib
 from libs.simulations import compute, filtering
 from libs.simulations.config import ROI_WIDTH, ROI_HEIGHT
 
@@ -53,13 +53,13 @@ def main():
                 _direction=DIRECTION,
                 _time_points=MINIMUM_TIME_POINTS
             )
-            _same_correlations_array.append(compute.correlation(
-                compute.derivative(_same_left_cell_fibers_densities, _n=DERIVATIVE),
-                compute.derivative(_same_right_cell_fibers_densities, _n=DERIVATIVE)
+            _same_correlations_array.append(compute_lib.correlation(
+                compute_lib.derivative(_same_left_cell_fibers_densities, _n=DERIVATIVE),
+                compute_lib.derivative(_same_right_cell_fibers_densities, _n=DERIVATIVE)
             ))
-            _different_correlations_array.append(compute.correlation(
-                compute.derivative(_same_left_cell_fibers_densities, _n=DERIVATIVE),
-                compute.derivative(_different_left_cell_fibers_densities, _n=DERIVATIVE)
+            _different_correlations_array.append(compute_lib.correlation(
+                compute_lib.derivative(_same_left_cell_fibers_densities, _n=DERIVATIVE),
+                compute_lib.derivative(_different_left_cell_fibers_densities, _n=DERIVATIVE)
             ))
 
     _same_minus_different = np.array(_same_correlations_array) - np.array(_different_correlations_array)

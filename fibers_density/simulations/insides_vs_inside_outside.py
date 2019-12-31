@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.stats import wilcoxon
 
-from libs import compute
+from libs import compute_lib
 from libs.simulations import compute, filtering
 from libs.simulations.config import ROI_WIDTH, ROI_HEIGHT
 
@@ -59,22 +59,22 @@ def main():
             _time_points=TIME_POINTS
         )
         # left cell
-        _insides_correlations_array.append(compute.correlation(
-            compute.derivative(_left_cell_inside_fibers_densities, _n=DERIVATIVE),
-            compute.derivative(_right_cell_inside_fibers_densities, _n=DERIVATIVE)
+        _insides_correlations_array.append(compute_lib.correlation(
+            compute_lib.derivative(_left_cell_inside_fibers_densities, _n=DERIVATIVE),
+            compute_lib.derivative(_right_cell_inside_fibers_densities, _n=DERIVATIVE)
         ))
-        _inside_outside_correlations_array.append(compute.correlation(
-            compute.derivative(_left_cell_inside_fibers_densities, _n=DERIVATIVE),
-            compute.derivative(_left_cell_outside_fibers_densities, _n=DERIVATIVE)
+        _inside_outside_correlations_array.append(compute_lib.correlation(
+            compute_lib.derivative(_left_cell_inside_fibers_densities, _n=DERIVATIVE),
+            compute_lib.derivative(_left_cell_outside_fibers_densities, _n=DERIVATIVE)
         ))
         # right cell
-        _insides_correlations_array.append(compute.correlation(
-            compute.derivative(_left_cell_inside_fibers_densities, _n=DERIVATIVE),
-            compute.derivative(_right_cell_inside_fibers_densities, _n=DERIVATIVE)
+        _insides_correlations_array.append(compute_lib.correlation(
+            compute_lib.derivative(_left_cell_inside_fibers_densities, _n=DERIVATIVE),
+            compute_lib.derivative(_right_cell_inside_fibers_densities, _n=DERIVATIVE)
         ))
-        _inside_outside_correlations_array.append(compute.correlation(
-            compute.derivative(_right_cell_inside_fibers_densities, _n=DERIVATIVE),
-            compute.derivative(_right_cell_outside_fibers_densities, _n=DERIVATIVE)
+        _inside_outside_correlations_array.append(compute_lib.correlation(
+            compute_lib.derivative(_right_cell_inside_fibers_densities, _n=DERIVATIVE),
+            compute_lib.derivative(_right_cell_outside_fibers_densities, _n=DERIVATIVE)
         ))
 
     _insides_minus_inside_outside = np.array(_insides_correlations_array) - np.array(_inside_outside_correlations_array)

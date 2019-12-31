@@ -1,6 +1,8 @@
 import os
 
-SIMULATIONS = 'G:\\My Drive\\BGU\\Thesis\\Cell-ECM & Cell-ECM-Cell Project\\Data\\Simulations'
+from libs.paths_lib import working_directory
+
+SIMULATIONS = os.path.join(working_directory(), 'Simulations')
 
 # Main
 RAW = os.path.join(SIMULATIONS, 'Raw')

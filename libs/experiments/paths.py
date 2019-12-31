@@ -1,6 +1,7 @@
 import os
 
 EXPERIMENTS = 'G:\\My Drive\\BGU\\Thesis\\Cell-ECM & Cell-ECM-Cell Project\\Data\\Experiments'
+# EXPERIMENTS = os.path.join(working_directory(), 'Experiments')
 
 # Main
 RAW = os.path.join(EXPERIMENTS, 'Raw')
