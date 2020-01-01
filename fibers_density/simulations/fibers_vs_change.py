@@ -1,3 +1,4 @@
+import os
 import time
 
 import numpy as np
@@ -27,7 +28,7 @@ def main():
         _is_causality=False,
         _is_dominant_passive=False
     )
-    _simulations = filtering.by_distances(_simulations, DISTANCES)
+    # _simulations = filtering.by_distances(_simulations, DISTANCES)
     _simulations_by_distance = organize.by_distances(_simulations)
     _fibers_densities_by_distance = {}
     _change_in_fibers_densities_by_distance = {}
@@ -60,13 +61,13 @@ def main():
         _modes_array=['markers'] * len(_fibers_densities_by_distance.keys()),
         _x_axis_title='Fibers Densities',
         _y_axis_title='Change in Fibers Densities',
-        _title='Fibers Densities vs. Change in Fibers Densities'
+        _title='Fibers Densities vs. Change in Fibers Densities - ' + DIRECTION.capitalize()
     )
 
     save.to_html(
         _fig=_fig,
-        _path=paths.PLOTS,
-        _filename='fibers_vs_change_points_' + _time
+        _path=os.path.join(paths.PLOTS, save.get_module_name()),
+        _filename=DIRECTION + '_points_' + _time
     )
 
     # line of best fit
@@ -87,13 +88,13 @@ def main():
         _modes_array=['lines'] * len(_simulations_by_distance),
         _x_axis_title='Fibers Densities',
         _y_axis_title='Change in Fibers Densities',
-        _title='Fibers Densities vs. Change in Fibers Densities - Line of Best Fit'
+        _title='Fibers Densities vs. Change in Fibers Densities - ' + DIRECTION.capitalize() + ' - Line of Best Fit'
     )
 
     save.to_html(
         _fig=_fig,
-        _path=paths.PLOTS,
-        _filename='fibers_vs_change_best_fit_' + _time
+        _path=os.path.join(paths.PLOTS, save.get_module_name()),
+        _filename=DIRECTION + '_best_fit_' + _time
     )
 
 
