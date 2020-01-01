@@ -36,7 +36,7 @@ def time_points(_simulation):
     _raw_files = raw_files(_simulation)
     _files = [_file for _file in _raw_files if _file.startswith('tp_') and _file.endswith('.txt')]
 
-    return sorted([int(_file.split('.')[0]) for _file in _files])
+    return sorted([int(os.path.splitext(_file)[0].split('tp_')[1]) for _file in _files])
 
 
 def properties(_simulation):

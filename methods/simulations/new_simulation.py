@@ -148,5 +148,4 @@ def process_all_simulations(_overwrite=False):
     process_simulations(libs.simulations.load.raw(), _overwrite)
 
 
-# process_all_simulations()
-process_simulations(['3D_1', '3D_2', '3D_3', '3D_4', '3D_5'])
+process_all_simulations()

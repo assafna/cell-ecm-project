@@ -2,7 +2,6 @@ CELL_DIAMETER = 0.08
 
 CELLS_DIAMETERS_FILE_NAME = 'cells_diameters.txt'
 ELEMENTS_FILE_NAME = 'elements.txt'
-PROPERTIES_FILE_NAME = 'properties.json'
 
 NET_DIMENSIONS = {
     'x1': -2,
