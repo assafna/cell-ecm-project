@@ -1,16 +1,23 @@
-from libs import compute_lib
-from libs.simulations import filtering, load, organize, compute
-from libs.simulations.config import ROI_WIDTH, ROI_HEIGHT
+import time
 
+import numpy as np
+from scipy import stats
+
+from libs import compute_lib
+from libs.simulations import filtering, load, organize, compute, paths
+from libs.simulations.config import ROI_WIDTH, ROI_HEIGHT
+from plotting import scatter, save
 
 TIME_POINTS = 51
 OFFSET_X = 0
 OFFSET_Y = 0
 DERIVATIVE = 1
+DISTANCES = [3.0, 7.0, 12.0]
 DIRECTION = 'inside'
 
 
 def main():
+    _time = time.strftime('%Y_%m_%d-%H_%M_%S')
     _simulations = load.structured()
     _simulations = filtering.by_categories(
         _simulations,
@@ -20,6 +27,7 @@ def main():
         _is_causality=False,
         _is_dominant_passive=False
     )
+    _simulations = filtering.by_distances(_simulations, DISTANCES)
     _simulations_by_distance = organize.by_distances(_simulations)
     _fibers_densities_by_distance = {}
     _change_in_fibers_densities_by_distance = {}
@@ -45,7 +53,48 @@ def main():
         _fibers_densities_by_distance[_distance] = _fibers_densities_array
         _change_in_fibers_densities_by_distance[_distance] = _change_in_fibers_densities_array
 
-    # TODO: create the plots
+    _fig = scatter.create_plot(
+        _x_array=_fibers_densities_by_distance.values(),
+        _y_array=_change_in_fibers_densities_by_distance.values(),
+        _names_array=['Distance ' + str(_distance) for _distance in _fibers_densities_by_distance.keys()],
+        _modes_array=['markers'] * len(_fibers_densities_by_distance.keys()),
+        _x_axis_title='Fibers Densities',
+        _y_axis_title='Change in Fibers Densities',
+        _title='Fibers Densities vs. Change in Fibers Densities'
+    )
+
+    save.to_html(
+        _fig=_fig,
+        _path=paths.PLOTS,
+        _filename='fibers_vs_change_points_' + _time
+    )
+
+    # line of best fit
+    _best_fit_lines_x_array = []
+    _best_fit_lines_y_array = []
+    for _distance in _simulations_by_distance:
+        _x_array = _fibers_densities_by_distance[_distance]
+        _y_array = _change_in_fibers_densities_by_distance[_distance]
+        _slope, _intercept, _r_value, _p_value, _std_err = stats.linregress(_x_array, _y_array)
+        _line = _slope * np.array(_x_array) + _intercept
+        _best_fit_lines_x_array.append(_x_array)
+        _best_fit_lines_y_array.append(_line)
+
+    _fig = scatter.create_plot(
+        _x_array=_best_fit_lines_x_array,
+        _y_array=_best_fit_lines_y_array,
+        _names_array=['Distance ' + str(_distance) for _distance in _simulations_by_distance],
+        _modes_array=['lines'] * len(_simulations_by_distance),
+        _x_axis_title='Fibers Densities',
+        _y_axis_title='Change in Fibers Densities',
+        _title='Fibers Densities vs. Change in Fibers Densities - Line of Best Fit'
+    )
+
+    save.to_html(
+        _fig=_fig,
+        _path=paths.PLOTS,
+        _filename='fibers_vs_change_best_fit_' + _time
+    )
 
 
 if __name__ == '__main__':

@@ -16,6 +16,11 @@ def by_distance(_simulations, _distance):
             cells_distance(load.properties(_simulation)) == _distance]
 
 
+def by_distances(_simulations, _distances):
+    return [_simulation for _simulation in _simulations if
+            cells_distance(load.properties(_simulation)) in _distances]
+
+
 def is_single_cell(_simulation):
     return 'single_cell' in _simulation
 

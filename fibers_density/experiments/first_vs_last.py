@@ -29,7 +29,7 @@ def plot(_experiment, _series, _group, _z_group, _fibers_density, _normalization
             'Time-Point ' + str(_tp_last['tp']),
             'Time-Point ' + str(_tp_first['tp'])
         ],
-        _mode_array=[
+        _modes_array=[
             'lines+markers',
             'lines+markers'
         ],

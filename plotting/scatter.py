@@ -37,9 +37,9 @@ def create_error_bars_plot(_x_array, _y_array, _names_array, _mode_array, _dash_
     return _fig
 
 
-def create_plot(_x_array, _y_array, _names_array, _mode_array, _x_axis_title, _y_axis_title, _title):
+def create_plot(_x_array, _y_array, _names_array, _modes_array, _x_axis_title, _y_axis_title, _title):
     _data = []
-    for _x, _y, _name, _mode in zip(_x_array, _y_array, _names_array, _mode_array):
+    for _x, _y, _name, _mode in zip(_x_array, _y_array, _names_array, _modes_array):
         _data.append(
             go.Scatter(
                 x=_x,
