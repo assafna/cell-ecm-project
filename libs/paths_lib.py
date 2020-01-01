@@ -12,4 +12,7 @@ def working_directory():
         else:
             return 'G:\\My Drive\\BGU\\Thesis\\Cell-ECM & Cell-ECM-Cell Project\\Data'
     elif USER == 'Yoni':
-        return None
+        if platform.system() == 'Linux':
+            return '/data/work/assafna/'
+        else:
+            return None
