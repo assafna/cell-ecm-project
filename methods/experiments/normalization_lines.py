@@ -38,7 +38,7 @@ def main():
                         _min_distance = min(_min_distance, _distance)
                     if _min_distance > _line_max_distance:
                         _line_max_distance = _min_distance
-                        _line = [(_x1, _y1), (_x2, _y2)]
+                        _line = [_x1, _y1, _x2, _y2]
 
             save.normalization_line(_experiment, _series, _line)
 

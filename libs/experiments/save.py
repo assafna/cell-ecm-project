@@ -45,6 +45,6 @@ def normalization_line(_experiment, _series, _line):
     _file_path = os.path.join(_experiment_path, 'series_' + str(_series.split()[1]) + '.txt')
     try:
         with open(_file_path, 'w') as _f:
-            _f.write(_line[0] + '\t' + _line[1] + '\t' + _line[2] + '\t' + _line[3])
+            _f.write(str(_line[0]) + '\t' + str(_line[1]) + '\t' + str(_line[2]) + '\t' + str(_line[3]))
     finally:
         _f.close()
