@@ -68,6 +68,6 @@ def plot_all(_experiment, _experiment_fibers_density, _experiment_normalization)
 
 if __name__ == '__main__':
     for experiment in config.SINGLE_CELL:
-        experiment_fibers_density = load.experiment_fibers_densities(experiment)
+        experiment_fibers_density = load.fibers_density_experiment_file_data(experiment)
         experiment_normalization = load.experiment_normalization(experiment)
         plot_all(experiment, experiment_fibers_density, experiment_normalization)

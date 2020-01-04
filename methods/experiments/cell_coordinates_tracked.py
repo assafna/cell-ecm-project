@@ -9,11 +9,11 @@ from libs.experiments.config import MAX_DISTANCE_CHANGE
 def main():
     for _experiment in paths.folders(paths.OBJECTS):
         print('Experiment', _experiment)
-        _objects_data = load.objects_experiment_file_data(_experiment)
-        for _series in _objects_data:
+        for _series in paths.folders(paths.objects(_experiment)):
             print('Series', _series)
-            _cell_coordinates = [[_coordinates] for _coordinates in _objects_data[_series][0]]
-            for _tp in _objects_data[_series][1:]:
+            _series_data = load.objects_series_file_data(_experiment, _series)
+            _cell_coordinates = [[_coordinates] for _coordinates in _series_data[0]]
+            for _tp in _series_data[1:]:
                 for _cell_index, _cell in enumerate(_cell_coordinates):
                     if _cell[-1] is not None:
                         _previous_cell_x, _previous_cell_y, _previous_cell_z = _cell[-1]

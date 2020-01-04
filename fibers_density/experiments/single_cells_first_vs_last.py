@@ -166,7 +166,7 @@ def plot_deltas_average(_experiment, _fibers_density_per_cell_averages):
 
 if __name__ == '__main__':
     for experiment in config.SINGLE_CELL:
-        experiment_fibers_density = load.experiment_fibers_densities(experiment)
+        experiment_fibers_density = load.fibers_density_experiment_file_data(experiment)
         experiment_normalization = load.experiment_normalization(experiment)
         fibers_density_per_cell = per_cell(experiment_fibers_density, experiment_normalization)
         fibers_density_per_cell_averages = all_directions_average(fibers_density_per_cell)
