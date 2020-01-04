@@ -112,7 +112,6 @@ def plot_average(_experiment, _fibers_density_per_cell_averages):
         _fig=_fig,
         _color='black',
         _width=2,
-        _format=',.0%',
         _range=[-0.15, 1.5]
     )
 
@@ -153,7 +152,6 @@ def plot_deltas_average(_experiment, _fibers_density_per_cell_averages):
         _fig=_fig,
         _color='black',
         _width=2,
-        _format=',.0%',
         _range=[-0.15, 1.5]
     )
 

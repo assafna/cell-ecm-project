@@ -34,7 +34,7 @@ def plot(_experiment, _series, _group, _z_group, _fibers_density, _normalization
             'lines+markers'
         ],
         _x_axis_title='Distance from Left Cell (cell size)',
-        _y_axis_title='Normalized Fibers Density Change (%)',
+        _y_axis_title='Fibers Density Z-score',
         _title=_experiment + ' - ' + _series + ' - ' + _group + ' - ' + _z_group + ' - TP First vs. Last'
     )
 
@@ -42,8 +42,7 @@ def plot(_experiment, _series, _group, _z_group, _fibers_density, _normalization
         _fig=_fig,
         _color='black',
         _width=2,
-        _format=',.0%',
-        _range=[-0.15, 1.5]
+        _range=[0, 25]
     )
 
     save.to_html(
@@ -53,21 +52,19 @@ def plot(_experiment, _series, _group, _z_group, _fibers_density, _normalization
     )
 
 
-def plot_all(_experiment, _experiment_fibers_density, _experiment_normalization):
-    for _series in _experiment_fibers_density:
-        _series_fibers_density = _experiment_fibers_density[_series]
-        _series_normalization = experiment_normalization[_series]
-        for _group in _series_fibers_density:
-            _group_fibers_density = _series_fibers_density[_group]
-            _group_normalization = _series_normalization[_group]
-            for _z_group in _group_fibers_density:
-                print('Plotting', _series, _group, _z_group)
-                _fibers_density = _group_fibers_density[_z_group]
-                plot(_experiment, _series, _group, _z_group, _fibers_density, _group_normalization)
+def main():
+    for _experiment in paths.folders(paths.FIBERS_DENSITY):
+        print('Experiment', _experiment)
+        for _series in paths.folders(paths.fibers_density(_experiment)):
+            print(_series)
+            _normalization = load.normalization_series_file_data(_experiment, _series)
+            for _group in paths.folders(paths.fibers_density(_experiment, _series)):
+                print('Group', _group)
+                for _z_group in paths.folders(paths.fibers_density(_experiment, _series, _group)):
+                    print('Z Group', _z_group)
+                    _fibers_density = load.fibers_density_z_group_file_data(_experiment, _series, _group, _z_group)
+                    plot(_experiment, _series, _group, _z_group, _fibers_density, _normalization)
 
 
 if __name__ == '__main__':
-    for experiment in config.SINGLE_CELL:
-        experiment_fibers_density = load.fibers_density_experiment_file_data(experiment)
-        experiment_normalization = load.experiment_normalization(experiment)
-        plot_all(experiment, experiment_fibers_density, experiment_normalization)
+    main()

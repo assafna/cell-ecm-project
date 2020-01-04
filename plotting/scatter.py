@@ -60,12 +60,11 @@ def create_plot(_x_array, _y_array, _names_array, _modes_array, _x_axis_title, _
     return _fig
 
 
-def update_y_axis(_fig, _color, _width, _format, _range):
+def update_y_axis(_fig, _color, _width, _range):
     _fig.update_layout(
         yaxis=dict(
             zerolinecolor=_color,
             zerolinewidth=_width,
-            tickformat=_format,
             range=_range
         )
     )
