@@ -37,3 +37,14 @@ def cell_coordinates_tracked_z(_experiment, _series, _group, _cell_coordinates):
             _f.write(_lines)
     finally:
         _f.close()
+
+
+def normalization_line(_experiment, _series, _line):
+    _experiment_path = paths.normalization_lines(_experiment)
+    os.mkdir(_experiment_path) if not os.path.isdir(_experiment_path) else None
+    _file_path = os.path.join(_experiment_path, 'series_' + str(_series.split()[1]) + '.txt')
+    try:
+        with open(_file_path, 'w') as _f:
+            _f.write(_line[0] + '\t' + _line[1] + '\t' + _line[2] + '\t' + _line[3])
+    finally:
+        _f.close()

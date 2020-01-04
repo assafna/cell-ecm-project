@@ -10,7 +10,7 @@ def main():
     for _experiment in paths.folders(paths.OBJECTS_Z):
         print('Experiment', _experiment)
         for _series in paths.folders(paths.objects_z(_experiment)):
-            print('Series', _series)
+            print(_series)
             for _group in paths.folders(paths.objects_z(_experiment, _series)):
                 print('Group', _group)
                 _group_data = load.objects_z_group_file_data(_experiment, _series, _group)
@@ -31,6 +31,7 @@ def main():
                             )
                         else:
                             _cell_coordinates[_cell_index].append(None)
+
                 save.cell_coordinates_tracked_z(_experiment, _series, _group, _cell_coordinates)
 
 

@@ -10,7 +10,7 @@ def main():
     for _experiment in paths.folders(paths.OBJECTS):
         print('Experiment', _experiment)
         for _series in paths.folders(paths.objects(_experiment)):
-            print('Series', _series)
+            print(_series)
             _series_data = load.objects_series_file_data(_experiment, _series)
             _cell_coordinates = [[_coordinates] for _coordinates in _series_data[0]]
             for _tp in _series_data[1:]:
@@ -29,6 +29,7 @@ def main():
                         )
                     else:
                         _cell_coordinates[_cell_index].append(None)
+
             save.cell_coordinates_tracked(_experiment, _series, _cell_coordinates)
 
 
