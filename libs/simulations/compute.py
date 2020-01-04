@@ -30,33 +30,39 @@ def roi_fibers_density(_simulation, _time_point, _roi):
     return _roi_sum / _roi_size
 
 
+def roi_fibers_density_time_point(_simulation, _length_x, _length_y, _offset_x, _offset_y, _cell_id, _direction, _time_point, _simulation_properties=None):
+    _simulation_properties = _simulation_properties if _simulation_properties is not None else properties(_simulation)
+    _time_point_properties = _simulation_properties['time_points'][_time_point]
+    _time_point_fibers_densities = fibers_densities(_simulation, _time_point)
+    _time_point_roi = roi(
+        _length_x=_length_x,
+        _length_y=_length_y,
+        _offset_x=_offset_x,
+        _offset_y=_offset_y,
+        _cell_coordinates=_time_point_properties[_cell_id]['coordinates'],
+        _cell_diameter=_time_point_properties[_cell_id]['diameter'],
+        _direction='right' if
+        (_cell_id, _direction) == ('left_cell', 'inside') or
+        (_cell_id, _direction) == ('right_cell', 'outside') or
+        (_cell_id, _direction) == ('cell', 'right') else 'left'
+    )
+    if _time_point_roi in _time_point_fibers_densities:
+        return _time_point_fibers_densities[_time_point_roi]
+    else:
+        print('Computing:', _simulation, _cell_id, 'roi', _time_point_roi, 'direction', _direction, 'tp', _time_point)
+        _roi_fibers_density = roi_fibers_density(_simulation, _time_point, _time_point_roi)
+        _time_point_fibers_densities[_time_point_roi] = _roi_fibers_density
+        save.fibers_densities(_simulation, _time_point, _time_point_fibers_densities)
+        return _roi_fibers_density
+
+
 def roi_fibers_density_by_time(_simulation, _length_x, _length_y, _offset_x, _offset_y, _cell_id, _direction, _time_points):
     _simulation_properties = properties(_simulation)
-    _fibers_densities = []
-    for _time_point in range(min(_time_points, len(_simulation_properties['time_points']))):
-        _time_point_properties = _simulation_properties['time_points'][_time_point]
-        _time_point_roi = roi(
-            _length_x=_length_x,
-            _length_y=_length_y,
-            _offset_x=_offset_x,
-            _offset_y=_offset_y,
-            _cell_coordinates=_time_point_properties[_cell_id]['coordinates'],
-            _cell_diameter=_time_point_properties[_cell_id]['diameter'],
-            _direction='right' if
-            (_cell_id, _direction) == ('left_cell', 'inside') or
-            (_cell_id, _direction) == ('right_cell', 'outside') else 'left'
-        )
-        _time_point_fibers_densities = fibers_densities(_simulation, _time_point)
-        if _time_point_roi in _time_point_fibers_densities:
-            _fibers_densities.append(_time_point_fibers_densities[_time_point_roi])
-        else:
-            print('Computing:', _simulation, _cell_id, 'roi', _time_point_roi, 'direction', _direction, 'tp', _time_point)
-            _roi_fibers_density = roi_fibers_density(_simulation, _time_point, _time_point_roi)
-            _time_point_fibers_densities[_time_point_roi] = _roi_fibers_density
-            save.fibers_densities(_simulation, _time_point, _time_point_fibers_densities)
-            _fibers_densities.append(_roi_fibers_density)
-
-    return _fibers_densities
+    return [
+        roi_fibers_density_time_point(
+            _simulation, _length_x, _length_y, _offset_x, _offset_y, _cell_id, _direction, _time_point, _simulation_properties
+        ) for _time_point in range(min(_time_points, len(_simulation_properties['time_points'])))
+    ]
 
 
 def pairs_roi_fibers_density_by_time(_simulation, _length_x, _length_y, _offset_x, _offset_y, _direction, _time_points):
@@ -99,7 +105,7 @@ def roi(_length_x, _length_y, _offset_x, _offset_y, _cell_coordinates, _cell_dia
     if _direction == 'right':
         _x1 = round(_cell_coordinates['x'] + _cell_diameter / 2 + _offset_x, 10)
     elif _direction == 'left':
-        _x1 = round(_cell_coordinates['x'] - _cell_diameter / 2 - _length_x, 10)
+        _x1 = round(_cell_coordinates['x'] - _cell_diameter / 2 - _offset_x - _length_x, 10)
     else:
         raise Exception('No such direction ' + _direction)
     _x2 = round(_x1 + _length_x, 10)
