@@ -4,13 +4,13 @@ import time
 import numpy as np
 
 from libs.simulations import load, filtering, compute, paths
-from libs.simulations.config import ROI_WIDTH, ROI_HEIGHT
+from libs.simulations.config import ROI_WIDTH, ROI_HEIGHT, CELL_DIAMETER
 from plotting import scatter, save
 
 TIME_POINT = 50
 OFFSET_X_START = 0
-OFFSET_X_END = 0.14
-OFFSET_X_STEP = 0.02
+OFFSET_X_END = 0.3
+OFFSET_X_STEP = 0.01
 OFFSET_Y = 0
 
 
@@ -61,7 +61,7 @@ def main():
 
     # TODO: Change to Z score
     _fig = scatter.create_error_bars_plot(
-        _x_array=[np.arange(start=OFFSET_X_START, stop=OFFSET_X_END, step=OFFSET_X_STEP)],
+        _x_array=[np.arange(start=OFFSET_X_START, stop=OFFSET_X_END, step=OFFSET_X_STEP) / CELL_DIAMETER],
         _y_array=[_fibers_densities],
         _names_array=['Time-Point Last'],
         _mode_array=['lines+markers'],
