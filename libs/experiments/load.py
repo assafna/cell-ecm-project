@@ -7,6 +7,10 @@ def time_point_file_name_to_number(_time_point_file_name):
     return int(str(_time_point_file_name.split('tp_')[1]).split('.')[0])
 
 
+def series_file_name_to_name(_series_file_name):
+    return 'Series ' + str(str(_series_file_name.split('series_')[1]).split('.')[0])
+
+
 def objects_time_point_file_data(_experiment, _series, _time_point):
     _file_path = paths.objects(_experiment, _series, _time_point)
     try:
@@ -186,36 +190,7 @@ def normalization_series_file_data(_experiment, _series):
     return _average, _std
 
 
-def objects_file_names(_experiment, _series):
-    _experiment_path = paths.objects(_experiment)
-    _series_path = os.path.join(_experiment_path)
-
-
-def serieses(_experiment_path):
-    return [_series for _series in os.listdir(_experiment_path) if
-            os.path.isdir(os.path.join(_experiment_path, _series)) and _series.startswith('Series')]
-
-
-def group_normalization(_series_path, _group):
-    _group_path = os.path.join(_series_path, _group)
-    return fibers_density_time_point_file_data(_group_path)[0]
-
-
-def series_normalization(_experiment_path, _series):
-    _series_path = os.path.join(_experiment_path, _series)
-    _series_groups = [_group for _group in os.listdir(_series_path) if _group.startswith('cell')]
-    _series_data = {}
-    for _group in _series_groups:
-        _series_data[str(_group.split('.')[0])] = group_normalization(_series_path, _group)
-
-    return _series_data
-
-
-def experiment_normalization(_experiment):
-    _experiment_path = paths.normalization(_experiment)
-    _experiment_serieses = serieses(_experiment_path)
-    _experiment_data = {}
-    for _series in _experiment_serieses:
-        _experiment_data[_series] = series_normalization(_experiment_path, _series)
-
-    return _experiment_data
+def normalization_experiment_file_data(_experiment):
+    return {series_file_name_to_name(_series):
+            normalization_series_file_data(_experiment, series_file_name_to_name(_series)) for
+            _series in paths.text_files(paths.normalization(_experiment))}

@@ -9,17 +9,16 @@ def per_cell(_experiment_fibers_density, _experiment_normalization):
     _experiment_fibers_density_per_cell = {}
     for _series in _experiment_fibers_density:
         _series_fibers_density = _experiment_fibers_density[_series]
-        _series_normalization = _experiment_normalization[_series]
+        _normalization = _experiment_normalization[_series]
         _series_fibers_density_per_cell = {}
         for _group in _series_fibers_density:
             _group_fibers_density = _series_fibers_density[_group]
-            _group_normalization = _series_normalization[_group]
             _cell_name = str(_group.split('_degree')[0])
             if _cell_name not in _series_fibers_density_per_cell:
                 _series_fibers_density_per_cell[_cell_name] = []
             for _z_group in _group_fibers_density:
                 _z_group_fibers_density = _group_fibers_density[_z_group]
-                _fibers_density_normalized = z_score_fibers_density_array(_z_group_fibers_density, _group_normalization)
+                _fibers_density_normalized = z_score_fibers_density_array(_z_group_fibers_density, _normalization)
                 _cut_left = fibers_density_cut_left_edge(_fibers_density_normalized)
                 _series_fibers_density_per_cell[_cell_name].append(_cut_left)
         _experiment_fibers_density_per_cell[_series] = _series_fibers_density_per_cell
@@ -104,7 +103,7 @@ def plot_average(_experiment, _fibers_density_per_cell_averages):
             'dash'
         ],
         _x_axis_title='Distance from Left Cell (cell size)',
-        _y_axis_title='Normalized Fibers Density Change (%)',
+        _y_axis_title='Fibers Density Z-score',
         _title=_experiment + ' - TP First vs. Last'
     )
 
@@ -112,7 +111,7 @@ def plot_average(_experiment, _fibers_density_per_cell_averages):
         _fig=_fig,
         _color='black',
         _width=2,
-        _range=[-0.15, 1.5]
+        _range=[0, 25]
     )
 
     save.to_html(
@@ -144,7 +143,7 @@ def plot_deltas_average(_experiment, _fibers_density_per_cell_averages):
         _mode_array=['lines+markers'],
         _dash_array=['solid'],
         _x_axis_title='Distance from Left Cell (cell size)',
-        _y_axis_title='Normalized Fibers Density Change (%)',
+        _y_axis_title='Fibers Density Z-score',
         _title=_experiment + ' - TP First vs. Last - Deltas'
     )
 
@@ -152,7 +151,7 @@ def plot_deltas_average(_experiment, _fibers_density_per_cell_averages):
         _fig=_fig,
         _color='black',
         _width=2,
-        _range=[-0.15, 1.5]
+        _range=[0, 25]
     )
 
     save.to_html(
@@ -162,11 +161,16 @@ def plot_deltas_average(_experiment, _fibers_density_per_cell_averages):
     )
 
 
-if __name__ == '__main__':
+def main():
+    # TODO: improve it like the others
     for experiment in config.SINGLE_CELL:
         experiment_fibers_density = load.fibers_density_experiment_file_data(experiment)
-        experiment_normalization = load.experiment_normalization(experiment)
+        experiment_normalization = load.normalization_experiment_file_data(experiment)
         fibers_density_per_cell = per_cell(experiment_fibers_density, experiment_normalization)
         fibers_density_per_cell_averages = all_directions_average(fibers_density_per_cell)
         plot_average(experiment, fibers_density_per_cell_averages)
         plot_deltas_average(experiment, fibers_density_per_cell_averages)
+
+
+if __name__ == '__main__':
+    main()
