@@ -5,3 +5,5 @@ SINGLE_CELL = [
 PAIRS = [
     'SN16_CZI'
 ]
+
+MAX_DISTANCE_CHANGE = 20
