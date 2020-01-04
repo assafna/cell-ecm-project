@@ -3,6 +3,10 @@ import os
 from libs.experiments import paths
 
 
+def time_point_file_name_to_number(_time_point_file_name):
+    return int(str(_time_point_file_name.split('tp_')[1]).split('.')[0])
+
+
 def objects_time_point_file_data(_experiment, _series, _time_point):
     _file_path = paths.objects(_experiment, _series, _time_point)
     try:
@@ -24,7 +28,7 @@ def objects_time_point_file_data(_experiment, _series, _time_point):
 def objects_series_file_data(_experiment, _series):
     _objects_by_time = list([None] * len(paths.text_files(paths.objects(_experiment, _series))))
     for _time_point_file in paths.text_files(paths.objects(_experiment, _series)):
-        _time_point = int(str(_time_point_file.split('tp_')[1]).split('.')[0]) - 1
+        _time_point = time_point_file_name_to_number(_time_point_file)
         _objects_by_time[_time_point] = objects_time_point_file_data(_experiment, _series, _time_point_file)
 
     return _objects_by_time
@@ -56,7 +60,7 @@ def objects_z_time_point_file_data(_experiment, _series, _group, _time_point):
 def objects_z_group_file_data(_experiment, _series, _group):
     _objects_by_time = list([None] * len(paths.text_files(paths.objects_z(_experiment, _series, _group))))
     for _time_point_file in paths.text_files(paths.objects_z(_experiment, _series, _group)):
-        _time_point = int(str(_time_point_file.split('tp_')[1]).split('.')[0]) - 1
+        _time_point = time_point_file_name_to_number(_time_point_file)
         _objects_by_time[_time_point] = objects_z_time_point_file_data(_experiment, _series, _group, _time_point_file)
 
     return _objects_by_time
@@ -149,7 +153,8 @@ def fibers_density_time_point_file_data(_experiment, _series, _group, _z_group, 
 
 
 def fibers_density_z_group_file_data(_experiment, _series, _group, _z_group):
-    return {_time_point: fibers_density_time_point_file_data(_experiment, _series, _group, _z_group, _time_point) for
+    return {time_point_file_name_to_number(_time_point):
+            fibers_density_time_point_file_data(_experiment, _series, _group, _z_group, _time_point) for
             _time_point in paths.text_files(paths.fibers_density(_experiment, _series, _group, _z_group))}
 
 
@@ -168,9 +173,17 @@ def fibers_density_experiment_file_data(_experiment):
             _series in paths.folders(paths.fibers_density(_experiment))}
 
 
-def normalization_file_data(_experiment, _series):
-    # TODO: create it
-    return False
+def normalization_series_file_data(_experiment, _series):
+    _file_path = paths.normalization(_experiment, _series)
+    try:
+        with open(_file_path, 'r') as _file:
+            _lines = _file.readlines()
+            _line = _lines[0].split()
+            _average, _std = float(_line[0]), float(_line[1])
+    finally:
+        _file.close()
+
+    return _average, _std
 
 
 def objects_file_names(_experiment, _series):

@@ -8,12 +8,12 @@ def create_plot(_x_labels, _y_labels, _z_array, _x_axis_title, _y_axis_title, _c
             y=_y_labels,
             z=_z_array,
             colorscale=_color_scale,
-            colorbar=dict(
-                tickformat=',.0%'
-            ),
+            # colorbar=dict(
+            #     tickformat=',.0%'
+            # ),
             showscale=_show_scale,
             zmin=0,
-            zmax=1
+            zmax=20
         )
     )
 

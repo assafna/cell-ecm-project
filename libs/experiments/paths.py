@@ -20,6 +20,10 @@ NORMALIZATION = os.path.join(OUTPUTS, 'Normalization')
 PLOTS = os.path.join(OUTPUTS, 'Plots')
 
 
+def get_series_text_file_name(_series):
+    return 'series_' + str(_series.split()[1]) + '.txt'
+
+
 def folders(_path):
     return [_folder for _folder in os.listdir(_path) if os.path.isdir(os.path.join(_path, _folder))]
 
@@ -129,7 +133,7 @@ def normalization(_experiment, _series=None):
     if _series is None:
         return _experiment_path
 
-    return os.path.join(_experiment_path, _series)
+    return os.path.join(_experiment_path, get_series_text_file_name(_series))
 
 
 def plots(_experiment, _series=None, _group=None, _z_group=None):

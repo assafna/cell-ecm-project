@@ -1,7 +1,7 @@
 import numpy as np
 
 from plotting import save, scatter
-from libs.experiments.compute import normalized_fibers_density, fibers_density_cut_left_edge
+from libs.experiments.compute import z_score_fibers_density_array, fibers_density_cut_left_edge
 from libs.experiments import config, load, paths
 
 
@@ -19,7 +19,7 @@ def per_cell(_experiment_fibers_density, _experiment_normalization):
                 _series_fibers_density_per_cell[_cell_name] = []
             for _z_group in _group_fibers_density:
                 _z_group_fibers_density = _group_fibers_density[_z_group]
-                _fibers_density_normalized = normalized_fibers_density(_z_group_fibers_density, _group_normalization)
+                _fibers_density_normalized = z_score_fibers_density_array(_z_group_fibers_density, _group_normalization)
                 _cut_left = fibers_density_cut_left_edge(_fibers_density_normalized)
                 _series_fibers_density_per_cell[_cell_name].append(_cut_left)
         _experiment_fibers_density_per_cell[_series] = _series_fibers_density_per_cell
