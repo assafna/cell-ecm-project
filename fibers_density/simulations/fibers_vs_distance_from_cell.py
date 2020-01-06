@@ -15,7 +15,6 @@ OFFSET_Y = 0
 
 
 def main():
-    _time = time.strftime('%Y_%m_%d-%H_%M_%S')
     _simulations = load.structured()
     _simulations = filtering.by_categories(
         _simulations,
@@ -74,7 +73,7 @@ def main():
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        _filename=_time
+        _filename='plot'
     )
 
 

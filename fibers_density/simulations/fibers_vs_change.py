@@ -18,7 +18,6 @@ DIRECTION = 'inside'
 
 
 def main():
-    _time = time.strftime('%Y_%m_%d-%H_%M_%S')
     _simulations = load.structured()
     _simulations = filtering.by_categories(
         _simulations,
@@ -67,7 +66,7 @@ def main():
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        _filename=DIRECTION + '_points_' + _time
+        _filename=DIRECTION + '_points'
     )
 
     # line of best fit
@@ -94,7 +93,7 @@ def main():
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        _filename=DIRECTION + '_best_fit_' + _time
+        _filename=DIRECTION + '_best_fit'
     )
 
 

@@ -1,7 +1,11 @@
 import os
 
 import inspect
+import time
+
 import plotly
+
+from libs.simulations import paths
 
 
 def div_to_website(_div, _filepath):
@@ -36,9 +40,20 @@ def to_html(_fig, _path, _filename):
         include_plotlyjs=False
     )
 
+    # regular save
     div_to_website(
         _div=_div,
         _filepath=os.path.join(_path, _filename)
+    )
+
+    # backup
+    _time = time.strftime('%Y_%m_%d-%H_%M_%S')
+    _backup_path = os.path.join(paths.PLOTS_HISTORY, os.path.basename(os.path.normpath(_path)))
+    os.makedirs(_backup_path, exist_ok=True)
+    _backup_filename = _filename + '-' + _time
+    div_to_website(
+        _div=_div,
+        _filepath=os.path.join(_backup_path, _backup_filename)
     )
 
     print('Saved plot:', _filename)
