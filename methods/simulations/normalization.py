@@ -20,8 +20,9 @@ CELLS_ZONE_Y_END = CELL_DIAMETER / 2
 def process_simulation(_simulation, _overwrite=False):
     _start_time = time.time()
 
-    _simulation_structured_path = paths.structured(_simulation)
-    os.makedirs(_simulation_structured_path) if not os.path.isdir(_simulation_structured_path) else None
+    _normalization_pickle_path = os.path.join(paths.NORMALIZATION, _simulation + '.pkl')
+    if not _overwrite and os.path.isfile(_normalization_pickle_path):
+        return
 
     _fibers_densities = []
     _offsets_x = list(np.arange(OFFSET_X_START, OFFSET_X_END - ROI_WIDTH, STEP))
@@ -51,6 +52,8 @@ def process_simulation(_simulation, _overwrite=False):
     }
     save.normalization(_simulation, _normalization)
 
+    print(_simulation, 'Finished!', 'Total ' + str(round(time.time() - _start_time, 2)) + ' seconds')
+
 
 def process_simulations(_simulations, _overwrite=False):
     _arguments = [(_simulation, _overwrite) for _simulation in _simulations]
@@ -64,5 +67,4 @@ def process_all_simulations(_overwrite=False):
 
 
 if __name__ == '__main__':
-    process_simulation(_simulation='3D_1')
-    # process_all_simulations()
+    process_all_simulations()
