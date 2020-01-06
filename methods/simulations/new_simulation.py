@@ -148,4 +148,5 @@ def process_all_simulations(_overwrite=False):
     process_simulations(libs.simulations.load.raw(), _overwrite)
 
 
-process_all_simulations()
+if __name__ == '__main__':
+    process_all_simulations()

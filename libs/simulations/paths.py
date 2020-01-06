@@ -13,6 +13,7 @@ OUTPUTS = os.path.join(SIMULATIONS, 'Outputs')
 STRUCTURED = os.path.join(MANIPULATIONS, 'Structured')
 FIBERS_LENGTHS = os.path.join(MANIPULATIONS, 'Fibers Lengths')
 FIBERS_DENSITIES = os.path.join(MANIPULATIONS, 'Fibers Densities')
+NORMALIZATION = os.path.join(MANIPULATIONS, 'Normalization')
 PLOTS = os.path.join(OUTPUTS, 'Plots')
 RESULTS = os.path.join(OUTPUTS, 'Results')
 
@@ -31,6 +32,10 @@ def fibers_lengths(_simulation):
 
 def fibers_densities(_simulation):
     return os.path.join(FIBERS_DENSITIES, _simulation)
+
+
+def normalization(_simulation):
+    return os.path.join(NORMALIZATION, _simulation)
 
 
 def plots(_simulation):
