@@ -3,6 +3,23 @@ import os
 from libs.experiments import paths
 
 
+def fibers_density_dictionary(_experiments):
+    _dictionary = {}
+    for _experiment in _experiments:
+        for _series in paths.folders(paths.fibers_density(_experiment)):
+            for _group in paths.folders(paths.fibers_density(_experiment, _series)):
+                for _z_group in paths.folders(paths.fibers_density(_experiment, _series, _group)):
+                    if _experiment not in _dictionary:
+                        _dictionary[_experiment] = {}
+                    if _series not in _dictionary[_experiment]:
+                        _dictionary[_experiment][_series] = {}
+                    if _group not in _dictionary[_experiment][_series]:
+                        _dictionary[_experiment][_series][_group] = []
+                    _dictionary[_experiment][_series][_group].append(_z_group)
+
+    return _dictionary
+
+
 def time_point_file_name_to_number(_time_point_file_name):
     return int(str(_time_point_file_name.split('tp_')[1]).split('.')[0])
 
