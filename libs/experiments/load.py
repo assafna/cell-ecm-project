@@ -1,3 +1,4 @@
+import json
 import os
 
 from libs.experiments import paths
@@ -28,16 +29,13 @@ def series_file_name_to_name(_series_file_name):
     return 'Series ' + str(str(_series_file_name.split('series_')[1]).split('.')[0])
 
 
-def information_file_data(_experiment, _series):
-    _file_path = paths.information(_experiment, _series)
+def image_properties(_experiment, _series):
+    _file_path = paths.image_properties(_experiment, _series.split()[1])
     try:
-        _lines = None
-        with open(_file_path) as _f:
-            _lines = _f.readlines()
+        with open(_file_path) as _json:
+            return json.load(_json)
     finally:
-        _f.close()
-
-    return _lines
+        _json.close()
 
 
 def objects_time_point_file_data(_experiment, _series, _time_point):
