@@ -11,6 +11,18 @@ def series_file_name_to_name(_series_file_name):
     return 'Series ' + str(str(_series_file_name.split('series_')[1]).split('.')[0])
 
 
+def information_file_data(_experiment, _series):
+    _file_path = paths.information(_experiment, _series)
+    try:
+        _lines = None
+        with open(_file_path) as _f:
+            _lines = _f.readlines()
+    finally:
+        _f.close()
+
+    return _lines
+
+
 def objects_time_point_file_data(_experiment, _series, _time_point):
     _file_path = paths.objects(_experiment, _series, _time_point)
     try:
@@ -86,7 +98,8 @@ def cell_coordinates_tracked_series_file_data(_experiment, _series):
         _cells = []
         with open(_file_path) as _f:
             _lines = _f.readlines()
-            for _line in _lines[1:]:
+            for _line in _lines:
+                _line = _line.replace('\n', '')
                 _line = _line.split('\t')
                 _coordinates_by_time = []
                 for _coordinates in _line:

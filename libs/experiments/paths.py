@@ -9,6 +9,7 @@ MANIPULATIONS = os.path.join(EXPERIMENTS, 'Manipulations')
 OUTPUTS = os.path.join(EXPERIMENTS, 'Outputs')
 
 # Outputs
+INFORMATION = os.path.join(OUTPUTS, 'Information')
 OBJECTS = os.path.join(OUTPUTS, 'Objects')
 OBJECTS_Z = os.path.join(OUTPUTS, 'Objects Z')
 CELL_COORDINATES_TRACKED = os.path.join(OUTPUTS, 'Cell Coordinates Tracked')
@@ -30,6 +31,15 @@ def folders(_path):
 
 def text_files(_path):
     return [_file for _file in os.listdir(_path) if _file.endswith('.txt')]
+
+
+def information(_experiment, _series=None):
+    _experiment_path = os.path.join(INFORMATION, _experiment)
+
+    if _series is None:
+        return _experiment_path
+
+    return os.path.join(_experiment_path, _series)
 
 
 def objects(_experiment, _series=None, _time_point=None):
