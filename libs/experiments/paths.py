@@ -9,6 +9,7 @@ MANIPULATIONS = os.path.join(EXPERIMENTS, 'Manipulations')
 OUTPUTS = os.path.join(EXPERIMENTS, 'Outputs')
 
 # Outputs
+IMAGE_PROPERTIES = os.path.join(OUTPUTS, 'Image Properties')
 INFORMATION = os.path.join(OUTPUTS, 'Information')
 OBJECTS = os.path.join(OUTPUTS, 'Objects')
 OBJECTS_Z = os.path.join(OUTPUTS, 'Objects Z')
@@ -31,6 +32,24 @@ def folders(_path):
 
 def text_files(_path):
     return [_file for _file in os.listdir(_path) if _file.endswith('.txt')]
+
+
+def tif(_experiment, _series=None):
+    _experiment_path = os.path.join(MANIPULATIONS, _experiment)
+
+    if _series is None:
+        return _experiment_path
+
+    return os.path.join(_experiment_path, _series)
+
+
+def image_properties(_experiment, _series=None):
+    _experiment_path = os.path.join(IMAGE_PROPERTIES, _experiment)
+
+    if _series is None:
+        return _experiment_path
+
+    return os.path.join(_experiment_path, _series)
 
 
 def information(_experiment, _series=None):

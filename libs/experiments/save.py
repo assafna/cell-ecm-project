@@ -1,3 +1,4 @@
+import json
 import os
 
 from libs.experiments import paths
@@ -48,3 +49,11 @@ def normalization_line(_experiment, _series, _line):
             _f.write(str(_line[0]) + '\t' + str(_line[1]) + '\t' + str(_line[2]) + '\t' + str(_line[3]))
     finally:
         _f.close()
+
+
+def image_properties(_experiment, _series_id, _image_properties):
+    _experiment_path = paths.image_properties(_experiment)
+    os.mkdir(_experiment_path) if not os.path.isdir(_experiment_path) else None
+    _path = os.path.join(_experiment_path, 'series_' + str(_series_id) + '.json')
+    with open(_path, 'w') as _json:
+        json.dump(_image_properties, _json, indent=4)
