@@ -1,3 +1,5 @@
+import random
+
 import numpy as np
 from scipy.stats import wilcoxon
 
@@ -5,10 +7,10 @@ from libs import compute_lib
 from libs.experiments import load, config, filtering, organize, compute
 
 MINIMUM_TIME_POINTS = 15
-WINDOW_OFFSET = 5
+WINDOW_OFFSET = 4
 DERIVATIVE = 1
-CELLS_DISTANCE_MIN = 7.0
-CELLS_DISTANCE_MAX = 9.0
+CELLS_DISTANCE_MIN = 6.5
+CELLS_DISTANCE_MAX = 7.5
 
 
 def main():
@@ -18,6 +20,7 @@ def main():
         _experiments, _min_distance=CELLS_DISTANCE_MIN, _max_distance=CELLS_DISTANCE_MAX
     )
     _experiments = organize.by_tuples(_experiments)
+    # random.shuffle(_experiments)
     _same_correlations_array = []
     _different_correlations_array = []
     for _same_index in range(len(_experiments)):

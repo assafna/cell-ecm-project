@@ -30,7 +30,7 @@ def series_file_name_to_name(_series_file_name):
 
 
 def image_properties(_experiment, _series):
-    _file_path = paths.image_properties(_experiment, _series.split()[1])
+    _file_path = paths.image_properties(_experiment, 'series_' + str(_series.split()[1]) + '.json')
     try:
         with open(_file_path) as _json:
             return json.load(_json)
@@ -142,7 +142,8 @@ def cell_coordinates_tracked_z_group_file_data(_experiment, _series, _group):
         _cells = []
         with open(_file_path) as _f:
             _lines = _f.readlines()
-            for _line in _lines[1:]:
+            for _line in _lines:
+                _line = _line.replace('\n', '')
                 _line = _line.split('\t')
                 _coordinates_by_time = []
                 for _coordinates in _line:
