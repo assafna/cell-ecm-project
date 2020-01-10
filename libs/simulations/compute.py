@@ -1,7 +1,7 @@
 import math
 
 from libs.simulations import save
-from libs.compute_lib import two_lines_intersection, is_value_between_values
+from libs.compute_lib import two_lines_intersection, is_value_between_values, roi
 from libs.simulations.config import CELL_DIAMETER, EPSILON, NET_DIMENSIONS
 from libs.simulations.load import elements, fibers_lengths, intersections, properties, fibers_densities
 
@@ -166,20 +166,6 @@ def cells_distance(_properties):
 
 def is_in_region(_x, _y, _roi):
     return _roi[0] - EPSILON <= _x <= _roi[2] + EPSILON and _roi[1] - EPSILON <= _y <= _roi[3] + EPSILON
-
-
-def roi(_length_x, _length_y, _offset_x, _offset_y, _cell_coordinates, _cell_diameter, _direction):
-    if _direction == 'right':
-        _x1 = round(_cell_coordinates['x'] + _cell_diameter / 2 + _offset_x, 10)
-    elif _direction == 'left':
-        _x1 = round(_cell_coordinates['x'] - _cell_diameter / 2 - _offset_x - _length_x, 10)
-    else:
-        raise Exception('No such direction ' + _direction)
-    _x2 = round(_x1 + _length_x, 10)
-    _y1 = round(_cell_coordinates['y'] - _length_y / 2 + _offset_y, 10)
-    _y2 = round(_y1 + _length_y, 10)
-
-    return _x1, _y1, _x2, _y2
 
 
 def line(_x1, _y1, _x2, _y2):
