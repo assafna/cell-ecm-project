@@ -38,13 +38,17 @@ def angle_between_three_points(_a, _b, _c):
 
 
 def rotate_point_around_another_point(_point, _angle_in_radians, _around_point):
-    _x, _y = _point
+    _z = None
+    if len(_point) == 3:
+        _x, _y, _z = _point
+    else:
+        _x, _y = _point
     _offset_x, _offset_y = _around_point
     _adjusted_x = (_x - _offset_x)
     _adjusted_y = (_y - _offset_y)
     _cos_rad = math.cos(_angle_in_radians)
     _sin_rad = math.sin(_angle_in_radians)
-    _qx = _offset_x + _cos_rad * _adjusted_x + _sin_rad * _adjusted_y
-    _qy = _offset_y + -_sin_rad * _adjusted_x + _cos_rad * _adjusted_y
+    _qx = int(round(_offset_x + _cos_rad * _adjusted_x + _sin_rad * _adjusted_y))
+    _qy = int(round(_offset_y + -_sin_rad * _adjusted_x + _cos_rad * _adjusted_y))
 
-    return _qx, _qy
+    return [_qx, _qy, _z] if len(_point) == 3 else [_qx, _qy]

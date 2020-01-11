@@ -43,12 +43,12 @@ def roi(_length_x, _length_y, _offset_x, _offset_y, _cell_coordinates, _cell_dia
     return _x1, _y1, _x2, _y2
 
 
-def roi_by_microns(_resolution, _length_x, _length_y, _offset_x, _offset_y, _cell_coordinates, _direction):
-    _cell_diameter_in_pixels = CELL_DIAMETER_IN_MICRONS / _resolution
-    _length_x_in_pixels = _length_x / _resolution
-    _length_y_in_pixels = _length_y / _resolution
-    _offset_x_in_pixels = _offset_x / _resolution
-    _offset_y_in_pixels = _offset_y / _resolution
+def roi_by_microns(_resolution_x, _resolution_y, _length_x, _length_y, _offset_x, _offset_y, _cell_coordinates, _direction):
+    _cell_diameter_in_pixels = CELL_DIAMETER_IN_MICRONS / _resolution_x
+    _length_x_in_pixels = _length_x / _resolution_x
+    _length_y_in_pixels = _length_y / _resolution_y
+    _offset_x_in_pixels = _offset_x / _resolution_x
+    _offset_y_in_pixels = _offset_y / _resolution_y
 
     return roi(
         _length_x=_length_x_in_pixels,
