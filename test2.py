@@ -20,19 +20,15 @@ def main():
     _image = tifffile.imread(
         'G:\My Drive\BGU\Thesis\Cell-ECM & Cell-ECM-Cell Project\Data\Experiments\Manipulations\SN16_CZI\Series 1\series_1_bc.tif')
     _cell_coordinates_tracked = load.cell_coordinates_tracked_series_file_data(_experiment, 'series_' + str(_series.split()[1]) + '.txt')
-    _width = _image[0][0][0].shape[1]
-    _height = _image[0][0][0].shape[0]
-    _diagonal = math.sqrt(_width**2 + _height**2)
-    _padding_x = int(round((_diagonal - _width) / 2))
-    _padding_y = int(round((_diagonal - _height) / 2))
+
     _cell_3 = [
-        int(round(_cell_coordinates_tracked[2][0][0])) + _padding_x,
-        int(round(_cell_coordinates_tracked[2][0][1])) + _padding_y,
+        int(round(_cell_coordinates_tracked[2][0][0])),
+        int(round(_cell_coordinates_tracked[2][0][1])),
         int(round(_cell_coordinates_tracked[2][0][2])),
     ]
     _cell_4 = [
-        int(round(_cell_coordinates_tracked[3][0][0])) + _padding_x,
-        int(round(_cell_coordinates_tracked[3][0][1])) + _padding_y,
+        int(round(_cell_coordinates_tracked[3][0][0])),
+        int(round(_cell_coordinates_tracked[3][0][1])),
         int(round(_cell_coordinates_tracked[3][0][2])),
     ]
     if _cell_3[0] <= _cell_4[0]:
@@ -41,25 +37,50 @@ def main():
     else:
         _c = (_cell_4[0] + 1, _cell_4[1])
         _angle = compute.angle_between_three_points(_cell_3, _cell_4, _c)
-    _image_tp_fibres = np.array([rotate(np.pad(_z[0], pad_width=((_padding_y, _padding_y), (_padding_x, _padding_x))), _angle, reshape=False) for _z in _image[0]])
+
+    # get padding
+    _image_zeros = np.zeros(_image[0][0][0].shape)
+    _image_zeros_rotated = rotate(_image_zeros, _angle)
+    _padding_y = int((_image_zeros_rotated.shape[0] - _image_zeros.shape[0]) / 2)
+    _padding_x = int((_image_zeros_rotated.shape[1] - _image_zeros.shape[1]) / 2)
+
+    _cell_3 = [
+        int(round(_cell_coordinates_tracked[2][0][0])) + _padding_x,
+        int(round(_cell_coordinates_tracked[2][0][1])) + _padding_y,
+        int(round(_cell_coordinates_tracked[2][0][2]))
+    ]
+    _cell_4 = [
+        int(round(_cell_coordinates_tracked[3][0][0])) + _padding_x,
+        int(round(_cell_coordinates_tracked[3][0][1])) + _padding_y,
+        int(round(_cell_coordinates_tracked[3][0][2]))
+    ]
+    _image_tp_fibres = np.array([rotate(_z[0], _angle) for _z in _image[0]])
+
+    plt.imshow(_image_tp_fibres[20])
+    plt.show()
+    print('hi')
 
     # rotate along the z
     _new_image = np.swapaxes(_image_tp_fibres, 0, 1)
 
     # get new coordinates
-    _image_center = ((_image[0][0][0].shape[0] + _padding_y * 2) / 2, (_image[0][0][0].shape[1] + _padding_x * 2) / 2)
+    _image_center = (_image_tp_fibres[0].shape[0] / 2, _image_tp_fibres[0].shape[1] / 2)
     _cell_3_new_coordinates = compute.rotate_point_around_another_point(_cell_3, math.radians(_angle), _image_center)
     _cell_4_new_coordinates = compute.rotate_point_around_another_point(_cell_4, math.radians(_angle), _image_center)
     _cell_3_new_x = _cell_3_new_coordinates[0]
     _cell_3_new_y = _cell_3_new_coordinates[2]
     _cell_3_new_z = int((_cell_3_new_coordinates[1] + _cell_4_new_coordinates[1]) / 2)
-    # _new_image[_cell_3_new_z][_cell_3_new_y][_cell_3_new_x] = 255
+    _new_image[_cell_3_new_z][_cell_3_new_y][_cell_3_new_x] = 255
     _cell_4_new_x = _cell_4_new_coordinates[0]
     _cell_4_new_y = _cell_4_new_coordinates[2]
     _cell_4_new_z = _cell_3_new_z
     _res_x = 0.41513
     _res_y = 2.0
     _res_z = 0.41513
+
+    plt.imshow(_new_image[_cell_3_new_z])
+    plt.show()
+    print('hi')
 
     # second rotate
     _width = _new_image[0].shape[1]
