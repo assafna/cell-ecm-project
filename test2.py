@@ -1,4 +1,5 @@
 import math
+from itertools import product
 
 import numpy as np
 from bresenham import bresenham
@@ -17,6 +18,9 @@ def main():
     _group = 'cells_3_4'
     _channel = 0
     _tp = 1
+    _res_x = 0.41513
+    _res_y = 0.41513
+    _res_z = 2.0
     _image = tifffile.imread(
         'G:\My Drive\BGU\Thesis\Cell-ECM & Cell-ECM-Cell Project\Data\Experiments\Manipulations\SN16_CZI\Series 1\series_1_bc.tif')
     _cell_coordinates_tracked = load.cell_coordinates_tracked_series_file_data(_experiment, 'series_' + str(_series.split()[1]) + '.txt')
@@ -64,66 +68,81 @@ def main():
     _new_image = np.swapaxes(_image_tp_fibres, 0, 1)
 
     # get new coordinates
-    _image_center = (_image_tp_fibres[0].shape[0] / 2, _image_tp_fibres[0].shape[1] / 2)
+    _image_center = (_image_tp_fibres[0].shape[1] / 2, _image_tp_fibres[0].shape[0] / 2)
     _cell_3_new_coordinates = compute.rotate_point_around_another_point(_cell_3, math.radians(_angle), _image_center)
     _cell_4_new_coordinates = compute.rotate_point_around_another_point(_cell_4, math.radians(_angle), _image_center)
     _cell_3_new_x = _cell_3_new_coordinates[0]
     _cell_3_new_y = _cell_3_new_coordinates[2]
     _cell_3_new_z = int((_cell_3_new_coordinates[1] + _cell_4_new_coordinates[1]) / 2)
-    _new_image[_cell_3_new_z][_cell_3_new_y][_cell_3_new_x] = 255
+    # for _y, _x in product(range(_cell_3_new_y), range(_cell_3_new_x)):
+    #     _new_image[_cell_3_new_z][_y][_x] = 255
     _cell_4_new_x = _cell_4_new_coordinates[0]
     _cell_4_new_y = _cell_4_new_coordinates[2]
     _cell_4_new_z = _cell_3_new_z
-    _res_x = 0.41513
-    _res_y = 2.0
-    _res_z = 0.41513
+    _res_x = _res_x
+    _res_y = _res_z
+    _res_z = _res_y
 
     plt.imshow(_new_image[_cell_3_new_z])
     plt.show()
     print('hi')
 
     # second rotate
-    _width = _new_image[0].shape[1]
-    _height = _new_image[0].shape[0]
-    _diagonal = math.sqrt(_width ** 2 + _height ** 2)
-    _padding_x = int(round((_diagonal - _width) / 2))
-    _padding_y = int(round((_diagonal - _height) / 2))
+    _c = (_cell_3_new_x + 1, _cell_3_new_y)
+    _angle = compute.angle_between_three_points((_cell_4_new_x, _cell_4_new_y), (_cell_3_new_x, _cell_3_new_y), _c)
+
+    # get padding
+    _image_zeros = np.zeros(_new_image[0].shape)
+    _image_zeros_rotated = rotate(_image_zeros, _angle)
+    _padding_y = int((_image_zeros_rotated.shape[0] - _image_zeros.shape[0]) / 2)
+    _padding_x = int((_image_zeros_rotated.shape[1] - _image_zeros.shape[1]) / 2)
     _cell_3_new_x = _cell_3_new_x + _padding_x
     _cell_3_new_y = _cell_3_new_y + _padding_y
     _cell_4_new_x = _cell_4_new_x + _padding_x
     _cell_4_new_y = _cell_4_new_y + _padding_y
-    if _cell_3_new_x <= _cell_4_new_x:
-        _c = (_cell_3_new_x + 1, _cell_3_new_y)
-        _angle = compute.angle_between_three_points((_cell_4_new_x, _cell_4_new_y), (_cell_3_new_x, _cell_3_new_y), _c)
-    else:
-        _c = (_cell_4_new_x + 1, _cell_4_new_y)
-        _angle = compute.angle_between_three_points((_cell_3_new_x, _cell_3_new_y), (_cell_4_new_x, _cell_4_new_y), _c)
-    _rotated_image = np.array([rotate(np.pad(_z, pad_width=((_padding_y, _padding_y), (_padding_x, _padding_x))), _angle, reshape=False) for _z in _new_image])
+    _rotated_image = np.array([rotate(_z, _angle) for _z in _new_image])
 
     # get new coordinates
-    _image_center = ((_new_image[0].shape[0] + _padding_y * 2) / 2, (_new_image[0].shape[1] + _padding_x * 2) / 2)
+    _image_center = (_new_image[0].shape[1] / 2, _new_image[0].shape[0] / 2)
     _cell_3_new_coordinates = compute.rotate_point_around_another_point((_cell_3_new_x, _cell_3_new_y, _cell_3_new_z), math.radians(_angle), _image_center)
     _cell_4_new_coordinates = compute.rotate_point_around_another_point((_cell_4_new_x, _cell_4_new_y, _cell_4_new_z), math.radians(_angle), _image_center)
-    _rotated_image[_cell_3_new_coordinates[2]][_cell_3_new_coordinates[1]][_cell_3_new_coordinates[0]] = 255
-    plt.imshow(_rotated_image[_cell_3_new_coordinates[2]])
+    _fixed_y = int((_cell_3_new_coordinates[1] + _cell_4_new_coordinates[1]) / 2)
+    _cell_3_new_coordinates[1] = _fixed_y
+    _cell_4_new_coordinates[1] = _fixed_y
+    # for _y, _x in product(range(_cell_4_new_coordinates[1]), range(_cell_4_new_coordinates[0])):
+    #     _rotated_image[_cell_4_new_coordinates[2]][_y][_x] = 255
+    plt.imshow(_rotated_image[_cell_4_new_coordinates[2]])
     plt.show()
     print('hi')
 
+    # new resolutions
+    _res_z = _res_z
+    _res_x = (_angle / 90) * _res_y + ((90 - _angle) / 90) * _res_x
+    _res_y = (_angle / 90) * _res_x + ((90 - _angle) / 90) * _res_y
+
+    print('res_y', _res_y)
+    print('res_x', _res_x)
+
     _roi = compute_lib.roi_by_microns(_resolution_x=_res_x, _resolution_y=_res_y, _length_x=CELL_DIAMETER_IN_MICRONS,
                                       _length_y=CELL_DIAMETER_IN_MICRONS / 2, _offset_x=0, _offset_y=0,
-                                      _cell_coordinates=[_cell_3_new_x, _cell_3_new_y], _direction='right')
+                                      _cell_coordinates=[_cell_3_new_coordinates[0], _cell_3_new_coordinates[1]], _direction='right')
     _values = []
     for i in range(int(_roi[0]), int(_roi[2])):
         for j in range(int(_roi[1]), int(_roi[3])):
-            _values.append(_new_image[_cell_3_new_z][j][i])
-            _new_image[_cell_3_new_z][j][i] = 255
+            _values.append(_rotated_image[_cell_3_new_coordinates[2]][j][i])
+            _rotated_image[_cell_3_new_coordinates[2]][j][i] = 255
     print(len(_values), np.mean(_values))
     # for i in range(int(_cell_4_new_y) - 4, int(_cell_4_new_y) + 4):
     #     for j in range(int(_cell_4_new_x) - 4, int(_cell_4_new_x) + 4):
     #         _new_image[_cell_4_new_z][i][j] = 255
-    plt.imshow(_new_image[_cell_4_new_z])
+    plt.imshow(_rotated_image[_cell_3_new_coordinates[-1]])
     plt.show()
     print('hi')
+
+    # properties
+    _properties = {
+
+    }
 
 
 if __name__ == '__main__':
