@@ -1,24 +1,10 @@
+import gzip
 import json
 import os
 
+import pickle
+
 from libs.experiments import paths
-
-
-def fibers_density_dictionary(_experiments):
-    _dictionary = {}
-    for _experiment in _experiments:
-        for _series in paths.folders(paths.fibers_density(_experiment)):
-            for _group in paths.folders(paths.fibers_density(_experiment, _series)):
-                for _z_group in paths.folders(paths.fibers_density(_experiment, _series, _group)):
-                    if _experiment not in _dictionary:
-                        _dictionary[_experiment] = {}
-                    if _series not in _dictionary[_experiment]:
-                        _dictionary[_experiment][_series] = {}
-                    if _group not in _dictionary[_experiment][_series]:
-                        _dictionary[_experiment][_series][_group] = []
-                    _dictionary[_experiment][_series][_group].append(_z_group)
-
-    return _dictionary
 
 
 def time_point_file_name_to_number(_time_point_file_name):
@@ -29,6 +15,15 @@ def series_file_name_to_name(_series_file_name):
     return 'Series ' + str(str(_series_file_name.split('series_')[1]).split('.')[0])
 
 
+def experiment_groups_as_tuples(_experiment):
+    _tuples = []
+    for _series in paths.folders(paths.structured(_experiment)):
+        for _group in paths.folders(paths.structured(_experiment, _series)):
+            _tuples.append((_experiment, int(_series.split()[1]), _group))
+
+    return _tuples
+
+
 def image_properties(_experiment, _series):
     _file_path = paths.image_properties(_experiment, 'series_' + str(_series.split()[1]) + '.json')
     try:
@@ -36,6 +31,24 @@ def image_properties(_experiment, _series):
             return json.load(_json)
     finally:
         _json.close()
+
+
+def group_properties(_experiment, _series_id, _group):
+    _file_path = paths.group_properties(_experiment, 'Series ' + str(_series_id), _group)
+    try:
+        with gzip.open(_file_path, 'rb') as _pickle:
+            return pickle.load(_pickle)
+    finally:
+        _pickle.close()
+
+
+def structured_image(_experiment, _series_id, _group, _time_point):
+    _image_path = paths.structured(_experiment, 'Series ' + str(_series_id), _group, str(_time_point) + '.pkl')
+    try:
+        with gzip.open(_image_path, 'rb') as _pickle:
+            return pickle.load(_pickle)
+    finally:
+        _pickle.close()
 
 
 def objects_time_point_file_data(_experiment, _series, _time_point):
@@ -204,6 +217,18 @@ def fibers_density_series_file_data(_experiment, _series):
 def fibers_density_experiment_file_data(_experiment):
     return {_series: fibers_density_series_file_data(_experiment, _series) for
             _series in paths.folders(paths.fibers_density(_experiment))}
+
+
+def fibers_densities(_experiment, _series_id, _group, _time_point):
+    _fibers_densities_path = paths.fibers_densities(_experiment, 'Series ' + str(_series_id), _group, str(_time_point) + '.pkl')
+    if os.path.isfile(_fibers_densities_path):
+        try:
+            with gzip.open(_fibers_densities_path, 'rb') as _pickle:
+                return pickle.load(_pickle)
+        finally:
+            _pickle.close()
+    else:
+        return {}
 
 
 def normalization_series_file_data(_experiment, _series):

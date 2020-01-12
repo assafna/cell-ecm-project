@@ -8,6 +8,7 @@ from scipy.ndimage import rotate
 from tifffile import tifffile, TiffFile
 import matplotlib.pyplot as plt
 
+import libs.experiments.compute
 from libs import compute_lib, save_lib
 from libs.experiments import load, compute, paths
 from libs.experiments.config import CELL_DIAMETER_IN_MICRONS
@@ -16,25 +17,25 @@ from libs.experiments.config import CELL_DIAMETER_IN_MICRONS
 def main():
     _experiment = 'SN16_CZI'
     _series = 'Series 1'
-    _group = 'cells_3_4'
+    _group = 'cells_0_1'
     _channel = 0
     _tp = 1
     _res_x = 0.41513
     _res_y = 0.41513
     _res_z = 2.0
     _image = tifffile.imread(
-        'G:\My Drive\BGU\Thesis\Cell-ECM & Cell-ECM-Cell Project\Data\Experiments\Manipulations\SN16_CZI\Series 1\series_1_bc.tif')
+        'G:\My Drive\BGU\Thesis\Cell-ECM & Cell-ECM-Cell Project\Data\Experiments\Manipulations\Serieses\SN16_CZI\series_1_bc.tif')
     _cell_coordinates_tracked = load.cell_coordinates_tracked_series_file_data(_experiment, 'series_' + str(_series.split()[1]) + '.txt')
 
     _cell_3 = [
-        int(round(_cell_coordinates_tracked[2][0][0])),
-        int(round(_cell_coordinates_tracked[2][0][1])),
-        int(round(_cell_coordinates_tracked[2][0][2])),
+        int(round(_cell_coordinates_tracked[0][0][0])),
+        int(round(_cell_coordinates_tracked[0][0][1])),
+        int(round(_cell_coordinates_tracked[0][0][2])),
     ]
     _cell_4 = [
-        int(round(_cell_coordinates_tracked[3][0][0])),
-        int(round(_cell_coordinates_tracked[3][0][1])),
-        int(round(_cell_coordinates_tracked[3][0][2])),
+        int(round(_cell_coordinates_tracked[1][0][0])),
+        int(round(_cell_coordinates_tracked[1][0][1])),
+        int(round(_cell_coordinates_tracked[1][0][2])),
     ]
     if _cell_3[0] <= _cell_4[0]:
         _c = (_cell_3[0] + 1, _cell_3[1])
@@ -50,18 +51,18 @@ def main():
     _padding_x = int((_image_zeros_rotated.shape[1] - _image_zeros.shape[1]) / 2)
 
     _cell_3 = [
-        int(round(_cell_coordinates_tracked[2][0][0])) + _padding_x,
-        int(round(_cell_coordinates_tracked[2][0][1])) + _padding_y,
-        int(round(_cell_coordinates_tracked[2][0][2]))
+        int(round(_cell_coordinates_tracked[0][0][0])) + _padding_x,
+        int(round(_cell_coordinates_tracked[0][0][1])) + _padding_y,
+        int(round(_cell_coordinates_tracked[0][0][2]))
     ]
     _cell_4 = [
-        int(round(_cell_coordinates_tracked[3][0][0])) + _padding_x,
-        int(round(_cell_coordinates_tracked[3][0][1])) + _padding_y,
-        int(round(_cell_coordinates_tracked[3][0][2]))
+        int(round(_cell_coordinates_tracked[1][0][0])) + _padding_x,
+        int(round(_cell_coordinates_tracked[1][0][1])) + _padding_y,
+        int(round(_cell_coordinates_tracked[1][0][2]))
     ]
     _image_tp_fibres = np.array([rotate(_z[0], _angle) for _z in _image[0]])
 
-    plt.imshow(_image_tp_fibres[20])
+    plt.imshow(_image_tp_fibres[_cell_3[2]])
     plt.show()
     print('hi')
 
@@ -124,9 +125,9 @@ def main():
     print('res_y', _res_y)
     print('res_x', _res_x)
 
-    _roi = compute_lib.roi_by_microns(_resolution_x=_res_x, _resolution_y=_res_y, _length_x=CELL_DIAMETER_IN_MICRONS,
-                                      _length_y=CELL_DIAMETER_IN_MICRONS / 2, _offset_x=0, _offset_y=0,
-                                      _cell_coordinates=[_cell_3_new_coordinates[0], _cell_3_new_coordinates[1]], _direction='right')
+    _roi = libs.experiments.compute.roi_by_microns(_resolution_x=_res_x, _resolution_y=_res_y, _length_x=CELL_DIAMETER_IN_MICRONS,
+                                                   _length_y=CELL_DIAMETER_IN_MICRONS / 2, _offset_x=0, _offset_y=0,
+                                                   _cell_coordinates=[_cell_3_new_coordinates[0], _cell_3_new_coordinates[1]], _direction='right')
     _values = []
     for i in range(int(_roi[0]), int(_roi[2])):
         for j in range(int(_roi[1]), int(_roi[3])):
@@ -148,16 +149,6 @@ def main():
             'left_cell': 3,
             'right_cell': 4
         },
-        'image_center': {
-            'x': int(_rotated_image.shape[2] / 2),
-            'y': int(_rotated_image.shape[1] / 2),
-            'z': int(_rotated_image.shape[0] / 2)
-        },
-        'resolutions': {
-            'x': _res_x,
-            'y': _res_y,
-            'z': _res_z
-        },
         'time_points': [{
             'left_cell': {
                 'coordinates': {
@@ -172,6 +163,11 @@ def main():
                     'y': _cell_4_new_coordinates[1],
                     'z': _cell_4_new_coordinates[2]
                 }
+            },
+            'resolutions': {
+                'x': _res_x,
+                'y': _res_y,
+                'z': _res_z
             }
         }]
     }

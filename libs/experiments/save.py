@@ -2,6 +2,7 @@ import json
 import os
 
 from libs.experiments import paths
+from libs.save_lib import to_pickle
 
 
 def cell_coordinates_tracked(_experiment, _series, _cell_coordinates):
@@ -60,3 +61,8 @@ def image_properties(_experiment, _series_id, _image_properties):
             json.dump(_image_properties, _json, indent=4)
     finally:
         _json.close()
+
+
+def fibers_densities(_experiment, _series_id, _group, _time_point, _fibers_densities):
+    _fibers_densities_path = paths.fibers_densities(_experiment, 'Series ' + str(_series_id), _group, str(_time_point) + '.pkl')
+    to_pickle(_fibers_densities, _fibers_densities_path)

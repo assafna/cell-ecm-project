@@ -5,6 +5,7 @@ import numpy as np
 from scipy.ndimage.interpolation import rotate
 from tifffile import tifffile
 
+import libs.experiments.compute
 from libs import compute_lib
 from libs.experiments import load
 from libs.experiments.compute import angle_between_three_points, rotate_point_around_another_point
@@ -33,7 +34,7 @@ def main():
     image_center = tuple(np.array(_image_tp_0_channel_0.shape[1::-1]) / 2)
     _cell_1_coordinates_new = rotate_point_around_another_point(_point=_cell_1_coordinates, _angle_in_radians=math.radians(_angle), _around_point=image_center)
     _cell_2_coordinates_new = rotate_point_around_another_point(_point=_cell_2_coordinates, _angle_in_radians=math.radians(_angle), _around_point=image_center)
-    _roi = compute_lib.roi_by_microns(_resolution_x=0.41513, _resolution_y=0.41513, _length_x=CELL_DIAMETER_IN_MICRONS, _length_y=CELL_DIAMETER_IN_MICRONS / 2, _offset_x=0, _offset_y=0, _cell_coordinates=_cell_1_coordinates_new, _direction='right')
+    _roi = libs.experiments.compute.roi_by_microns(_resolution_x=0.41513, _resolution_y=0.41513, _length_x=CELL_DIAMETER_IN_MICRONS, _length_y=CELL_DIAMETER_IN_MICRONS / 2, _offset_x=0, _offset_y=0, _cell_coordinates=_cell_1_coordinates_new, _direction='right')
     for i in range(int(_cell_1_coordinates_new[1]) - 4, int(_cell_1_coordinates_new[1]) + 4):
         for j in range(int(_cell_1_coordinates_new[0]) - 4, int(_cell_1_coordinates_new[0]) + 4):
             rotated[i][j] = 255

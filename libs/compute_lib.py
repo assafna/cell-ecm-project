@@ -1,6 +1,5 @@
 import numpy as np
 
-from libs.experiments.config import CELL_DIAMETER_IN_MICRONS
 from libs.simulations.config import EPSILON
 
 
@@ -41,24 +40,3 @@ def roi(_length_x, _length_y, _offset_x, _offset_y, _cell_coordinates, _cell_dia
     _y2 = round(_y1 + _length_y, 10)
 
     return _x1, _y1, _x2, _y2
-
-
-def roi_by_microns(_resolution_x, _resolution_y, _length_x, _length_y, _offset_x, _offset_y, _cell_coordinates, _direction):
-    _cell_diameter_in_pixels = CELL_DIAMETER_IN_MICRONS / _resolution_x
-    _length_x_in_pixels = _length_x / _resolution_x
-    _length_y_in_pixels = _length_y / _resolution_y
-    _offset_x_in_pixels = _offset_x / _resolution_x
-    _offset_y_in_pixels = _offset_y / _resolution_y
-
-    return roi(
-        _length_x=_length_x_in_pixels,
-        _length_y=_length_y_in_pixels,
-        _offset_x=_offset_x_in_pixels,
-        _offset_y=_offset_y_in_pixels,
-        _cell_coordinates={
-            'x': _cell_coordinates[0],
-            'y': _cell_coordinates[1]
-        },
-        _cell_diameter=_cell_diameter_in_pixels,
-        _direction=_direction
-    )
