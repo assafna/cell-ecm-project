@@ -6,7 +6,7 @@ import libs.simulations.load
 from libs.simulations import load, paths
 from libs.simulations.config import CELL_DIAMETER, NET_DIMENSIONS, ORIGIN_COORDINATES, \
     ELEMENTS_FILE_NAME
-from libs.simulations.save import to_pickle
+from libs.save_lib import to_pickle
 
 
 def create_properties(_simulation):

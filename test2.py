@@ -1,4 +1,5 @@
 import math
+import os
 from itertools import product
 
 import numpy as np
@@ -7,8 +8,8 @@ from scipy.ndimage import rotate
 from tifffile import tifffile, TiffFile
 import matplotlib.pyplot as plt
 
-from libs import compute_lib
-from libs.experiments import load, compute
+from libs import compute_lib, save_lib
+from libs.experiments import load, compute, paths
 from libs.experiments.config import CELL_DIAMETER_IN_MICRONS
 
 
@@ -140,9 +141,47 @@ def main():
     print('hi')
 
     # properties
-    _properties = {
-
+    _data = {
+        'experiment': _experiment,
+        'series_id': int(_series.split()[1]),
+        'cells_ids': {
+            'left_cell': 3,
+            'right_cell': 4
+        },
+        'image_center': {
+            'x': int(_rotated_image.shape[2] / 2),
+            'y': int(_rotated_image.shape[1] / 2),
+            'z': int(_rotated_image.shape[0] / 2)
+        },
+        'resolutions': {
+            'x': _res_x,
+            'y': _res_y,
+            'z': _res_z
+        },
+        'time_points': [{
+            'left_cell': {
+                'coordinates': {
+                    'x': _cell_3_new_coordinates[0],
+                    'y': _cell_3_new_coordinates[1],
+                    'z': _cell_3_new_coordinates[2]
+                }
+            },
+            'right_cell': {
+                'coordinates': {
+                    'x': _cell_4_new_coordinates[0],
+                    'y': _cell_4_new_coordinates[1],
+                    'z': _cell_4_new_coordinates[2]
+                }
+            }
+        }]
     }
+    _group_structured_path = paths.structured(_experiment, _series, _group)
+    _properties_pickle_path = os.path.join(_group_structured_path, 'properties.pkl')
+    save_lib.to_pickle(_data, _properties_pickle_path)
+
+    # save image to pickle
+    _time_point_pickle_path = paths.structured(_experiment, _series, _group, _time_point=str(_tp - 1) + '.pkl')
+    save_lib.to_pickle(_rotated_image, _time_point_pickle_path)
 
 
 if __name__ == '__main__':

@@ -8,6 +8,9 @@ RAW = os.path.join(EXPERIMENTS, 'Raw')
 MANIPULATIONS = os.path.join(EXPERIMENTS, 'Manipulations')
 OUTPUTS = os.path.join(EXPERIMENTS, 'Outputs')
 
+# Manipulations
+STRUCTURED = os.path.join(MANIPULATIONS, 'Structured')
+
 # Outputs
 IMAGE_PROPERTIES = os.path.join(OUTPUTS, 'Image Properties')
 INFORMATION = os.path.join(OUTPUTS, 'Information')
@@ -41,6 +44,23 @@ def tif(_experiment, _series=None):
         return _experiment_path
 
     return os.path.join(_experiment_path, _series)
+
+
+def structured(_experiment, _series=None, _group=None, _time_point=None):
+    _experiment_path = os.path.join(STRUCTURED, _experiment)
+
+    if _series is None:
+        return _experiment_path
+
+    _series_path = os.path.join(_experiment_path, _series)
+    if _group is None:
+        return _series_path
+
+    _group_path = os.path.join(_series_path, _group)
+    if _time_point is None:
+        return _group_path
+
+    return os.path.join(_group_path, _time_point)
 
 
 def image_properties(_experiment, _series=None):
