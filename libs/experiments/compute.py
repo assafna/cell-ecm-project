@@ -1,4 +1,5 @@
 import math
+from multiprocessing.pool import Pool
 
 import numpy as np
 from scipy.ndimage import rotate
@@ -64,15 +65,16 @@ def axes_padding(_2d_image_shape, _angle):
     _image_zeros_rotated = rotate(_image_zeros, _angle)
     _image_zeros_shape = _image_zeros_rotated.shape
 
-    return int(round((_image_zeros_shape[0] - _2d_image_shape[0]) / 2)),\
-        int(round((_image_zeros_shape[1] - _2d_image_shape[1]) / 2))
+    return int(round((_image_zeros_shape[0] - _2d_image_shape[0]) / 2)), \
+           int(round((_image_zeros_shape[1] - _2d_image_shape[1]) / 2))
 
 
 def image_center_coordinates(_image_shape):
     return [_value / 2 for _value in _image_shape]
 
 
-def roi_by_microns(_resolution_x, _resolution_y, _resolution_z, _length_x, _length_y, _length_z, _offset_x, _offset_y, _offset_z, _cell_coordinates, _direction):
+def roi_by_microns(_resolution_x, _resolution_y, _resolution_z, _length_x, _length_y, _length_z, _offset_x, _offset_y,
+                   _offset_z, _cell_coordinates, _direction):
     _cell_diameter_in_pixels = CELL_DIAMETER_IN_MICRONS / _resolution_x
     _length_x_in_pixels = _length_x / _resolution_x
     _length_y_in_pixels = _length_y / _resolution_y
@@ -106,8 +108,11 @@ def roi_fibers_density(_experiment, _series, _group, _time_point, _roi):
     return np.mean(_time_point_image[_z1:_z2, _y1:_y2, _x1:_x2])
 
 
-def roi_fibers_density_time_point(_experiment, _series_id, _group, _length_x, _length_y, _length_z, _offset_x, _offset_y, _offset_z, _cell_id, _direction, _time_point, _group_properties=None):
-    _group_properties = _group_properties if _group_properties is not None else load.group_properties(_experiment, _series_id, _group)
+def roi_fibers_density_time_point(_experiment, _series_id, _group, _length_x, _length_y, _length_z, _offset_x,
+                                  _offset_y, _offset_z, _cell_id, _direction, _time_point, _group_properties=None):
+    _group_properties = _group_properties if _group_properties is not None else load.group_properties(_experiment,
+                                                                                                      _series_id,
+                                                                                                      _group)
     _time_point_properties = _group_properties['time_points'][_time_point]
     _time_point_fibers_densities = load.fibers_densities(_experiment, _series_id, _group, _time_point)
     _time_point_roi = roi_by_microns(
@@ -129,14 +134,16 @@ def roi_fibers_density_time_point(_experiment, _series_id, _group, _length_x, _l
     if _time_point_roi in _time_point_fibers_densities:
         return _time_point_fibers_densities[_time_point_roi]
     else:
-        print('Computing:', _experiment, _series_id, _group, _cell_id, 'roi', _time_point_roi, 'direction', _direction, 'tp', _time_point)
+        print('Computing:', _experiment, _series_id, _group, _cell_id, 'roi', _time_point_roi, 'direction', _direction,
+              'tp', _time_point)
         _roi_fibers_density = roi_fibers_density(_experiment, _series_id, _group, _time_point, _time_point_roi)
         _time_point_fibers_densities[_time_point_roi] = _roi_fibers_density
         save.fibers_densities(_experiment, _series_id, _group, _time_point, _time_point_fibers_densities)
         return _roi_fibers_density
 
 
-def roi_fibers_density_by_time(_experiment, _series_id, _group, _length_x, _length_y, _length_z, _offset_x, _offset_y, _offset_z, _cell_id, _direction, _time_points):
+def roi_fibers_density_by_time(_experiment, _series_id, _group, _length_x, _length_y, _length_z, _offset_x, _offset_y,
+                               _offset_z, _cell_id, _direction, _time_points):
     _group_properties = load.group_properties(_experiment, _series_id, _group)
     return [
         roi_fibers_density_time_point(
@@ -144,3 +151,14 @@ def roi_fibers_density_by_time(_experiment, _series_id, _group, _length_x, _leng
             _direction, _time_point, _group_properties
         ) for _time_point in range(min(_time_points, len(_group_properties['time_points'])))
     ]
+
+
+def roi_fibers_density_by_time_pairs(_experiment, _series_id, _group, _length_x, _length_y, _length_z, _offset_x,
+                                     _offset_y, _offset_z, _direction, _time_points):
+    return {
+        'left_cell': roi_fibers_density_by_time(_experiment, _series_id, _group, _length_x, _length_y, _length_z,
+                                                _offset_x, _offset_y, _offset_z, 'left_cell', _direction, _time_points),
+        'right_cell': roi_fibers_density_by_time(_experiment, _series_id, _group, _length_x, _length_y, _length_z,
+                                                 _offset_x, _offset_y, _offset_z, 'right_cell', _direction,
+                                                 _time_points),
+    }

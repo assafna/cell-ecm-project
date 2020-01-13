@@ -222,6 +222,8 @@ def fibers_density_experiment_file_data(_experiment):
 def fibers_densities(_experiment, _series_id, _group, _time_point):
     _fibers_densities_path = paths.fibers_densities(_experiment, 'Series ' + str(_series_id), _group, str(_time_point) + '.pkl')
     if os.path.isfile(_fibers_densities_path):
+        if os.path.getsize(_fibers_densities_path) == 0:
+            return {}
         try:
             with gzip.open(_fibers_densities_path, 'rb') as _pickle:
                 return pickle.load(_pickle)
