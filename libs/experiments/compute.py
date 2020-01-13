@@ -103,12 +103,6 @@ def roi_by_microns(_resolution_x, _resolution_y, _resolution_z, _length_x, _leng
 def roi_fibers_density(_experiment, _series, _group, _time_point, _roi):
     _time_point_image = load.structured_image(_experiment, _series, _group, _time_point)
     _x1, _y1, _z1, _x2, _y2, _z2 = _roi
-    # _sum = 0
-    # _counter = 0
-    # for _z in range(_z1, _z2):
-    #     _sum += np.average(_time_point_image[_z])
-    #     _counter += 1
-    # return _sum / _counter
     return np.mean(_time_point_image[_z1:_z2, _y1:_y2, _x1:_x2])
 
 
