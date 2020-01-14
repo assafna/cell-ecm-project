@@ -9,20 +9,21 @@ from libs import compute_lib
 from libs.experiments import load, filtering, compute, save
 from libs.experiments.config import ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT, CELL_DIAMETER_IN_MICRONS
 
-# MINIMUM_TIME_POINTS = 18
-OFFSET_X = CELL_DIAMETER_IN_MICRONS * 0
+MINIMUM_TIME_POINTS = 240
+OFFSET_X = (CELL_DIAMETER_IN_MICRONS / 8) * 0
 OFFSET_Y = 0
 OFFSET_Z = 0
 DERIVATIVE = 1
-# CELLS_DISTANCE = 5
+# CELLS_DISTANCE = 7
 DIRECTION = 'inside'
 
 
 def main():
     _experiments = load.experiment_groups_as_tuples('SN41')
     # _experiments = filtering.by_distance(_experiments, CELLS_DISTANCE)
-    _minimum_time_points = compute.minimum_time_points(_experiments)
-    # _experiments = filtering.by_time_points_amount(_experiments, _minimum_time_points)
+    # _minimum_time_points = compute.minimum_time_points(_experiments)
+    _minimum_time_points = MINIMUM_TIME_POINTS
+    _experiments = filtering.by_time_points_amount(_experiments, _minimum_time_points)
     # random.shuffle(_experiments)
 
     # prepare data in mp
@@ -52,6 +53,7 @@ def main():
             compute_lib.derivative(_same_left_cell_fibers_densities, _n=DERIVATIVE),
             compute_lib.derivative(_same_right_cell_fibers_densities, _n=DERIVATIVE)
         )
+        print(_same_correlation)
         for _different_index in range(_same_index + 1, len(_experiments)):
             _different_tuple = _experiments[_different_index]
             _different_experiment, _different_series, _different_group = _different_tuple

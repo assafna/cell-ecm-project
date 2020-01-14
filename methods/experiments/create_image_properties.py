@@ -48,4 +48,4 @@ def process_all_experiments(_overwrite=False):
 
 
 if __name__ == '__main__':
-    process_all_experiments(_overwrite=True)
+    process_all_experiments()

@@ -109,7 +109,7 @@ def main():
         _names_array=['Time-Point Last'],
         _mode_array=['lines+markers'],
         _dash_array=['solid'],
-        _x_axis_title='Distance from Left Cell (cell size)',
+        _x_axis_title='Distance from Cell (cell size)',
         _y_axis_title='Fibers Density Z-score',
         _title='Fibers Densities vs. Distance from Cell'
     )

@@ -47,6 +47,7 @@ def to_html(_fig, _path, _filename):
     )
 
     # backup
+    # TODO: fix the history it is not working
     _time = time.strftime('%Y_%m_%d-%H_%M_%S')
     _backup_path = os.path.join(paths.PLOTS_HISTORY, os.path.basename(os.path.normpath(_path)))
     os.makedirs(_backup_path, exist_ok=True)
