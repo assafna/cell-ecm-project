@@ -3,14 +3,14 @@ from libs.experiments import load, paths, config, compute
 
 def main():
     for _experiment in config.PAIRS:
-        for _series in paths.folders(paths.fibers_density(_experiment)):
+        for _series in paths.folders(paths.structured(_experiment)):
             _series_id = str(_series.split()[1])
-            for _group in paths.folders(paths.fibers_density(_experiment, _series)):
+            for _group in paths.folders(paths.structured(_experiment, _series)):
                 _group_id = _group.split('cells_')[1]
-                for _z_group in paths.folders(paths.fibers_density(_experiment, _series, _group)):
+                for _z_group in paths.folders(paths.structured(_experiment, _series, _group)):
                     _z_group_id = _z_group.split('cells_')[1]
                     _time_points_amount = len(
-                        paths.text_files(paths.fibers_density(_experiment, _series, _group, _z_group))
+                        paths.text_files(paths.structured(_experiment, _series, _group, _z_group))
                     )
                     _cell_coordinates_tracked_file = 'series_' + _series_id + '.txt'
                     _cell_coordinates_tracked = load.cell_coordinates_tracked_series_file_data(
