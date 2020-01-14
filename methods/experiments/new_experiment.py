@@ -1,6 +1,7 @@
 import math
 import os
 from itertools import product
+from multiprocessing.pool import Pool
 
 import numpy as np
 from scipy.ndimage import rotate
@@ -241,8 +242,13 @@ def process_series(_experiment, _series_id, _overwrite=False):
 
 
 def process_experiment(_experiment, _overwrite=False):
-    for _series in paths.image_files(paths.serieses(_experiment)):
-        process_series(_experiment, _series_id=int(_series.split('_')[1]), _overwrite=_overwrite)
+    _arguments = [
+        (_experiment, int(_series.split('_')[1]), _overwrite)
+        for _series in paths.image_files(paths.serieses(_experiment))
+    ]
+    _p = Pool()
+    _p.starmap(process_series, _arguments)
+    _p.close()
 
 
 def process_all_experiments(_overwrite=False):
@@ -251,4 +257,4 @@ def process_all_experiments(_overwrite=False):
 
 
 if __name__ == '__main__':
-    process_experiment('SN41')
+    process_all_experiments()
