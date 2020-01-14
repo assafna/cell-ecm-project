@@ -1,17 +1,11 @@
 import math
-from multiprocessing.pool import Pool
 
 import numpy as np
 from scipy.ndimage import rotate
-import matplotlib.pyplot as plt
 
-from libs.compute_lib import roi
+from libs.compute_lib import roi, z_score
 from libs.experiments import load, save
 from libs.experiments.config import CELL_DIAMETER_IN_MICRONS
-
-
-def z_score(_x, _average, _std):
-    return (_x - _average) / _std
 
 
 def z_score_fibers_density_array(_fibers_density, _normalization):

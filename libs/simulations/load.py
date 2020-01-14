@@ -100,3 +100,12 @@ def raw():
 def structured():
     return [_simulation for _simulation in os.listdir(paths.STRUCTURED)
             if os.path.isdir(os.path.join(paths.STRUCTURED, _simulation))]
+
+
+def normalization(_simulation):
+    _path = paths.normalization(_simulation + '.pkl')
+    try:
+        with gzip.open(_path, 'rb') as _pickle:
+            return pickle.load(_pickle)
+    finally:
+        _pickle.close()

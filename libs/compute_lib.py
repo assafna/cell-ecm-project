@@ -47,3 +47,7 @@ def roi(_length_x, _length_y, _offset_x, _offset_y, _cell_coordinates, _cell_dia
     _y2 = round(_y1 + _length_y, 10)
 
     return _x1, _y1, _x2, _y2
+
+
+def z_score(_x, _average, _std):
+    return (_x - _average) / _std

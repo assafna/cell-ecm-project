@@ -101,6 +101,12 @@ def roi_fibers_density_time_point(_simulation, _length_x, _length_y, _offset_x, 
     _simulation_properties = _simulation_properties if _simulation_properties is not None else properties(_simulation)
     _time_point_properties = _simulation_properties['time_points'][_time_point]
     _time_point_fibers_densities = fibers_densities(_simulation, _time_point)
+    if _direction == 'inside':
+        _new_direction = 'right' if _cell_id == 'left_cell' else 'left'
+    elif _direction == 'outside':
+        _new_direction = 'left' if _cell_id == 'left_cell' else 'right'
+    else:
+        _new_direction = _direction
     _time_point_roi = roi(
         _length_x=_length_x,
         _length_y=_length_y,
@@ -108,10 +114,7 @@ def roi_fibers_density_time_point(_simulation, _length_x, _length_y, _offset_x, 
         _offset_y=_offset_y,
         _cell_coordinates=_time_point_properties[_cell_id]['coordinates'],
         _cell_diameter=_time_point_properties[_cell_id]['diameter'],
-        _direction='right' if
-        (_cell_id, _direction) == ('left_cell', 'inside') or
-        (_cell_id, _direction) == ('right_cell', 'outside') or
-        (_cell_id, _direction) == ('cell', 'right') else 'left'
+        _direction=_new_direction
     )
     if _time_point_roi in _time_point_fibers_densities:
         return _time_point_fibers_densities[_time_point_roi]
