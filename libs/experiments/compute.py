@@ -162,3 +162,13 @@ def roi_fibers_density_by_time_pairs(_experiment, _series_id, _group, _length_x,
                                                  _offset_x, _offset_y, _offset_z, 'right_cell', _direction,
                                                  _time_points),
     }
+
+
+def minimum_time_points(_experiments_tuples):
+    _minimum_time_points = 10000
+    for _tuple in _experiments_tuples:
+        _experiment, _series_id, _group = _tuple
+        _group_properties = load.group_properties(_experiment, _series_id, _group)
+        _minimum_time_points = min(_minimum_time_points, len(_group_properties['time_points']))
+
+    return _minimum_time_points

@@ -1,7 +1,7 @@
 from libs.experiments import load, compute, paths
 
 
-def by_distance(_experiments_tuples, _min_distance, _max_distance):
+def by_distance(_experiments_tuples, _distance):
     _experiments_tuples_filtered = []
     for _tuple in _experiments_tuples:
         _experiment, _series_id, _group = _tuple
@@ -12,10 +12,10 @@ def by_distance(_experiments_tuples, _min_distance, _max_distance):
         _cell_1_id, _cell_2_id = _group.split('_')[1], _group.split('_')[2]
         _cell_1_coordinates = _cell_coordinates_tracked[int(_cell_1_id)]
         _cell_2_coordinates = _cell_coordinates_tracked[int(_cell_2_id)]
-        _distance = compute.cells_distance_in_cell_size(
+        _cells_distance = compute.cells_distance_in_cell_size(
             _experiment, _series_id, _cell_1_coordinates, _cell_2_coordinates
         )
-        if _min_distance <= _distance <= _max_distance:
+        if _distance - 0.5 <= _cells_distance <= _distance + 0.5:
             _experiments_tuples_filtered.append(_tuple)
 
     return _experiments_tuples_filtered

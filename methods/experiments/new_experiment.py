@@ -14,22 +14,52 @@ from libs.experiments.config import FIBERS_CHANNEL_INDEX
 SHOW_PLOTS = False
 
 
-def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell_2_id, _series_image_by_time_points, _resolutions):
+def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell_2_id, _series_image_by_time_points, _resolutions, _overwrite=False):
     _time_points_data = []
     _time_point = 0
+    _left_cell_id = None
+    _right_cell_id = None
     while _time_point is not None:
-        print(_experiment, 'Series ' + str(_series_id), 'Cell 1 #:', _cell_1_id, 'Cell 2 #:', _cell_2_id, 'Time point:', _time_point, sep='\t')
         _time_point_image = _series_image_by_time_points[_time_point]
         _cell_1_coordinates = [int(round(_value)) for _value in _cells_coordinates[_cell_1_id][_time_point]]
         _cell_2_coordinates = [int(round(_value)) for _value in _cells_coordinates[_cell_2_id][_time_point]]
 
         # choose left and right cells
-        if _cell_1_coordinates[0] <= _cell_2_coordinates[0]:
-            _left_cell_coordinates = _cell_1_coordinates
-            _right_cell_coordinates = _cell_2_coordinates
+        if _time_point == 0:
+            if _cell_1_coordinates[0] <= _cell_2_coordinates[0]:
+                _left_cell_id, _right_cell_id = _cell_1_id, _cell_2_id
+            else:
+                _right_cell_id, _left_cell_id = _cell_1_id, _cell_2_id
+
+        # check if exists
+        _group_structured_path = paths.structured(
+            _experiment, 'Series ' + str(_series_id), 'cells_' + str(_cell_1_id) + '_' + str(_cell_2_id)
+        )
+        _properties_pickle_path = os.path.join(_group_structured_path, 'properties.pkl')
+        _time_point_pickle_path = paths.structured(
+            _experiment=_experiment,
+            _series='Series ' + str(_series_id),
+            _group='cells_' + str(_cell_1_id) + '_' + str(_cell_2_id),
+            _time_point=str(_time_point) + '.pkl'
+        )
+        if os.path.isfile(_properties_pickle_path) and not _overwrite and os.path.isfile(_time_point_pickle_path):
+            # check for more time points
+            if _time_point + 1 < len(_cells_coordinates[_cell_1_id]) and \
+                    _cells_coordinates[_cell_1_id][_time_point + 1] is not None and \
+                    _cells_coordinates[_cell_2_id][_time_point + 1] is not None:
+                _time_point += 1
+            else:
+                _time_point = None
+            continue
+
+        print(_experiment, 'Series ' + str(_series_id), 'Cell 1 #:', _cell_1_id, 'Cell 2 #:', _cell_2_id, 'Time point:',
+              _time_point, sep='\t')
+
+        # set coordinates
+        if _left_cell_id == _cell_1_id:
+            _left_cell_coordinates, _right_cell_coordinates = _cell_1_coordinates, _cell_2_coordinates
         else:
-            _left_cell_coordinates = _cell_2_coordinates
-            _right_cell_coordinates = _cell_1_coordinates
+            _right_cell_coordinates, _left_cell_coordinates = _cell_1_coordinates, _cell_2_coordinates
 
         # compute padding
         _helper_coordinates = (_left_cell_coordinates[0] + 1, _left_cell_coordinates[1])
@@ -167,14 +197,6 @@ def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell
         else:
             _time_point = None
 
-    # get left and right cells ids
-    if _cells_coordinates[_cell_1_id][0][0] <= _cells_coordinates[_cell_2_id][0][0]:
-        _left_cell_id = _cell_1_id
-        _right_cell_id = _cell_2_id
-    else:
-        _left_cell_id = _cell_2_id
-        _right_cell_id = _cell_1_id
-
     # save properties
     _properties_data = {
         'experiment': _experiment,
@@ -192,7 +214,7 @@ def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell
     save_lib.to_pickle(_properties_data, _properties_pickle_path)
 
 
-def process_series(_experiment, _series_id):
+def process_series(_experiment, _series_id, _overwrite=False):
     _series_name = 'Series ' + str(_series_id)
     _series_image_path = paths.serieses(_experiment, 'series_' + str(_series_id) + '_bc.tif')
     _image_properties = load.image_properties(_experiment, 'Series ' + str(_series_id))
@@ -213,20 +235,20 @@ def process_series(_experiment, _series_id):
                 _cell_1_id=_cell_1_id,
                 _cell_2_id=_cell_2_id,
                 _series_image_by_time_points=_series_image_by_time_points,
-                _resolutions=_image_properties['resolutions']
+                _resolutions=_image_properties['resolutions'],
+                _overwrite=_overwrite
             )
 
 
-def process_experiment(_experiment):
+def process_experiment(_experiment, _overwrite=False):
     for _series in paths.image_files(paths.serieses(_experiment)):
-        process_series(_experiment, _series_id=int(_series.split('_')[1]))
+        process_series(_experiment, _series_id=int(_series.split('_')[1]), _overwrite=_overwrite)
 
 
-def process_all_experiments():
+def process_all_experiments(_overwrite=False):
     for _experiment in paths.folders(paths.SERIESES):
-        process_experiment(_experiment)
+        process_experiment(_experiment, _overwrite)
 
 
 if __name__ == '__main__':
-    # TODO: add the 'overwrite' flag
     process_experiment('SN41')

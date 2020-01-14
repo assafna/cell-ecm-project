@@ -9,22 +9,20 @@ from libs import compute_lib
 from libs.experiments import load, filtering, compute, save
 from libs.experiments.config import ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT, CELL_DIAMETER_IN_MICRONS
 
-MINIMUM_TIME_POINTS = 18
-OFFSET_X = (CELL_DIAMETER_IN_MICRONS / 8) * 6
+# MINIMUM_TIME_POINTS = 18
+OFFSET_X = CELL_DIAMETER_IN_MICRONS * 0
 OFFSET_Y = 0
 OFFSET_Z = 0
 DERIVATIVE = 1
-CELLS_DISTANCE_MIN = 6.5
-CELLS_DISTANCE_MAX = 7.5
+# CELLS_DISTANCE = 5
 DIRECTION = 'inside'
 
 
 def main():
-    _experiments = load.experiment_groups_as_tuples('SN16_CZI')
-    _experiments = filtering.by_time_points_amount(_experiments, MINIMUM_TIME_POINTS)
-    _experiments = filtering.by_distance(
-        _experiments, _min_distance=CELLS_DISTANCE_MIN, _max_distance=CELLS_DISTANCE_MAX
-    )
+    _experiments = load.experiment_groups_as_tuples('SN41')
+    # _experiments = filtering.by_distance(_experiments, CELLS_DISTANCE)
+    _minimum_time_points = compute.minimum_time_points(_experiments)
+    # _experiments = filtering.by_time_points_amount(_experiments, _minimum_time_points)
     # random.shuffle(_experiments)
 
     # prepare data in mp
@@ -33,7 +31,7 @@ def main():
     for _tuple in _experiments:
         _experiment, _series, _group = _tuple
         _arguments.append((_experiment, _series, _group, ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT,
-                           OFFSET_X, OFFSET_Y, OFFSET_Z, DIRECTION, MINIMUM_TIME_POINTS))
+                           OFFSET_X, OFFSET_Y, OFFSET_Z, DIRECTION, _minimum_time_points))
     _p = Pool()
     _answers = _p.starmap(compute.roi_fibers_density_by_time_pairs, _arguments)
     _p.close()
