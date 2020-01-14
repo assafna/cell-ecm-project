@@ -11,12 +11,14 @@ from libs import save_lib
 from libs.experiments import paths, load, compute
 from libs.experiments.config import FIBERS_CHANNEL_INDEX
 
+SHOW_PLOTS = False
+
 
 def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell_2_id, _series_image_by_time_points, _resolutions):
     _time_points_data = []
     _time_point = 0
     while _time_point is not None:
-        print(_experiment, 'Series ' + str(_series_id), 'cell 1', _cell_1_id, 'cell 2', _cell_2_id, 'tp', _time_point, sep='\t')
+        print(_experiment, 'Series ' + str(_series_id), 'Cell 1 #:', _cell_1_id, 'Cell 2 #:', _cell_2_id, 'Time point:', _time_point, sep='\t')
         _time_point_image = _series_image_by_time_points[_time_point]
         _cell_1_coordinates = [int(round(_value)) for _value in _cells_coordinates[_cell_1_id][_time_point]]
         _cell_2_coordinates = [int(round(_value)) for _value in _cells_coordinates[_cell_2_id][_time_point]]
@@ -44,10 +46,11 @@ def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell
         _time_point_image_rotated = np.array([rotate(_z, _angle) for _z in _time_point_image])
         _time_point_image_swapped = np.swapaxes(_time_point_image_rotated, 0, 1)
 
-        # plt.imshow(_time_point_image_rotated[_left_cell_coordinates[2]])
-        # plt.show()
-        # plt.imshow(_time_point_image_rotated[_right_cell_coordinates[2]])
-        # plt.show()
+        if SHOW_PLOTS:
+            plt.imshow(_time_point_image_rotated[_left_cell_coordinates[2]])
+            plt.show()
+            plt.imshow(_time_point_image_rotated[_right_cell_coordinates[2]])
+            plt.show()
 
         # update coordinates
         _image_center = compute.image_center_coordinates(_image_shape=reversed(_time_point_image_rotated[0].shape))
@@ -69,8 +72,9 @@ def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell
         _left_cell_coordinates[2] = _fixed_y
         _right_cell_coordinates[2] = _fixed_y
 
-        # plt.imshow(_time_point_image_swapped[_left_cell_coordinates[2]])
-        # plt.show()
+        if SHOW_PLOTS:
+            plt.imshow(_time_point_image_swapped[_left_cell_coordinates[2]])
+            plt.show()
 
         # swap resolutions
         _new_resolutions = {
@@ -109,8 +113,9 @@ def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell
         _left_cell_coordinates[1] = _fixed_y
         _right_cell_coordinates[1] = _fixed_y
 
-        # plt.imshow(_time_point_image_swapped_rotated[_left_cell_coordinates[2]])
-        # plt.show()
+        if SHOW_PLOTS:
+            plt.imshow(_time_point_image_swapped_rotated[_left_cell_coordinates[2]])
+            plt.show()
 
         # update resolutions
         _new_resolutions['x'] = (_angle / 90) * _new_resolutions['y'] + ((90 - _angle) / 90) * _new_resolutions['x']
@@ -223,4 +228,5 @@ def process_all_experiments():
 
 
 if __name__ == '__main__':
-    process_experiment('SN16_CZI')
+    # TODO: add the 'overwrite' flag
+    process_experiment('SN41')

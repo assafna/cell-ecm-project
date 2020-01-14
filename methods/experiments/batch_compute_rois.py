@@ -5,7 +5,7 @@ import numpy as np
 from libs.experiments import load, compute, save
 from libs.experiments.config import CELL_DIAMETER_IN_MICRONS
 
-EXPERIMENT = 'SN16_CZI'
+EXPERIMENT = 'SN41'
 DIRECTION = 'inside'
 OFFSETS_X = range(0, 16)
 OFFSETS_Y = [0]
