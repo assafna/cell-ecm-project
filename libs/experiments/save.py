@@ -5,10 +5,10 @@ from libs.experiments import paths
 from libs.save_lib import to_pickle
 
 
-def cell_coordinates_tracked(_experiment, _series, _cell_coordinates):
+def cell_coordinates_tracked(_experiment, _series_id, _cell_coordinates):
     _experiment_path = paths.cell_coordinates_tracked(_experiment)
     os.mkdir(_experiment_path) if not os.path.isdir(_experiment_path) else None
-    _file_path = os.path.join(_experiment_path, 'series_' + str(_series.split()[1]) + '.txt')
+    _file_path = os.path.join(_experiment_path, 'series_' + str(_series_id) + '.txt')
     _lines = ''
     for _cell_index, _cell in enumerate(_cell_coordinates):
         _line = ''

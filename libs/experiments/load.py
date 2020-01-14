@@ -73,7 +73,7 @@ def objects_series_file_data(_experiment, _series):
     _objects_by_time = list([None] * len(paths.text_files(paths.objects(_experiment, _series))))
     for _time_point_file in paths.text_files(paths.objects(_experiment, _series)):
         _time_point = time_point_file_name_to_number(_time_point_file)
-        _objects_by_time[_time_point] = objects_time_point_file_data(_experiment, _series, _time_point_file)
+        _objects_by_time[_time_point - 1] = objects_time_point_file_data(_experiment, _series, _time_point_file)
 
     return _objects_by_time
 
