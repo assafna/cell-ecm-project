@@ -65,8 +65,9 @@ def axes_padding(_2d_image_shape, _angle):
     _image_zeros_rotated = rotate(_image_zeros, _angle)
     _image_zeros_shape = _image_zeros_rotated.shape
 
-    return int(round((_image_zeros_shape[0] - _2d_image_shape[0]) / 2)), \
-           int(round((_image_zeros_shape[1] - _2d_image_shape[1]) / 2))
+    # return x, y
+    return int(round((_image_zeros_shape[1] - _2d_image_shape[1]) / 2)), \
+        int(round((_image_zeros_shape[0] - _2d_image_shape[0]) / 2))
 
 
 def image_center_coordinates(_image_shape):

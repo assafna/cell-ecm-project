@@ -118,7 +118,7 @@ def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell
         _angle = compute.angle_between_three_points(
             _right_cell_coordinates, _left_cell_coordinates, _helper_coordinates
         )
-        _padding_x, _padding_y = compute.axes_padding(_2d_image_shape=_time_point_image[0].shape, _angle=_angle)
+        _padding_x, _padding_y = compute.axes_padding(_2d_image_shape=_time_point_image_swapped[0].shape, _angle=_angle)
         _left_cell_coordinates[0] += _padding_x
         _left_cell_coordinates[1] += _padding_y
         _right_cell_coordinates[0] += _padding_x
