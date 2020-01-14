@@ -6,9 +6,14 @@ from PIL.TiffTags import TAGS
 from libs.experiments import paths, save, config
 
 
-def process_series(_experiment, _series):
-    _series_id = str(_series.split()[1])
-    _path = os.path.join(paths.tif(_experiment, _series), 'series_' + _series_id + '_bc.tif')
+def process_series(_experiment, _series_id, _overwrite=False):
+    _experiment_path = paths.image_properties(_experiment)
+    _properties_path = os.path.join(_experiment_path, 'series_' + str(_series_id) + '.json')
+    if not _overwrite and os.path.isfile(_properties_path):
+        return
+
+    print('Creating image properties for:', _experiment, 'Series ' + str(_series_id), sep='\t')
+    _path = paths.serieses(_experiment, 'series_' + str(_series_id) + '_bc.tif')
     with Image.open(_path) as _img:
         _meta_dict = {TAGS[_key]: _img.tag[_key] for _key in _img.tag}
 
@@ -31,14 +36,14 @@ def process_series(_experiment, _series):
     save.image_properties(_experiment, _series_id, _properties)
 
 
-def process_experiment(_experiment):
-    for _series in paths.folders(paths.tif(_experiment)):
-        process_series(_experiment, _series)
+def process_experiment(_experiment, _overwrite=False):
+    for _series in paths.image_files(paths.serieses(_experiment)):
+        process_series(_experiment, int(_series.split('_')[1]), _overwrite)
 
 
-def process_all_experiments():
+def process_all_experiments(_overwrite=False):
     for _experiment in config.experiments():
-        process_experiment(_experiment)
+        process_experiment(_experiment, _overwrite)
 
 
 if __name__ == '__main__':

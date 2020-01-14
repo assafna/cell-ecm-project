@@ -3,7 +3,8 @@ SINGLE_CELL = [
 ]
 
 PAIRS = [
-    'SN16_CZI'
+    'SN16_CZI',
+    'SN41'
 ]
 
 FIBERS_CHANNEL_INDEX = 0
