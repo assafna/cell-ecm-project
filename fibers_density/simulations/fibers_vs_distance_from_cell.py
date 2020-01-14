@@ -9,8 +9,8 @@ from plotting import scatter, save
 
 TIME_POINT = 50
 OFFSET_X_START = 0
-OFFSET_X_END = 0.3
-OFFSET_X_STEP = 0.01
+OFFSET_X_END = CELL_DIAMETER * 4
+OFFSET_X_STEP = CELL_DIAMETER / 8
 OFFSET_Y = 0
 
 

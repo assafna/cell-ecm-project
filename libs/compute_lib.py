@@ -31,12 +31,19 @@ def is_value_between_values(_v1, _v2, _v):
 def roi(_length_x, _length_y, _offset_x, _offset_y, _cell_coordinates, _cell_diameter, _direction):
     if _direction == 'right':
         _x1 = round(_cell_coordinates['x'] + _cell_diameter / 2 + _offset_x, 10)
+        _y1 = round(_cell_coordinates['y'] - _length_y / 2 + _offset_y, 10)
     elif _direction == 'left':
         _x1 = round(_cell_coordinates['x'] - _cell_diameter / 2 - _offset_x - _length_x, 10)
+        _y1 = round(_cell_coordinates['y'] - _length_y / 2 + _offset_y, 10)
+    elif _direction == 'up':
+        _x1 = round(_cell_coordinates['x'] - _length_x / 2 + _offset_x, 10)
+        _y1 = round(_cell_coordinates['y'] + _cell_diameter / 2 + _offset_y, 10)
+    elif _direction == 'down':
+        _x1 = round(_cell_coordinates['x'] - _length_x / 2 + _offset_x, 10)
+        _y1 = round(_cell_coordinates['y'] - _cell_diameter / 2 - _offset_y - _length_y, 10)
     else:
         raise Exception('No such direction ' + _direction)
     _x2 = round(_x1 + _length_x, 10)
-    _y1 = round(_cell_coordinates['y'] - _length_y / 2 + _offset_y, 10)
     _y2 = round(_y1 + _length_y, 10)
 
     return _x1, _y1, _x2, _y2
