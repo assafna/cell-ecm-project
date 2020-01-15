@@ -2,10 +2,10 @@ import numpy as np
 import plotly.graph_objs as go
 
 
-def create_error_bars_plot(_x_array, _y_array, _names_array, _mode_array, _dash_array, _x_axis_title, _y_axis_title, _title):
+def create_error_bars_plot(_x_array, _y_array, _names_array, _modes_array, _dashes_array, _x_axis_title, _y_axis_title, _title):
     _fig = go.Figure()
 
-    for _x, _y, _name, _mode, _dash in zip(_x_array, _y_array, _names_array, _mode_array, _dash_array):
+    for _x, _y, _name, _mode, _dash in zip(_x_array, _y_array, _names_array, _modes_array, _dashes_array):
         _averages = []
         _std = []
         for _array in _y:
@@ -37,15 +37,16 @@ def create_error_bars_plot(_x_array, _y_array, _names_array, _mode_array, _dash_
     return _fig
 
 
-def create_plot(_x_array, _y_array, _names_array, _modes_array, _x_axis_title, _y_axis_title, _title):
+def create_plot(_x_array, _y_array, _names_array, _modes_array, _showlegend_array, _x_axis_title, _y_axis_title, _title):
     _data = []
-    for _x, _y, _name, _mode in zip(_x_array, _y_array, _names_array, _modes_array):
+    for _x, _y, _name, _mode, _showlegend in zip(_x_array, _y_array, _names_array, _modes_array, _showlegend_array):
         _data.append(
             go.Scatter(
                 x=_x,
                 y=_y,
                 name=_name,
-                mode=_mode
+                mode=_mode,
+                showlegend=_showlegend
             )
         )
 
@@ -66,6 +67,23 @@ def update_y_axis(_fig, _color, _width, _range):
             zerolinecolor=_color,
             zerolinewidth=_width,
             range=_range
+        )
+    )
+
+    return _fig
+
+
+def add_line(_fig, _x1, _y1, _x2, _y2, _name, _color, _showlegend):
+    _fig.add_trace(
+        go.Scatter(
+            x=[_x1, _x2],
+            y=[_y1, _y2],
+            name=_name,
+            marker=dict(
+                color=_color
+            ),
+            mode='lines',
+            showlegend=_showlegend
         )
     )
 

@@ -94,11 +94,11 @@ def plot_average(_experiment, _fibers_density_per_cell_averages):
             'Time-Point Last',
             'Time-Point 1'
         ],
-        _mode_array=[
+        _modes_array=[
             'lines+markers',
             'lines+markers'
         ],
-        _dash_array=[
+        _dashes_array=[
             'solid',
             'dash'
         ],
@@ -140,8 +140,8 @@ def plot_deltas_average(_experiment, _fibers_density_per_cell_averages):
         _x_array=[np.arange(start=0.0, stop=100.0, step=0.125)[:len(_delta_data)]],
         _y_array=[_delta_data],
         _names_array=['Deltas'],
-        _mode_array=['lines+markers'],
-        _dash_array=['solid'],
+        _modes_array=['lines+markers'],
+        _dashes_array=['solid'],
         _x_axis_title='Distance from Left Cell (cell size)',
         _y_axis_title='Fibers Density Z-score',
         _title=_experiment + ' - TP First vs. Last - Deltas'

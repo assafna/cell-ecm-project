@@ -93,8 +93,8 @@ def main():
         _x_array=[list(range(TIME_POINTS))] * 3,
         _y_array=[_fibers_densities_single_cells, _fibers_densities_pairs_left, _fibers_densities_pairs_right],
         _names_array=['Single Cell', 'Pair Left Cell', 'Pair Right Cell'],
-        _mode_array=['lines+markers'] * 3,
-        _dash_array=['dash'] + ['solid'] * 2,
+        _modes_array=['lines+markers'] * 3,
+        _dashes_array=['dash'] + ['solid'] * 2,
         _x_axis_title='Time (cell contraction percentages)',
         _y_axis_title='Fibers Density Z-score',
         _title='Fibers Densities vs. Time'

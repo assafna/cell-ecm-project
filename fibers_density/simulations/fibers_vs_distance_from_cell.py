@@ -107,8 +107,8 @@ def main():
         _x_array=[np.arange(start=OFFSET_X_START, stop=OFFSET_X_END, step=OFFSET_X_STEP) / CELL_DIAMETER],
         _y_array=[_fibers_densities],
         _names_array=['Time-Point Last'],
-        _mode_array=['lines+markers'],
-        _dash_array=['solid'],
+        _modes_array=['lines+markers'],
+        _dashes_array=['solid'],
         _x_axis_title='Distance from Cell (cell size)',
         _y_axis_title='Fibers Density Z-score',
         _title='Fibers Densities vs. Distance from Cell'

@@ -89,8 +89,8 @@ def main():
         _x_array=[np.arange(start=0, stop=OFFSET_X_END, step=OFFSET_X_STEP) / CELL_DIAMETER] * 2,
         _y_array=[_fibers_densities_single_cells, _fibers_densities_pairs],
         _names_array=['Single Cell', 'Pair'],
-        _mode_array=['lines+markers'] * 2,
-        _dash_array=['dash', 'solid'],
+        _modes_array=['lines+markers'] * 2,
+        _dashes_array=['dash', 'solid'],
         _x_axis_title='Distance from Left Cell (cell size)',
         _y_axis_title='Fibers Density Z-score',
         _title='Fibers Densities vs. Distance from Cell'
