@@ -62,7 +62,7 @@ def main():
         _is_causality=False,
         _is_dominant_passive=False
     )
-    _simulations = filtering.by_distances(_simulations, _distances=[CELLS_DISTANCE])
+    _simulations = filtering.by_distance(_simulations, _distance=CELLS_DISTANCE)
     _simulations_by_std = organize.by_heterogeneity(_simulations)
     _insides_correlations = []
     _outsides_correlations = []

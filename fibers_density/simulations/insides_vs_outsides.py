@@ -14,7 +14,7 @@ CELLS_DISTANCE = 3.0
 
 def main():
     _simulations = ['3D_1', '3D_2', '3D_3', '3D_4', '3D_5']
-    _simulations = filtering.by_distance(_simulations, CELLS_DISTANCE)
+    _simulations = filtering.by_distance(_simulations, _distance=CELLS_DISTANCE)
     _insides_correlations_array = []
     _outsides_correlations_array = []
     for _simulation in _simulations:

@@ -16,7 +16,7 @@ DIRECTION = 'inside'
 def main():
     _simulations = ['3D_1', '3D_2', '3D_3', '3D_4', '3D_5']
     _simulations = filtering.by_time_points_amount(_simulations, MINIMUM_TIME_POINTS)
-    _simulations = filtering.by_distance(_simulations, CELLS_DISTANCE)
+    _simulations = filtering.by_distance(_simulations, _distance=CELLS_DISTANCE)
     _same_correlations_array = []
     _different_correlations_array = []
     for _same_index in range(len(_simulations)):

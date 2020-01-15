@@ -24,7 +24,7 @@ def main():
         _is_causality=False,
         _is_dominant_passive=False
     )
-    _simulations = filtering.by_distances(_simulations, _distances=[CELLS_DISTANCE])
+    _simulations = filtering.by_distance(_simulations, _distance=CELLS_DISTANCE)
     _simulations = filtering.by_time_points_amount(_simulations, _time_points=TIME_POINT)
     _fibers_densities = list([None] * len(np.arange(start=0, stop=OFFSET_X_END, step=OFFSET_X_STEP)))
     for _simulation in _simulations:

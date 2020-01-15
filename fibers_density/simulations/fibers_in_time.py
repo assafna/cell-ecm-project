@@ -76,7 +76,7 @@ def main():
         _is_causality=False,
         _is_dominant_passive=False
     )
-    _simulations_pairs = filtering.by_distances(_simulations, _distances=[CELLS_DISTANCE])
+    _simulations_pairs = filtering.by_distance(_simulations, _distance=CELLS_DISTANCE)
     _fibers_densities_pairs_left = run(
         _simulations=_simulations_pairs,
         _cell_id='left_cell',
