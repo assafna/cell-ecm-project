@@ -9,7 +9,8 @@ TIME_POINTS = 50
 OFFSET_X = 0
 OFFSET_Y = 0
 DERIVATIVE = 2
-CELLS_DISTANCES = [5.0, 7.0, 9.0]
+STD = 0.5
+CELLS_DISTANCES = [5.0, 7.0, 9.0, 12.0]
 
 
 def run(_simulation, _direction):
@@ -63,7 +64,7 @@ def main():
         _is_dominant_passive=False
     )
     _simulations = filtering.by_distances(_simulations, _distances=CELLS_DISTANCES)
-    _simulations = filtering.by_heterogeneity(_simulations, _std=0.25)
+    _simulations = filtering.by_heterogeneity(_simulations, _std=STD)
     _simulations_by_distances = organize.by_distances(_simulations)
     _insides_correlations = []
     _outsides_correlations = []
@@ -72,7 +73,7 @@ def main():
         for _simulation in _simulations_by_distances[_distance]:
             print(_simulation)
             _insides_correlations.append(run(_simulation, _direction='inside'))
-            _insides_correlations.append(run(_simulation, _direction='outside'))
+            _outsides_correlations.append(run(_simulation, _direction='outside'))
             _x_array.append(_distance)
 
     # plot
