@@ -1,5 +1,5 @@
 from fibers_density.simulations import fibers_vs_distance, fibers_in_time, different_single_cell_correlations, \
-    insides_vs_outsides_stds, insides_vs_outsides_cell_distances
+    insides_vs_outsides_stds, insides_vs_outsides_cell_distances, same_vs_different, same_vs_different_cell_distances
 
 
 def figure_1():
@@ -17,7 +17,13 @@ def figure_3():
     insides_vs_outsides_cell_distances.main()
 
 
+def figure_4():
+    same_vs_different.main()
+    same_vs_different_cell_distances.main()
+
+
 if __name__ == '__main__':
     figure_1()
     figure_2()
     figure_3()
+    figure_4()
