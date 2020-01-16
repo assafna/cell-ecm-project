@@ -261,4 +261,4 @@ if __name__ == '__main__':
     # TODO: handle single cell experiments
     # process_all_experiments()
     # process_experiment('SN41')
-    process_series('SN16_CZI', 12)
+    process_series('SN16', 12)

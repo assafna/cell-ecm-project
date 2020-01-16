@@ -3,7 +3,7 @@ SINGLE_CELL = [
 ]
 
 PAIRS = [
-    'SN16_CZI',
+    'SN16',
     'SN41'
 ]
 
