@@ -88,7 +88,7 @@ def image_properties(_experiment, _series=None):
 
 
 def group_properties(_experiment, _series, _group):
-    return os.path.join(structured(_experiment, _series, _group), 'properties.pkl')
+    return os.path.join(structured(_experiment, _series, _group), 'properties.json')
 
 
 def objects(_experiment, _series=None, _time_point=None):

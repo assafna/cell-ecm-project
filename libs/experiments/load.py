@@ -36,10 +36,10 @@ def image_properties(_experiment, _series):
 def group_properties(_experiment, _series_id, _group):
     _file_path = paths.group_properties(_experiment, 'Series ' + str(_series_id), _group)
     try:
-        with gzip.open(_file_path, 'rb') as _pickle:
-            return pickle.load(_pickle)
+        with open(_file_path) as _json:
+            return json.load(_json)
     finally:
-        _pickle.close()
+        _json.close()
 
 
 def structured_image(_experiment, _series_id, _group, _time_point):

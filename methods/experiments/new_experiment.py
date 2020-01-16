@@ -36,14 +36,14 @@ def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell
         _group_structured_path = paths.structured(
             _experiment, 'Series ' + str(_series_id), 'cells_' + str(_cell_1_id) + '_' + str(_cell_2_id)
         )
-        _properties_pickle_path = os.path.join(_group_structured_path, 'properties.pkl')
+        _properties_json_path = os.path.join(_group_structured_path, 'properties.json')
         _time_point_pickle_path = paths.structured(
             _experiment=_experiment,
             _series='Series ' + str(_series_id),
             _group='cells_' + str(_cell_1_id) + '_' + str(_cell_2_id),
             _time_point=str(_time_point) + '.pkl'
         )
-        if os.path.isfile(_properties_pickle_path) and not _overwrite and os.path.isfile(_time_point_pickle_path):
+        if os.path.isfile(_properties_json_path) and not _overwrite and os.path.isfile(_time_point_pickle_path):
             # check for more time points
             if _time_point + 1 < len(_cells_coordinates[_cell_1_id]) and \
                     _cells_coordinates[_cell_1_id][_time_point + 1] is not None and \
@@ -206,13 +206,14 @@ def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell
             'left_cell': _left_cell_id,
             'right_cell': _right_cell_id
         },
-        'time_points': _time_points_data
+        'time_points': _time_points_data,
+        'band': None
     }
     _group_structured_path = paths.structured(
         _experiment, 'Series ' + str(_series_id), 'cells_' + str(_cell_1_id) + '_' + str(_cell_2_id)
     )
-    _properties_pickle_path = os.path.join(_group_structured_path, 'properties.pkl')
-    save_lib.to_pickle(_properties_data, _properties_pickle_path)
+    _properties_json_path = os.path.join(_group_structured_path, 'properties.json')
+    save_lib.to_json(_properties_data, _properties_json_path)
 
 
 def process_series(_experiment, _series_id, _overwrite=False):
@@ -259,4 +260,5 @@ def process_all_experiments(_overwrite=False):
 if __name__ == '__main__':
     # TODO: handle single cell experiments
     # process_all_experiments()
-    process_experiment('SN41')
+    # process_experiment('SN41')
+    process_series('SN16_CZI', 12)

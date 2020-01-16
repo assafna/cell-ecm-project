@@ -1,6 +1,7 @@
 import json
 import os
 
+from libs import save_lib
 from libs.experiments import paths
 from libs.save_lib import to_pickle
 
@@ -38,11 +39,7 @@ def image_properties(_experiment, _series_id, _image_properties):
     _experiment_path = paths.image_properties(_experiment)
     os.mkdir(_experiment_path) if not os.path.isdir(_experiment_path) else None
     _path = os.path.join(_experiment_path, 'series_' + str(_series_id) + '.json')
-    try:
-        with open(_path, 'w') as _json:
-            json.dump(_image_properties, _json, indent=4)
-    finally:
-        _json.close()
+    save_lib.to_json(_image_properties, _path)
 
 
 def fibers_densities(_experiment, _series_id, _group, _time_point, _fibers_densities):

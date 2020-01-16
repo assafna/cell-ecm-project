@@ -1,4 +1,5 @@
 import gzip
+import json
 import os
 import pickle
 
@@ -10,3 +11,12 @@ def to_pickle(_object, _pickle_path):
             pickle.dump(_object, _pickle, -1)
     finally:
         _pickle.close()
+
+
+def to_json(_json_data, _json_path):
+    os.makedirs(os.path.dirname(_json_path)) if not os.path.isdir(os.path.dirname(_json_path)) else None
+    try:
+        with open(_json_path, 'w') as _json:
+            json.dump(_json_data, _json, indent=4)
+    finally:
+        _json.close()
