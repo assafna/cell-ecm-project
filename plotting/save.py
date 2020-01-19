@@ -50,7 +50,7 @@ def to_html(_fig, _path, _filename):
     os.makedirs(_backup_path, exist_ok=True)
     div_to_website(
         _div=_div,
-        _filepath=os.path.join(_backup_path, _filename)
+        _filepath=os.path.join(_backup_path, _backup_filename)
     )
 
     print('Saved plot:', _filename)
