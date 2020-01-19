@@ -21,6 +21,18 @@ def by_distance(_experiments_tuples, _distance):
     return _experiments_tuples_filtered
 
 
+def by_distances(_experiments_tuples, _distances):
+    # TODO: improve efficiency
+    _experiments_tuples_filtered = []
+    for _distance in _distances:
+        _distance_tuples = by_distance(_experiments_tuples, _distance)
+        for _tuple in _distance_tuples:
+            if _tuple not in _experiments_tuples_filtered:
+                _experiments_tuples_filtered.append(_tuple)
+
+    return _experiments_tuples_filtered
+
+
 def by_time_points_amount(_experiments_tuples, _time_points, _exactly=False):
     _experiments_tuples_filtered = []
     for _tuple in _experiments_tuples:
