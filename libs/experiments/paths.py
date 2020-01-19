@@ -24,6 +24,7 @@ NORMALIZATION = os.path.join(MANIPULATIONS, 'Normalization')
 PAIRS = os.path.join(OUTPUTS, 'Pairs')
 CELLS = os.path.join(OUTPUTS, 'Cells')
 PLOTS = os.path.join(OUTPUTS, 'Plots')
+IMAGES = os.path.join(OUTPUTS, 'Images')
 ANIMATIONS = os.path.join(OUTPUTS, 'Animations')
 
 
@@ -163,6 +164,19 @@ def normalization(_experiment, _series=None):
 
 def plots(_experiment, _series=None, _group=None):
     _experiment_path = os.path.join(PLOTS, _experiment)
+
+    if _series is None:
+        return _experiment_path
+
+    _series_path = os.path.join(_experiment_path, _series)
+    if _group is None:
+        return _series_path
+
+    return os.path.join(_series_path, _group)
+
+
+def images(_experiment, _series=None, _group=None):
+    _experiment_path = os.path.join(IMAGES, _experiment)
 
     if _series is None:
         return _experiment_path

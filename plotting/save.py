@@ -5,8 +5,6 @@ import time
 
 import plotly
 
-from libs.simulations import paths
-
 
 def div_to_website(_div, _filepath):
     _web_page = '''
@@ -32,8 +30,6 @@ def get_module_name():
 
 
 def to_html(_fig, _path, _filename):
-    os.makedirs(_path, exist_ok=True)
-
     _div = plotly.offline.plot(
         figure_or_data=_fig,
         output_type='div',
@@ -41,20 +37,20 @@ def to_html(_fig, _path, _filename):
     )
 
     # regular save
+    os.makedirs(_path, exist_ok=True)
     div_to_website(
         _div=_div,
         _filepath=os.path.join(_path, _filename)
     )
 
-    # backup
-    # TODO: fix the history it is not working
+    # backup save
     _time = time.strftime('%Y_%m_%d-%H_%M_%S')
-    _backup_path = os.path.join(paths.PLOTS_HISTORY, os.path.basename(os.path.normpath(_path)))
-    os.makedirs(_backup_path, exist_ok=True)
     _backup_filename = _filename + '-' + _time
+    _backup_path = os.path.join(_path, 'History')
+    os.makedirs(_backup_path, exist_ok=True)
     div_to_website(
         _div=_div,
-        _filepath=os.path.join(_backup_path, _backup_filename)
+        _filepath=os.path.join(_backup_path, _filename)
     )
 
     print('Saved plot:', _filename)
