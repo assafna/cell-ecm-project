@@ -10,9 +10,9 @@ from libs.experiments import load, filtering, compute, paths
 from libs.experiments.config import ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT, CELL_DIAMETER_IN_MICRONS
 from plotting import scatter, save
 
-MINIMUM_TIME_POINTS = 23
+MINIMUM_TIME_POINTS = 15
 OFFSET_X = (CELL_DIAMETER_IN_MICRONS / 8) * 0
-OFFSET_Y = 0
+OFFSET_Y = (CELL_DIAMETER_IN_MICRONS / 8) * 8
 OFFSET_Z = 0
 DERIVATIVE = 2
 CELLS_DISTANCE = 8
