@@ -10,7 +10,7 @@ from libs.experiments import load, filtering, compute, paths
 from libs.experiments.config import ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT, CELL_DIAMETER_IN_MICRONS
 from plotting import scatter, save
 
-MINIMUM_TIME_POINTS = 240
+MINIMUM_TIME_POINTS = 23
 OFFSET_X = (CELL_DIAMETER_IN_MICRONS / 8) * 0
 OFFSET_Y = 0
 OFFSET_Z = 0
@@ -20,9 +20,10 @@ DIRECTION = 'inside'
 
 
 def main():
-    _experiments = load.experiment_groups_as_tuples('SN41')
-    # _experiments = filtering.by_distance(_experiments, CELLS_DISTANCE)
+    _experiments = load.experiment_groups_as_tuples('SN16')
+    _experiments = filtering.by_distance(_experiments, CELLS_DISTANCE)
     # _minimum_time_points = compute.minimum_time_points(_experiments)
+    _experiments = filtering.by_band(_experiments, True)
     _minimum_time_points = MINIMUM_TIME_POINTS
     _experiments = filtering.by_time_points_amount(_experiments, _minimum_time_points)
 

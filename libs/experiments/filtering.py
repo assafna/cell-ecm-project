@@ -32,3 +32,13 @@ def by_time_points_amount(_experiments_tuples, _time_points, _exactly=False):
             _experiments_tuples_filtered.append(_tuple)
 
     return _experiments_tuples_filtered
+
+
+def by_band(_experiments_tuples, _band=True):
+    _experiments_tuples_filtered = []
+    for _tuple in _experiments_tuples:
+        _experiment, _series_id, _group = _tuple
+        _group_properties = load.group_properties(_experiment, _series_id, _group)
+        _experiments_tuples_filtered.append(_tuple) if _group_properties['band'] == _band else None
+
+    return _experiments_tuples_filtered
