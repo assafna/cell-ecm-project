@@ -31,12 +31,12 @@ def main():
     )
     _simulations = filtering.by_heterogeneity(_simulations, _std=STD)
     _simulations = filtering.by_distance(_simulations, _distance=CELLS_DISTANCE)
-    _same_correlations_array = []
-    _different_correlations_array = []
-    for _same_index in range(len(_simulations)):
-        _same_simulation = _simulations[_same_index]
-        _same_left_cell_fibers_densities = compute.roi_fibers_density_by_time(
-            _simulation=_same_simulation,
+    _master_correlations_array = []
+    _slave_correlations_array = []
+    for _master_index in range(len(_simulations)):
+        _master_simulation = _simulations[_master_index]
+        _master_left_cell_fibers_densities = compute.roi_fibers_density_by_time(
+            _simulation=_master_simulation,
             _length_x=ROI_WIDTH,
             _length_y=ROI_HEIGHT,
             _offset_x=OFFSET_X,
@@ -45,8 +45,8 @@ def main():
             _direction=DIRECTION,
             _time_points=MINIMUM_TIME_POINTS
         )
-        _same_right_cell_fibers_densities = compute.roi_fibers_density_by_time(
-            _simulation=_same_simulation,
+        _master_right_cell_fibers_densities = compute.roi_fibers_density_by_time(
+            _simulation=_master_simulation,
             _length_x=ROI_WIDTH,
             _length_y=ROI_HEIGHT,
             _offset_x=OFFSET_X,
@@ -55,15 +55,15 @@ def main():
             _direction=DIRECTION,
             _time_points=MINIMUM_TIME_POINTS
         )
-        _same_correlation = compute_lib.correlation(
-            compute_lib.derivative(_same_left_cell_fibers_densities, _n=DERIVATIVE),
-            compute_lib.derivative(_same_right_cell_fibers_densities, _n=DERIVATIVE)
+        _master_correlation = compute_lib.correlation(
+            compute_lib.derivative(_master_left_cell_fibers_densities, _n=DERIVATIVE),
+            compute_lib.derivative(_master_right_cell_fibers_densities, _n=DERIVATIVE)
         )
-        for _different_index in range(_same_index + 1, len(_simulations)):
-            _different_simulation = _simulations[_different_index]
-            print(_same_simulation, _different_simulation, sep='\t')
-            _different_left_cell_fibers_densities = compute.roi_fibers_density_by_time(
-                _simulation=_different_simulation,
+        for _slave_index in range(_master_index + 1, len(_simulations)):
+            _slave_simulation = _simulations[_slave_index]
+            print(_master_simulation, _slave_simulation, sep='\t')
+            _slave_left_cell_fibers_densities = compute.roi_fibers_density_by_time(
+                _simulation=_slave_simulation,
                 _length_x=ROI_WIDTH,
                 _length_y=ROI_HEIGHT,
                 _offset_x=OFFSET_X,
@@ -72,22 +72,22 @@ def main():
                 _direction=DIRECTION,
                 _time_points=MINIMUM_TIME_POINTS
             )
-            _different_correlations_array.append(compute_lib.correlation(
-                compute_lib.derivative(_same_left_cell_fibers_densities, _n=DERIVATIVE),
-                compute_lib.derivative(_different_left_cell_fibers_densities, _n=DERIVATIVE)
+            _slave_correlations_array.append(compute_lib.correlation(
+                compute_lib.derivative(_master_left_cell_fibers_densities, _n=DERIVATIVE),
+                compute_lib.derivative(_slave_left_cell_fibers_densities, _n=DERIVATIVE)
             ))
-            _same_correlations_array.append(_same_correlation)
+            _master_correlations_array.append(_master_correlation)
 
     # points plot
     _fig = scatter.create_plot(
-        _x_array=[_same_correlations_array],
-        _y_array=[_different_correlations_array],
+        _x_array=[_master_correlations_array],
+        _y_array=[_slave_correlations_array],
         _names_array=['Distance ' + str(CELLS_DISTANCE)],
         _modes_array=['markers'],
         _showlegend_array=[False],
-        _x_axis_title='Same Network Correlation',
-        _y_axis_title='Different Network Correlation',
-        _title='Same vs. Different Network Correlations'
+        _x_axis_title='master Network Correlation',
+        _y_axis_title='slave Network Correlation',
+        _title='master vs. slave Network Correlations'
     )
 
     _fig = scatter.add_line(
@@ -104,12 +104,12 @@ def main():
         _filename='plot'
     )
 
-    _same_minus_different = np.array(_same_correlations_array) - np.array(_different_correlations_array)
-    _same_count = len(_same_minus_different[_same_minus_different > 0])
-    _same_percentages = round(_same_count / len(_same_minus_different), 10)
-    _wilcoxon_rank = wilcoxon(_same_minus_different)
+    _master_minus_slave = np.array(_master_correlations_array) - np.array(_slave_correlations_array)
+    _master_count = len(_master_minus_slave[_master_minus_slave > 0])
+    _master_percentages = round(_master_count / len(_master_minus_slave), 10)
+    _wilcoxon_rank = wilcoxon(_master_minus_slave)
 
-    print('Same Network:', str(_same_percentages * 100) + '%')
+    print('master Network:', str(_master_percentages * 100) + '%')
     print('Wilcoxon:', _wilcoxon_rank)
 
     # TODO: create plot

@@ -19,12 +19,12 @@ DIRECTION = 'inside'
 
 
 def run(_simulations):
-    _same_correlations_array = []
-    _different_correlations_array = []
-    for _same_index in range(len(_simulations)):
-        _same_simulation = _simulations[_same_index]
-        _same_left_cell_fibers_densities = compute.roi_fibers_density_by_time(
-            _simulation=_same_simulation,
+    _master_correlations_array = []
+    _slave_correlations_array = []
+    for _master_index in range(len(_simulations)):
+        _master_simulation = _simulations[_master_index]
+        _master_left_cell_fibers_densities = compute.roi_fibers_density_by_time(
+            _simulation=_master_simulation,
             _length_x=ROI_WIDTH,
             _length_y=ROI_HEIGHT,
             _offset_x=OFFSET_X,
@@ -33,8 +33,8 @@ def run(_simulations):
             _direction=DIRECTION,
             _time_points=MINIMUM_TIME_POINTS
         )
-        _same_right_cell_fibers_densities = compute.roi_fibers_density_by_time(
-            _simulation=_same_simulation,
+        _master_right_cell_fibers_densities = compute.roi_fibers_density_by_time(
+            _simulation=_master_simulation,
             _length_x=ROI_WIDTH,
             _length_y=ROI_HEIGHT,
             _offset_x=OFFSET_X,
@@ -43,15 +43,15 @@ def run(_simulations):
             _direction=DIRECTION,
             _time_points=MINIMUM_TIME_POINTS
         )
-        _same_correlation = compute_lib.correlation(
-            compute_lib.derivative(_same_left_cell_fibers_densities, _n=DERIVATIVE),
-            compute_lib.derivative(_same_right_cell_fibers_densities, _n=DERIVATIVE)
+        _master_correlation = compute_lib.correlation(
+            compute_lib.derivative(_master_left_cell_fibers_densities, _n=DERIVATIVE),
+            compute_lib.derivative(_master_right_cell_fibers_densities, _n=DERIVATIVE)
         )
-        for _different_index in range(_same_index + 1, len(_simulations)):
-            _different_simulation = _simulations[_different_index]
-            print(_same_simulation, _different_simulation, sep='\t')
-            _different_left_cell_fibers_densities = compute.roi_fibers_density_by_time(
-                _simulation=_different_simulation,
+        for _slave_index in range(_master_index + 1, len(_simulations)):
+            _slave_simulation = _simulations[_slave_index]
+            print(_master_simulation, _slave_simulation, sep='\t')
+            _slave_left_cell_fibers_densities = compute.roi_fibers_density_by_time(
+                _simulation=_slave_simulation,
                 _length_x=ROI_WIDTH,
                 _length_y=ROI_HEIGHT,
                 _offset_x=OFFSET_X,
@@ -60,13 +60,13 @@ def run(_simulations):
                 _direction=DIRECTION,
                 _time_points=MINIMUM_TIME_POINTS
             )
-            _different_correlations_array.append(compute_lib.correlation(
-                compute_lib.derivative(_same_left_cell_fibers_densities, _n=DERIVATIVE),
-                compute_lib.derivative(_different_left_cell_fibers_densities, _n=DERIVATIVE)
+            _slave_correlations_array.append(compute_lib.correlation(
+                compute_lib.derivative(_master_left_cell_fibers_densities, _n=DERIVATIVE),
+                compute_lib.derivative(_slave_left_cell_fibers_densities, _n=DERIVATIVE)
             ))
-            _same_correlations_array.append(_same_correlation)
+            _master_correlations_array.append(_master_correlation)
 
-    return np.array(_same_correlations_array) - np.array(_different_correlations_array)
+    return np.array(_master_correlations_array) - np.array(_slave_correlations_array)
 
 
 def main():
@@ -90,8 +90,8 @@ def main():
         _y_array=_y_arrays,
         _names_array=CELLS_DISTANCES,
         _x_axis_title='Cells Distance',
-        _y_axis_title='Same minus Different',
-        _title='Same minus Different Network Correlations by Cell Distance'
+        _y_axis_title='master minus slave',
+        _title='master minus slave Network Correlations by Cell Distance'
     )
 
     save.to_html(
