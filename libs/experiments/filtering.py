@@ -54,3 +54,7 @@ def by_band(_experiments_tuples, _band=True):
         _experiments_tuples_filtered.append(_tuple) if _group_properties['band'] == _band else None
 
     return _experiments_tuples_filtered
+
+
+def by_series_id(_experiments_tuples, _series_id):
+    return [_tuple for _tuple in _experiments_tuples if _tuple[1] == _series_id]
