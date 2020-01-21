@@ -8,7 +8,7 @@ from libs.simulations.config import CELL_DIAMETER, ROI_WIDTH, ROI_HEIGHT
 from plotting import scatter, save
 
 TIME_POINTS = 50
-CELLS_DISTANCE = 7.0
+CELLS_DISTANCE = 5.0
 OFFSET_X = 0
 OFFSET_Y = 0
 
@@ -88,13 +88,18 @@ def main():
         _directions=['inside']
     )
 
+    # combine left and right cells
+    _fibers_densities_pairs = []
+    for _left, _right in zip(_fibers_densities_pairs_left, _fibers_densities_pairs_right):
+        _fibers_densities_pairs.append(_left + _right)
+
     # plot
     _fig = scatter.create_error_bars_plot(
-        _x_array=[list(range(TIME_POINTS))] * 3,
-        _y_array=[_fibers_densities_single_cells, _fibers_densities_pairs_left, _fibers_densities_pairs_right],
-        _names_array=['Single Cell', 'Pair Left Cell', 'Pair Right Cell'],
-        _modes_array=['lines+markers'] * 3,
-        _dashes_array=['dash'] + ['solid'] * 2,
+        _x_array=[list(range(TIME_POINTS))] * 2,
+        _y_array=[_fibers_densities_single_cells, _fibers_densities_pairs],
+        _names_array=['Single Cell', 'Pair Cell'],
+        _modes_array=['lines+markers'] * 2,
+        _dashes_array=['dash', 'solid'],
         _x_axis_title='Time (cell contraction percentages)',
         _y_axis_title='Fibers Density Z-score',
         _title='Fibers Densities vs. Time'
