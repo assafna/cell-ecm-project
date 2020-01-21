@@ -1,5 +1,6 @@
 import numpy as np
 
+import plotting.edit
 from plotting import save, scatter
 from libs.experiments.compute import z_score_fibers_density_array, fibers_density_cut_left_edge
 from libs.experiments import config, load, paths
@@ -107,11 +108,11 @@ def plot_average(_experiment, _fibers_density_per_cell_averages):
         _title=_experiment + ' - TP First vs. Last'
     )
 
-    _fig = scatter.update_y_axis(
+    _fig = plotting.edit.update_y_axis(
         _fig=_fig,
+        _range=[0, 25],
         _color='black',
-        _width=2,
-        _range=[0, 25]
+        _width=2
     )
 
     save.to_html(
@@ -147,11 +148,11 @@ def plot_deltas_average(_experiment, _fibers_density_per_cell_averages):
         _title=_experiment + ' - TP First vs. Last - Deltas'
     )
 
-    _fig = scatter.update_y_axis(
+    _fig = plotting.edit.update_y_axis(
         _fig=_fig,
+        _range=[0, 25],
         _color='black',
-        _width=2,
-        _range=[0, 25]
+        _width=2
     )
 
     save.to_html(

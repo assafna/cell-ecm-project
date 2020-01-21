@@ -2,6 +2,7 @@ import os
 
 import numpy as np
 
+import plotting.edit
 from plotting import save, scatter
 from libs.experiments.compute import z_score_fibers_density_array, fibers_density_cut_edges
 from libs.experiments import config, load, paths
@@ -39,11 +40,11 @@ def plot(_experiment, _series, _group, _z_group, _fibers_density, _normalization
         _title=_experiment + ' - ' + _series + ' - ' + _group + ' - ' + _z_group + ' - TP First vs. Last'
     )
 
-    _fig = scatter.update_y_axis(
+    _fig = plotting.edit.update_y_axis(
         _fig=_fig,
+        _range=[0, 25],
         _color='black',
-        _width=2,
-        _range=[0, 25]
+        _width=2
     )
 
     save.to_html(
