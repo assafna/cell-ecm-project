@@ -59,24 +59,25 @@ def main():
             compute_lib.derivative(_master_left_cell_fibers_densities, _n=DERIVATIVE),
             compute_lib.derivative(_master_right_cell_fibers_densities, _n=DERIVATIVE)
         )
-        for _slave_index in range(_master_index + 1, len(_simulations)):
-            _slave_simulation = _simulations[_slave_index]
-            print(_master_simulation, _slave_simulation, sep='\t')
-            _slave_left_cell_fibers_densities = compute.roi_fibers_density_by_time(
-                _simulation=_slave_simulation,
-                _length_x=ROI_WIDTH,
-                _length_y=ROI_HEIGHT,
-                _offset_x=OFFSET_X,
-                _offset_y=OFFSET_Y,
-                _cell_id='left_cell',
-                _direction=DIRECTION,
-                _time_points=MINIMUM_TIME_POINTS
-            )
-            _slave_correlations_array.append(compute_lib.correlation(
-                compute_lib.derivative(_master_left_cell_fibers_densities, _n=DERIVATIVE),
-                compute_lib.derivative(_slave_left_cell_fibers_densities, _n=DERIVATIVE)
-            ))
-            _master_correlations_array.append(_master_correlation)
+        for _slave_index in range(len(_simulations)):
+            if _master_index != _slave_index:
+                _slave_simulation = _simulations[_slave_index]
+                print(_master_simulation, _slave_simulation, sep='\t')
+                _slave_left_cell_fibers_densities = compute.roi_fibers_density_by_time(
+                    _simulation=_slave_simulation,
+                    _length_x=ROI_WIDTH,
+                    _length_y=ROI_HEIGHT,
+                    _offset_x=OFFSET_X,
+                    _offset_y=OFFSET_Y,
+                    _cell_id='left_cell',
+                    _direction=DIRECTION,
+                    _time_points=MINIMUM_TIME_POINTS
+                )
+                _slave_correlations_array.append(compute_lib.correlation(
+                    compute_lib.derivative(_master_left_cell_fibers_densities, _n=DERIVATIVE),
+                    compute_lib.derivative(_slave_left_cell_fibers_densities, _n=DERIVATIVE)
+                ))
+                _master_correlations_array.append(_master_correlation)
 
     # points plot
     _fig = scatter.create_plot(
