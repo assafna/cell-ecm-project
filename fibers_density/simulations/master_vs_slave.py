@@ -86,9 +86,9 @@ def main():
         _names_array=['Distance ' + str(CELLS_DISTANCE)],
         _modes_array=['markers'],
         _showlegend_array=[False],
-        _x_axis_title='master Network Correlation',
-        _y_axis_title='slave Network Correlation',
-        _title='master vs. slave Network Correlations'
+        _x_axis_title='Master Network Correlation',
+        _y_axis_title='Slave Network Correlation',
+        _title='Master vs. Slave Network Correlations'
     )
 
     _fig = scatter.add_line(
@@ -102,7 +102,7 @@ def main():
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        _filename='plot'
+        _filename='plot_derivative_' + str(DERIVATIVE)
     )
 
     _master_minus_slave = np.array(_master_correlations_array) - np.array(_slave_correlations_array)
@@ -110,7 +110,7 @@ def main():
     _master_percentages = round(_master_count / len(_master_minus_slave), 10)
     _wilcoxon_rank = wilcoxon(_master_minus_slave)
 
-    print('master Network:', str(_master_percentages * 100) + '%')
+    print('Master Network:', str(_master_percentages * 100) + '%')
     print('Wilcoxon:', _wilcoxon_rank)
 
     # TODO: create plot
