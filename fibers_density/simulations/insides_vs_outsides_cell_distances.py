@@ -2,11 +2,11 @@ import os
 
 from libs import compute_lib
 from libs.simulations import load, filtering, organize, compute, paths
-from libs.simulations.config import ROI_WIDTH, ROI_HEIGHT
-from plotting import box, save
+from libs.simulations.config import ROI_WIDTH, ROI_HEIGHT, CELL_DIAMETER
+from plotting import box, save, edit
 
 TIME_POINTS = 50
-OFFSET_X = 0
+OFFSET_X = CELL_DIAMETER * 1
 OFFSET_Y = 0
 DERIVATIVE = 2
 STD = 0.5
@@ -86,10 +86,15 @@ def main():
         _title='Insides & Outsides Correlation by Cell Distance'
     )
 
+    _fig = edit.update_y_axis(
+        _fig=_fig,
+        _range=[-0.5, 1.0]
+    )
+
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        _filename='plot'
+        _filename='plot_offset_x_1_cell'
     )
 
 
