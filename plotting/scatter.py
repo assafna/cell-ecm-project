@@ -61,18 +61,6 @@ def create_plot(_x_array, _y_array, _names_array, _modes_array, _showlegend_arra
     return _fig
 
 
-def update_y_axis(_fig, _color, _width, _range):
-    _fig.update_layout(
-        yaxis=dict(
-            zerolinecolor=_color,
-            zerolinewidth=_width,
-            range=_range
-        )
-    )
-
-    return _fig
-
-
 def add_line(_fig, _x1, _y1, _x2, _y2, _name, _color, _showlegend):
     _fig.add_trace(
         go.Scatter(
