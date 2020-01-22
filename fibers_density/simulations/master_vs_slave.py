@@ -113,7 +113,7 @@ def main():
     print('Master Network:', str(_master_percentages * 100) + '%')
     print('Wilcoxon:', _wilcoxon_rank)
 
-    # TODO: create plot
+    # TODO: create bot plot ?
 
 
 if __name__ == '__main__':

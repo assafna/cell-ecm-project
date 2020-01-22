@@ -1,5 +1,7 @@
 import os
 
+from scipy.stats import wilcoxon
+
 from libs import compute_lib
 from libs.simulations import load, filtering, organize, compute, paths
 from libs.simulations.config import ROI_WIDTH, ROI_HEIGHT
@@ -68,11 +70,22 @@ def main():
     _outsides_correlations = []
     _x_array = []
     for _std in _simulations_by_std:
+        _std_insides_correlations = []
+        _std_outsides_correlations = []
         for _simulation in _simulations_by_std[_std]:
             print(_simulation)
-            _insides_correlations.append(run(_simulation, _direction='inside'))
-            _outsides_correlations.append(run(_simulation, _direction='outside'))
+            _insides_correlation = run(_simulation, _direction='inside')
+            _outsides_correlation = run(_simulation, _direction='outside')
+            _insides_correlations.append(_insides_correlation)
+            _outsides_correlations.append(_outsides_correlation)
+            _std_insides_correlations.append(_insides_correlation)
+            _std_outsides_correlations.append(_outsides_correlation)
             _x_array.append(_std)
+
+        # wilcoxon
+        print('Wilcoxon STD', _std, 'insides', wilcoxon(_std_insides_correlations), sep='\t')
+        print('Wilcoxon STD', _std, 'outsides', wilcoxon(_std_outsides_correlations), sep='\t')
+
 
     # plot
     _fig = box.create_group_plot(

@@ -1,6 +1,7 @@
 import os
 
 import numpy as np
+from scipy.stats import wilcoxon
 
 from libs import compute_lib
 from libs.simulations import load, filtering, compute, paths
@@ -86,6 +87,11 @@ def main():
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
         _filename='plot'
     )
+
+    # wilcoxon
+    print('Derivative 0:', wilcoxon(_correlations_array_derivative_0))
+    print('Derivative 1:', wilcoxon(_correlations_array_derivative_1))
+    print('Derivative 2:', wilcoxon(_correlations_array_derivative_2))
 
 
 if __name__ == '__main__':
