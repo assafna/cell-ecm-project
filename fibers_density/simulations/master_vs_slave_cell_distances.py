@@ -100,6 +100,10 @@ def main():
         _filename='plot'
     )
 
+    # wilcoxon
+    for _distance, _y in zip(CELLS_DISTANCES, _y_arrays):
+        print('Wilcoxon distance', _distance, wilcoxon(_y))
+
 
 if __name__ == '__main__':
     main()
