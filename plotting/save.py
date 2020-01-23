@@ -6,6 +6,15 @@ import time
 import plotly
 
 
+def replace_image_download(_div):
+    return _div.replace(
+        '{"responsive": true}',
+        '{modeBarButtonsToRemove: ["toImage", "sendDataToCloud"], modeBarButtonsToAdd: [{ name: "SVG", '
+        'icon: Plotly.Icons.camera, click: function(gd) {Plotly.downloadImage(gd, {format: "svg", '
+        'height: window.innerHeight, width: window.innerWidth})}}]},{"responsive": true} '
+    )
+
+
 def div_to_website(_div, _filepath):
     _web_page = '''
     <html>
@@ -30,11 +39,19 @@ def get_module_name():
 
 
 def to_html(_fig, _path, _filename):
+    # update theme
+    # options: plotly_white, presentation, none
+    _fig.update_layout(template='presentation')
+
+    # create div
     _div = plotly.offline.plot(
         figure_or_data=_fig,
         output_type='div',
         include_plotlyjs=False
     )
+
+    # update download button
+    _div = replace_image_download(_div)
 
     # regular save
     os.makedirs(_path, exist_ok=True)
