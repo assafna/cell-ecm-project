@@ -1,7 +1,6 @@
 import math
 
 from libs.experiments import paths, load, save
-from libs.experiments.config import IMAGE_SIZE_PIXELS
 
 JUMPS = 5
 FACTOR = 20
@@ -9,15 +8,18 @@ MIN_LINE_DISTANCE = 200
 
 
 def main():
-    _borders_points = [(i, FACTOR) for i in range(FACTOR, IMAGE_SIZE_PIXELS - FACTOR, JUMPS)] +\
-                      [(i, IMAGE_SIZE_PIXELS - FACTOR - 1) for i in range(FACTOR, IMAGE_SIZE_PIXELS - FACTOR, JUMPS)] +\
-                      [(FACTOR, i) for i in range(FACTOR, IMAGE_SIZE_PIXELS - FACTOR, JUMPS)] +\
-                      [(IMAGE_SIZE_PIXELS - FACTOR - 1, i) for i in range(FACTOR, IMAGE_SIZE_PIXELS - FACTOR, JUMPS)]
-
     for _experiment in paths.folders(paths.OBJECTS):
         print('Experiment', _experiment)
         for _series in paths.folders(paths.objects(_experiment)):
             print(_series)
+            _series_properties = load.image_properties(_experiment, _series)
+            _width = _series_properties['dimensions']['width']
+            _height = _series_properties['dimensions']['height']
+            _borders_points = [(i, FACTOR) for i in range(FACTOR, _width - FACTOR, JUMPS)] + \
+                              [(i, _width - FACTOR - 1) for i in range(FACTOR, _width - FACTOR, JUMPS)] + \
+                              [(FACTOR, i) for i in range(FACTOR, _height - FACTOR, JUMPS)] + \
+                              [(_height - FACTOR - 1, i) for i in range(FACTOR, _height - FACTOR, JUMPS)]
+
             _objects = load.objects_time_point_file_data(_experiment, _series, _time_point='tp_1.txt')
             _line = None
             _line_max_distance = 0
@@ -44,4 +46,5 @@ def main():
 
 
 if __name__ == '__main__':
+    # TODO: replace this computation with python computation
     main()
