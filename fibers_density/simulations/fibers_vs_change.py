@@ -14,6 +14,7 @@ OFFSET_Y = 0
 DERIVATIVE = 1
 DISTANCES = [3.0, 7.0, 12.0]
 DIRECTION = 'inside'
+HETEROGENEITY = False
 
 
 def main():
@@ -21,7 +22,7 @@ def main():
     _simulations = filtering.by_categories(
         _simulations,
         _is_single_cell=False,
-        _is_heterogeneity=False,
+        _is_heterogeneity=HETEROGENEITY,
         _is_low_connectivity=False,
         _is_causality=False,
         _is_dominant_passive=False
@@ -73,7 +74,7 @@ def main():
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        _filename=DIRECTION + '_points'
+        _filename=DIRECTION + '_heterogeneity_' + str(HETEROGENEITY) + '_points'
     )
 
     # line of best fit
@@ -102,7 +103,7 @@ def main():
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        _filename=DIRECTION + '_best_fit'
+        _filename=DIRECTION + '_heterogeneity_' + str(HETEROGENEITY) + '_best_fit'
     )
 
 
