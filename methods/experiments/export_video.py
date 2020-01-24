@@ -9,8 +9,8 @@ from libs.experiments.compute import roi_by_microns
 from libs.experiments.config import CELL_DIAMETER_IN_MICRONS, ROI_LENGTH, ROI_HEIGHT, ROI_WIDTH
 
 MINIMUM_TIME_POINTS = 15
-OFFSET_X = (CELL_DIAMETER_IN_MICRONS / 8) * 0
-OFFSET_Y = (CELL_DIAMETER_IN_MICRONS / 8) * 8
+OFFSET_X = CELL_DIAMETER_IN_MICRONS * 0
+OFFSET_Y = CELL_DIAMETER_IN_MICRONS * 1
 OFFSET_Z = 0
 CELLS_DISTANCES = [8]
 DIRECTION = 'inside'
@@ -45,7 +45,7 @@ def mark_cells(_image, _group_properties, _time_point, _cell_coordinates):
     return _image
 
 
-def draw_borders(_image, _roi, _z_slice):
+def draw_borders(_image, _roi):
     _x1, _y1, _, _x2, _y2, _ = _roi
     _image[_y1, _x1:_x2] = 255
     _image[_y2, _x1:_x2] = 255
@@ -79,8 +79,8 @@ def process_group(_experiment, _series_id, _group, _mark_cells=True, _draw_borde
         if _draw_borders:
             _left_roi = get_roi(_group_properties, _time_point, 'left_cell', DIRECTION)
             _right_roi = get_roi(_group_properties, _time_point, 'right_cell', DIRECTION)
-            _average_across_z = draw_borders(_average_across_z, _left_roi, _left_cell_coordinates['z'])
-            _average_across_z = draw_borders(_average_across_z, _right_roi, _right_cell_coordinates['z'])
+            _average_across_z = draw_borders(_average_across_z, _left_roi)
+            _average_across_z = draw_borders(_average_across_z, _right_roi)
 
         # _z_image_stretched = np.repeat(
         #     _average_across_z, repeats=int(round(_average_across_z.shape[1] / _average_across_z.shape[0])), axis=0
@@ -102,4 +102,5 @@ def process_experiments():
 
 
 if __name__ == '__main__':
-    process_experiments()
+    # process_experiments()
+    process_group('SN16', 16, 'cells_1_2')
