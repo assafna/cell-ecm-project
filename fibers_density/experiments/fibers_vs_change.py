@@ -16,7 +16,7 @@ OFFSET_X = 0
 OFFSET_Y = CELL_DIAMETER_IN_MICRONS * 0
 OFFSET_Z = 0
 DERIVATIVE = 1
-CELLS_DISTANCES = [4.0, 5.0, 6.0, 7.0, 8.0, 9.0]
+CELLS_DISTANCES = [5.0, 7.0, 9.0, 12.0, 15.0]
 DIRECTION = 'inside'
 
 
@@ -56,6 +56,10 @@ def main():
                 # fix if found nan
                 if True in np.isnan(_cell_fibers_densities):
                     _cell_fibers_densities = _cell_fibers_densities[:np.where(np.isnan(_cell_fibers_densities))[0][0]]
+
+                # not enough data
+                if len(_cell_fibers_densities) < DERIVATIVE + 1:
+                    continue
 
                 _z_score_fibers_density = libs.compute_lib.z_score_fibers_densities_array(
                     _cell_fibers_densities, _series_normalization
