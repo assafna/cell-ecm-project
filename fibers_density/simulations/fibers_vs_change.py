@@ -77,9 +77,10 @@ def main():
         _x_array = _fibers_densities_by_distance[_distance]
         _y_array = _change_in_fibers_densities_by_distance[_distance]
         _slope, _intercept, _r_value, _p_value, _std_err = stats.linregress(_x_array, _y_array)
-        _line = _slope * np.array(_x_array) + _intercept
-        _best_fit_lines_x_array.append(_x_array)
-        _best_fit_lines_y_array.append(_line)
+        _x1, _x2 = min(_x_array), max(_x_array)
+        _y1, _y2 = _slope * _x1 + _intercept, _slope * _x2 + _intercept
+        _best_fit_lines_x_array.append([_x1, _x2])
+        _best_fit_lines_y_array.append([_y1, _y2])
 
     _fig = scatter.create_plot(
         _x_array=_best_fit_lines_x_array,
@@ -100,4 +101,5 @@ def main():
 
 
 if __name__ == '__main__':
+    # TODO: change to z score
     main()
