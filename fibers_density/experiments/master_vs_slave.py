@@ -3,6 +3,7 @@ from itertools import product
 from multiprocessing.pool import Pool
 
 import numpy as np
+import plotly
 from scipy.stats import wilcoxon
 
 from libs import compute_lib
@@ -10,13 +11,13 @@ from libs.experiments import load, filtering, compute, paths
 from libs.experiments.config import ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT, CELL_DIAMETER_IN_MICRONS
 from plotting import scatter, save
 
-MINIMUM_TIME_POINTS = 245
-OFFSET_X = (CELL_DIAMETER_IN_MICRONS / 8) * 0
+MINIMUM_TIME_POINTS = 15
+OFFSET_X = CELL_DIAMETER_IN_MICRONS * 0
 # TODO: set the offset in y according to the angle in the original Z slices of the cells
-OFFSET_Y = CELL_DIAMETER_IN_MICRONS * 0
+OFFSET_Y = CELL_DIAMETER_IN_MICRONS * 1
 OFFSET_Z = CELL_DIAMETER_IN_MICRONS * 0
 DERIVATIVE = 2
-CELLS_DISTANCES = [5, 6, 7, 8, 9, 10, 11, 12, 13]
+CELLS_DISTANCES = [8]
 DIRECTION = 'inside'
 
 
@@ -33,13 +34,13 @@ def wilcoxon_test(_master_correlations_array, _slave_correlations_array, _name):
 
 
 def main():
-    _experiments = load.experiment_groups_as_tuples('SN41')
+    _experiments = load.experiment_groups_as_tuples('SN16')
     _experiments = filtering.by_distances(_experiments, CELLS_DISTANCES)
     _experiments_band = filtering.by_band(_experiments, _band=True)
     # _experiments = _experiments_band
     _minimum_time_points = MINIMUM_TIME_POINTS
     _experiments = filtering.by_time_points_amount(_experiments, _minimum_time_points)
-    # _experiments.remove(('SN16', 13, 'cells_0_1'))
+    _experiments.remove(('SN16', 13, 'cells_0_1'))
     # _experiments.remove(('SN16', 21, 'cells_0_1'))
     # _experiments.remove(('SN16', 1, 'cells_1_5'))
     # _experiments = filtering.by_series_id(_experiments, _series_id=22)
@@ -149,7 +150,7 @@ def main():
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        _filename='plot'
+        _filename='plot_derivative_' + str(DERIVATIVE)
     )
 
     # wilcoxon

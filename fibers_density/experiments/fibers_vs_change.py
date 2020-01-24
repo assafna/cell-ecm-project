@@ -5,6 +5,7 @@ from multiprocessing.pool import Pool
 import numpy as np
 from scipy.stats import stats
 
+import libs.compute_lib
 from libs import compute_lib
 from libs.experiments import load, filtering, compute, paths, organize
 from libs.experiments.config import ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT, CELL_DIAMETER_IN_MICRONS
@@ -56,7 +57,7 @@ def main():
                 if True in np.isnan(_cell_fibers_densities):
                     _cell_fibers_densities = _cell_fibers_densities[:np.where(np.isnan(_cell_fibers_densities))[0][0]]
 
-                _z_score_fibers_density = compute.z_score_fibers_density_array(
+                _z_score_fibers_density = libs.compute_lib.z_score_fibers_densities_array(
                     _cell_fibers_densities, _series_normalization
                 )
                 _fibers_densities_array += _z_score_fibers_density

@@ -4,7 +4,8 @@ import numpy as np
 
 import plotting.edit
 from plotting import save, scatter
-from libs.experiments.compute import z_score_fibers_density_array, fibers_density_cut_edges
+from libs.experiments.compute import fibers_density_cut_edges
+from libs.compute_lib import z_score_fibers_densities_array
 from libs.experiments import config, load, paths
 
 
@@ -17,7 +18,7 @@ def get_first_and_last_tps(_normalized_fibers_density):
 
 
 def plot(_experiment, _series, _group, _z_group, _fibers_density, _normalization):
-    _normalized_fibers_density = z_score_fibers_density_array(_fibers_density, _normalization)
+    _normalized_fibers_density = z_score_fibers_densities_array(_fibers_density, _normalization)
     _normalized_fibers_density_cut = fibers_density_cut_edges(_normalized_fibers_density)
     _tp_first, _tp_last = get_first_and_last_tps(_normalized_fibers_density_cut)
     _fig = scatter.create_plot(

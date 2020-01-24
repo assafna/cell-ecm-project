@@ -51,3 +51,8 @@ def roi(_length_x, _length_y, _offset_x, _offset_y, _cell_coordinates, _cell_dia
 
 def z_score(_x, _average, _std):
     return (_x - _average) / _std
+
+
+def z_score_fibers_densities_array(_fibers_densities, _normalization):
+    _average, _std = _normalization
+    return [z_score(_x, _average, _std) for _x in _fibers_densities]

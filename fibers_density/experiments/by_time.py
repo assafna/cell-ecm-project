@@ -4,12 +4,13 @@ import numpy as np
 import seaborn
 
 from libs.experiments import load, paths
-from libs.experiments.compute import z_score_fibers_density_array, fibers_density_cut_edges
+from libs.experiments.compute import fibers_density_cut_edges
+from libs.compute_lib import z_score_fibers_densities_array
 from plotting import heatmap, save
 
 
 def plot(_experiment, _series, _group, _z_group, _fibers_density, _normalization):
-    _normalized_fibers_density = z_score_fibers_density_array(_fibers_density, _normalization)
+    _normalized_fibers_density = z_score_fibers_densities_array(_fibers_density, _normalization)
     _normalized_fibers_density_cut = fibers_density_cut_edges(_normalized_fibers_density)
     _sorted_by_time = sorted(_normalized_fibers_density_cut)
     _max_distances = max([len(_tp) for _tp in _normalized_fibers_density_cut.values()])
