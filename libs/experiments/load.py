@@ -24,6 +24,14 @@ def experiment_groups_as_tuples(_experiment):
     return _tuples
 
 
+def experiments_groups_as_tuples(_experiments):
+    _tuples = []
+    for _experiment in _experiments:
+        _tuples += experiment_groups_as_tuples(_experiment)
+
+    return _tuples
+
+
 def image_properties(_experiment, _series):
     _file_path = paths.image_properties(_experiment, 'series_' + str(_series.split()[1]) + '.json')
     try:
