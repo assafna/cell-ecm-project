@@ -38,7 +38,7 @@ def get_module_name():
     return os.path.splitext(os.path.basename(inspect.stack()[1].filename))[0]
 
 
-def to_html(_fig, _path, _filename):
+def to_html(_fig, _path, _filename, _and_to_image=True):
     # update theme
     # options: plotly_white, presentation, none
     _fig.update_layout(template='presentation')
@@ -71,3 +71,17 @@ def to_html(_fig, _path, _filename):
     )
 
     print('Saved plot:', _filename)
+
+    if _and_to_image:
+        to_image(_fig, _path, _filename)
+
+
+def to_image(_fig, _path, _filename, _format='svg', _width=1000, _height=1000):
+    os.makedirs(_path, exist_ok=True)
+    _fig.write_image(
+        os.path.join(_path, _filename + '.' + _format),
+        width=_width,
+        height=_height
+    )
+
+    print('Saved image:', _filename)
