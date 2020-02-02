@@ -78,7 +78,7 @@ def roi_by_microns(_resolution_x, _resolution_y, _resolution_z, _length_x, _leng
         _direction=_direction
     )]
 
-    _z1 = int(round(_cell_coordinates['z'] - _length_z_in_pixels / 2 + _offset_z, 10))
+    _z1 = int(round(_cell_coordinates['z'] - _length_z_in_pixels / 2 + _offset_z_in_pixels, 10))
     _z2 = int(round(_z1 + _length_z_in_pixels, 10))
 
     return _x1, _y1, _z1, _x2, _y2, _z2
