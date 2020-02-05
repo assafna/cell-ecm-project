@@ -14,9 +14,19 @@ from libs.experiments.config import FIBERS_CHANNEL_INDEX
 
 SHOW_PLOTS = False
 
+# PROCESS:
+# 1. Fiji script "czi_to_files_bc_concat"
+# 2. Fiji script "objects_counter_all_tps"
+# 3. Python script "cell_coordinates_tracked"
+# 4. Python script "create_image_properties"
+# 5. This Python script "new_experiment"
+# 6. Update manually "band" property TODO: change to automatic
+# 7. TODO: extract cells images in time
+# 8. Normalization?
+
 
 def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell_2_id, _series_image_by_time_points,
-                  _resolutions, _overwrite=False):
+                  _resolutions, _real_cells=True, _fake_cell_1_id=None, _fake_cell_2_id=None, _x_change=0, _y_change=0, _z_change=0, _overwrite=False):
     _time_points_data = []
     _left_cell_id = None
     _right_cell_id = None
@@ -24,6 +34,12 @@ def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell
         len([_value for _value in _cells_coordinates[_cell_1_id] if _value is not None]),
         len([_value for _value in _cells_coordinates[_cell_2_id] if _value is not None])
     )
+    if _real_cells:
+        _group = 'cells_' + str(_cell_1_id) + '_' + str(_cell_2_id)
+    elif _fake_cell_1_id is None:
+        _group = 'noCells_' + str(_cell_1_id) + '_' + str(_cell_2_id)
+    else:
+        _group = 'noCellsStatic_' + str(_fake_cell_1_id) + '_' + str(_fake_cell_2_id)
 
     # check if needed (missing time-point / properties file)
     if not _overwrite:
@@ -32,14 +48,14 @@ def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell
             _time_point_pickle_path = paths.structured(
                 _experiment=_experiment,
                 _series='Series ' + str(_series_id),
-                _group='cells_' + str(_cell_1_id) + '_' + str(_cell_2_id),
+                _group=_group,
                 _time_point=str(_time_point) + '.pkl'
             )
             if not os.path.isfile(_time_point_pickle_path):
                 _missing = True
                 break
         _group_structured_path = paths.structured(
-            _experiment, 'Series ' + str(_series_id), 'cells_' + str(_cell_1_id) + '_' + str(_cell_2_id)
+            _experiment, 'Series ' + str(_series_id), _group
         )
         _properties_json_path = os.path.join(_group_structured_path, 'properties.json')
         if not os.path.isfile(_properties_json_path):
@@ -52,6 +68,19 @@ def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell
         _time_point_image = _series_image_by_time_points[_time_point]
         _cell_1_coordinates = [int(round(_value)) for _value in _cells_coordinates[_cell_1_id][_time_point]]
         _cell_2_coordinates = [int(round(_value)) for _value in _cells_coordinates[_cell_2_id][_time_point]]
+
+        # update coordinates if needed
+        if any([_x_change != 0, _y_change != 0, _z_change != 0]):
+            _cell_1_coordinates = [
+                _cell_1_coordinates[0] + _x_change,
+                _cell_1_coordinates[1] + _y_change,
+                _cell_1_coordinates[2] + _z_change
+            ]
+            _cell_2_coordinates = [
+                _cell_2_coordinates[0] + _x_change,
+                _cell_2_coordinates[1] + _y_change,
+                _cell_2_coordinates[2] + _z_change
+            ]
 
         # choose left and right cells
         if _time_point == 0:
@@ -152,7 +181,8 @@ def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell
         _left_cell_coordinates[1] = _fixed_y
         _right_cell_coordinates[1] = _fixed_y
 
-        if SHOW_PLOTS:
+        # if SHOW_PLOTS:
+        if _time_point == 0 or _time_point == 50 or _time_point == 150:
             plt.imshow(_time_point_image_swapped_rotated[_left_cell_coordinates[2]])
             plt.show()
 
@@ -193,7 +223,7 @@ def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell
         _time_point_pickle_path = paths.structured(
             _experiment=_experiment,
             _series='Series ' + str(_series_id),
-            _group='cells_' + str(_cell_1_id) + '_' + str(_cell_2_id),
+            _group=_group,
             _time_point=str(_time_point) + '.pkl'
         )
         save_lib.to_pickle(_time_point_image_swapped_rotated, _time_point_pickle_path)
@@ -207,17 +237,18 @@ def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell
             'right_cell': _right_cell_id
         },
         'time_points': _time_points_data,
-        'band': None
+        'band': None if _fake_cell_1_id is None else False,
+        'real_cells': _real_cells,
+        'static': False if _fake_cell_1_id is None else True
     }
     _group_structured_path = paths.structured(
-        _experiment, 'Series ' + str(_series_id), 'cells_' + str(_cell_1_id) + '_' + str(_cell_2_id)
+        _experiment, 'Series ' + str(_series_id), _group
     )
     _properties_json_path = os.path.join(_group_structured_path, 'properties.json')
     save_lib.to_json(_properties_data, _properties_json_path)
 
 
 def process_series(_experiment, _series_id, _overwrite=False):
-    _series_name = 'Series ' + str(_series_id)
     _series_image_path = paths.serieses(_experiment, 'series_' + str(_series_id) + '_bc.tif')
     _image_properties = load.image_properties(_experiment, 'Series ' + str(_series_id))
     _series_image = tifffile.imread(_series_image_path)
@@ -261,3 +292,4 @@ if __name__ == '__main__':
     # TODO: handle single cell experiments
     # process_all_experiments()
     process_experiment('SN16')
+    # process_experiment('SN41')
