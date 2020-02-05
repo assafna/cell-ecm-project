@@ -9,15 +9,16 @@ from scipy.stats import wilcoxon
 from libs import compute_lib
 from libs.experiments import load, filtering, compute, paths
 from libs.experiments.config import ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT, CELL_DIAMETER_IN_MICRONS
+from methods.experiments import export_video
 from plotting import scatter, save
 
-MINIMUM_TIME_POINTS = 15
+MINIMUM_TIME_POINTS = 20
 OFFSET_X = CELL_DIAMETER_IN_MICRONS * 0
 # TODO: set the offset in y according to the angle in the original Z slices of the cells
-OFFSET_Y = CELL_DIAMETER_IN_MICRONS * 1
+OFFSET_Y = CELL_DIAMETER_IN_MICRONS * 0
 OFFSET_Z = CELL_DIAMETER_IN_MICRONS * 0
 DERIVATIVE = 2
-CELLS_DISTANCES = [8]
+CELLS_DISTANCES = range(4, 16)
 DIRECTION = 'inside'
 
 
@@ -29,18 +30,33 @@ def wilcoxon_test(_master_correlations_array, _slave_correlations_array, _name):
 
     print(_name)
     print('\tN:', str(len(_master_minus_slave)))
-    print('\tmaster Network:', str(_master_percentages * 100) + '%')
+    print('\tMaster Network:', str(_master_percentages * 100) + '%')
     print('\tWilcoxon:', _wilcoxon_rank)
 
 
 def main():
     _experiments = load.experiment_groups_as_tuples('SN16')
     _experiments = filtering.by_distances(_experiments, CELLS_DISTANCES)
+
+    # remove static
+    # _experiments.remove(('SN41', 3, 'noCellsStatic_0_1'))
+
+    _experiments_fake_cells = filtering.by_real_cells(_experiments, _real_cells=False, _static=True)
+    # _experiments_real_cells = [
+    #     (_tuple[0], _tuple[1], 'cells_' + _tuple[2].split('noCells_')[1]) for _tuple in _experiments_fake_cells
+    # ]
+
+    _experiments = _experiments_fake_cells
+
+    # _experiments = filtering.by_real_cells(_experiments)
+
     _experiments_band = filtering.by_band(_experiments, _band=True)
+    _experiments_band = _experiments
     # _experiments = _experiments_band
     _minimum_time_points = MINIMUM_TIME_POINTS
     _experiments = filtering.by_time_points_amount(_experiments, _minimum_time_points)
-    _experiments.remove(('SN16', 13, 'cells_0_1'))
+    print(len(_experiments))
+    # _experiments.remove(('SN16', 13, 'cells_0_1'))
     # _experiments.remove(('SN16', 21, 'cells_0_1'))
     # _experiments.remove(('SN16', 1, 'cells_1_5'))
     # _experiments = filtering.by_series_id(_experiments, _series_id=22)
@@ -51,6 +67,17 @@ def main():
     #     # ('SN16', 22, 'cells_0_1')
     # ]
 
+    # _experiments = [
+    #     ('SN16', 1, 'cells_2_5'),
+    #     ('SN16', 2, 'cells_0_2'),
+    #     ('SN16', 20, 'cells_2_3'),
+    #     ('SN16', 21, 'cells_1_2'),
+    #     ('SN16', 7, 'cells_0_2'),
+    #     ('SN16', 1, 'cells_2_3'),
+    #     ('SN16', 1, 'cells_2_4')
+    # ]
+    # _experiments.remove(('SN16', 19, 'cells_2_3'))
+
     # prepare data in mp
     _fibers_densities = {}
     _arguments = []
@@ -58,6 +85,10 @@ def main():
         _experiment, _series, _group = _tuple
         _arguments.append((_experiment, _series, _group, ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT,
                            OFFSET_X, OFFSET_Y, OFFSET_Z, DIRECTION, _minimum_time_points))
+
+        # video
+        # export_video.process_group(_experiment, _series, _group)
+
     _p = Pool()
     _answers = _p.starmap(compute.roi_fibers_density_by_time_pairs, _arguments)
     _p.close()
@@ -81,11 +112,18 @@ def main():
         _master_left_cell_fibers_densities = _fibers_densities[(_master_experiment, _master_series, _master_group)]['left_cell']
         _master_right_cell_fibers_densities = _fibers_densities[(_master_experiment, _master_series, _master_group)][
             'right_cell']
+
+        # take until not 'nan'
+        # if any(np.isnan(_master_left_cell_fibers_densities)) or any(np.isnan(_master_right_cell_fibers_densities)):
+        #     _left_nan_index = np.where(np.isnan(_master_left_cell_fibers_densities))[0][0]
+        #     _right_nan_index = np.where(np.isnan(_master_right_cell_fibers_densities))[0][0]
+
         _master_correlation = compute_lib.correlation(
             compute_lib.derivative(_master_left_cell_fibers_densities, _n=DERIVATIVE),
             compute_lib.derivative(_master_right_cell_fibers_densities, _n=DERIVATIVE)
         )
-        print(_master_tuple, _master_correlation)
+        if _master_tuple in _experiments_band:
+            print(_master_tuple, _master_correlation)
         for _slave_index in range(len(_experiments)):
             if _master_index != _slave_index:
                 _slave_tuple = _experiments[_slave_index]
@@ -113,51 +151,107 @@ def main():
                     _no_band_no_band_slave_correlations_array.append(_slave_correlation)
 
     # points plot
-    _fig = scatter.create_plot(
-        _x_array=[
-            _band_band_master_correlations_array,
-            _band_no_band_master_correlations_array,
-            _no_band_band_master_correlations_array,
-            _no_band_no_band_master_correlations_array
-        ],
-        _y_array=[
-            _band_band_slave_correlations_array,
-            _band_no_band_slave_correlations_array,
-            _no_band_band_slave_correlations_array,
-            _no_band_no_band_slave_correlations_array
-        ],
-        _names_array=[
-            'Master Band, Slave Band',
-            'Master Band, Slave No Band',
-            'Master No Band, Slave Band',
-            'Master No Band, Slave No Band'
-        ],
-        _modes_array=['markers'] * 4,
-        _showlegend_array=[True] * 4,
-        _x_axis_title='Master Network Correlation',
-        _y_axis_title='Slave Network Correlation',
-        _title='Master vs. Slave Network Correlations'
-    )
+    # _fig = scatter.create_plot(
+    #     _x_array=[_no_band_no_band_master_correlations_array],
+    #     _y_array=[_no_band_no_band_slave_correlations_array],
+    #     _names_array=['Master, Slave'],
+    #     _modes_array=['markers'],
+    #     _showlegend_array=[False],
+    #     _x_axis_title='Master Network Correlation',
+    #     _y_axis_title='Slave Network Correlation',
+    #     _title=None
+    # )
+    #
+    # _fig = scatter.add_line(
+    #     _fig=_fig,
+    #     _x1=-1, _y1=-1, _x2=1, _y2=1,
+    #     _name='y = x',
+    #     _color='red',
+    #     _showlegend=False
+    # )
+    #
+    # save.to_html(
+    #     _fig=_fig,
+    #     _path=os.path.join(paths.PLOTS, save.get_module_name()),
+    #     _filename='plot_fake_cells'
+    # )
 
-    _fig = scatter.add_line(
-        _fig=_fig,
-        _x1=-1, _y1=-1, _x2=1, _y2=1,
-        _name='y = x',
-        _color='red',
-        _showlegend=True
-    )
+    # points plot
+    # _fig = scatter.create_plot(
+    #     _x_array=[_band_band_master_correlations_array],
+    #     _y_array=[_band_band_slave_correlations_array],
+    #     _names_array=['Master Band, Slave Band'],
+    #     _modes_array=['markers'],
+    #     _showlegend_array=[False],
+    #     _x_axis_title='Master Network Correlation',
+    #     _y_axis_title='Slave Network Correlation',
+    #     _title=None
+    # )
+    #
+    # _fig = scatter.add_line(
+    #     _fig=_fig,
+    #     _x1=-1, _y1=-1, _x2=1, _y2=1,
+    #     _name='y = x',
+    #     _color='red',
+    #     _showlegend=False
+    # )
+    #
+    # save.to_html(
+    #     _fig=_fig,
+    #     _path=os.path.join(paths.PLOTS, save.get_module_name()),
+    #     _filename='plot_master_band_slave_band'
+    # )
 
-    save.to_html(
-        _fig=_fig,
-        _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        _filename='plot_derivative_' + str(DERIVATIVE)
-    )
+    # points plot
+    # _fig = scatter.create_plot(
+    #     _x_array=[
+    #         _band_band_master_correlations_array,
+    #         _band_no_band_master_correlations_array,
+    #         _no_band_band_master_correlations_array,
+    #         _no_band_no_band_master_correlations_array
+    #     ],
+    #     _y_array=[
+    #         _band_band_slave_correlations_array,
+    #         _band_no_band_slave_correlations_array,
+    #         _no_band_band_slave_correlations_array,
+    #         _no_band_no_band_slave_correlations_array
+    #     ],
+    #     _names_array=[
+    #         'Master Band, Slave Band',
+    #         'Master Band, Slave No Band',
+    #         'Master No Band, Slave Band',
+    #         'Master No Band, Slave No Band'
+    #     ],
+    #     _modes_array=['markers'] * 4,
+    #     _showlegend_array=[True] * 4,
+    #     _x_axis_title='Master Network Correlation',
+    #     _y_axis_title='Slave Network Correlation',
+    #     _title='Master vs. Slave Network Correlations'
+    # )
+    #
+    # _fig = scatter.add_line(
+    #     _fig=_fig,
+    #     _x1=-1, _y1=-1, _x2=1, _y2=1,
+    #     _name='y = x',
+    #     _color='red',
+    #     _showlegend=True
+    # )
+    #
+    # save.to_html(
+    #     _fig=_fig,
+    #     _path=os.path.join(paths.PLOTS, save.get_module_name()),
+    #     _filename='plot_derivative_' + str(DERIVATIVE)
+    # )
 
     # wilcoxon
-    wilcoxon_test(_band_band_master_correlations_array, _band_band_slave_correlations_array, 'Master Band, Slave Band')
-    wilcoxon_test(_band_no_band_master_correlations_array, _band_no_band_slave_correlations_array, 'Master Band, Slave No Band')
-    wilcoxon_test(_no_band_band_master_correlations_array, _no_band_band_slave_correlations_array, 'Master No Band, Slave Band')
-    wilcoxon_test(_no_band_no_band_master_correlations_array, _no_band_no_band_slave_correlations_array, 'Master No Band, Slave No Band')
+    if len(_band_band_master_correlations_array) > 0:
+        wilcoxon_test(_band_band_master_correlations_array, _band_band_slave_correlations_array, 'Master Band, Slave Band')
+    if len(_band_no_band_master_correlations_array) > 0:
+        wilcoxon_test(_band_no_band_master_correlations_array, _band_no_band_slave_correlations_array, 'Master Band, Slave No Band')
+    if len(_no_band_band_master_correlations_array) > 0:
+        wilcoxon_test(_no_band_band_master_correlations_array, _no_band_band_slave_correlations_array, 'Master No Band, Slave Band')
+    if len(_no_band_no_band_master_correlations_array) > 0:
+        wilcoxon_test(_no_band_no_band_master_correlations_array, _no_band_no_band_slave_correlations_array, 'Master No Band, Slave No Band')
 
 
 if __name__ == '__main__':
