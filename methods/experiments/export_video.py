@@ -8,9 +8,9 @@ from libs.experiments import load, paths, filtering
 from libs.experiments.compute import roi_by_microns
 from libs.experiments.config import CELL_DIAMETER_IN_MICRONS, ROI_LENGTH, ROI_HEIGHT, ROI_WIDTH
 
-MINIMUM_TIME_POINTS = 15
+MINIMUM_TIME_POINTS = 20
 OFFSET_X = CELL_DIAMETER_IN_MICRONS * 0
-OFFSET_Y = CELL_DIAMETER_IN_MICRONS * 1
+OFFSET_Y = CELL_DIAMETER_IN_MICRONS * 0.5
 OFFSET_Z = 0
 CELLS_DISTANCES = [8]
 DIRECTION = 'inside'
@@ -47,9 +47,13 @@ def mark_cells(_image, _group_properties, _time_point, _cell_coordinates):
 
 def draw_borders(_image, _roi):
     _x1, _y1, _, _x2, _y2, _ = _roi
+    # if _y1 < _image.shape[0] and _x1 < _image.shape[1] and _x2 < _image.shape[1]:
     _image[_y1, _x1:_x2] = 255
+    # if _y2 < _image.shape[0] and _x1 < _image.shape[1] and _x2 < _image.shape[1]:
     _image[_y2, _x1:_x2] = 255
+    # if _y1 < _image.shape[0] and _y2 < _image.shape[0] and _x1 < _image.shape[1]:
     _image[_y1:_y2, _x1] = 255
+    # if _y1 < _image.shape[0] and _y2 < _image.shape[0] and _x2 < _image.shape[1]:
     _image[_y1:_y2, _x2] = 255
 
     return _image
@@ -57,9 +61,9 @@ def draw_borders(_image, _roi):
 
 def process_group(_experiment, _series_id, _group, _mark_cells=True, _draw_borders=True):
     _group_properties = load.group_properties(_experiment, _series_id, _group)
-    _group_path = paths.images(_experiment, 'Series ' + str(_series_id), _group)
+    _group_path = paths.images(_experiment + ' TEST2', 'Series ' + str(_series_id), _group)
     os.makedirs(_group_path, exist_ok=True)
-    for _time_point in range(0, len(_group_properties['time_points']), 5):
+    for _time_point in range(0, len(_group_properties['time_points']), 1):
         print(_experiment, _series_id, _group, _time_point, sep='\t')
         _time_point_image = load.structured_image(_experiment, _series_id, _group, _time_point)
         _left_cell_coordinates = _group_properties['time_points'][_time_point]['left_cell']['coordinates']
@@ -101,6 +105,6 @@ def process_experiments():
     _p.close()
 
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
     # process_experiments()
-    process_group('SN16', 16, 'cells_1_2')
+    # process_group('SN16', 1, 'cells_2_3')
