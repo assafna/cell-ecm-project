@@ -10,8 +10,7 @@ if __name__ == '__main__':
             _group_proproties = load.group_properties(_experiment, _series_id, _group)
             for _line in _lines:
                 _series, _cells, _value = _line.split('\t')
-                _new_cells = str(int(_cells.split('_')[0]) - 1) + '_' + str(int(_cells.split('_')[1]) - 1)
-                if _series == str(_series_id) and _group == 'cells_' + _new_cells:
+                if _series == str(_series_id) and _group == _cells:
                     _group_proproties['band'] = True if _value == 'TRUE\n' else False
                     print(_experiment, _series_id, _group, _group_proproties['band'])
                     _path = paths.group_properties(_experiment, 'Series ' + str(_series_id), _group)
