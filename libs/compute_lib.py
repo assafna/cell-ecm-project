@@ -4,6 +4,7 @@ from libs.simulations.config import EPSILON
 
 
 def correlation(_array1, _array2):
+    # TODO: change to pearson correlation with p value
     return np.corrcoef(_array1, _array2)[0][1]
 
 
