@@ -87,7 +87,16 @@ def roi_by_microns(_resolution_x, _resolution_y, _resolution_z, _length_x, _leng
 def roi_fibers_density(_experiment, _series, _group, _time_point, _roi):
     _time_point_image = load.structured_image(_experiment, _series, _group, _time_point)
     _x1, _y1, _z1, _x2, _y2, _z2 = _roi
-    return np.mean(_time_point_image[_z1:_z2, _y1:_y2, _x1:_x2])
+
+    # fix boundaries
+    _z_shape, _y_shape, _x_shape = _time_point_image.shape
+    _x1, _y1, _z1 = max(0, _x1), max(0, _y1), max(0, _z1)
+    _x2, _y2, _z2 = min(_x2, _x_shape), min(_y2, _y_shape), min(_z2, _z_shape)
+
+    _roi_pixels = _time_point_image[_z1:_z2, _y1:_y2, _x1:_x2]
+    _non_zero_mask = np.nonzero(_roi_pixels)
+
+    return np.mean(_roi_pixels[_non_zero_mask])
 
 
 def roi_fibers_density_time_point(_experiment, _series_id, _group, _length_x, _length_y, _length_z, _offset_x,
