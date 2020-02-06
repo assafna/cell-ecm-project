@@ -5,7 +5,11 @@ from libs.experiments import compute, load, paths, config
 from libs.experiments.config import CELL_DIAMETER_IN_MICRONS
 
 
-def process_group(_experiment, _series_id, _group):
+def process_group(_experiment, _series_id, _group, _overwrite=False):
+    _group_properties = load.group_properties(_experiment, _series_id, _group)
+    if not _overwrite and _group_properties['band'] is not None:
+        return
+
     if 'static' in _group:
         return
     elif 'fake' in _group:
@@ -13,16 +17,16 @@ def process_group(_experiment, _series_id, _group):
     else:
         _group_real = _group
 
-    _group_properties = load.group_properties(_experiment, _series_id, _group_real)
-    _time_points_amount = len(_group_properties['time_points'])
+    _group_real_properties = load.group_properties(_experiment, _series_id, _group_real)
+    _time_points_amount = len(_group_real_properties['time_points'])
 
     _fibers_densities = []
     for _time_point in [0, int(round(_time_points_amount / 2)), _time_points_amount - 1]:
-        _left_cell_coordinates = _group_properties['time_points'][_time_point]['left_cell']['coordinates']
-        _right_cell_coordinates = _group_properties['time_points'][_time_point]['right_cell']['coordinates']
-        _cell_diameter_x = CELL_DIAMETER_IN_MICRONS / _group_properties['time_points'][_time_point]['resolutions']['x']
-        _cell_diameter_y = CELL_DIAMETER_IN_MICRONS / _group_properties['time_points'][_time_point]['resolutions']['y']
-        _cell_diameter_z = CELL_DIAMETER_IN_MICRONS / _group_properties['time_points'][_time_point]['resolutions']['z']
+        _left_cell_coordinates = _group_real_properties['time_points'][_time_point]['left_cell']['coordinates']
+        _right_cell_coordinates = _group_real_properties['time_points'][_time_point]['right_cell']['coordinates']
+        _cell_diameter_x = CELL_DIAMETER_IN_MICRONS / _group_real_properties['time_points'][_time_point]['resolutions']['x']
+        _cell_diameter_y = CELL_DIAMETER_IN_MICRONS / _group_real_properties['time_points'][_time_point]['resolutions']['y']
+        _cell_diameter_z = CELL_DIAMETER_IN_MICRONS / _group_real_properties['time_points'][_time_point]['resolutions']['z']
         _x1 = (_left_cell_coordinates['x'] + _right_cell_coordinates['x']) / 2 - _cell_diameter_x / 2
         _x2 = _x1 + _cell_diameter_x
         _y1 = (_left_cell_coordinates['y'] + _right_cell_coordinates['y']) / 2 - _cell_diameter_y / 2
@@ -46,28 +50,25 @@ def process_group(_experiment, _series_id, _group):
 
     print(_experiment, _series_id, _group, _band, sep='\t')
 
-    if _group != _group_real:
-        _group_properties = load.group_properties(_experiment, _series_id, _group)
     _group_properties['band'] = _band
-
     _group_structured_path = paths.structured(_experiment, 'Series ' + str(_series_id), _group)
     _properties_json_path = os.path.join(_group_structured_path, 'properties.json')
     save_lib.to_json(_group_properties, _properties_json_path)
 
 
-def process_experiment(_experiment):
+def process_experiment(_experiment, _overwrite=False):
     for _tuple in load.experiment_groups_as_tuples(_experiment):
         _experiment, _series_id, _group = _tuple
-        process_group(_experiment, _series_id, _group)
+        process_group(_experiment, _series_id, _group, _overwrite)
 
 
-def process_experiments(_experiments):
+def process_experiments(_experiments, _overwrite=False):
     for _experiment in _experiments:
-        process_experiment(_experiment)
+        process_experiment(_experiment, _overwrite)
 
 
-def process_all_experiments():
-    process_experiments(config.PAIRS)
+def process_all_experiments(_overwrite=False):
+    process_experiments(config.PAIRS, _overwrite)
 
 
 if __name__ == '__main__':
