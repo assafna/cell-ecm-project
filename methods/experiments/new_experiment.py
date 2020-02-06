@@ -187,6 +187,7 @@ def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell
             plt.show()
 
         # update resolutions
+        _angle = abs(_angle)
         _new_resolutions['x'] = (_angle / 90) * _new_resolutions['y'] + ((90 - _angle) / 90) * _new_resolutions['x']
         _new_resolutions['y'] = (_angle / 90) * _new_resolutions['x'] + ((90 - _angle) / 90) * _new_resolutions['y']
 
@@ -254,9 +255,7 @@ def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell
         'fake': _fake,
         'static': _static
     }
-    _group_structured_path = paths.structured(
-        _experiment, 'Series ' + str(_series_id), _group
-    )
+    _group_structured_path = paths.structured(_experiment, 'Series ' + str(_series_id), _group)
     _properties_json_path = os.path.join(_group_structured_path, 'properties.json')
     save_lib.to_json(_properties_data, _properties_json_path)
 
@@ -301,8 +300,9 @@ def process_all_experiments(_overwrite=False):
         process_experiment(_experiment, _overwrite)
 
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
     # TODO: handle single cell experiments
-    # process_all_experiments()
+    process_all_experiments()
     # process_experiment('SN16')
-    # process_experiment('SN41')
+    # process_experiment('SN18')
+    # process_series('SN16', 17, True)
