@@ -59,21 +59,23 @@ def by_series_id(_experiments_tuples, _series_id):
     return [_tuple for _tuple in _experiments_tuples if _tuple[1] == _series_id]
 
 
-def by_real_cells(_experiments_tuples, _real_cells=True, _static=None):
-    # TODO: change to be based on the properties
-    _tuples = []
+def by_real_cells(_experiments_tuples, _real_cells=True):
+    _experiments_tuples_filtered = []
     for _tuple in _experiments_tuples:
-        _group = _tuple[2]
-        if _real_cells:
-            if 'noCells' not in _group:
-                _tuples.append(_tuple)
-        elif _static is None:
-            _tuples.append(_tuple)
-        elif _static:
-            if 'noCellsStatic' in _group:
-                _tuples.append(_tuple)
-        else:
-            if 'noCellsStatic' not in _group:
-                _tuples.append(_tuple)
+        _experiment, _series_id, _group = _tuple
+        _group_properties = load.group_properties(_experiment, _series_id, _group)
+        if _group_properties['fake'] != _real_cells:
+            _experiments_tuples_filtered.append(_tuple)
 
-    return _tuples
+    return _experiments_tuples_filtered
+
+
+def by_static_cells(_experiments_tuples, _static=True):
+    _experiments_tuples_filtered = []
+    for _tuple in _experiments_tuples:
+        _experiment, _series_id, _group = _tuple
+        _group_properties = load.group_properties(_experiment, _series_id, _group)
+        if _group_properties['static'] == _static:
+            _experiments_tuples_filtered.append(_tuple)
+
+    return _experiments_tuples_filtered
