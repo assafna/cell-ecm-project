@@ -20,8 +20,8 @@ SHOW_PLOTS = False
 # 3. Python script "cell_coordinates_tracked"
 # 4. Python script "create_image_properties"
 # 5. This Python script "new_experiment"
-# 6. Update manually "band" property TODO: change to automatic
-# 7. TODO: extract cells images in time
+# 6. Python script "set_band_property"
+# 7. Python script "export_video" for visualization
 # 8. Normalization?
 
 
@@ -37,9 +37,9 @@ def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell
     if _real_cells:
         _group = 'cells_' + str(_cell_1_id) + '_' + str(_cell_2_id)
     elif _fake_cell_1_id is None:
-        _group = 'noCells_' + str(_cell_1_id) + '_' + str(_cell_2_id)
+        _group = 'fake_' + str(_cell_1_id) + '_' + str(_cell_2_id)
     else:
-        _group = 'noCellsStatic_' + str(_fake_cell_1_id) + '_' + str(_fake_cell_2_id)
+        _group = 'static_' + str(_fake_cell_1_id) + '_' + str(_fake_cell_2_id)
 
     # check if needed (missing time-point / properties file)
     if not _overwrite:
@@ -229,6 +229,19 @@ def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell
         save_lib.to_pickle(_time_point_image_swapped_rotated, _time_point_pickle_path)
 
     # save properties
+    if _real_cells:
+        _band = None
+        _fake = False
+        _static = False
+    elif _fake_cell_1_id is None:
+        _based_on_properties = load.group_properties(_experiment, _series_id, 'cells_' + _group.split('fake_')[1])
+        _band = _based_on_properties['band']
+        _fake = True
+        _static = False
+    else:
+        _band = False
+        _fake = True
+        _static = True
     _properties_data = {
         'experiment': _experiment,
         'series_id': _series_id,
@@ -237,9 +250,9 @@ def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell
             'right_cell': _right_cell_id
         },
         'time_points': _time_points_data,
-        'band': None if _fake_cell_1_id is None else False,
-        'real_cells': _real_cells,
-        'static': False if _fake_cell_1_id is None else True
+        'band': _band,
+        'fake': _fake,
+        'static': _static
     }
     _group_structured_path = paths.structured(
         _experiment, 'Series ' + str(_series_id), _group
@@ -288,8 +301,8 @@ def process_all_experiments(_overwrite=False):
         process_experiment(_experiment, _overwrite)
 
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
     # TODO: handle single cell experiments
     # process_all_experiments()
-    process_experiment('SN16')
+    # process_experiment('SN16')
     # process_experiment('SN41')
