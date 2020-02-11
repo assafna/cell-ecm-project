@@ -1,6 +1,9 @@
 import os
 
+from multiprocess.pool import Pool
+
 from libs import save_lib
+from libs.config_lib import CPUS_TO_USE
 from libs.experiments import compute, load, paths, config
 from libs.experiments.config import CELL_DIAMETER_IN_MICRONS
 
@@ -57,9 +60,14 @@ def process_group(_experiment, _series_id, _group, _overwrite=False):
 
 
 def process_experiment(_experiment, _overwrite=False):
+    _arguments = []
     for _tuple in load.experiment_groups_as_tuples(_experiment):
         _experiment, _series_id, _group = _tuple
-        process_group(_experiment, _series_id, _group, _overwrite)
+        _arguments.append((_experiment, _series_id, _group, _overwrite))
+
+    _p = Pool(CPUS_TO_USE)
+    _p.starmap(process_group, _arguments)
+    _p.close()
 
 
 def process_experiments(_experiments, _overwrite=False):
