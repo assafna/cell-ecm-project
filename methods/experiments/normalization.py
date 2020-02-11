@@ -18,7 +18,7 @@ def is_in_roi(_x1, _y1, _z1, _x2, _y2, _z2, _point_x, _point_y, _point_z):
 
 
 def process_series(_experiment, _series_id, _overwrite=False):
-    _normalization_path = paths.normalization(_experiment, 'series_' + str(_series_id) + '.json')
+    _normalization_path = os.path.join(paths.normalization(_experiment), 'series_' + str(_series_id) + '.json')
     if not _overwrite and os.path.isfile(_normalization_path):
         return
 
@@ -109,7 +109,8 @@ def process_experiments(_experiments, _overwrite=False):
 
 
 def process_all_experiments(_overwrite=False):
-    process_experiments(config.experiments())
+    # TODO: handle single cell
+    process_experiments(config.PAIRS)
 
 
 if __name__ == '__main__':
