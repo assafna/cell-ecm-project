@@ -4,7 +4,11 @@ import os
 
 import pickle
 
+import numpy as np
+from tifffile import tifffile
+
 from libs.experiments import paths
+from libs.experiments.config import FIBERS_CHANNEL_INDEX
 
 
 def time_point_file_name_to_number(_time_point_file_name):
@@ -13,6 +17,18 @@ def time_point_file_name_to_number(_time_point_file_name):
 
 def series_file_name_to_name(_series_file_name):
     return 'Series ' + str(str(_series_file_name.split('series_')[1]).split('.')[0])
+
+
+def experiment_serieses_as_tuples(_experiment):
+    return [(_experiment, int(_series.split()[1])) for _series in paths.folders(paths.structured(_experiment))]
+
+
+def experiments_serieses_as_tuples(_experiments):
+    _tuples = []
+    for _experiment in _experiments:
+        _tuples += experiment_serieses_as_tuples(_experiment)
+
+    return _tuples
 
 
 def experiment_groups_as_tuples(_experiment):
@@ -32,8 +48,8 @@ def experiments_groups_as_tuples(_experiments):
     return _tuples
 
 
-def image_properties(_experiment, _series):
-    _file_path = paths.image_properties(_experiment, 'series_' + str(_series.split()[1]) + '.json')
+def image_properties(_experiment, _series_id):
+    _file_path = paths.image_properties(_experiment, 'series_' + str(_series_id) + '.json')
     try:
         with open(_file_path) as _json:
             return json.load(_json)
@@ -137,17 +153,26 @@ def fibers_densities(_experiment, _series_id, _group, _time_point):
 def normalization_series_file_data(_experiment, _series):
     _file_path = paths.normalization(_experiment, _series)
     try:
-        with open(_file_path, 'r') as _file:
-            _lines = _file.readlines()
-            _line = _lines[0].split()
-            _average, _std = float(_line[0]), float(_line[1])
+        with open(_file_path) as _json:
+            return json.load(_json)
     finally:
-        _file.close()
-
-    return _average, _std
+        _json.close()
 
 
 def normalization_experiment_file_data(_experiment):
     return {series_file_name_to_name(_series):
             normalization_series_file_data(_experiment, series_file_name_to_name(_series)) for
             _series in paths.text_files(paths.normalization(_experiment))}
+
+
+def series_image(_experiment, _series_id, _fibers_channel=True):
+    _series_image_path = paths.serieses(_experiment, 'series_' + str(_series_id) + '_bc.tif')
+    _series_image = tifffile.imread(_series_image_path)
+
+    if _fibers_channel:
+        return np.array([
+            np.array([_z[FIBERS_CHANNEL_INDEX] for _z in _series_image[_time_point]])
+            for _time_point in range(_series_image.shape[0])
+        ])
+    else:
+        return _series_image
