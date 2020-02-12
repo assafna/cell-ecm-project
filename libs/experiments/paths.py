@@ -29,7 +29,7 @@ ANIMATIONS = os.path.join(OUTPUTS, 'Animations')
 
 
 def get_series_text_file_name(_series):
-    return 'series_' + str(_series.split()[1]) + '.txt'
+    return 'series_' + str(_series.split()[1]) + '.json'
 
 
 def folders(_path):
