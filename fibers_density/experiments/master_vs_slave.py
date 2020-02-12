@@ -147,7 +147,8 @@ def main():
             if _master_index != _slave_index:
                 _slave_tuple = _experiments[_slave_index]
                 _slave_experiment, _slave_series, _slave_group = _slave_tuple
-                for _master_cell_id, _slave_cell_id in product(['left_cell', 'right_cell'], ['left_cell', 'right_cell']):
+                for _master_cell_id, _slave_cell_id in product(['left_cell', 'right_cell'],
+                                                               ['left_cell', 'right_cell']):
                     _master_fibers_densities = \
                         _fibers_densities[(_master_experiment, _master_series, _master_group)][_master_cell_id]
                     _slave_fibers_densities = \
