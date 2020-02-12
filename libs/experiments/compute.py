@@ -9,7 +9,7 @@ from libs.experiments.config import CELL_DIAMETER_IN_MICRONS
 
 
 def cells_distance_in_cell_size(_experiment, _series_id, _cell_1_coordinates, _cell_2_coordinates):
-    _image_properties = load.image_properties(_experiment, 'Series ' + str(_series_id))
+    _image_properties = load.image_properties(_experiment, _series_id)
     _image_resolutions = _image_properties['resolutions']
     _x1, _y1, _z1 = [float(_value) for _value in _cell_1_coordinates[0]]
     _x2, _y2, _z2 = [float(_value) for _value in _cell_2_coordinates[0]]
@@ -48,7 +48,7 @@ def axes_padding(_2d_image_shape, _angle):
 
     # return x, y
     return int(round((_image_zeros_shape[1] - _2d_image_shape[1]) / 2)), \
-        int(round((_image_zeros_shape[0] - _2d_image_shape[0]) / 2))
+           int(round((_image_zeros_shape[0] - _2d_image_shape[0]) / 2))
 
 
 def image_center_coordinates(_image_shape):
@@ -88,15 +88,24 @@ def roi_fibers_density(_experiment, _series, _group, _time_point, _roi):
     _time_point_image = load.structured_image(_experiment, _series, _group, _time_point)
     _x1, _y1, _z1, _x2, _y2, _z2 = _roi
 
-    # fix boundaries
+    _out_of_boundaries = False
+
     _z_shape, _y_shape, _x_shape = _time_point_image.shape
-    _x1, _y1, _z1 = max(0, _x1), max(0, _y1), max(0, _z1)
-    _x2, _y2, _z2 = min(_x2, _x_shape), min(_y2, _y_shape), min(_z2, _z_shape)
+    if any([_x1 < 0, _y1 < 0, _z1 < 0, _x2 >= _x_shape, _y2 >= _y_shape, _z2 >= _z_shape]):
+        _out_of_boundaries = True
+
+        # fix boundaries
+        _x1, _y1, _z1 = max(0, _x1), max(0, _y1), max(0, _z1)
+        _x2, _y2, _z2 = min(_x2, _x_shape), min(_y2, _y_shape), min(_z2, _z_shape)
 
     _roi_pixels = _time_point_image[_z1:_z2, _y1:_y2, _x1:_x2]
     _non_zero_mask = np.nonzero(_roi_pixels)
 
-    return np.mean(_roi_pixels[_non_zero_mask])
+    # check if more than 1% is black
+    if np.count_nonzero(_roi_pixels == 0) / (_roi_pixels.shape[0] * _roi_pixels.shape[1] * _roi_pixels.shape[2]) > 0.01:
+        _out_of_boundaries = True
+
+    return np.mean(_roi_pixels[_non_zero_mask]), _out_of_boundaries
 
 
 def roi_fibers_density_time_point(_experiment, _series_id, _group, _length_x, _length_y, _length_z, _offset_x,
@@ -129,7 +138,8 @@ def roi_fibers_density_time_point(_experiment, _series_id, _group, _length_x, _l
         if _print:
             print('Computing:', _experiment, _series_id, _group, _cell_id, 'roi', _time_point_roi, 'direction',
                   _direction, 'tp', _time_point, sep='\t')
-        _roi_fibers_density = roi_fibers_density(_experiment, _series_id, _group, _time_point, _time_point_roi)
+        _roi_fibers_density = roi_fibers_density(_experiment, _series_id, _group, _time_point,
+                                                                     _time_point_roi)
         if _save:
             _time_point_fibers_densities[_time_point_roi] = _roi_fibers_density
             save.fibers_densities(_experiment, _series_id, _group, _time_point, _time_point_fibers_densities)
@@ -167,3 +177,20 @@ def minimum_time_points(_experiments_tuples):
         _minimum_time_points = min(_minimum_time_points, len(_group_properties['time_points']))
 
     return _minimum_time_points
+
+
+def longest_fibers_densities_ascending_sequence(_fibers_densities):
+    _out_of_boundaries = np.array([_fibers_density[1] for _fibers_density in _fibers_densities])
+    if False not in _out_of_boundaries:
+        return []
+
+    _idx_pairs = np.where(np.diff(np.hstack(([False], _out_of_boundaries == False, [False]))))[0].reshape(-1, 2)
+    _start_longest_seq = _idx_pairs[np.diff(_idx_pairs, axis=1).argmax(), 0]
+    _end_longest_seq_indices = np.where(_out_of_boundaries[_start_longest_seq:] == 1)
+
+    if len(_end_longest_seq_indices[0]) > 0:
+        _longest_seq = _fibers_densities[_start_longest_seq:_end_longest_seq_indices[0][0] + _start_longest_seq]
+    else:
+        _longest_seq = _fibers_densities[_start_longest_seq:]
+
+    return [_fibers_density[0] for _fibers_density in _longest_seq]
