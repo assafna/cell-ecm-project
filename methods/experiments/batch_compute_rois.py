@@ -3,6 +3,7 @@ from multiprocessing.pool import Pool
 
 import numpy as np
 
+from libs.config_lib import CPUS_TO_USE
 from libs.experiments import load, compute, save
 from libs.experiments.config import CELL_DIAMETER_IN_MICRONS
 
@@ -59,6 +60,6 @@ if __name__ == '__main__':
         _group_properties = load.group_properties(_experiment, _series_id, _group)
         for _time_point in range(len(_group_properties['time_points'])):
             _arguments.append((_experiment, _series_id, _group, _group_properties, _time_point))
-    _p = Pool()
+    _p = Pool(CPUS_TO_USE)
     _answers = _p.starmap(main, _arguments)
     _p.close()
