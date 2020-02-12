@@ -139,7 +139,7 @@ def roi_fibers_density_time_point(_experiment, _series_id, _group, _length_x, _l
             print('Computing:', _experiment, _series_id, _group, _cell_id, 'roi', _time_point_roi, 'direction',
                   _direction, 'tp', _time_point, sep='\t')
         _roi_fibers_density = roi_fibers_density(_experiment, _series_id, _group, _time_point,
-                                                                     _time_point_roi)
+                                                 _time_point_roi)
         if _save:
             _time_point_fibers_densities[_time_point_roi] = _roi_fibers_density
             save.fibers_densities(_experiment, _series_id, _group, _time_point, _time_point_fibers_densities)
@@ -147,25 +147,32 @@ def roi_fibers_density_time_point(_experiment, _series_id, _group, _length_x, _l
 
 
 def roi_fibers_density_by_time(_experiment, _series_id, _group, _length_x, _length_y, _length_z, _offset_x, _offset_y,
-                               _offset_z, _cell_id, _direction, _time_points, _print=True, _save=True):
+                               _offset_z, _cell_id, _direction, _time_points, _print=True, _save=True,
+                               _out_of_borders=True):
     _group_properties = load.group_properties(_experiment, _series_id, _group)
-    return [
+    _fibers_densities = [
         roi_fibers_density_time_point(
             _experiment, _series_id, _group, _length_x, _length_y, _length_z, _offset_x, _offset_y, _offset_z, _cell_id,
             _direction, _time_point, _group_properties, _print, _save
         ) for _time_point in range(min(_time_points, len(_group_properties['time_points'])))
     ]
 
+    if not _out_of_borders:
+        return longest_fibers_densities_ascending_sequence(_fibers_densities)
+    else:
+        return _fibers_densities
+
 
 def roi_fibers_density_by_time_pairs(_experiment, _series_id, _group, _length_x, _length_y, _length_z, _offset_x,
-                                     _offset_y, _offset_z, _direction, _time_points, _print=True, _save=True):
+                                     _offset_y, _offset_z, _direction, _time_points, _print=True, _save=True,
+                                     _out_of_borders=True):
     return {
         'left_cell': roi_fibers_density_by_time(_experiment, _series_id, _group, _length_x, _length_y, _length_z,
                                                 _offset_x, _offset_y, _offset_z, 'left_cell', _direction, _time_points,
-                                                _print, _save),
+                                                _print, _save, _out_of_borders),
         'right_cell': roi_fibers_density_by_time(_experiment, _series_id, _group, _length_x, _length_y, _length_z,
                                                  _offset_x, _offset_y, _offset_z, 'right_cell', _direction,
-                                                 _time_points, _print, _save),
+                                                 _time_points, _print, _save, _out_of_borders),
     }
 
 
@@ -194,3 +201,23 @@ def longest_fibers_densities_ascending_sequence(_fibers_densities):
         _longest_seq = _fibers_densities[_start_longest_seq:]
 
     return [_fibers_density[0] for _fibers_density in _longest_seq]
+
+
+def longest_same_indices_shared_in_borders_sub_array(_fibers_densities1, _fibers_densities2):
+    _out_of_boundaries1 = np.array([_fibers_density[1] for _fibers_density in _fibers_densities1])
+    _out_of_boundaries2 = np.array([_fibers_density[1] for _fibers_density in _fibers_densities2])
+
+    # not-and on both
+    _out_of_boundaries = np.logical_not(
+        np.logical_and(np.logical_not(_out_of_boundaries1), np.logical_not(_out_of_boundaries2))
+    )
+
+    _fibers_densities1_filtered = []
+    _fibers_densities2_filtered = []
+    for _fibers_density1, _fibers_density2, _out_of_boundaries_value in \
+            zip(_fibers_densities1, _fibers_densities2, _out_of_boundaries):
+        _fibers_densities1_filtered.append((_fibers_density1[0], _out_of_boundaries_value))
+        _fibers_densities2_filtered.append((_fibers_density2[0], _out_of_boundaries_value))
+
+    return longest_fibers_densities_ascending_sequence(_fibers_densities1_filtered), \
+        longest_fibers_densities_ascending_sequence(_fibers_densities2_filtered)
