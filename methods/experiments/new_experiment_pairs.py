@@ -1,16 +1,15 @@
 import math
 import os
-from itertools import product
 from multiprocessing.pool import Pool
 
+import matplotlib.pyplot as plt
 import numpy as np
 from scipy.ndimage import rotate
 from tifffile import tifffile
-import matplotlib.pyplot as plt
 
 from libs import save_lib
 from libs.config_lib import CPUS_TO_USE
-from libs.experiments import paths, load, compute
+from libs.experiments import paths, load, compute, config
 from libs.experiments.config import FIBERS_CHANNEL_INDEX
 
 SHOW_PLOTS = False
@@ -27,7 +26,8 @@ SHOW_PLOTS = False
 
 
 def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell_2_id, _series_image_by_time_points,
-                  _resolutions, _real_cells=True, _fake_cell_1_id=None, _fake_cell_2_id=None, _x_change=0, _y_change=0, _z_change=0, _overwrite=False):
+                  _resolutions, _real_cells=True, _fake_cell_1_id=None, _fake_cell_2_id=None,
+                  _x_change=0, _y_change=0, _z_change=0, _overwrite=False):
     _time_points_data = []
     _left_cell_id = None
     _right_cell_id = None
@@ -297,13 +297,10 @@ def process_experiment(_experiment, _overwrite=False):
 
 
 def process_all_experiments(_overwrite=False):
-    for _experiment in paths.folders(paths.SERIESES):
+    for _experiment in config.PAIRS:
         process_experiment(_experiment, _overwrite)
 
 
 if __name__ == '__main__':
-    # TODO: handle single cell experiments
-    # process_all_experiments()
+    process_all_experiments()
     process_experiment('SN18')
-    # process_experiment('SN18')
-    # process_series('SN16', 17, True)
