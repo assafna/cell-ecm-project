@@ -102,7 +102,7 @@ def roi_fibers_density(_experiment, _series, _group, _time_point, _roi):
     _non_zero_mask = np.nonzero(_roi_pixels)
 
     # check if more than 1% is black
-    if np.count_nonzero(_roi_pixels == 0) / (_roi_pixels.shape[0] * _roi_pixels.shape[1] * _roi_pixels.shape[2]) > 0.01:
+    if not _out_of_boundaries and np.count_nonzero(_roi_pixels == 0) / np.size(_roi_pixels) > 0.01:
         _out_of_boundaries = True
 
     return np.mean(_roi_pixels[_non_zero_mask]), _out_of_boundaries
