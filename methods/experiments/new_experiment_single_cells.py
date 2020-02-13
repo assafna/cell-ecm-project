@@ -17,6 +17,9 @@ SHOW_PLOTS = False
 DEGREES_XY = [0, 45, 90, 135]
 DEGREES_Z = [0, 45, 90, 135]
 
+# PROCESS:
+# Same as in "new_experiment_pairs"
+
 
 def process_group(_experiment, _series_id, _cell_id, _degrees_xy, _degrees_z, _cell_coordinates,
                   _series_image_by_time_points, _resolutions, _real_cell=True, _fake_cell_id=None,
@@ -25,9 +28,10 @@ def process_group(_experiment, _series_id, _cell_id, _degrees_xy, _degrees_z, _c
     _time_points_amount = len([_value for _value in _cell_coordinates if _value is not None])
     if _real_cell:
         _group = 'cell_' + str(_cell_id) + '_' + str(_degrees_xy) + '_' + str(_degrees_z)
+    elif _fake_cell_id is None:
+        _group = 'fake_' + str(_cell_id) + '_' + str(_degrees_xy) + '_' + str(_degrees_z)
     else:
-        # TODO: implement fake cells
-        _group = None
+        _group = 'static_' + str(_cell_id) + '_' + str(_degrees_xy) + '_' + str(_degrees_z)
 
     # check if needed (missing time-point / properties file)
     if not _overwrite:
