@@ -9,6 +9,7 @@ from tifffile import tifffile
 import matplotlib.pyplot as plt
 
 from libs import save_lib
+from libs.config_lib import CPUS_TO_USE
 from libs.experiments import paths, load, compute
 from libs.experiments.config import FIBERS_CHANNEL_INDEX
 
@@ -22,7 +23,7 @@ SHOW_PLOTS = False
 # 5. This Python script "new_experiment"
 # 6. Python script "set_band_property"
 # 7. Python script "export_video" for visualization
-# 8. Normalization?
+# 8. Python script "normalization"
 
 
 def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell_2_id, _series_image_by_time_points,
@@ -262,7 +263,7 @@ def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell
 
 def process_series(_experiment, _series_id, _overwrite=False):
     _series_image_path = paths.serieses(_experiment, 'series_' + str(_series_id) + '_bc.tif')
-    _image_properties = load.image_properties(_experiment, 'Series ' + str(_series_id))
+    _image_properties = load.image_properties(_experiment, _series_id)
     _series_image = tifffile.imread(_series_image_path)
     _cells_coordinates = load.cell_coordinates_tracked_series_file_data(
         _experiment, 'series_' + str(_series_id) + '.txt'
@@ -290,7 +291,7 @@ def process_experiment(_experiment, _overwrite=False):
         (_experiment, int(_series.split('_')[1]), _overwrite)
         for _series in paths.image_files(paths.serieses(_experiment))
     ]
-    _p = Pool()
+    _p = Pool(CPUS_TO_USE)
     _p.starmap(process_series, _arguments)
     _p.close()
 
@@ -302,7 +303,7 @@ def process_all_experiments(_overwrite=False):
 
 if __name__ == '__main__':
     # TODO: handle single cell experiments
-    process_all_experiments()
-    # process_experiment('SN16')
+    # process_all_experiments()
+    process_experiment('SN18')
     # process_experiment('SN18')
     # process_series('SN16', 17, True)
