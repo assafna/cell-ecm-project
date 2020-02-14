@@ -221,3 +221,17 @@ def longest_same_indices_shared_in_borders_sub_array(_fibers_densities1, _fibers
 
     return longest_fibers_densities_ascending_sequence(_fibers_densities1_filtered), \
         longest_fibers_densities_ascending_sequence(_fibers_densities2_filtered)
+
+
+def remove_blacklist(_experiment, _series_id, _group, _fibers_densities):
+    _blacklist = load.blacklist(_experiment, _series_id, _group)
+
+    if len(_blacklist) > 0:
+        _out_of_boundaries = np.array([_fibers_density[1] for _fibers_density in _fibers_densities])
+        _out_of_boundaries[list(_blacklist.keys())] = False
+        return [
+            (_fibers_density, _out_of_boundaries_value)
+            for _fibers_density, _out_of_boundaries_value in zip(_fibers_densities, _out_of_boundaries)
+        ]
+    else:
+        return _fibers_densities

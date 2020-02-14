@@ -45,3 +45,8 @@ def image_properties(_experiment, _series_id, _image_properties):
 def fibers_densities(_experiment, _series_id, _group, _time_point, _fibers_densities):
     _fibers_densities_path = paths.fibers_densities(_experiment, 'Series ' + str(_series_id), _group, str(_time_point) + '.pkl')
     to_pickle(_fibers_densities, _fibers_densities_path)
+
+
+def blacklist(_experiment, _series_id, _group, _blacklist):
+    _path = paths.blacklist(_experiment, _series_id, _group)
+    to_pickle(_blacklist, _path)

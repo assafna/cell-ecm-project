@@ -19,6 +19,7 @@ CELL_COORDINATES_TRACKED = os.path.join(MANIPULATIONS, 'Cell Coordinates Tracked
 FIBERS_DENSITIES = os.path.join(MANIPULATIONS, 'Fibers Densities')
 NORMALIZATION_LINES = os.path.join(MANIPULATIONS, 'Normalization Lines')
 NORMALIZATION = os.path.join(MANIPULATIONS, 'Normalization')
+BLACKLIST = os.path.join(MANIPULATIONS, 'Blacklist')
 
 # Outputs
 PAIRS = os.path.join(OUTPUTS, 'Pairs')
@@ -186,3 +187,16 @@ def images(_experiment, _series=None, _group=None):
         return _series_path
 
     return os.path.join(_series_path, _group)
+
+
+def blacklist(_experiment, _series_id=None, _group=None):
+    _experiment_path = os.path.join(BLACKLIST, _experiment)
+
+    if _series_id is None:
+        return _experiment_path
+
+    _series_path = os.path.join(_experiment_path, 'Series ' + str(_series_id))
+    if _group is None:
+        return _series_path
+
+    return os.path.join(_series_path, _group + '.pkl')

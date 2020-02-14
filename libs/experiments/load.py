@@ -7,10 +7,12 @@ import pickle
 import numpy as np
 from tifffile import tifffile
 
+from libs import load_lib
 from libs.experiments import paths
 from libs.experiments.config import FIBERS_CHANNEL_INDEX
 
 
+# TODO: change everywhere to use the save_lib and load_lib
 def time_point_file_name_to_number(_time_point_file_name):
     return int(str(_time_point_file_name.split('tp_')[1]).split('.')[0])
 
@@ -176,3 +178,8 @@ def series_image(_experiment, _series_id, _fibers_channel=True):
         ])
     else:
         return _series_image
+
+
+def blacklist(_experiment, _series_id, _group):
+    _path = paths.blacklist(_experiment, _series_id, _group)
+    return load_lib.from_pickle(_path)

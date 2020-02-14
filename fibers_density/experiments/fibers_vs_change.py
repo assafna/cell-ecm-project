@@ -56,11 +56,13 @@ def main():
         _change_in_fibers_densities_array = []
         for _tuple in _experiments_by_distance[_distance]:
             print(_tuple)
-            _experiment, _series_id, _ = _tuple
+            _experiment, _series_id, _group = _tuple
             _series_normalization = load.normalization_series_file_data(_experiment, 'Series ' + str(_series_id))
             _series_normalization = [_series_normalization['average'], _series_normalization['std']]
             for _cell_id in ['left_cell', 'right_cell']:
                 _cell_fibers_densities = _fibers_densities[_tuple][_cell_id]
+                _cell_fibers_densities = compute.remove_blacklist(
+                    _experiment, _series_id, _group, _cell_fibers_densities)
                 _cell_fibers_densities = compute.longest_fibers_densities_ascending_sequence(_cell_fibers_densities)
 
                 # fix if found nan
@@ -129,8 +131,7 @@ def main():
         _y_axis_title='Change in Fibers Densities Z-Score',
         # _color_scale=seaborn.light_palette("navy", reverse=True).as_hex(),
         _color_scale='Viridis',
-        _show_scale=True,
-        _title=None
+        _zmax=0.015
     )
 
     # line of best fit

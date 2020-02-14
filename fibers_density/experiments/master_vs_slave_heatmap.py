@@ -14,8 +14,12 @@ from libs.experiments.config import ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT, CELL_DIAM
 from methods.experiments import export_video
 from plotting import scatter, save, heatmap, contour
 
-MINIMUM_TIME_POINTS = 240
-# TIME_POINTS_START = 0
+EXPERIMENTS = ['SN16']
+EXPERIMENTS_STR = '_'.join(EXPERIMENTS)
+REAL_CELLS = False
+STATIC = True
+BAND = False
+MINIMUM_TIME_POINTS = 20
 VALUES = [-1, -0.9, -0.8, -0.7, -0.6, -0.5, -0.4, -0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
 VALUES_BY_CELL_DIAMETER = np.array(VALUES) * CELL_DIAMETER_IN_MICRONS
 _OFFSET_X = 0
@@ -26,14 +30,15 @@ PRINT = False
 
 
 def main():
-    _experiments = load.experiments_groups_as_tuples(['SN41'])
+    _experiments = load.experiments_groups_as_tuples(EXPERIMENTS)
     _experiments = filtering.by_distances(_experiments, CELLS_DISTANCES)
-    _experiments = filtering.by_real_cells(_experiments, _real_cells=True)
-    # _experiments = filtering.by_static_cells(_experiments, _static=True)
-    # _experiments = filtering.by_band(_experiments, _band=True)
+    _experiments = filtering.by_real_cells(_experiments, _real_cells=REAL_CELLS)
+    _experiments = filtering.by_static_cells(_experiments, _static=STATIC)
+    if BAND:
+        _experiments = filtering.by_band(_experiments)
     _experiments = filtering.by_time_points_amount(_experiments, MINIMUM_TIME_POINTS)
 
-    _experiments.remove(('SN41', 6, 'cells_1_2'))
+    # _experiments.remove(('SN41', 6, 'cells_1_2'))
     # _experiments.remove(('SN41', 2, 'cells_0_2'))
 
     _z_array = np.zeros(shape=(len(VALUES), len(VALUES)))
@@ -65,6 +70,11 @@ def main():
                 _fibers_densities[(_master_experiment, _master_series, _master_group)]['left_cell']
             _master_right_cell_fibers_densities = \
                 _fibers_densities[(_master_experiment, _master_series, _master_group)]['right_cell']
+
+            _master_left_cell_fibers_densities = compute.remove_blacklist(
+                _master_experiment, _master_series, _master_group, _master_left_cell_fibers_densities)
+            _master_right_cell_fibers_densities = compute.remove_blacklist(
+                _master_experiment, _master_series, _master_group, _master_right_cell_fibers_densities)
 
             _master_left_cell_fibers_densities_filtered, _master_right_cell_fibers_densities_filtered = \
                 compute.longest_same_indices_shared_in_borders_sub_array(
@@ -103,7 +113,8 @@ def main():
         _master_count = len(_master_minus_slave[_master_minus_slave > 0])
         _master_percentages = round(_master_count / len(_master_minus_slave), 10)
 
-        print('z', _offset_y, 'xy', _offset_z, _master_percentages, sep='\t')
+        print('z', _offset_y / CELL_DIAMETER_IN_MICRONS, 'xy', _offset_z / CELL_DIAMETER_IN_MICRONS,
+              _master_percentages, sep='\t')
         _z_array[_offset_z_index, _offset_y_index] = _master_percentages
 
     # plot
@@ -114,14 +125,15 @@ def main():
         _x_axis_title='Offset in Z axis',
         _y_axis_title='Offset in XY axis',
         _color_scale=sns.color_palette('BrBG').as_hex(),
-        _show_scale=True,
-        _title=None
+        _zmin=0,
+        _zmax=1
     )
 
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        _filename='plot_SN41_real_cells_oob_heatmap'
+        _filename='plot_' + EXPERIMENTS_STR + '_real_' + str(REAL_CELLS) + '_static_' + str(STATIC) + '_band_' +
+                  str(BAND) + '_oob_heatmap'
     )
 
     _fig = contour.create_plot(
@@ -131,14 +143,15 @@ def main():
         _x_axis_title='Offset in Z axis',
         _y_axis_title='Offset in XY axis',
         _color_scale=sns.color_palette('BrBG').as_hex(),
-        _show_scale=True,
-        _title=None
+        _zmin=0,
+        _zmax=1
     )
 
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        _filename='plot_SN41_real_cells_oob_contour'
+        _filename='plot_' + EXPERIMENTS_STR + '_real_' + str(REAL_CELLS) + '_static_' + str(STATIC) + '_band_' +
+                  str(BAND) + '_oob_contour'
     )
 
 

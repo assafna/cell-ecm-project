@@ -39,7 +39,7 @@ def wilcoxon_test(_master_correlations_array, _slave_correlations_array, _name):
 
 
 def main():
-    _experiments = load.experiments_groups_as_tuples(['SN41'])
+    _experiments = load.experiments_groups_as_tuples(['SN44'])
     _experiments = filtering.by_distances(_experiments, CELLS_DISTANCES)
 
     # _experiments.remove(('SN16', 17, 'cells_2_4'))
@@ -63,12 +63,13 @@ def main():
     _experiments = filtering.by_real_cells(_experiments)
 
     _experiments_band = filtering.by_band(_experiments, _band=True)
-    _experiments_band = _experiments
+    # _experiments_band = _experiments
     # _experiments = _experiments_band
     _minimum_time_points = MINIMUM_TIME_POINTS
     _experiments = filtering.by_time_points_amount(_experiments, _minimum_time_points)
+    _experiments = [_tuple for _tuple in _experiments if _tuple[1] != 6]
     print(len(_experiments))
-    _experiments.remove(('SN41', 6, 'cells_1_2'))
+    # _experiments.remove(('SN41', 6, 'cells_1_2'))
     # _experiments.remove(('SN16', 21, 'cells_0_1'))
     # _experiments.remove(('SN16', 1, 'cells_1_5'))
     # _experiments = filtering.by_series_id(_experiments, _series_id=22)
@@ -127,6 +128,11 @@ def main():
         _master_right_cell_fibers_densities = \
             _fibers_densities[(_master_experiment, _master_series, _master_group)]['right_cell']
 
+        _master_left_cell_fibers_densities = compute.remove_blacklist(
+            _master_experiment, _master_series, _master_group, _master_left_cell_fibers_densities)
+        _master_right_cell_fibers_densities = compute.remove_blacklist(
+            _master_experiment, _master_series, _master_group, _master_right_cell_fibers_densities)
+
         _master_left_cell_fibers_densities_filtered, _master_right_cell_fibers_densities_filtered = \
             compute.longest_same_indices_shared_in_borders_sub_array(
                 _master_left_cell_fibers_densities, _master_right_cell_fibers_densities
@@ -153,6 +159,11 @@ def main():
                         _fibers_densities[(_master_experiment, _master_series, _master_group)][_master_cell_id]
                     _slave_fibers_densities = \
                         _fibers_densities[(_slave_experiment, _slave_series, _slave_group)][_slave_cell_id]
+
+                    _master_fibers_densities = compute.remove_blacklist(
+                        _master_experiment, _master_series, _master_group, _master_fibers_densities)
+                    _slave_fibers_densities = compute.remove_blacklist(
+                        _slave_experiment, _slave_series, _slave_group, _slave_fibers_densities)
 
                     _master_fibers_densities_filtered, _slave_fibers_densities_filtered = \
                         compute.longest_same_indices_shared_in_borders_sub_array(
