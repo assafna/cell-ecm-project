@@ -4,6 +4,7 @@ from multiprocessing.pool import Pool
 
 import numpy as np
 
+from libs.config_lib import CPUS_TO_USE
 from libs.simulations import paths, compute, load, save
 from libs.simulations.config import ROI_WIDTH, ROI_HEIGHT, CELL_DIAMETER
 
@@ -57,7 +58,7 @@ def process_simulation(_simulation, _overwrite=False):
 
 def process_simulations(_simulations, _overwrite=False):
     _arguments = [(_simulation, _overwrite) for _simulation in _simulations]
-    _p = Pool()
+    _p = Pool(CPUS_TO_USE)
     _p.starmap(process_simulation, _arguments)
     _p.close()
 
