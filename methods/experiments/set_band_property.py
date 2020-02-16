@@ -5,7 +5,7 @@ from multiprocess.pool import Pool
 from libs import save_lib
 from libs.config_lib import CPUS_TO_USE
 from libs.experiments import compute, load, paths, config
-from libs.experiments.config import CELL_DIAMETER_IN_MICRONS
+from libs.experiments.config import AVERAGE_CELL_DIAMETER_IN_MICRONS
 
 
 def process_group(_experiment, _series_id, _group, _overwrite=False):
@@ -27,9 +27,9 @@ def process_group(_experiment, _series_id, _group, _overwrite=False):
     for _time_point in [0, int(round(_time_points_amount / 2)), _time_points_amount - 1]:
         _left_cell_coordinates = _group_real_properties['time_points'][_time_point]['left_cell']['coordinates']
         _right_cell_coordinates = _group_real_properties['time_points'][_time_point]['right_cell']['coordinates']
-        _cell_diameter_x = CELL_DIAMETER_IN_MICRONS / _group_real_properties['time_points'][_time_point]['resolutions']['x']
-        _cell_diameter_y = CELL_DIAMETER_IN_MICRONS / _group_real_properties['time_points'][_time_point]['resolutions']['y']
-        _cell_diameter_z = CELL_DIAMETER_IN_MICRONS / _group_real_properties['time_points'][_time_point]['resolutions']['z']
+        _cell_diameter_x = AVERAGE_CELL_DIAMETER_IN_MICRONS / _group_real_properties['time_points'][_time_point]['resolutions']['x']
+        _cell_diameter_y = AVERAGE_CELL_DIAMETER_IN_MICRONS / _group_real_properties['time_points'][_time_point]['resolutions']['y']
+        _cell_diameter_z = AVERAGE_CELL_DIAMETER_IN_MICRONS / _group_real_properties['time_points'][_time_point]['resolutions']['z']
         _x1 = (_left_cell_coordinates['x'] + _right_cell_coordinates['x']) / 2 - _cell_diameter_x / 2
         _x2 = _x1 + _cell_diameter_x
         _y1 = (_left_cell_coordinates['y'] + _right_cell_coordinates['y']) / 2 - _cell_diameter_y / 2
