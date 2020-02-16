@@ -8,7 +8,7 @@ from libs.experiments import load, save
 from libs.experiments.config import AVERAGE_CELL_DIAMETER_IN_MICRONS
 
 
-def cells_distance_in_cell_size(_experiment, _series_id, _cell_1_id, _cell_2_id, _cell_1_coordinates, _cell_2_coordinates):
+def cells_distance_in_cell_size(_experiment, _series_id, _cell_1_coordinates, _cell_2_coordinates):
     _image_properties = load.image_properties(_experiment, _series_id)
     _image_resolutions = _image_properties['resolutions']
     _x1, _y1, _z1 = [float(_value) for _value in _cell_1_coordinates[0]]
