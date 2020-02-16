@@ -190,13 +190,14 @@ def images(_experiment, _series=None, _group=None):
 
 
 def blacklist(_experiment, _series_id=None, _group=None):
+    if _series_id is None:
+        return os.path.join(BLACKLIST, _experiment + '.pkl')
+
     _experiment_path = os.path.join(BLACKLIST, _experiment)
 
-    if _series_id is None:
-        return _experiment_path
+    if _group is None:
+        return os.path.join(_experiment_path, 'series_' + str(_series_id) + '.pkl')
 
     _series_path = os.path.join(_experiment_path, 'Series ' + str(_series_id))
-    if _group is None:
-        return _series_path
 
     return os.path.join(_series_path, _group + '.pkl')
