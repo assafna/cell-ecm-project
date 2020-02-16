@@ -1,10 +1,12 @@
 import math
+import os
+import sys
 
 import numpy as np
 from scipy.ndimage import rotate
 
 from libs.compute_lib import roi
-from libs.experiments import load, save
+from libs.experiments import load, save, paths
 from libs.experiments.config import AVERAGE_CELL_DIAMETER_IN_MICRONS
 
 
@@ -102,7 +104,8 @@ def roi_fibers_density(_experiment, _series, _group, _time_point, _roi):
     _non_zero_mask = np.nonzero(_roi_pixels)
 
     # check if more than 1% is black
-    if not _out_of_boundaries and np.count_nonzero(_roi_pixels == 0) / np.size(_roi_pixels) > 0.01:
+    if not _out_of_boundaries and \
+            (np.size(_roi_pixels) == 0 or np.count_nonzero(_roi_pixels == 0) / np.size(_roi_pixels) > 0.01):
         _out_of_boundaries = True
 
     return np.mean(_roi_pixels[_non_zero_mask]), _out_of_boundaries
@@ -110,13 +113,16 @@ def roi_fibers_density(_experiment, _series, _group, _time_point, _roi):
 
 def roi_fibers_density_time_point(_experiment, _series_id, _group, _length_x, _length_y, _length_z, _offset_x,
                                   _offset_y, _offset_z, _cell_id, _direction, _time_point, _group_properties=None,
-                                  _print=True, _save=True):
+                                  _print=False, _save=True):
     _group_properties = _group_properties if _group_properties is not None else load.group_properties(_experiment,
                                                                                                       _series_id,
                                                                                                       _group)
     _time_point_properties = _group_properties['time_points'][_time_point]
     _time_point_fibers_densities = load.fibers_densities(_experiment, _series_id, _group, _time_point)
-    _cell_diameter_in_microns = load.mean_distance_to_surface_in_microns(_experiment, _series_id, _cell_id)
+    _cell_diameter_in_microns = load.mean_distance_to_surface_in_microns(
+        _experiment=_experiment,
+        _series_id=_series_id,
+        _cell_id=_group_properties['cells_ids'][_cell_id]) * 2
     _time_point_roi = roi_by_microns(
         _resolution_x=_group_properties['time_points'][_time_point]['resolutions']['x'],
         _resolution_y=_group_properties['time_points'][_time_point]['resolutions']['y'],
@@ -149,7 +155,7 @@ def roi_fibers_density_time_point(_experiment, _series_id, _group, _length_x, _l
 
 
 def roi_fibers_density_by_time(_experiment, _series_id, _group, _length_x, _length_y, _length_z, _offset_x, _offset_y,
-                               _offset_z, _cell_id, _direction, _time_points, _print=True, _save=True,
+                               _offset_z, _cell_id, _direction, _time_points=sys.maxsize, _print=False, _save=True,
                                _out_of_borders=True):
     _group_properties = load.group_properties(_experiment, _series_id, _group)
     _fibers_densities = [
@@ -166,7 +172,7 @@ def roi_fibers_density_by_time(_experiment, _series_id, _group, _length_x, _leng
 
 
 def roi_fibers_density_by_time_pairs(_experiment, _series_id, _group, _length_x, _length_y, _length_z, _offset_x,
-                                     _offset_y, _offset_z, _direction, _time_points, _print=True, _save=True,
+                                     _offset_y, _offset_z, _direction, _time_points=sys.maxsize, _print=False, _save=True,
                                      _out_of_borders=True):
     return {
         'left_cell': roi_fibers_density_by_time(_experiment, _series_id, _group, _length_x, _length_y, _length_z,
@@ -208,6 +214,11 @@ def longest_fibers_densities_ascending_sequence(_fibers_densities):
 def longest_same_indices_shared_in_borders_sub_array(_fibers_densities1, _fibers_densities2):
     _out_of_boundaries1 = np.array([_fibers_density[1] for _fibers_density in _fibers_densities1])
     _out_of_boundaries2 = np.array([_fibers_density[1] for _fibers_density in _fibers_densities2])
+
+    # based on the shortest
+    _min_size = min(len(_out_of_boundaries1), len(_out_of_boundaries2))
+    _out_of_boundaries1 = _out_of_boundaries1[:_min_size]
+    _out_of_boundaries2 = _out_of_boundaries2[:_min_size]
 
     # not-and on both
     _out_of_boundaries = np.logical_not(
