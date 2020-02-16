@@ -9,15 +9,15 @@ from scipy.stats import wilcoxon
 from libs import compute_lib
 from libs.config_lib import CPUS_TO_USE
 from libs.experiments import load, filtering, compute, paths
-from libs.experiments.config import ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT, CELL_DIAMETER_IN_MICRONS
+from libs.experiments.config import ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT
 from methods.experiments import export_video
 from plotting import scatter, save
 
 MINIMUM_TIME_POINTS = 240
-OFFSET_X = CELL_DIAMETER_IN_MICRONS * 0
+OFFSET_X = 0
 # TODO: set the offset in y according to the angle in the original Z slices of the cells
-OFFSET_Y = CELL_DIAMETER_IN_MICRONS * 0.5
-OFFSET_Z = CELL_DIAMETER_IN_MICRONS * 0
+OFFSET_Y = 0.5
+OFFSET_Z = 0
 DERIVATIVE = 2
 CELLS_DISTANCES = [6, 7, 8, 9]
 DIRECTION = 'inside'
@@ -96,7 +96,7 @@ def main():
     _arguments = []
     for _tuple in _experiments:
         _experiment, _series, _group = _tuple
-        _arguments.append((_experiment, _series, _group, ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT,
+        _arguments.append((_experiment, _series, _group, ROI_LENGTH, ROI_HEIGHT, ROI_WIDTH,
                            OFFSET_X, OFFSET_Y, OFFSET_Z, DIRECTION, _minimum_time_points,
                            PRINT, SAVE))
 
