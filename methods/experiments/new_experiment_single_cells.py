@@ -26,6 +26,12 @@ def process_group(_experiment, _series_id, _cell_id, _degrees_xy, _degrees_z, _c
                   _x_change=0, _y_change=0, _z_change=0, _overwrite=False):
     _time_points_data = []
     _time_points_amount = len([_value for _value in _cell_coordinates if _value is not None])
+
+    # smooth coordinates
+    _cells_coordinates_cell_smoothed = compute.smooth_coordinates_in_time(
+        [_value for _value in _cell_coordinates if _value is not None]
+    )
+
     if _real_cell:
         _group = 'cell_' + str(_cell_id) + '_' + str(_degrees_xy) + '_' + str(_degrees_z)
     elif _fake_cell_id is None:
@@ -56,7 +62,7 @@ def process_group(_experiment, _series_id, _cell_id, _degrees_xy, _degrees_z, _c
     # running for each time point
     for _time_point in range(_time_points_amount):
         _time_point_image = _series_image_by_time_points[_time_point]
-        _cell_coordinates = [int(round(_value)) for _value in _cell_coordinates[_time_point]]
+        _cell_coordinates = [_value for _value in _cells_coordinates_cell_smoothed[_time_point]]
 
         # update coordinates if needed
         if any([_x_change != 0, _y_change != 0, _z_change != 0]):
@@ -81,24 +87,24 @@ def process_group(_experiment, _series_id, _cell_id, _degrees_xy, _degrees_z, _c
         _time_point_image_swapped = np.swapaxes(_time_point_image_rotated, 0, 1)
 
         if SHOW_PLOTS:
-            plt.imshow(_time_point_image_rotated[_cell_coordinates[2]])
+            plt.imshow(_time_point_image_rotated[int(round(_cell_coordinates[2]))])
             plt.show()
 
         # update coordinates
         _image_center = compute.image_center_coordinates(_image_shape=reversed(_time_point_image_rotated[0].shape))
-        cell_coordinates = compute.rotate_point_around_another_point(
+        _cell_coordinates = compute.rotate_point_around_another_point(
             _point=_cell_coordinates,
             _angle_in_radians=math.radians(_degrees_xy),
             _around_point=_image_center
         )
-        _fixed_y = int(round(_cell_coordinates[1]))
+        _fixed_y = _cell_coordinates[1]
         # y is now z
         _cell_coordinates[1] = _cell_coordinates[2]
         # z is now y
         _cell_coordinates[2] = _fixed_y
 
         if SHOW_PLOTS:
-            plt.imshow(_time_point_image_swapped[_cell_coordinates[2]])
+            plt.imshow(_time_point_image_swapped[int(round(_cell_coordinates[2]))])
             plt.show()
 
         # swap resolutions
@@ -126,14 +132,11 @@ def process_group(_experiment, _series_id, _cell_id, _degrees_xy, _degrees_z, _c
             _angle_in_radians=math.radians(_degrees_z),
             _around_point=_image_center
         )
-        _fixed_y = int(round(_cell_coordinates[1]))
-        _cell_coordinates[1] = _fixed_y
-        _cell_coordinates[1] = _fixed_y
 
-        # if SHOW_PLOTS:
-        if _time_point == 0 or _time_point == 50 or _time_point == 150:
-            plt.imshow(_time_point_image_swapped_rotated[_cell_coordinates[2]])
-            plt.show()
+        if SHOW_PLOTS:
+            if _time_point == 0 or _time_point == 50 or _time_point == 150:
+                plt.imshow(_time_point_image_swapped_rotated[int(round(_cell_coordinates[2]))])
+                plt.show()
 
         # update resolutions
         _angle = abs(_degrees_z)
