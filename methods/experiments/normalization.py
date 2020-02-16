@@ -7,7 +7,7 @@ import numpy as np
 from libs import save_lib
 from libs.config_lib import CPUS_TO_USE
 from libs.experiments import load, save, paths, config
-from libs.experiments.config import CELL_DIAMETER_IN_MICRONS
+from libs.experiments.config import AVERAGE_CELL_DIAMETER_IN_MICRONS
 
 STEP_PERCENTAGE = 0.1
 CELL_BORDERS_VALUES = [-2, -1, 0, 1, 2]
@@ -25,9 +25,9 @@ def process_series(_experiment, _series_id, _overwrite=False):
     _series_image_first_time_point = load.series_image(_experiment, _series_id)[0]
     _image_properties = load.image_properties(_experiment, _series_id)
     _cells = load.objects_time_point_file_data(_experiment, 'Series ' + str(_series_id), _time_point='tp_1.txt')
-    _cell_diameter_x = CELL_DIAMETER_IN_MICRONS / _image_properties['resolutions']['x']
-    _cell_diameter_y = CELL_DIAMETER_IN_MICRONS / _image_properties['resolutions']['y']
-    _cell_diameter_z = CELL_DIAMETER_IN_MICRONS / _image_properties['resolutions']['z']
+    _cell_diameter_x = AVERAGE_CELL_DIAMETER_IN_MICRONS / _image_properties['resolutions']['x']
+    _cell_diameter_y = AVERAGE_CELL_DIAMETER_IN_MICRONS / _image_properties['resolutions']['y']
+    _cell_diameter_z = AVERAGE_CELL_DIAMETER_IN_MICRONS / _image_properties['resolutions']['z']
     _z_shape, _y_shape, _x_shape = _series_image_first_time_point.shape
     _z_step, _y_step, _x_step = [int(round(_value * STEP_PERCENTAGE)) for _value in [_z_shape, _y_shape, _x_shape]]
 
