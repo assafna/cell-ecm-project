@@ -5,10 +5,10 @@ from scipy.ndimage import rotate
 
 from libs.compute_lib import roi
 from libs.experiments import load, save
-from libs.experiments.config import CELL_DIAMETER_IN_MICRONS
+from libs.experiments.config import AVERAGE_CELL_DIAMETER_IN_MICRONS
 
 
-def cells_distance_in_cell_size(_experiment, _series_id, _cell_1_coordinates, _cell_2_coordinates):
+def cells_distance_in_cell_size(_experiment, _series_id, _cell_1_id, _cell_2_id, _cell_1_coordinates, _cell_2_coordinates):
     _image_properties = load.image_properties(_experiment, _series_id)
     _image_resolutions = _image_properties['resolutions']
     _x1, _y1, _z1 = [float(_value) for _value in _cell_1_coordinates[0]]
@@ -16,7 +16,7 @@ def cells_distance_in_cell_size(_experiment, _series_id, _cell_1_coordinates, _c
     _x1, _y1, _z1 = _x1 * _image_resolutions['x'], _y1 * _image_resolutions['y'], _z1 * _image_resolutions['z']
     _x2, _y2, _z2 = _x2 * _image_resolutions['x'], _y2 * _image_resolutions['y'], _z2 * _image_resolutions['z']
 
-    return math.sqrt((_x1 - _x2) ** 2 + (_y1 - _y2) ** 2 + (_z1 - _z2) ** 2) / CELL_DIAMETER_IN_MICRONS
+    return math.sqrt((_x1 - _x2) ** 2 + (_y1 - _y2) ** 2 + (_z1 - _z2) ** 2) / AVERAGE_CELL_DIAMETER_IN_MICRONS
 
 
 def angle_between_three_points(_a, _b, _c):
@@ -56,14 +56,14 @@ def image_center_coordinates(_image_shape):
 
 
 def roi_by_microns(_resolution_x, _resolution_y, _resolution_z, _length_x, _length_y, _length_z, _offset_x, _offset_y,
-                   _offset_z, _cell_coordinates, _direction):
-    _cell_diameter_in_pixels = CELL_DIAMETER_IN_MICRONS / _resolution_x
+                   _offset_z, _cell_coordinates, _cell_diameter_in_microns, _direction):
+    _cell_diameter_in_pixels = _cell_diameter_in_microns / _resolution_x
     _length_x_in_pixels = _length_x / _resolution_x
     _length_y_in_pixels = _length_y / _resolution_y
     _length_z_in_pixels = _length_z / _resolution_z
-    _offset_x_in_pixels = _offset_x / _resolution_x
-    _offset_y_in_pixels = _offset_y / _resolution_y
-    _offset_z_in_pixels = _offset_z / _resolution_z
+    _offset_x_in_pixels = (_cell_diameter_in_microns * _offset_x) / _resolution_x
+    _offset_y_in_pixels = (_cell_diameter_in_microns * _offset_y) / _resolution_y
+    _offset_z_in_pixels = (_cell_diameter_in_microns * _offset_z) / _resolution_z
 
     _x1, _y1, _x2, _y2 = [int(round(_value)) for _value in roi(
         _length_x=_length_x_in_pixels,
@@ -116,6 +116,7 @@ def roi_fibers_density_time_point(_experiment, _series_id, _group, _length_x, _l
                                                                                                       _group)
     _time_point_properties = _group_properties['time_points'][_time_point]
     _time_point_fibers_densities = load.fibers_densities(_experiment, _series_id, _group, _time_point)
+    _cell_diameter_in_microns = load.mean_distance_to_surface_in_microns(_experiment, _series_id, _cell_id)
     _time_point_roi = roi_by_microns(
         _resolution_x=_group_properties['time_points'][_time_point]['resolutions']['x'],
         _resolution_y=_group_properties['time_points'][_time_point]['resolutions']['y'],
@@ -127,6 +128,7 @@ def roi_fibers_density_time_point(_experiment, _series_id, _group, _length_x, _l
         _offset_y=_offset_y,
         _offset_z=_offset_z,
         _cell_coordinates=_group_properties['time_points'][_time_point][_cell_id]['coordinates'],
+        _cell_diameter_in_microns=_cell_diameter_in_microns,
         _direction='right' if
         (_cell_id, _direction) == ('left_cell', 'inside') or
         (_cell_id, _direction) == ('right_cell', 'outside') or
