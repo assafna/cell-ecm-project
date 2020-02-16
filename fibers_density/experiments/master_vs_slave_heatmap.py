@@ -10,7 +10,7 @@ from scipy.stats import wilcoxon
 from libs import compute_lib
 from libs.config_lib import CPUS_TO_USE
 from libs.experiments import load, filtering, compute, paths
-from libs.experiments.config import ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT, CELL_DIAMETER_IN_MICRONS
+from libs.experiments.config import ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT
 from methods.experiments import export_video
 from plotting import scatter, save, heatmap, contour
 
@@ -20,8 +20,8 @@ REAL_CELLS = False
 STATIC = True
 BAND = False
 MINIMUM_TIME_POINTS = 20
-VALUES = [-1, -0.9, -0.8, -0.7, -0.6, -0.5, -0.4, -0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
-VALUES_BY_CELL_DIAMETER = np.array(VALUES) * CELL_DIAMETER_IN_MICRONS
+VALUES_BY_CELL_DIAMETER = np.array(
+    [-1, -0.9, -0.8, -0.7, -0.6, -0.5, -0.4, -0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1])
 _OFFSET_X = 0
 DERIVATIVE = 2
 CELLS_DISTANCES = [6, 7, 8, 9]
@@ -41,7 +41,7 @@ def main():
     # _experiments.remove(('SN41', 6, 'cells_1_2'))
     # _experiments.remove(('SN41', 2, 'cells_0_2'))
 
-    _z_array = np.zeros(shape=(len(VALUES), len(VALUES)))
+    _z_array = np.zeros(shape=(len(VALUES_BY_CELL_DIAMETER), len(VALUES_BY_CELL_DIAMETER)))
     for (_offset_y_index, _offset_y), (_offset_z_index, _offset_z) in \
             product(enumerate(VALUES_BY_CELL_DIAMETER), enumerate(VALUES_BY_CELL_DIAMETER)):
 
@@ -51,7 +51,7 @@ def main():
         _answers_keys = []
         for _tuple in _experiments:
             _experiment, _series, _group = _tuple
-            _arguments.append((_experiment, _series, _group, ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT,
+            _arguments.append((_experiment, _series, _group, ROI_LENGTH, ROI_HEIGHT, ROI_WIDTH,
                                _OFFSET_X, _offset_y, _offset_z, DIRECTION, MINIMUM_TIME_POINTS, PRINT))
             _answers_keys.append((_experiment, _series, _group))
 
@@ -113,14 +113,13 @@ def main():
         _master_count = len(_master_minus_slave[_master_minus_slave > 0])
         _master_percentages = round(_master_count / len(_master_minus_slave), 10)
 
-        print('z', _offset_y / CELL_DIAMETER_IN_MICRONS, 'xy', _offset_z / CELL_DIAMETER_IN_MICRONS,
-              _master_percentages, sep='\t')
+        print('z', _offset_y, 'xy', _offset_z, _master_percentages, sep='\t')
         _z_array[_offset_z_index, _offset_y_index] = _master_percentages
 
     # plot
     _fig = heatmap.create_plot(
-        _x_labels=VALUES,
-        _y_labels=VALUES,
+        _x_labels=VALUES_BY_CELL_DIAMETER,
+        _y_labels=VALUES_BY_CELL_DIAMETER,
         _z_array=_z_array,
         _x_axis_title='Offset in Z axis',
         _y_axis_title='Offset in XY axis',
@@ -137,8 +136,8 @@ def main():
     )
 
     _fig = contour.create_plot(
-        _x_labels=VALUES,
-        _y_labels=VALUES,
+        _x_labels=VALUES_BY_CELL_DIAMETER,
+        _y_labels=VALUES_BY_CELL_DIAMETER,
         _z_array=_z_array,
         _x_axis_title='Offset in Z axis',
         _y_axis_title='Offset in XY axis',
