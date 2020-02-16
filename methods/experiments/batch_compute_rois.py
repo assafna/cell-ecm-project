@@ -5,7 +5,6 @@ import numpy as np
 
 from libs.config_lib import CPUS_TO_USE
 from libs.experiments import load, compute, save
-from libs.experiments.config import CELL_DIAMETER_IN_MICRONS
 
 EXPERIMENT = 'SN41'
 DIRECTION = 'inside'
@@ -13,8 +12,8 @@ OFFSETS_X = list(range(0, 16))
 OFFSETS_Y = [-4, -3, -2, -1, 0, 1, 2, 3, 4]
 OFFSETS_Z = [-4, -3, -2, -1, 0, 1, 2, 3, 4]
 ROI_LENGTHS = list(range(4, 16))
-ROI_WIDTHS = list(range(4, 16))
 ROI_HEIGHTS = list(range(4, 16))
+ROI_WIDTHS = list(range(4, 16))
 CELLS_IDS = ['left_cell', 'right_cell']
 
 
@@ -25,17 +24,19 @@ def main(_experiment, _series_id, _group, _group_properties, _time_point):
     for _offset_x, _offset_y, _offset_z, _roi_length, _roi_width, _roi_height in \
             product(OFFSETS_X, OFFSETS_Y, OFFSETS_Z, ROI_LENGTHS, ROI_WIDTHS, ROI_HEIGHTS):
         for _cell_id in CELLS_IDS:
+            _cell_diameter_in_microns = load.mean_distance_to_surface_in_microns(_experiment, _series_id, _cell_id) * 2
             _roi = compute.roi_by_microns(
                 _resolution_x=_group_properties['time_points'][_time_point]['resolutions']['x'],
                 _resolution_y=_group_properties['time_points'][_time_point]['resolutions']['y'],
                 _resolution_z=_group_properties['time_points'][_time_point]['resolutions']['z'],
-                _length_x=_roi_length * (CELL_DIAMETER_IN_MICRONS / 8),
-                _length_y=_roi_width * (CELL_DIAMETER_IN_MICRONS / 8),
-                _length_z=_roi_height * (CELL_DIAMETER_IN_MICRONS / 8),
-                _offset_x=_offset_x * (CELL_DIAMETER_IN_MICRONS / 8),
-                _offset_y=_offset_y * (CELL_DIAMETER_IN_MICRONS / 8),
-                _offset_z=_offset_z * (CELL_DIAMETER_IN_MICRONS / 8),
+                _length_x=_roi_length * (_cell_diameter_in_microns / 8),
+                _length_y=_roi_height * (_cell_diameter_in_microns / 8),
+                _length_z=_roi_width * (_cell_diameter_in_microns / 8),
+                _offset_x=_offset_x * (_cell_diameter_in_microns / 8),
+                _offset_y=_offset_y * (_cell_diameter_in_microns / 8),
+                _offset_z=_offset_z * (_cell_diameter_in_microns / 8),
                 _cell_coordinates=_group_properties['time_points'][_time_point][_cell_id]['coordinates'],
+                _cell_diameter_in_microns=_cell_diameter_in_microns,
                 _direction='right' if
                 (_cell_id, DIRECTION) == ('left_cell', 'inside') or
                 (_cell_id, DIRECTION) == ('right_cell', 'outside') or
