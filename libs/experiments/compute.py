@@ -235,3 +235,24 @@ def remove_blacklist(_experiment, _series_id, _group, _fibers_densities):
         ]
     else:
         return _fibers_densities
+
+
+def coordinates_mean(_coordinates):
+    _x_mean = np.mean([_coordinate[0] for _coordinate in _coordinates])
+    _y_mean = np.mean([_coordinate[1] for _coordinate in _coordinates])
+    _z_mean = np.mean([_coordinate[2] for _coordinate in _coordinates])
+
+    return _x_mean, _y_mean, _z_mean
+
+
+def smooth_coordinates_in_time(_coordinates, _n=5):
+    _coordinates_smoothed = []
+    for _n_index in range(1, _n):
+        _current_coordinates = _coordinates[:_n_index]
+        _coordinates_smoothed.append(coordinates_mean(_current_coordinates))
+
+    for _index in range(_n, len(_coordinates) + 1):
+        _current_coordinates = _coordinates[_index - _n:_index]
+        _coordinates_smoothed.append(coordinates_mean(_current_coordinates))
+
+    return _coordinates_smoothed
