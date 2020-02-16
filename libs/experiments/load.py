@@ -194,4 +194,7 @@ def series_image(_experiment, _series_id, _fibers_channel=True):
 
 def blacklist(_experiment, _series_id, _group):
     _path = paths.blacklist(_experiment, _series_id, _group)
+    if not os.path.isfile(_path):
+        return {}
+
     return load_lib.from_pickle(_path)
