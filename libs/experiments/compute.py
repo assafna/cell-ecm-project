@@ -237,7 +237,10 @@ def longest_same_indices_shared_in_borders_sub_array(_fibers_densities1, _fibers
 
 
 def remove_blacklist(_experiment, _series_id, _group, _fibers_densities):
-    _blacklist = load.blacklist(_experiment, _series_id, _group)
+    # get all blacklists
+    _blacklist = load.blacklist(_experiment)
+    _blacklist.update(load.blacklist(_experiment, _series_id))
+    _blacklist.update(load.blacklist(_experiment, _series_id, _group))
 
     if len(_blacklist) > 0:
         _out_of_boundaries = np.array([_fibers_density[1] for _fibers_density in _fibers_densities])

@@ -47,6 +47,6 @@ def fibers_densities(_experiment, _series_id, _group, _time_point, _fibers_densi
     to_pickle(_fibers_densities, _fibers_densities_path)
 
 
-def blacklist(_experiment, _series_id, _group, _blacklist):
+def blacklist(_experiment, _series_id=None, _group=None, _blacklist={}):
     _path = paths.blacklist(_experiment, _series_id, _group)
     to_pickle(_blacklist, _path)
