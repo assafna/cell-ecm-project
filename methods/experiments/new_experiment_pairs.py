@@ -19,8 +19,8 @@ SHOW_PLOTS = False
 # 2. Fiji script "objects_counter_all_tps"
 # 3. Python script "cell_coordinates_tracked"
 # 4. Python script "create_image_properties"
-# 5. This Python script "new_experiment"
-# 6. Python script "set_band_property"
+# 5. This Python script "new_experiment_pairs"
+# 6. Python script "set_band_property" *** BETTER TO DO MANUALLY ***
 # 7. Python script "export_video" for visualization
 # 8. Python script "normalization"
 
@@ -35,6 +35,15 @@ def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell
         len([_value for _value in _cells_coordinates[_cell_1_id] if _value is not None]),
         len([_value for _value in _cells_coordinates[_cell_2_id] if _value is not None])
     )
+
+    # smooth coordinates
+    _cells_coordinates_cell_1_smoothed = compute.smooth_coordinates_in_time(
+        [_value for _value in _cells_coordinates[_cell_1_id] if _value is not None]
+    )
+    _cells_coordinates_cell_2_smoothed = compute.smooth_coordinates_in_time(
+        [_value for _value in _cells_coordinates[_cell_2_id] if _value is not None]
+    )
+
     if _real_cells:
         _group = 'cells_' + str(_cell_1_id) + '_' + str(_cell_2_id)
     elif _fake_cell_1_id is None:
@@ -67,8 +76,8 @@ def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell
     # running for each time point
     for _time_point in range(_time_points_amount):
         _time_point_image = _series_image_by_time_points[_time_point]
-        _cell_1_coordinates = [int(round(_value)) for _value in _cells_coordinates[_cell_1_id][_time_point]]
-        _cell_2_coordinates = [int(round(_value)) for _value in _cells_coordinates[_cell_2_id][_time_point]]
+        _cell_1_coordinates = [_value for _value in _cells_coordinates_cell_1_smoothed[_time_point]]
+        _cell_2_coordinates = [_value for _value in _cells_coordinates_cell_2_smoothed[_time_point]]
 
         # update coordinates if needed
         if any([_x_change != 0, _y_change != 0, _z_change != 0]):
@@ -115,9 +124,9 @@ def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell
         _time_point_image_swapped = np.swapaxes(_time_point_image_rotated, 0, 1)
 
         if SHOW_PLOTS:
-            plt.imshow(_time_point_image_rotated[_left_cell_coordinates[2]])
+            plt.imshow(_time_point_image_rotated[int(round(_left_cell_coordinates[2]))])
             plt.show()
-            plt.imshow(_time_point_image_rotated[_right_cell_coordinates[2]])
+            plt.imshow(_time_point_image_rotated[int(round(_right_cell_coordinates[2]))])
             plt.show()
 
         # update coordinates
@@ -132,7 +141,7 @@ def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell
             _angle_in_radians=math.radians(_angle),
             _around_point=_image_center
         )
-        _fixed_y = int(round((_left_cell_coordinates[1] + _right_cell_coordinates[1]) / 2))
+        _fixed_y = (_left_cell_coordinates[1] + _right_cell_coordinates[1]) / 2
         # y is now z
         _left_cell_coordinates[1] = _left_cell_coordinates[2]
         _right_cell_coordinates[1] = _right_cell_coordinates[2]
@@ -141,7 +150,7 @@ def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell
         _right_cell_coordinates[2] = _fixed_y
 
         if SHOW_PLOTS:
-            plt.imshow(_time_point_image_swapped[_left_cell_coordinates[2]])
+            plt.imshow(_time_point_image_swapped[int(round(_left_cell_coordinates[2]))])
             plt.show()
 
         # swap resolutions
@@ -178,14 +187,14 @@ def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell
             _angle_in_radians=math.radians(_angle),
             _around_point=_image_center
         )
-        _fixed_y = int(round((_left_cell_coordinates[1] + _right_cell_coordinates[1]) / 2))
+        _fixed_y = (_left_cell_coordinates[1] + _right_cell_coordinates[1]) / 2
         _left_cell_coordinates[1] = _fixed_y
         _right_cell_coordinates[1] = _fixed_y
 
-        # if SHOW_PLOTS:
-        if _time_point == 0 or _time_point == 50 or _time_point == 150:
-            plt.imshow(_time_point_image_swapped_rotated[_left_cell_coordinates[2]])
-            plt.show()
+        if SHOW_PLOTS:
+            if _time_point == 0 or _time_point == 50 or _time_point == 150:
+                plt.imshow(_time_point_image_swapped_rotated[int(round(_left_cell_coordinates[2]))])
+                plt.show()
 
         # update resolutions
         _angle = abs(_angle)
@@ -303,4 +312,3 @@ def process_all_experiments(_overwrite=False):
 
 if __name__ == '__main__':
     process_all_experiments()
-    process_experiment('SN18')
