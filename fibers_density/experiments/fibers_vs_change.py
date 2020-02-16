@@ -11,12 +11,12 @@ import libs.compute_lib
 from libs import compute_lib
 from libs.config_lib import CPUS_TO_USE
 from libs.experiments import load, filtering, compute, paths, organize
-from libs.experiments.config import ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT, CELL_DIAMETER_IN_MICRONS
+from libs.experiments.config import ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT
 from plotting import scatter, save, heatmap
 
 MINIMUM_TIME_POINTS = sys.maxsize
-OFFSET_X = CELL_DIAMETER_IN_MICRONS * 1
-OFFSET_Y = CELL_DIAMETER_IN_MICRONS * 0
+OFFSET_X = 0
+OFFSET_Y = 0
 OFFSET_Z = 0
 DERIVATIVE = 1
 CELLS_DISTANCES = range(6, 10)
@@ -36,7 +36,7 @@ def main():
     _arguments = []
     for _tuple in _experiments:
         _experiment, _series, _group = _tuple
-        _arguments.append((_experiment, _series, _group, ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT,
+        _arguments.append((_experiment, _series, _group, ROI_LENGTH, ROI_HEIGHT, ROI_WIDTH,
                            OFFSET_X, OFFSET_Y, OFFSET_Z, DIRECTION, MINIMUM_TIME_POINTS))
     _p = Pool(CPUS_TO_USE)
     _answers = _p.starmap(compute.roi_fibers_density_by_time_pairs, _arguments)
