@@ -77,6 +77,18 @@ def structured_image(_experiment, _series_id, _group, _time_point):
         _pickle.close()
 
 
+def mean_distance_to_surface_in_microns(_experiment, _series_id, _cell_id, _time_point=0):
+    _objects_file_path = paths.objects(_experiment, 'Series ' + str(_series_id), 'tp_' + str(_time_point + 1) + '.txt')
+    try:
+        with open(_objects_file_path) as _f:
+            _lines = _f.readlines()
+            _headers = _lines[0].split('\t')
+            _index = _headers.index('Mean dist. to surf. (micron)')
+            return float(_lines[_cell_id + 1].split('\t')[_index])
+    finally:
+        _f.close()
+
+
 def objects_time_point_file_data(_experiment, _series, _time_point):
     _file_path = paths.objects(_experiment, _series, _time_point)
     try:
