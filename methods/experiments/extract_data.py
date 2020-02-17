@@ -29,5 +29,4 @@ def process_all_experiments():
 
 
 if __name__ == '__main__':
-    # process_all_experiments()
-    process_experiment('SN44')
+    process_all_experiments()
