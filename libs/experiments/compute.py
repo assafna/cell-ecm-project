@@ -262,6 +262,9 @@ def coordinates_mean(_coordinates):
 
 
 def smooth_coordinates_in_time(_coordinates, _n=5):
+    if _n == 0:
+        return _coordinates
+
     _coordinates_smoothed = []
     for _n_index in range(1, _n):
         _current_coordinates = _coordinates[:_n_index]
