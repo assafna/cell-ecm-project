@@ -60,9 +60,9 @@ def image_center_coordinates(_image_shape):
 def roi_by_microns(_resolution_x, _resolution_y, _resolution_z, _length_x, _length_y, _length_z, _offset_x, _offset_y,
                    _offset_z, _cell_coordinates, _cell_diameter_in_microns, _direction):
     _cell_diameter_in_pixels = _cell_diameter_in_microns / _resolution_x
-    _length_x_in_pixels = _length_x / _resolution_x
-    _length_y_in_pixels = _length_y / _resolution_y
-    _length_z_in_pixels = _length_z / _resolution_z
+    _length_x_in_pixels = (_cell_diameter_in_microns * _length_x) / _resolution_x
+    _length_y_in_pixels = (_cell_diameter_in_microns * _length_y) / _resolution_y
+    _length_z_in_pixels = (_cell_diameter_in_microns * _length_z) / _resolution_z
     _offset_x_in_pixels = (_cell_diameter_in_microns * _offset_x) / _resolution_x
     _offset_y_in_pixels = (_cell_diameter_in_microns * _offset_y) / _resolution_y
     _offset_z_in_pixels = (_cell_diameter_in_microns * _offset_z) / _resolution_z
