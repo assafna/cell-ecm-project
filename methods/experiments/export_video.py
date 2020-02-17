@@ -10,13 +10,16 @@ from libs.experiments.compute import roi_by_microns
 from libs.experiments.config import ROI_LENGTH, ROI_HEIGHT, ROI_WIDTH
 
 OFFSET_X = 0
-OFFSET_Y = 0.5
+OFFSET_Y = 0
 OFFSET_Z = 0
 DIRECTION = 'inside'
 
 
 def get_roi(_experiment, _series_id, _group_properties, _time_point, _cell_id, _direction):
-    _cell_diameter_in_microns = load.mean_distance_to_surface_in_microns(_experiment, _series_id, _cell_id) * 2
+    _cell_diameter_in_microns = load.mean_distance_to_surface_in_microns(
+        _experiment=_experiment,
+        _series_id=_series_id,
+        _cell_id=_group_properties['cells_ids'][_cell_id]) * 2
     return roi_by_microns(
         _resolution_x=_group_properties['time_points'][_time_point]['resolutions']['x'],
         _resolution_y=_group_properties['time_points'][_time_point]['resolutions']['y'],
@@ -82,8 +85,8 @@ def process_group(_experiment, _series_id, _group, _mark_cells=True, _draw_borde
         _average_across_z = np.rint(np.mean(_z_image, axis=0))
 
         if _mark_cells:
-            _average_across_z = mark_cells(_average_across_z, _group_properties, _time_point, _left_cell_coordinates, _cell_diameter_in_microns)
-            _average_across_z = mark_cells(_average_across_z, _group_properties, _time_point, _right_cell_coordinates, _cell_diameter_in_microns)
+            _average_across_z = mark_cells(_average_across_z, _group_properties, _time_point, _left_cell_coordinates, _left_cell_diameter_in_microns)
+            _average_across_z = mark_cells(_average_across_z, _group_properties, _time_point, _right_cell_coordinates, _right_cell_diameter_in_microns)
 
         if _draw_borders:
             _left_roi = get_roi(_experiment, _series_id, _group_properties, _time_point, 'left_cell', DIRECTION)
@@ -116,4 +119,4 @@ def process_all_experiments():
 if __name__ == '__main__':
     # process_all_experiments()
     # process_experiments(['SN44'])
-    process_group('SN41', 2, 'cells_0_1')
+    process_group('SN16', 1, 'cells_0_2')
