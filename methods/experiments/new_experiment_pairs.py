@@ -13,6 +13,7 @@ from libs.experiments import paths, load, compute, config
 from libs.experiments.config import FIBERS_CHANNEL_INDEX
 
 SHOW_PLOTS = False
+SMOOTH_AMOUNT = 5
 
 # PROCESS:
 # 1. Fiji script "czi_to_files_bc_concat"
@@ -38,10 +39,10 @@ def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell
 
     # smooth coordinates
     _cells_coordinates_cell_1_smoothed = compute.smooth_coordinates_in_time(
-        [_value for _value in _cells_coordinates[_cell_1_id] if _value is not None]
+        [_value for _value in _cells_coordinates[_cell_1_id] if _value is not None], _n=SMOOTH_AMOUNT
     )
     _cells_coordinates_cell_2_smoothed = compute.smooth_coordinates_in_time(
-        [_value for _value in _cells_coordinates[_cell_2_id] if _value is not None]
+        [_value for _value in _cells_coordinates[_cell_2_id] if _value is not None], _n=SMOOTH_AMOUNT
     )
 
     if _real_cells:
