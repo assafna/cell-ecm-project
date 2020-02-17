@@ -13,7 +13,6 @@ from libs.experiments.config import ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT
 from methods.experiments import export_video
 from plotting import scatter, save
 
-MINIMUM_TIME_POINTS = 240
 OFFSET_X = 0
 # TODO: set the offset in y according to the angle in the original Z slices of the cells
 OFFSET_Y = 0.5
@@ -21,9 +20,6 @@ OFFSET_Z = 0
 DERIVATIVE = 2
 CELLS_DISTANCES = [6, 7, 8, 9]
 DIRECTION = 'inside'
-
-PRINT = True
-SAVE = True
 
 
 def wilcoxon_test(_master_correlations_array, _slave_correlations_array, _name):
@@ -65,9 +61,7 @@ def main():
     _experiments_band = filtering.by_band(_experiments, _band=True)
     # _experiments_band = _experiments
     # _experiments = _experiments_band
-    _minimum_time_points = MINIMUM_TIME_POINTS
-    _experiments = filtering.by_time_points_amount(_experiments, _minimum_time_points)
-    _experiments = [_tuple for _tuple in _experiments if _tuple[1] != 6]
+    # _experiments = [_tuple for _tuple in _experiments if _tuple[1] != 6]
     print(len(_experiments))
     # _experiments.remove(('SN41', 6, 'cells_1_2'))
     # _experiments.remove(('SN16', 21, 'cells_0_1'))
@@ -97,8 +91,7 @@ def main():
     for _tuple in _experiments:
         _experiment, _series, _group = _tuple
         _arguments.append((_experiment, _series, _group, ROI_LENGTH, ROI_HEIGHT, ROI_WIDTH,
-                           OFFSET_X, OFFSET_Y, OFFSET_Z, DIRECTION, _minimum_time_points,
-                           PRINT, SAVE))
+                           OFFSET_X, OFFSET_Y, OFFSET_Z, DIRECTION))
 
         # video
         # export_video.process_group(_experiment, _series, _group)
@@ -138,6 +131,16 @@ def main():
                 _master_left_cell_fibers_densities, _master_right_cell_fibers_densities
             )
 
+        # ignore small arrays
+        if _master_experiment in ['SN16', 'SN18']:
+            if len(_master_left_cell_fibers_densities_filtered) < 15:
+                continue
+        elif _master_experiment in ['SN41', 'SN44']:
+            if len(_master_left_cell_fibers_densities_filtered) < 50:
+                continue
+        else:
+            raise Exception('No such experiment!')
+
         # take until not 'nan'
         # if any(np.isnan(_master_left_cell_fibers_densities)) or any(np.isnan(_master_right_cell_fibers_densities)):
         #     _left_nan_index = np.where(np.isnan(_master_left_cell_fibers_densities))[0][0]
@@ -169,6 +172,16 @@ def main():
                         compute.longest_same_indices_shared_in_borders_sub_array(
                             _master_fibers_densities, _slave_fibers_densities
                         )
+
+                    # ignore small arrays
+                    if _slave_experiment in ['SN16', 'SN18']:
+                        if len(_master_fibers_densities_filtered) < 15:
+                            continue
+                    elif _slave_experiment in ['SN41', 'SN44']:
+                        if len(_master_fibers_densities_filtered) < 50:
+                            continue
+                    else:
+                        raise Exception('No such experiment!')
 
                     _slave_correlation = compute_lib.correlation(
                         compute_lib.derivative(_master_fibers_densities_filtered, _n=DERIVATIVE),
