@@ -14,29 +14,26 @@ from libs.experiments.config import ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT
 from methods.experiments import export_video
 from plotting import scatter, save, heatmap, contour
 
-EXPERIMENTS = ['SN16']
+EXPERIMENTS = ['SN16', 'SN41']
 EXPERIMENTS_STR = '_'.join(EXPERIMENTS)
-REAL_CELLS = False
-STATIC = True
+REAL_CELLS = True
+STATIC = False
 BAND = False
-MINIMUM_TIME_POINTS = 20
 VALUES_BY_CELL_DIAMETER = np.array(
     [-1, -0.9, -0.8, -0.7, -0.6, -0.5, -0.4, -0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1])
 _OFFSET_X = 0
 DERIVATIVE = 2
 CELLS_DISTANCES = [6, 7, 8, 9]
 DIRECTION = 'inside'
-PRINT = False
 
 
 def main():
     _experiments = load.experiments_groups_as_tuples(EXPERIMENTS)
-    _experiments = filtering.by_distances(_experiments, CELLS_DISTANCES)
-    _experiments = filtering.by_real_cells(_experiments, _real_cells=REAL_CELLS)
-    _experiments = filtering.by_static_cells(_experiments, _static=STATIC)
-    if BAND:
-        _experiments = filtering.by_band(_experiments)
-    _experiments = filtering.by_time_points_amount(_experiments, MINIMUM_TIME_POINTS)
+    # _experiments = filtering.by_distances(_experiments, CELLS_DISTANCES)
+    # _experiments = filtering.by_real_cells(_experiments, _real_cells=REAL_CELLS)
+    # _experiments = filtering.by_static_cells(_experiments, _static=STATIC)
+    # if BAND:
+    #     _experiments = filtering.by_band(_experiments)
 
     # _experiments.remove(('SN41', 6, 'cells_1_2'))
     # _experiments.remove(('SN41', 2, 'cells_0_2'))
@@ -52,7 +49,7 @@ def main():
         for _tuple in _experiments:
             _experiment, _series, _group = _tuple
             _arguments.append((_experiment, _series, _group, ROI_LENGTH, ROI_HEIGHT, ROI_WIDTH,
-                               _OFFSET_X, _offset_y, _offset_z, DIRECTION, MINIMUM_TIME_POINTS, PRINT))
+                               _OFFSET_X, _offset_y, _offset_z, DIRECTION))
             _answers_keys.append((_experiment, _series, _group))
 
         _p = Pool(CPUS_TO_USE)
@@ -81,6 +78,16 @@ def main():
                     _master_left_cell_fibers_densities, _master_right_cell_fibers_densities
                 )
 
+            # ignore small arrays
+            if _master_experiment in ['SN16', 'SN18']:
+                if len(_master_left_cell_fibers_densities_filtered) < 15:
+                    continue
+            elif _master_experiment in ['SN41', 'SN44']:
+                if len(_master_left_cell_fibers_densities_filtered) < 50:
+                    continue
+            else:
+                raise Exception('No such experiment!')
+
             _master_correlation = compute_lib.correlation(
                 compute_lib.derivative(_master_left_cell_fibers_densities_filtered, _n=DERIVATIVE),
                 compute_lib.derivative(_master_right_cell_fibers_densities_filtered, _n=DERIVATIVE)
@@ -101,6 +108,16 @@ def main():
                                 _master_fibers_densities, _slave_fibers_densities
                             )
 
+                        # ignore small arrays
+                        if _slave_experiment in ['SN16', 'SN18']:
+                            if len(_master_fibers_densities_filtered) < 15:
+                                continue
+                        elif _slave_experiment in ['SN41', 'SN44']:
+                            if len(_master_fibers_densities_filtered) < 50:
+                                continue
+                        else:
+                            raise Exception('No such experiment!')
+
                         _slave_correlation = compute_lib.correlation(
                             compute_lib.derivative(_master_fibers_densities_filtered, _n=DERIVATIVE),
                             compute_lib.derivative(_slave_fibers_densities_filtered, _n=DERIVATIVE)
@@ -111,9 +128,12 @@ def main():
         # compute percentages
         _master_minus_slave = np.array(_master_correlations_array) - np.array(_slave_correlations_array)
         _master_count = len(_master_minus_slave[_master_minus_slave > 0])
-        _master_percentages = round(_master_count / len(_master_minus_slave), 10)
+        if len(_master_minus_slave) > 0:
+            _master_percentages = round(_master_count / len(_master_minus_slave), 10)
+        else:
+            _master_percentages = None
 
-        print('z', _offset_y, 'xy', _offset_z, _master_percentages, sep='\t')
+        print('z:', _offset_y, 'xy:', _offset_z, 'Master:', _master_percentages, 'N:', len(_master_minus_slave), 'Wilcoxon:', wilcoxon(_master_minus_slave), sep='\t')
         _z_array[_offset_z_index, _offset_y_index] = _master_percentages
 
     # plot
@@ -132,7 +152,7 @@ def main():
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
         _filename='plot_' + EXPERIMENTS_STR + '_real_' + str(REAL_CELLS) + '_static_' + str(STATIC) + '_band_' +
-                  str(BAND) + '_oob_heatmap'
+                  str(BAND) + '_smooth_heatmap'
     )
 
     _fig = contour.create_plot(
@@ -150,7 +170,7 @@ def main():
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
         _filename='plot_' + EXPERIMENTS_STR + '_real_' + str(REAL_CELLS) + '_static_' + str(STATIC) + '_band_' +
-                  str(BAND) + '_oob_contour'
+                  str(BAND) + '_smooth_contour'
     )
 
 
