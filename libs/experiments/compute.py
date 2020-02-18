@@ -249,11 +249,15 @@ def remove_blacklist(_experiment, _series_id, _cell_id, _fibers_densities):
     if _cell_id in _blacklist or None in _blacklist:
         _out_of_boundaries = np.array([_fibers_density[1] for _fibers_density in _fibers_densities])
         if _cell_id in _blacklist:
-            _out_of_boundaries[list(_blacklist[_cell_id].keys())] = False
+            for _time_point in _blacklist[_cell_id]:
+                if _time_point < len(_out_of_boundaries):
+                    _out_of_boundaries[_time_point] = True
         if None in _blacklist:
-            _out_of_boundaries[list(_blacklist[None].keys())] = False
+            for _time_point in _blacklist[None]:
+                if _time_point < len(_out_of_boundaries):
+                    _out_of_boundaries[_time_point] = True
         return [
-            (_fibers_density, _out_of_boundaries_value)
+            (_fibers_density[0], _out_of_boundaries_value)
             for _fibers_density, _out_of_boundaries_value in zip(_fibers_densities, _out_of_boundaries)
         ]
     else:
