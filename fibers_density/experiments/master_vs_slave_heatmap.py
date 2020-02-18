@@ -16,7 +16,7 @@ from plotting import scatter, save, heatmap, contour
 
 EXPERIMENTS = ['SN16', 'SN41']
 EXPERIMENTS_STR = '_'.join(EXPERIMENTS)
-REAL_CELLS = True
+REAL_CELLS = False
 STATIC = False
 BAND = False
 VALUES_BY_CELL_DIAMETER = np.array(
@@ -30,7 +30,7 @@ DIRECTION = 'inside'
 def main():
     _experiments = load.experiments_groups_as_tuples(EXPERIMENTS)
     # _experiments = filtering.by_distances(_experiments, CELLS_DISTANCES)
-    # _experiments = filtering.by_real_cells(_experiments, _real_cells=REAL_CELLS)
+    _experiments = filtering.by_real_cells(_experiments, _real_cells=REAL_CELLS)
     # _experiments = filtering.by_static_cells(_experiments, _static=STATIC)
     # if BAND:
     #     _experiments = filtering.by_band(_experiments)
