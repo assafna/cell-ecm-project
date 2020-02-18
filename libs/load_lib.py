@@ -7,6 +7,8 @@ def from_pickle(_path):
     try:
         with gzip.open(_path, 'rb') as _pickle:
             return pickle.load(_pickle)
+    except EOFError:
+        return {}
     finally:
         _pickle.close()
 
