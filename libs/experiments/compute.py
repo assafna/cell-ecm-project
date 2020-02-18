@@ -174,6 +174,10 @@ def roi_fibers_density_by_time(_experiment, _series_id, _group, _length_x, _leng
 def roi_fibers_density_by_time_pairs(_experiment, _series_id, _group, _length_x, _length_y, _length_z, _offset_x,
                                      _offset_y, _offset_z, _direction, _time_points=sys.maxsize, _print=False, _save=True,
                                      _out_of_borders=True):
+    # stop if needed
+    if os.path.isfile(os.path.join(paths.EXPERIMENTS, 'stop.txt')):
+        return
+
     return {
         'left_cell': roi_fibers_density_by_time(_experiment, _series_id, _group, _length_x, _length_y, _length_z,
                                                 _offset_x, _offset_y, _offset_z, 'left_cell', _direction, _time_points,

@@ -55,6 +55,12 @@ def main():
         _p = Pool(CPUS_TO_USE)
         _answers = _p.starmap(compute.roi_fibers_density_by_time_pairs, _arguments)
         _p.close()
+
+        # stop if needed
+        if os.path.isfile(os.path.join(paths.EXPERIMENTS, 'stop.txt')):
+            print('STOPPED!')
+            return
+
         for _answer_key, _answer in zip(_answers_keys, _answers):
             _fibers_densities[_answer_key] = _answer
 
