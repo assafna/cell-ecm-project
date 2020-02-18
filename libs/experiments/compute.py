@@ -7,7 +7,7 @@ from scipy.ndimage import rotate
 
 from libs.compute_lib import roi
 from libs.experiments import load, save, paths
-from libs.experiments.config import AVERAGE_CELL_DIAMETER_IN_MICRONS
+from libs.experiments.config import AVERAGE_CELL_DIAMETER_IN_MICRONS, ROI_BY_AVERAGE_CELL_DIAMETER
 
 
 def cells_distance_in_cell_size(_experiment, _series_id, _cell_1_coordinates, _cell_2_coordinates):
@@ -119,10 +119,13 @@ def roi_fibers_density_time_point(_experiment, _series_id, _group, _length_x, _l
                                                                                                       _group)
     _time_point_properties = _group_properties['time_points'][_time_point]
     _time_point_fibers_densities = load.fibers_densities(_experiment, _series_id, _group, _time_point)
-    _cell_diameter_in_microns = load.mean_distance_to_surface_in_microns(
-        _experiment=_experiment,
-        _series_id=_series_id,
-        _cell_id=_group_properties['cells_ids'][_cell_id]) * 2
+    if ROI_BY_AVERAGE_CELL_DIAMETER:
+        _cell_diameter_in_microns = AVERAGE_CELL_DIAMETER_IN_MICRONS
+    else:
+        _cell_diameter_in_microns = load.mean_distance_to_surface_in_microns(
+            _experiment=_experiment,
+            _series_id=_series_id,
+            _cell_id=_group_properties['cells_ids'][_cell_id]) * 2
     _time_point_roi = roi_by_microns(
         _resolution_x=_group_properties['time_points'][_time_point]['resolutions']['x'],
         _resolution_y=_group_properties['time_points'][_time_point]['resolutions']['y'],
