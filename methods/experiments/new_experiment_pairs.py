@@ -13,7 +13,7 @@ from libs.experiments import paths, load, compute, config
 from libs.experiments.config import FIBERS_CHANNEL_INDEX
 
 SHOW_PLOTS = False
-SMOOTH_AMOUNT = 5
+SMOOTH_AMOUNT = 0
 
 # PROCESS:
 # 1. Fiji script "czi_to_files_bc_concat"
