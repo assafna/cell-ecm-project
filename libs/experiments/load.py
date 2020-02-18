@@ -192,8 +192,8 @@ def series_image(_experiment, _series_id, _fibers_channel=True):
         return _series_image
 
 
-def blacklist(_experiment, _series_id=None, _group=None):
-    _path = paths.blacklist(_experiment, _series_id, _group)
+def blacklist(_experiment, _series_id=None):
+    _path = paths.blacklist(_experiment, _series_id)
     if not os.path.isfile(_path):
         return {}
 

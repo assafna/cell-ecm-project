@@ -61,8 +61,9 @@ def main():
             _series_normalization = [_series_normalization['average'], _series_normalization['std']]
             for _cell_id in ['left_cell', 'right_cell']:
                 _cell_fibers_densities = _fibers_densities[_tuple][_cell_id]
+                _properties = load.group_properties(_experiment, _series_id, _group)
                 _cell_fibers_densities = compute.remove_blacklist(
-                    _experiment, _series_id, _group, _cell_fibers_densities)
+                    _experiment, _series_id, _properties['cells_ids'][_cell_id], _cell_fibers_densities)
                 _cell_fibers_densities = compute.longest_fibers_densities_ascending_sequence(_cell_fibers_densities)
 
                 # fix if found nan

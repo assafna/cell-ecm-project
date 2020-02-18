@@ -3,34 +3,38 @@ import os
 from libs.experiments import load, save, paths
 
 
-def add_to_blacklist(_experiment, _series_id, _group, _time_point_start, _time_point_end, _reason):
-    if os.path.isfile(paths.blacklist(_experiment, _series_id, _group)):
-        _blacklist = load.blacklist(_experiment, _series_id, _group)
+def add_to_blacklist(_experiment, _series_id, _cell_id, _time_point_start, _time_point_end, _reason):
+    if os.path.isfile(paths.blacklist(_experiment, _series_id)):
+        _blacklist = load.blacklist(_experiment, _series_id)
     else:
         _blacklist = {}
 
     for _time_point in range(_time_point_start, _time_point_end + 1):
-        if _time_point in _blacklist:
-            _blacklist[_time_point].append(_reason)
+        if _cell_id in _blacklist:
+            if _time_point in _blacklist[_cell_id]:
+                _blacklist[_cell_id][_time_point].append(_reason)
+            else:
+                _blacklist[_cell_id].append({_time_point: [_reason]})
         else:
-            _blacklist[_time_point] = [_reason]
-        print('Added:', _experiment, _series_id, _group, _time_point, _reason, sep='\t')
+            _blacklist[_cell_id] = [{_time_point: [_reason]}]
+    print('Added:', _experiment, _series_id, _cell_id, (_time_point_start, _time_point_end, _reason), sep='\t')
 
-    save.blacklist(_experiment, _series_id, _group, _blacklist)
-    print('Saved:', _experiment, _series_id, _group)
+    save.blacklist(_experiment, _series_id, _blacklist)
+    print('Saved:', _experiment, _series_id)
 
 
-def remove_from_blacklist(_experiment, _series_id, _group, _time_point_start, _time_point_end):
-    if os.path.isfile(paths.blacklist(_experiment, _series_id, _group)):
-        _blacklist = load.blacklist(_experiment, _series_id, _group)
+def remove_from_blacklist(_experiment, _series_id, _cell_id, _time_point_start, _time_point_end):
+    if os.path.isfile(paths.blacklist(_experiment, _series_id)):
+        _blacklist = load.blacklist(_experiment, _series_id)
 
         for _time_point in range(_time_point_start, _time_point_end + 1):
-            _blacklist = {}
-            _reason = _blacklist.pop(_time_point, None)
-            print('Removed:', _experiment, _series_id, _group, _time_point, _reason, sep='\t')
+            if _cell_id in _blacklist:
+                if _time_point in _blacklist[_cell_id]:
+                    _reason = _blacklist[_cell_id].pop(_time_point, None)
+                    print('Removed:', _experiment, _series_id, _cell_id, _time_point, _reason, sep='\t')
 
-        save.blacklist(_experiment, _series_id, _group, _blacklist)
-        print('Saved:', _experiment, _series_id, _group)
+        save.blacklist(_experiment, _series_id, _blacklist)
+        print('Saved:', _experiment, _series_id)
     else:
         print('No such blacklist')
 

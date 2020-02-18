@@ -68,10 +68,13 @@ def main():
             _master_right_cell_fibers_densities = \
                 _fibers_densities[(_master_experiment, _master_series, _master_group)]['right_cell']
 
+            _master_properties = load.group_properties(_master_experiment, _master_series, _master_group)
             _master_left_cell_fibers_densities = compute.remove_blacklist(
-                _master_experiment, _master_series, _master_group, _master_left_cell_fibers_densities)
+                _master_experiment, _master_series, _master_properties['cells_ids']['left_cell'],
+                _master_left_cell_fibers_densities)
             _master_right_cell_fibers_densities = compute.remove_blacklist(
-                _master_experiment, _master_series, _master_group, _master_right_cell_fibers_densities)
+                _master_experiment, _master_series, _master_properties['cells_ids']['right_cell'],
+                _master_right_cell_fibers_densities)
 
             _master_left_cell_fibers_densities_filtered, _master_right_cell_fibers_densities_filtered = \
                 compute.longest_same_indices_shared_in_borders_sub_array(
@@ -102,6 +105,14 @@ def main():
                             _fibers_densities[(_master_experiment, _master_series, _master_group)][_master_cell_id]
                         _slave_fibers_densities = \
                             _fibers_densities[(_slave_experiment, _slave_series, _slave_group)][_slave_cell_id]
+
+                        _slave_properties = load.group_properties(_slave_experiment, _slave_series, _slave_group)
+                        _master_fibers_densities = compute.remove_blacklist(
+                            _master_experiment, _master_series, _master_properties['cells_ids'][_master_cell_id],
+                            _master_fibers_densities)
+                        _slave_fibers_densities = compute.remove_blacklist(
+                            _slave_experiment, _slave_series, _slave_properties['cells_ids'][_slave_cell_id],
+                            _slave_fibers_densities)
 
                         _master_fibers_densities_filtered, _slave_fibers_densities_filtered = \
                             compute.longest_same_indices_shared_in_borders_sub_array(
