@@ -14,9 +14,9 @@ def add_to_blacklist(_experiment, _series_id, _cell_id, _time_point_start, _time
             if _time_point in _blacklist[_cell_id]:
                 _blacklist[_cell_id][_time_point].append(_reason)
             else:
-                _blacklist[_cell_id].append({_time_point: [_reason]})
+                _blacklist[_cell_id][_time_point] = [_reason]
         else:
-            _blacklist[_cell_id] = [{_time_point: [_reason]}]
+            _blacklist[_cell_id] = {_time_point: [_reason]}
     print('Added:', _experiment, _series_id, _cell_id, (_time_point_start, _time_point_end, _reason), sep='\t')
 
     save.blacklist(_experiment, _series_id, _blacklist)
