@@ -42,7 +42,7 @@ def remove_from_blacklist(_experiment, _series_id, _cell_id, _time_point_start, 
 if __name__ == '__main__':
     add_to_blacklist(_experiment='SN41',
                      _series_id=3,
-                     _group=None,
+                     _cell_id=None,
                      _time_point_start=34,
                      _time_point_end=34,
                      _reason='Black image starting from Z slice #22'
