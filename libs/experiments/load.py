@@ -156,7 +156,7 @@ def fibers_densities(_experiment, _series_id, _group, _time_point):
         try:
             with gzip.open(_fibers_densities_path, 'rb') as _pickle:
                 return pickle.load(_pickle)
-        except EOFError:
+        except (EOFError, OSError):
             return {}
         finally:
             _pickle.close()
