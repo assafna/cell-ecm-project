@@ -3,38 +3,42 @@ from multiprocessing.pool import Pool
 
 import numpy as np
 
+from fibers_density.experiments.master_vs_slave_heatmap import VALUES_BY_CELL_DIAMETER
 from libs.config_lib import CPUS_TO_USE
 from libs.experiments import load, compute, save
+from libs.experiments.config import AVERAGE_CELL_DIAMETER_IN_MICRONS, ROI_BY_AVERAGE_CELL_DIAMETER
 
-EXPERIMENT = 'SN41'
+EXPERIMENT = 'SN16'
 DIRECTION = 'inside'
-OFFSETS_X = list(range(0, 16))
-OFFSETS_Y = [-4, -3, -2, -1, 0, 1, 2, 3, 4]
-OFFSETS_Z = [-4, -3, -2, -1, 0, 1, 2, 3, 4]
-ROI_LENGTHS = list(range(4, 16))
-ROI_HEIGHTS = list(range(4, 16))
-ROI_WIDTHS = list(range(4, 16))
+OFFSETS_X = [0]
+OFFSETS_Y = VALUES_BY_CELL_DIAMETER
+OFFSETS_Z = VALUES_BY_CELL_DIAMETER
+ROI_LENGTHS = [1]
+ROI_HEIGHTS = [1]
+ROI_WIDTHS = [1]
 CELLS_IDS = ['left_cell', 'right_cell']
 
 
 def main(_experiment, _series_id, _group, _group_properties, _time_point):
-    print(_experiment, _series_id, _group, _time_point)
     _fibers_densities_tp = load.fibers_densities(_experiment, _series_id, _group, _time_point)
     _rois = []
     for _offset_x, _offset_y, _offset_z, _roi_length, _roi_width, _roi_height in \
             product(OFFSETS_X, OFFSETS_Y, OFFSETS_Z, ROI_LENGTHS, ROI_WIDTHS, ROI_HEIGHTS):
         for _cell_id in CELLS_IDS:
-            _cell_diameter_in_microns = load.mean_distance_to_surface_in_microns(_experiment, _series_id, _cell_id) * 2
+            if ROI_BY_AVERAGE_CELL_DIAMETER:
+                _cell_diameter_in_microns = AVERAGE_CELL_DIAMETER_IN_MICRONS
+            else:
+                _cell_diameter_in_microns = load.mean_distance_to_surface_in_microns(_experiment, _series_id, _cell_id) * 2
             _roi = compute.roi_by_microns(
                 _resolution_x=_group_properties['time_points'][_time_point]['resolutions']['x'],
                 _resolution_y=_group_properties['time_points'][_time_point]['resolutions']['y'],
                 _resolution_z=_group_properties['time_points'][_time_point]['resolutions']['z'],
-                _length_x=_roi_length * (_cell_diameter_in_microns / 8),
-                _length_y=_roi_height * (_cell_diameter_in_microns / 8),
-                _length_z=_roi_width * (_cell_diameter_in_microns / 8),
-                _offset_x=_offset_x * (_cell_diameter_in_microns / 8),
-                _offset_y=_offset_y * (_cell_diameter_in_microns / 8),
-                _offset_z=_offset_z * (_cell_diameter_in_microns / 8),
+                _length_x=_roi_length,
+                _length_y=_roi_height,
+                _length_z=_roi_width,
+                _offset_x=_offset_x,
+                _offset_y=_offset_y,
+                _offset_z=_offset_z,
                 _cell_coordinates=_group_properties['time_points'][_time_point][_cell_id]['coordinates'],
                 _cell_diameter_in_microns=_cell_diameter_in_microns,
                 _direction='right' if
@@ -47,10 +51,12 @@ def main(_experiment, _series_id, _group, _group_properties, _time_point):
 
     _time_point_image = load.structured_image(_experiment, _series_id, _group, _time_point)
     for _roi in _rois:
-        _x1, _y1, _z1, _x2, _y2, _z2 = _roi
-        _fibers_densities_tp[_roi] = np.mean(_time_point_image[_z1:_z2, _y1:_y2, _x1:_x2])
+        _fibers_densities_tp[_roi] = compute.roi_fibers_density(
+            _experiment, _series_id, _group, _time_point, _roi, _time_point_image
+        )
 
     if len(_rois) > 0:
+        print(_experiment, _series_id, _group, _time_point)
         save.fibers_densities(_experiment, _series_id, _group, _time_point, _fibers_densities_tp)
 
 
