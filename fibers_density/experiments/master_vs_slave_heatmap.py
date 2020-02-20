@@ -8,15 +8,15 @@ import seaborn as sns
 from scipy.stats import wilcoxon
 
 from libs import compute_lib
-from libs.config_lib import CPUS_TO_USE
+from libs.config_lib import CPUS_TO_USE, USE_MULTIPROCESSING
 from libs.experiments import load, filtering, compute, paths
-from libs.experiments.config import ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT
+from libs.experiments.config import ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT, NO_RETURN
 from methods.experiments import export_video
 from plotting import scatter, save, heatmap, contour
 
-EXPERIMENTS = ['SN16', 'SN41']
+EXPERIMENTS = ['SN41']
 EXPERIMENTS_STR = '_'.join(EXPERIMENTS)
-REAL_CELLS = False
+REAL_CELLS = True
 STATIC = False
 BAND = False
 VALUES_BY_CELL_DIAMETER = np.array(
@@ -29,14 +29,11 @@ DIRECTION = 'inside'
 
 def main():
     _experiments = load.experiments_groups_as_tuples(EXPERIMENTS)
-    # _experiments = filtering.by_distances(_experiments, CELLS_DISTANCES)
+    _experiments = filtering.by_distances(_experiments, CELLS_DISTANCES)
     _experiments = filtering.by_real_cells(_experiments, _real_cells=REAL_CELLS)
-    # _experiments = filtering.by_static_cells(_experiments, _static=STATIC)
-    # if BAND:
-    #     _experiments = filtering.by_band(_experiments)
-
-    # _experiments.remove(('SN41', 6, 'cells_1_2'))
-    # _experiments.remove(('SN41', 2, 'cells_0_2'))
+    _experiments = filtering.by_static_cells(_experiments, _static=STATIC)
+    if BAND:
+        _experiments = filtering.by_band(_experiments)
 
     _z_array = np.zeros(shape=(len(VALUES_BY_CELL_DIAMETER), len(VALUES_BY_CELL_DIAMETER)))
     for (_offset_y_index, _offset_y), (_offset_z_index, _offset_z) in \
@@ -44,31 +41,44 @@ def main():
 
         # prepare data in mp
         _fibers_densities = {}
-        _arguments = []
-        _answers_keys = []
-        for _tuple in _experiments:
-            _experiment, _series, _group = _tuple
-            _arguments.append((_experiment, _series, _group, ROI_LENGTH, ROI_HEIGHT, ROI_WIDTH,
-                               _OFFSET_X, _offset_y, _offset_z, DIRECTION))
-            _answers_keys.append((_experiment, _series, _group))
+        if USE_MULTIPROCESSING:
+            _arguments = []
+            _answers_keys = []
+            for _tuple in _experiments:
+                _experiment, _series, _group = _tuple
+                _arguments.append((_experiment, _series, _group, ROI_LENGTH, ROI_HEIGHT, ROI_WIDTH,
+                                   _OFFSET_X, _offset_y, _offset_z, DIRECTION))
+                _answers_keys.append((_experiment, _series, _group))
 
-        _p = Pool(CPUS_TO_USE)
-        _answers = _p.starmap(compute.roi_fibers_density_by_time_pairs, _arguments)
-        _p.close()
+            _p = Pool(CPUS_TO_USE)
+            _answers = _p.starmap(compute.roi_fibers_density_by_time_pairs, _arguments)
+            _p.close()
 
-        # stop if needed
-        if os.path.isfile(os.path.join(paths.EXPERIMENTS, 'stop.txt')):
-            print('STOPPED!')
-            return
+            # stop if needed
+            if os.path.isfile(os.path.join(paths.EXPERIMENTS, 'stop.txt')):
+                print('STOPPED!')
+                return
 
-        for _answer_key, _answer in zip(_answers_keys, _answers):
-            _fibers_densities[_answer_key] = _answer
+            if NO_RETURN:
+                print(_offset_y, _offset_z)
+                continue
+
+            for _answer_key, _answer in zip(_answers_keys, _answers):
+                _fibers_densities[_answer_key] = _answer
 
         _master_correlations_array = []
         _slave_correlations_array = []
         for _master_index in range(len(_experiments)):
             _master_tuple = _experiments[_master_index]
             _master_experiment, _master_series, _master_group = _master_tuple
+
+            if not USE_MULTIPROCESSING:
+                _fibers_densities[(_master_experiment, _master_series, _master_group)] = \
+                    compute.roi_fibers_density_by_time_pairs(
+                        _master_experiment, _master_series, _master_group, ROI_LENGTH, ROI_HEIGHT, ROI_WIDTH,
+                         _OFFSET_X, _offset_y, _offset_z, DIRECTION
+                    )
+
             _master_left_cell_fibers_densities = \
                 _fibers_densities[(_master_experiment, _master_series, _master_group)]['left_cell']
             _master_right_cell_fibers_densities = \
@@ -105,6 +115,14 @@ def main():
                 if _master_index != _slave_index:
                     _slave_tuple = _experiments[_slave_index]
                     _slave_experiment, _slave_series, _slave_group = _slave_tuple
+
+                    if not USE_MULTIPROCESSING:
+                        _fibers_densities[(_slave_experiment, _slave_series, _slave_group)] = \
+                            compute.roi_fibers_density_by_time_pairs(
+                                _slave_experiment, _slave_series, _slave_group, ROI_LENGTH, ROI_HEIGHT, ROI_WIDTH,
+                                _OFFSET_X, _offset_y, _offset_z, DIRECTION
+                            )
+
                     for _master_cell_id, _slave_cell_id in product(['left_cell', 'right_cell'],
                                                                    ['left_cell', 'right_cell']):
                         _master_fibers_densities = \
@@ -147,10 +165,12 @@ def main():
         _master_count = len(_master_minus_slave[_master_minus_slave > 0])
         if len(_master_minus_slave) > 0:
             _master_percentages = round(_master_count / len(_master_minus_slave), 10)
+            print('z:', _offset_y, 'xy:', _offset_z, 'Master:', _master_percentages, 'N:', len(_master_minus_slave),
+                  'Wilcoxon:', wilcoxon(_master_minus_slave), sep='\t')
         else:
             _master_percentages = None
+            print('z:', _offset_y, 'xy:', _offset_z, 'Master:', _master_percentages, 'N:', 0, sep='\t')
 
-        print('z:', _offset_y, 'xy:', _offset_z, 'Master:', _master_percentages, 'N:', len(_master_minus_slave), 'Wilcoxon:', wilcoxon(_master_minus_slave), sep='\t')
         _z_array[_offset_z_index, _offset_y_index] = _master_percentages
 
     # plot
@@ -169,7 +189,7 @@ def main():
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
         _filename='plot_' + EXPERIMENTS_STR + '_real_' + str(REAL_CELLS) + '_static_' + str(STATIC) + '_band_' +
-                  str(BAND) + '_smooth_heatmap'
+                  str(BAND) + '_heatmap'
     )
 
     _fig = contour.create_plot(
@@ -187,7 +207,7 @@ def main():
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
         _filename='plot_' + EXPERIMENTS_STR + '_real_' + str(REAL_CELLS) + '_static_' + str(STATIC) + '_band_' +
-                  str(BAND) + '_smooth_contour'
+                  str(BAND) + '_contour'
     )
 
 
