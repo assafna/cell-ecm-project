@@ -41,93 +41,23 @@ def remove_from_blacklist(_experiment, _series_id, _cell_id, _time_point_start, 
 
 if __name__ == '__main__':
     add_to_blacklist(_experiment='SN41',
-                     _series_id=3,
-                     _cell_id=None,
-                     _time_point_start=34,
-                     _time_point_end=34,
-                     _reason='Black image starting from Z slice #22'
+                     _series_id=6,
+                     _cell_id=2,
+                     _time_point_start=151,
+                     _time_point_end=245,
+                     _reason='Cell expands'
                      )
     add_to_blacklist(_experiment='SN41',
-                     _series_id=3,
-                     _cell_id=None,
-                     _time_point_start=2,
-                     _time_point_end=4,
-                     _reason='Wave of light'
-                     )
-    add_to_blacklist(_experiment='SN16',
-                     _series_id=1,
-                     _cell_id=4,
-                     _time_point_start=21,
-                     _time_point_end=31,
-                     _reason='Cell expands'
-                     )
-    add_to_blacklist(_experiment='SN16',
-                     _series_id=2,
-                     _cell_id=1,
-                     _time_point_start=21,
-                     _time_point_end=31,
-                     _reason='Cell expands'
-                     )
-    add_to_blacklist(_experiment='SN16',
-                     _series_id=3,
+                     _series_id=6,
                      _cell_id=2,
-                     _time_point_start=18,
-                     _time_point_end=31,
-                     _reason='Cell expands'
-                     )
-    add_to_blacklist(_experiment='SN16',
-                     _series_id=7,
-                     _cell_id=1,
-                     _time_point_start=10,
-                     _time_point_end=31,
-                     _reason='Cell expands'
-                     )
-    add_to_blacklist(_experiment='SN16',
-                     _series_id=9,
-                     _cell_id=1,
-                     _time_point_start=23,
-                     _time_point_end=31,
-                     _reason='Cell expands'
-                     )
-    add_to_blacklist(_experiment='SN16',
-                     _series_id=17,
-                     _cell_id=1,
-                     _time_point_start=18,
-                     _time_point_end=31,
-                     _reason='Cell expands'
-                     )
-    add_to_blacklist(_experiment='SN16',
-                     _series_id=17,
-                     _cell_id=3,
-                     _time_point_start=20,
-                     _time_point_end=31,
-                     _reason='Cell expands'
-                     )
-    add_to_blacklist(_experiment='SN16',
-                     _series_id=17,
-                     _cell_id=3,
-                     _time_point_start=20,
-                     _time_point_end=31,
+                     _time_point_start=151,
+                     _time_point_end=245,
                      _reason='Cell attaches to another cell'
                      )
-    add_to_blacklist(_experiment='SN16',
-                     _series_id=21,
-                     _cell_id=1,
-                     _time_point_start=21,
-                     _time_point_end=31,
-                     _reason='Cell expands'
-                     )
-    add_to_blacklist(_experiment='SN16',
-                     _series_id=21,
-                     _cell_id=2,
-                     _time_point_start=23,
-                     _time_point_end=31,
-                     _reason='Cell expands'
-                     )
-    add_to_blacklist(_experiment='SN16',
-                     _series_id=21,
-                     _cell_id=3,
-                     _time_point_start=19,
-                     _time_point_end=31,
+    add_to_blacklist(_experiment='SN41',
+                     _series_id=9,
+                     _cell_id=0,
+                     _time_point_start=151,
+                     _time_point_end=245,
                      _reason='Cell expands'
                      )
