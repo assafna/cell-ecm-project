@@ -19,6 +19,8 @@ ROI_LENGTH = 1
 ROI_WIDTH = 1
 ROI_HEIGHT = 1
 
+NO_RETURN = False
+
 
 def experiments():
     return SINGLE_CELL + PAIRS
