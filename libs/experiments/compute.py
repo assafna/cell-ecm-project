@@ -7,7 +7,7 @@ from scipy.ndimage import rotate
 
 from libs.compute_lib import roi
 from libs.experiments import load, save, paths
-from libs.experiments.config import AVERAGE_CELL_DIAMETER_IN_MICRONS, ROI_BY_AVERAGE_CELL_DIAMETER
+from libs.experiments.config import AVERAGE_CELL_DIAMETER_IN_MICRONS, ROI_BY_AVERAGE_CELL_DIAMETER, NO_RETURN
 
 
 def cells_distance_in_cell_size(_experiment, _series_id, _cell_1_coordinates, _cell_2_coordinates):
@@ -86,8 +86,9 @@ def roi_by_microns(_resolution_x, _resolution_y, _resolution_z, _length_x, _leng
     return _x1, _y1, _z1, _x2, _y2, _z2
 
 
-def roi_fibers_density(_experiment, _series, _group, _time_point, _roi):
-    _time_point_image = load.structured_image(_experiment, _series, _group, _time_point)
+def roi_fibers_density(_experiment, _series_id, _group, _time_point, _roi, _time_point_image=None):
+    if _time_point_image is None:
+        _time_point_image = load.structured_image(_experiment, _series_id, _group, _time_point)
     _x1, _y1, _z1, _x2, _y2, _z2 = _roi
 
     _out_of_boundaries = False
@@ -144,7 +145,10 @@ def roi_fibers_density_time_point(_experiment, _series_id, _group, _length_x, _l
         (_cell_id, _direction) == ('cell', 'right') else 'left'
     )
     if _time_point_roi in _time_point_fibers_densities:
-        return _time_point_fibers_densities[_time_point_roi]
+        if NO_RETURN:
+            return None
+        else:
+            return _time_point_fibers_densities[_time_point_roi]
     else:
         if _print:
             print('Computing:', _experiment, _series_id, _group, _cell_id, 'roi', _time_point_roi, 'direction',
@@ -154,7 +158,11 @@ def roi_fibers_density_time_point(_experiment, _series_id, _group, _length_x, _l
         if _save:
             _time_point_fibers_densities[_time_point_roi] = _roi_fibers_density
             save.fibers_densities(_experiment, _series_id, _group, _time_point, _time_point_fibers_densities)
-        return _roi_fibers_density
+
+        if NO_RETURN:
+            return None
+        else:
+            return _roi_fibers_density
 
 
 def roi_fibers_density_by_time(_experiment, _series_id, _group, _length_x, _length_y, _length_z, _offset_x, _offset_y,
