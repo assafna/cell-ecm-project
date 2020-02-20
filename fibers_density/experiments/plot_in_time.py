@@ -1,20 +1,22 @@
+import os
 import sys
+from multiprocessing.pool import Pool
 
 from matplotlib import pyplot as plt
 
 from libs import compute_lib
-from libs.experiments import compute
+from libs.config_lib import CPUS_TO_USE
+from libs.experiments import compute, paths, load
 
 ROI_LENGTH = 1
 ROI_HEIGHT = 1
 ROI_WIDTH = 1
 OFFSET_X = 0
-OFFSET_Y = 0.5
+OFFSET_Y = 0
 OFFSET_Z = 0
 DIRECTION = 'inside'
 TIME_POINTS = sys.maxsize
-DERIVATIVE = 0
-OUT_OF_BOUNDARIES = True
+DERIVATIVE = 2
 
 
 def process_group(_experiment, _series_id, _group):
@@ -29,31 +31,24 @@ def process_group(_experiment, _series_id, _group):
         _offset_y=OFFSET_Y,
         _offset_z=OFFSET_Z,
         _direction=DIRECTION,
-        _time_points=TIME_POINTS,
-        _out_of_borders=OUT_OF_BOUNDARIES
+        _time_points=TIME_POINTS
     )
 
-    # _fibers_densities = compute.longest_same_indices_shared_in_borders_sub_array(
-    #     _fibers_densities['left_cell'],
-    #     _fibers_densities['right_cell']
-    # )
-    # _fibers_densities = {
-    #     'left_cell': _fibers_densities[0],
-    #     'right_cell': _fibers_densities[1]
-    # }
+    # remove blacklist
+    _fibers_densities = {
+        'left_cell': compute.remove_blacklist(_experiment, _series_id, 'left_cell', _fibers_densities['left_cell']),
+        'right_cell': compute.remove_blacklist(_experiment, _series_id, 'left_cell', _fibers_densities['right_cell'])
+    }
 
-    # remove out of boundaries
-    if OUT_OF_BOUNDARIES:
-        _fibers_densities = {
-            'left_cell': [_fibers_density[0] for _fibers_density in _fibers_densities['left_cell']],
-            'right_cell': [_fibers_density[0] for _fibers_density in _fibers_densities['right_cell']]
-        }
-
-    # delete problematic points
-    # del(_fibers_densities['left_cell'][80])
-    # del (_fibers_densities['right_cell'][80])
-    # del(_fibers_densities['left_cell'][138])
-    # del (_fibers_densities['right_cell'][138])
+    # get longest sequence
+    _fibers_densities = compute.longest_same_indices_shared_in_borders_sub_array(
+        _fibers_densities['left_cell'],
+        _fibers_densities['right_cell']
+    )
+    _fibers_densities = {
+        'left_cell': _fibers_densities[0],
+        'right_cell': _fibers_densities[1]
+    }
 
     # derivative
     if DERIVATIVE > 0:
@@ -70,8 +65,25 @@ def process_group(_experiment, _series_id, _group):
     plt.plot(_fibers_densities['right_cell'])
     plt.legend(['left cell', 'right cell'])
     plt.title('Correlation: ' + str(_correlation))
-    plt.show()
+
+    # save
+    _path = paths.images(_experiment + ' - In Time', 'Series ' + str(_series_id))
+    os.makedirs(_path, exist_ok=True)
+    plt.savefig(os.path.join(_path, _group + '.png'))
+    print('Saved:', _experiment, _series_id, _group, sep='\t')
+
+
+def process_experiment(_experiment):
+    _arguments = []
+    for _tuple in load.experiment_groups_as_tuples(_experiment):
+        _experiment, _series_id, _group = _tuple
+        _arguments.append((_experiment, _series_id, _group))
+
+    _p = Pool(CPUS_TO_USE)
+    _p.starmap(process_group, _arguments)
+    _p.close()
 
 
 if __name__ == '__main__':
-    process_group(_experiment='SN41', _series_id=2, _group='cells_0_1')
+    process_experiment('SN41')
+    # process_group('SN41', 8, 'cells_1_2')
