@@ -14,7 +14,7 @@ from libs.experiments import paths, compute, load, config
 from libs.experiments.config import FIBERS_CHANNEL_INDEX
 
 SHOW_PLOTS = False
-SMOOTH_AMOUNT = 5
+SMOOTH_AMOUNT = 0
 DEGREES_XY = [0, 45, 90, 135]
 DEGREES_Z = [0, 45, 90, 135]
 
@@ -26,11 +26,11 @@ def process_group(_experiment, _series_id, _cell_id, _degrees_xy, _degrees_z, _c
                   _series_image_by_time_points, _resolutions, _real_cell=True, _fake_cell_id=None,
                   _x_change=0, _y_change=0, _z_change=0, _overwrite=False):
     _time_points_data = []
-    _time_points_amount = len([_value for _value in _cell_coordinates if _value is not None])
+    _time_points_amount = len([_value for _value in _cell_coordinates[_cell_id] if _value is not None])
 
     # smooth coordinates
     _cells_coordinates_cell_smoothed = compute.smooth_coordinates_in_time(
-        [_value for _value in _cell_coordinates if _value is not None], _n=SMOOTH_AMOUNT
+        [_value for _value in _cell_coordinates[_cell_id] if _value is not None], _n=SMOOTH_AMOUNT
     )
 
     if _real_cell:
