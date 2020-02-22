@@ -8,46 +8,45 @@ from libs.config_lib import CPUS_TO_USE
 from libs.experiments import load, compute, save
 from libs.experiments.config import AVERAGE_CELL_DIAMETER_IN_MICRONS, ROI_BY_AVERAGE_CELL_DIAMETER
 
-EXPERIMENT = 'SN16'
-DIRECTION = 'inside'
+EXPERIMENT = 'Single_Cell_Ortal'
+DIRECTIONS = ['right', 'left']
 OFFSETS_X = [0]
 OFFSETS_Y = VALUES_BY_CELL_DIAMETER
 OFFSETS_Z = VALUES_BY_CELL_DIAMETER
 ROI_LENGTHS = [1]
 ROI_HEIGHTS = [1]
 ROI_WIDTHS = [1]
-CELLS_IDS = ['left_cell', 'right_cell']
+CELLS_IDS = ['cell']
 
 
 def main(_experiment, _series_id, _group, _group_properties, _time_point):
     _fibers_densities_tp = load.fibers_densities(_experiment, _series_id, _group, _time_point)
     _rois = []
-    for _offset_x, _offset_y, _offset_z, _roi_length, _roi_width, _roi_height in \
-            product(OFFSETS_X, OFFSETS_Y, OFFSETS_Z, ROI_LENGTHS, ROI_WIDTHS, ROI_HEIGHTS):
-        for _cell_id in CELLS_IDS:
-            if ROI_BY_AVERAGE_CELL_DIAMETER:
-                _cell_diameter_in_microns = AVERAGE_CELL_DIAMETER_IN_MICRONS
-            else:
-                _cell_diameter_in_microns = load.mean_distance_to_surface_in_microns(_experiment, _series_id, _cell_id) * 2
-            _roi = compute.roi_by_microns(
-                _resolution_x=_group_properties['time_points'][_time_point]['resolutions']['x'],
-                _resolution_y=_group_properties['time_points'][_time_point]['resolutions']['y'],
-                _resolution_z=_group_properties['time_points'][_time_point]['resolutions']['z'],
-                _length_x=_roi_length,
-                _length_y=_roi_height,
-                _length_z=_roi_width,
-                _offset_x=_offset_x,
-                _offset_y=_offset_y,
-                _offset_z=_offset_z,
-                _cell_coordinates=_group_properties['time_points'][_time_point][_cell_id]['coordinates'],
-                _cell_diameter_in_microns=_cell_diameter_in_microns,
-                _direction='right' if
-                (_cell_id, DIRECTION) == ('left_cell', 'inside') or
-                (_cell_id, DIRECTION) == ('right_cell', 'outside') or
-                (_cell_id, DIRECTION) == ('cell', 'right') else 'left'
-            )
-            if _roi not in _fibers_densities_tp:
-                _rois.append(_roi)
+    for _offset_x, _offset_y, _offset_z, _roi_length, _roi_width, _roi_height, _cell_id, _direction in \
+            product(OFFSETS_X, OFFSETS_Y, OFFSETS_Z, ROI_LENGTHS, ROI_WIDTHS, ROI_HEIGHTS, CELLS_IDS, DIRECTIONS):
+        if ROI_BY_AVERAGE_CELL_DIAMETER:
+            _cell_diameter_in_microns = AVERAGE_CELL_DIAMETER_IN_MICRONS
+        else:
+            _cell_diameter_in_microns = load.mean_distance_to_surface_in_microns(_experiment, _series_id, _cell_id) * 2
+        _roi = compute.roi_by_microns(
+            _resolution_x=_group_properties['time_points'][_time_point]['resolutions']['x'],
+            _resolution_y=_group_properties['time_points'][_time_point]['resolutions']['y'],
+            _resolution_z=_group_properties['time_points'][_time_point]['resolutions']['z'],
+            _length_x=_roi_length,
+            _length_y=_roi_height,
+            _length_z=_roi_width,
+            _offset_x=_offset_x,
+            _offset_y=_offset_y,
+            _offset_z=_offset_z,
+            _cell_coordinates=_group_properties['time_points'][_time_point][_cell_id]['coordinates'],
+            _cell_diameter_in_microns=_cell_diameter_in_microns,
+            _direction='right' if
+            (_cell_id, _direction) == ('left_cell', 'inside') or
+            (_cell_id, _direction) == ('right_cell', 'outside') or
+            (_cell_id, _direction) == ('cell', 'right') else 'left'
+        )
+        if _roi not in _fibers_densities_tp:
+            _rois.append(_roi)
 
     _time_point_image = load.structured_image(_experiment, _series_id, _group, _time_point)
     for _roi in _rois:
