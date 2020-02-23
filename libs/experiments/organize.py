@@ -34,3 +34,17 @@ def by_cells_distance(_experiments_tuples):
             _tuples_by_distance[_cells_distance] = [_tuple]
 
     return {_distance: _tuples_by_distance[_distance] for _distance in sorted(_tuples_by_distance.keys())}
+
+
+def by_single_cell_id(_experiments_tuples):
+    _tuples_by_single_cell_id = {}
+    for _tuple in _experiments_tuples:
+        _experiment, _series_id, _group = _tuple
+        _, _cell_id, _degrees_xy, _degrees_z = _group.split('_')
+        _new_tuple = (_experiment, _series_id, _cell_id)
+        if _new_tuple in _tuples_by_single_cell_id:
+            _tuples_by_single_cell_id[_new_tuple].append(_tuple)
+        else:
+            _tuples_by_single_cell_id[_new_tuple] = [_tuple]
+
+    return _tuples_by_single_cell_id
