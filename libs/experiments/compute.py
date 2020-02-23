@@ -8,7 +8,7 @@ from scipy.ndimage import rotate
 
 from libs.compute_lib import roi
 from libs.experiments import load, save, paths
-from libs.experiments.config import AVERAGE_CELL_DIAMETER_IN_MICRONS, ROI_BY_AVERAGE_CELL_DIAMETER, NO_RETURN
+from libs.experiments.config import AVERAGE_CELL_DIAMETER_IN_MICRONS, ROI_START_BY_AVERAGE_CELL_DIAMETER, NO_RETURN
 
 
 def cells_distance_in_cell_size(_experiment, _series_id, _cell_1_coordinates, _cell_2_coordinates):
@@ -60,13 +60,13 @@ def image_center_coordinates(_image_shape):
 
 def roi_by_microns(_resolution_x, _resolution_y, _resolution_z, _length_x, _length_y, _length_z, _offset_x, _offset_y,
                    _offset_z, _cell_coordinates, _cell_diameter_in_microns, _direction):
-    _cell_diameter_in_pixels = _cell_diameter_in_microns / _resolution_x
-    _length_x_in_pixels = (_cell_diameter_in_microns * _length_x) / _resolution_x
-    _length_y_in_pixels = (_cell_diameter_in_microns * _length_y) / _resolution_y
-    _length_z_in_pixels = (_cell_diameter_in_microns * _length_z) / _resolution_z
-    _offset_x_in_pixels = (_cell_diameter_in_microns * _offset_x) / _resolution_x
-    _offset_y_in_pixels = (_cell_diameter_in_microns * _offset_y) / _resolution_y
-    _offset_z_in_pixels = (_cell_diameter_in_microns * _offset_z) / _resolution_z
+    # always by average
+    _length_x_in_pixels = (AVERAGE_CELL_DIAMETER_IN_MICRONS * _length_x) / _resolution_x
+    _length_y_in_pixels = (AVERAGE_CELL_DIAMETER_IN_MICRONS * _length_y) / _resolution_y
+    _length_z_in_pixels = (AVERAGE_CELL_DIAMETER_IN_MICRONS * _length_z) / _resolution_z
+    _offset_x_in_pixels = (AVERAGE_CELL_DIAMETER_IN_MICRONS * _offset_x) / _resolution_x
+    _offset_y_in_pixels = (AVERAGE_CELL_DIAMETER_IN_MICRONS * _offset_y) / _resolution_y
+    _offset_z_in_pixels = (AVERAGE_CELL_DIAMETER_IN_MICRONS * _offset_z) / _resolution_z
 
     _x1, _y1, _x2, _y2 = [int(round(_value)) for _value in roi(
         _length_x=_length_x_in_pixels,
@@ -77,7 +77,7 @@ def roi_by_microns(_resolution_x, _resolution_y, _resolution_z, _length_x, _leng
             'x': _cell_coordinates['x'],
             'y': _cell_coordinates['y']
         },
-        _cell_diameter=_cell_diameter_in_pixels,
+        _cell_diameter=_cell_diameter_in_microns / _resolution_x,
         _direction=_direction
     )]
 
@@ -121,7 +121,7 @@ def roi_fibers_density_time_point(_experiment, _series_id, _group, _length_x, _l
                                                                                                       _group)
     _time_point_properties = _group_properties['time_points'][_time_point]
     _time_point_fibers_densities = load.fibers_densities(_experiment, _series_id, _group, _time_point)
-    if ROI_BY_AVERAGE_CELL_DIAMETER:
+    if ROI_START_BY_AVERAGE_CELL_DIAMETER:
         _cell_diameter_in_microns = AVERAGE_CELL_DIAMETER_IN_MICRONS
     else:
         _cell_diameter_in_microns = load.mean_distance_to_surface_in_microns(
