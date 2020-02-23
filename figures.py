@@ -1,9 +1,10 @@
-from fibers_density import simulations
-from fibers_density import experiments
+import fibers_density.simulations as simulations
+import fibers_density.experiments as experiments
 
 
 def figure_1():
     simulations.fibers_vs_distance.main()
+    experiments.fibers_vs_distance.main()
 
 
 def figure_2():
