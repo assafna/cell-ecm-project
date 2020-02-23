@@ -8,15 +8,15 @@ from libs.config_lib import CPUS_TO_USE
 from libs.experiments import load, compute, save
 from libs.experiments.config import AVERAGE_CELL_DIAMETER_IN_MICRONS, ROI_BY_AVERAGE_CELL_DIAMETER
 
-EXPERIMENT = 'Single_Cell_Ortal'
-DIRECTIONS = ['right', 'left']
-OFFSETS_X = [0]
+EXPERIMENTS = ['SN16', 'SN41']
+DIRECTIONS = ['inside']
+OFFSETS_X = np.arange(start=0, stop=10, step=0.1)
 OFFSETS_Y = VALUES_BY_CELL_DIAMETER
 OFFSETS_Z = VALUES_BY_CELL_DIAMETER
 ROI_LENGTHS = [1]
 ROI_HEIGHTS = [1]
 ROI_WIDTHS = [1]
-CELLS_IDS = ['cell']
+CELLS_IDS = ['left_cell', 'right_cell']
 
 
 def main(_experiment, _series_id, _group, _group_properties, _time_point):
@@ -61,7 +61,7 @@ def main(_experiment, _series_id, _group, _group_properties, _time_point):
 
 if __name__ == '__main__':
     _arguments = []
-    for _tuple in load.experiment_groups_as_tuples(EXPERIMENT):
+    for _tuple in load.experiments_groups_as_tuples(EXPERIMENTS):
         _experiment, _series_id, _group = _tuple
         _group_properties = load.group_properties(_experiment, _series_id, _group)
         for _time_point in range(len(_group_properties['time_points'])):
