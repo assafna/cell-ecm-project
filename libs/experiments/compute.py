@@ -1,6 +1,7 @@
 import math
 import os
 import sys
+from itertools import product
 
 import numpy as np
 from scipy.ndimage import rotate
@@ -89,7 +90,7 @@ def roi_by_microns(_resolution_x, _resolution_y, _resolution_z, _length_x, _leng
 def roi_fibers_density(_experiment, _series_id, _group, _time_point, _roi, _time_point_image=None):
     if _time_point_image is None:
         _time_point_image = load.structured_image(_experiment, _series_id, _group, _time_point)
-    _x1, _y1, _z1, _x2, _y2, _z2 = _roi
+    _x1, _y1, _z1, _x2, _y2, _z2 = [int(round(_value)) for _value in _roi]
 
     _out_of_boundaries = False
 
