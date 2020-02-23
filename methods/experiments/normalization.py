@@ -109,8 +109,7 @@ def process_experiments(_experiments, _overwrite=False):
 
 
 def process_all_experiments(_overwrite=False):
-    # TODO: handle single cell
-    process_experiments(config.PAIRS)
+    process_experiments(config.experiments())
 
 
 if __name__ == '__main__':
