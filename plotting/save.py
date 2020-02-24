@@ -8,7 +8,7 @@ import plotly
 def replace_image_download(_div):
     return _div.replace(
         '{"responsive": true}',
-        '{modeBarButtonsToRemove: ["toImage", "sendDataToCloud"], modeBarButtonsToAdd: [{ name: "SVG", '
+        '{modeBarButtonsToAdd: [{ name: "SVG", '
         'icon: Plotly.Icons.camera, click: function(gd) {Plotly.downloadImage(gd, {format: "svg", '
         'height: window.innerHeight, width: window.innerWidth})}}]},{"responsive": true} '
     )
