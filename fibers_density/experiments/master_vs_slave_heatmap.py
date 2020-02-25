@@ -21,7 +21,7 @@ STATIC = False
 BAND = True
 VALUES_BY_CELL_DIAMETER = np.array(
     [-1, -0.9, -0.8, -0.7, -0.6, -0.5, -0.4, -0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1])
-_OFFSET_X = 0
+OFFSET_X = 0
 DERIVATIVE = 2
 CELLS_DISTANCES = [6, 7, 8, 9]
 DIRECTION = 'inside'
@@ -43,6 +43,7 @@ def main():
         _experiments = filtering.by_band(_experiments)
 
     _z_array = np.zeros(shape=(len(VALUES_BY_CELL_DIAMETER), len(VALUES_BY_CELL_DIAMETER)))
+    _text_array = [['' for _j in range(len(VALUES_BY_CELL_DIAMETER))] for _i in range(len(VALUES_BY_CELL_DIAMETER))]
     for (_offset_y_index, _offset_y), (_offset_z_index, _offset_z) in \
             product(enumerate(VALUES_BY_CELL_DIAMETER), enumerate(VALUES_BY_CELL_DIAMETER)):
 
@@ -54,7 +55,7 @@ def main():
             for _tuple in _experiments:
                 _experiment, _series, _group = _tuple
                 _arguments.append((_experiment, _series, _group, ROI_LENGTH, ROI_HEIGHT, ROI_WIDTH,
-                                   _OFFSET_X, _offset_y, _offset_z, DIRECTION))
+                                   OFFSET_X, _offset_y, _offset_z, DIRECTION))
                 _answers_keys.append((_experiment, _series, _group))
 
             _p = Pool(CPUS_TO_USE)
@@ -83,7 +84,7 @@ def main():
                 _fibers_densities[(_master_experiment, _master_series, _master_group)] = \
                     compute.roi_fibers_density_by_time_pairs(
                         _master_experiment, _master_series, _master_group, ROI_LENGTH, ROI_HEIGHT, ROI_WIDTH,
-                         _OFFSET_X, _offset_y, _offset_z, DIRECTION
+                         OFFSET_X, _offset_y, _offset_z, DIRECTION
                     )
 
             _master_left_cell_fibers_densities = \
@@ -121,7 +122,7 @@ def main():
                         _fibers_densities[(_slave_experiment, _slave_series, _slave_group)] = \
                             compute.roi_fibers_density_by_time_pairs(
                                 _slave_experiment, _slave_series, _slave_group, ROI_LENGTH, ROI_HEIGHT, ROI_WIDTH,
-                                _OFFSET_X, _offset_y, _offset_z, DIRECTION
+                                OFFSET_X, _offset_y, _offset_z, DIRECTION
                             )
 
                     for _master_cell_id, _slave_cell_id in product(['left_cell', 'right_cell'],
@@ -161,27 +162,38 @@ def main():
         if len(_master_minus_slave) > 0:
             _master_percentages = round(_master_count / len(_master_minus_slave), 10)
             _wilcoxon = wilcoxon(_master_minus_slave)
+            _p_value = _wilcoxon[1]
             print('z:', _offset_y, 'xy:', _offset_z, 'Master:', _master_percentages, 'N:', len(_master_minus_slave),
-                  'Wilcoxon:', wilcoxon(_master_minus_slave), sep='\t')
-            if _wilcoxon[1] > MAXIMUM_P_VALUE:
-                _master_percentages = None
+                  'Wilcoxon:', _wilcoxon, sep='\t')
         else:
             _master_percentages = None
+            _p_value = None
             print('z:', _offset_y, 'xy:', _offset_z, 'Master:', _master_percentages, 'N:', 0, sep='\t')
 
         _z_array[_offset_z_index, _offset_y_index] = _master_percentages
+        _text_array[_offset_z_index][_offset_y_index] = compute_lib.p_value_text(_p_value)
 
     # plot
-    _fig = heatmap.create_plot(
+    _fig = heatmap.create_annotated_plot(
         _x_labels=VALUES_BY_CELL_DIAMETER,
         _y_labels=VALUES_BY_CELL_DIAMETER,
         _z_array=_z_array,
+        _text_array=_text_array,
         _x_axis_title='Offset in Z axis',
         _y_axis_title='Offset in XY axis',
         _color_scale=sns.color_palette('BrBG').as_hex(),
-        _zmin=0,
-        _zmax=1
     )
+
+    # _fig = heatmap.create_plot(
+    #     _x_labels=VALUES_BY_CELL_DIAMETER,
+    #     _y_labels=VALUES_BY_CELL_DIAMETER,
+    #     _z_array=_z_array,
+    #     _x_axis_title='Offset in Z axis',
+    #     _y_axis_title='Offset in XY axis',
+    #     _color_scale=sns.color_palette('BrBG').as_hex(),
+    #     _zmin=0,
+    #     _zmax=1
+    # )
 
     save.to_html(
         _fig=_fig,
