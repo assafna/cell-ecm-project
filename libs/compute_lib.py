@@ -57,3 +57,15 @@ def z_score(_x, _average, _std):
 def z_score_fibers_densities_array(_fibers_densities, _normalization):
     _average, _std = _normalization
     return [z_score(_x, _average, _std) for _x in _fibers_densities]
+
+
+def p_value_text(_p_value):
+    if _p_value is None:
+        return None
+
+    _values = [0.0001, 0.001, 0.01, 0.05]
+    for _value in _values:
+        if _p_value < _value:
+            return 'p-value < ' + str(_value)
+
+    return 'p-value > ' + str(_values[-1])
