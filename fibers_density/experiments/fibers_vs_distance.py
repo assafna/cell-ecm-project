@@ -1,3 +1,4 @@
+import math
 import os
 from itertools import product
 
@@ -13,10 +14,13 @@ from plotting import scatter, save
 PAIRS_EXPERIMENTS = ['SN16']
 PAIRS_CELLS_DISTANCE = 7
 PAIRS_BAND = True
-TIME_POINT = 15
-OFFSET_X_END = PAIRS_CELLS_DISTANCE - 1
+TIME_POINT = 18
+OFFSET_X_END = {
+    5: 2.8,
+    7: 5.3
+}
 OFFSET_X_STEP = 0.1
-OFFSETS_X = np.arange(start=0, stop=OFFSET_X_END + OFFSET_X_STEP, step=OFFSET_X_STEP)
+OFFSETS_X = np.arange(start=0, stop=OFFSET_X_END[PAIRS_CELLS_DISTANCE] + OFFSET_X_STEP, step=OFFSET_X_STEP)
 OFFSET_Y = 0
 OFFSET_Z = 0
 OUT_OF_BOUNDARIES = False
@@ -48,7 +52,7 @@ def main():
         _p.starmap(compute_offsets, _arguments)
         _p.close()
 
-    _single_cell_fibers_densities = list([None] * len(OFFSETS_X))
+    _single_cell_fibers_densities = [[] for _i in range(len(OFFSETS_X))]
     for _tuple in _experiments:
         _experiment, _series_id, _cell_id = _tuple
         print('Experiment:', _experiment, 'Series ID:', _series_id, 'Cell ID:', _cell_id, sep='\t')
@@ -75,10 +79,7 @@ def main():
                     _cell_fibers_densities.append(_normalized_fibers_density)
 
             if len(_cell_fibers_densities) > 0:
-                if _single_cell_fibers_densities[_offset_index] is None:
-                    _single_cell_fibers_densities[_offset_index] = [np.mean(_cell_fibers_densities)]
-                else:
-                    _single_cell_fibers_densities[_offset_index].append(np.mean(_cell_fibers_densities))
+                _single_cell_fibers_densities[_offset_index].append(np.mean(_cell_fibers_densities))
             _offset_index += 1
 
     # pairs
@@ -101,13 +102,25 @@ def main():
         _p.starmap(compute_offsets, _arguments)
         _p.close()
 
-    _pairs_fibers_densities = list([None] * len(OFFSETS_X))
+    _pairs_fibers_densities = [[] for _i in range(len(OFFSETS_X))]
     for _tuple in _experiments:
         _experiment, _series_id, _group = _tuple
         print('Experiment:', _experiment, 'Series ID:', _series_id, 'Group:', _group, sep='\t')
         _offset_index = 0
         _normalization = load.normalization_series_file_data(_experiment, 'Series ' + str(_series_id))
+
+        # take offsets based on cells distance
+        _properties = load.group_properties(_experiment, _series_id, _group)
+        _left_cell_coordinates = [list(_properties['time_points'][0]['left_cell']['coordinates'].values())]
+        _right_cell_coordinates = [list(_properties['time_points'][0]['right_cell']['coordinates'].values())]
+        _cells_distance = compute.cells_distance_in_cell_size(
+            _experiment, _series_id, _left_cell_coordinates, _right_cell_coordinates)
+        _edges_distance = _cells_distance - 1
+        _max_x_offset = _edges_distance - ROI_LENGTH
+
         for _offset_x in OFFSETS_X:
+            if _offset_x > _max_x_offset:
+                break
             _fibers_density = compute.roi_fibers_density_time_point(_experiment, _series_id, _group, ROI_LENGTH,
                                                                     ROI_WIDTH, ROI_HEIGHT, _offset_x, OFFSET_Y,
                                                                     OFFSET_Z, 'left_cell', 'inside', TIME_POINT - 1
@@ -121,10 +134,7 @@ def main():
                 _std=_normalization['std']
             )
 
-            if _pairs_fibers_densities[_offset_index] is None:
-                _pairs_fibers_densities[_offset_index] = [_normalized_fibers_density]
-            else:
-                _pairs_fibers_densities[_offset_index].append(_normalized_fibers_density)
+            _pairs_fibers_densities[_offset_index].append(_normalized_fibers_density)
             _offset_index += 1
 
     # plot
@@ -142,7 +152,7 @@ def main():
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        _filename='plot'
+        _filename='plot_distance_' + str(PAIRS_CELLS_DISTANCE) + '_time_point_' + str(TIME_POINT)
     )
 
 
