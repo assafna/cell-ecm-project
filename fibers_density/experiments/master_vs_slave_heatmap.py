@@ -14,17 +14,24 @@ from libs.experiments.config import ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT, NO_RETURN
 from methods.experiments import export_video
 from plotting import scatter, save, heatmap, contour
 
-EXPERIMENTS = ['SN41']
+EXPERIMENTS = ['SN16']
 EXPERIMENTS_STR = '_'.join(EXPERIMENTS)
 REAL_CELLS = True
 STATIC = False
-BAND = False
+BAND = True
 VALUES_BY_CELL_DIAMETER = np.array(
     [-1, -0.9, -0.8, -0.7, -0.6, -0.5, -0.4, -0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1])
 _OFFSET_X = 0
 DERIVATIVE = 2
 CELLS_DISTANCES = [6, 7, 8, 9]
 DIRECTION = 'inside'
+MAXIMUM_P_VALUE = 0.05
+MINIMUM_CORRELATION_TIME_POINTS = {
+    'SN16': 15,
+    'SN18': 15,
+    'SN41': 50,
+    'SN44': 50
+}
 
 
 def main():
@@ -98,14 +105,8 @@ def main():
                 )
 
             # ignore small arrays
-            if _master_experiment in ['SN16', 'SN18']:
-                if len(_master_left_cell_fibers_densities_filtered) < 15:
-                    continue
-            elif _master_experiment in ['SN41', 'SN44']:
-                if len(_master_left_cell_fibers_densities_filtered) < 50:
-                    continue
-            else:
-                raise Exception('No such experiment!')
+            if len(_master_left_cell_fibers_densities_filtered) < MINIMUM_CORRELATION_TIME_POINTS[_master_experiment]:
+                continue
 
             _master_correlation = compute_lib.correlation(
                 compute_lib.derivative(_master_left_cell_fibers_densities_filtered, _n=DERIVATIVE),
@@ -144,14 +145,8 @@ def main():
                             )
 
                         # ignore small arrays
-                        if _slave_experiment in ['SN16', 'SN18']:
-                            if len(_master_fibers_densities_filtered) < 15:
-                                continue
-                        elif _slave_experiment in ['SN41', 'SN44']:
-                            if len(_master_fibers_densities_filtered) < 50:
-                                continue
-                        else:
-                            raise Exception('No such experiment!')
+                        if len(_master_fibers_densities_filtered) < MINIMUM_CORRELATION_TIME_POINTS[_slave_experiment]:
+                            continue
 
                         _slave_correlation = compute_lib.correlation(
                             compute_lib.derivative(_master_fibers_densities_filtered, _n=DERIVATIVE),
@@ -165,8 +160,11 @@ def main():
         _master_count = len(_master_minus_slave[_master_minus_slave > 0])
         if len(_master_minus_slave) > 0:
             _master_percentages = round(_master_count / len(_master_minus_slave), 10)
+            _wilcoxon = wilcoxon(_master_minus_slave)
             print('z:', _offset_y, 'xy:', _offset_z, 'Master:', _master_percentages, 'N:', len(_master_minus_slave),
                   'Wilcoxon:', wilcoxon(_master_minus_slave), sep='\t')
+            if _wilcoxon[1] > MAXIMUM_P_VALUE:
+                _master_percentages = None
         else:
             _master_percentages = None
             print('z:', _offset_y, 'xy:', _offset_z, 'Master:', _master_percentages, 'N:', 0, sep='\t')
