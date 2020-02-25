@@ -6,13 +6,13 @@ import numpy as np
 from fibers_density.experiments.master_vs_slave_heatmap import VALUES_BY_CELL_DIAMETER
 from libs.config_lib import CPUS_TO_USE
 from libs.experiments import load, compute, save
-from libs.experiments.config import AVERAGE_CELL_DIAMETER_IN_MICRONS, ROI_BY_AVERAGE_CELL_DIAMETER
+from libs.experiments.config import AVERAGE_CELL_DIAMETER_IN_MICRONS, ROI_START_BY_AVERAGE_CELL_DIAMETER
 
-EXPERIMENTS = ['SN16', 'SN41']
+EXPERIMENTS = ['SN18', 'SN44']
 DIRECTIONS = ['inside']
-OFFSETS_X = np.arange(start=0, stop=10, step=0.1)
-OFFSETS_Y = VALUES_BY_CELL_DIAMETER
-OFFSETS_Z = VALUES_BY_CELL_DIAMETER
+OFFSETS_X = [0, 0.5]
+OFFSETS_Y = [0]
+OFFSETS_Z = [0]
 ROI_LENGTHS = [1]
 ROI_HEIGHTS = [1]
 ROI_WIDTHS = [1]
@@ -24,10 +24,11 @@ def main(_experiment, _series_id, _group, _group_properties, _time_point):
     _rois = []
     for _offset_x, _offset_y, _offset_z, _roi_length, _roi_width, _roi_height, _cell_id, _direction in \
             product(OFFSETS_X, OFFSETS_Y, OFFSETS_Z, ROI_LENGTHS, ROI_WIDTHS, ROI_HEIGHTS, CELLS_IDS, DIRECTIONS):
-        if ROI_BY_AVERAGE_CELL_DIAMETER:
+        if ROI_START_BY_AVERAGE_CELL_DIAMETER:
             _cell_diameter_in_microns = AVERAGE_CELL_DIAMETER_IN_MICRONS
         else:
-            _cell_diameter_in_microns = load.mean_distance_to_surface_in_microns(_experiment, _series_id, _cell_id) * 2
+            _cell_diameter_in_microns = load.mean_distance_to_surface_in_microns(
+                _experiment, _series_id, _group_properties['cells_ids'][_cell_id]) * 2
         _roi = compute.roi_by_microns(
             _resolution_x=_group_properties['time_points'][_time_point]['resolutions']['x'],
             _resolution_y=_group_properties['time_points'][_time_point]['resolutions']['y'],
