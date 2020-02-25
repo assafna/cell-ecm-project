@@ -8,15 +8,15 @@ from libs.config_lib import CPUS_TO_USE
 from libs.experiments import load, compute, save
 from libs.experiments.config import AVERAGE_CELL_DIAMETER_IN_MICRONS, ROI_START_BY_AVERAGE_CELL_DIAMETER
 
-EXPERIMENTS = ['SN18', 'SN44']
-DIRECTIONS = ['inside']
-OFFSETS_X = [0, 0.5]
+EXPERIMENTS = ['Single_Cell_Ortal']
+DIRECTIONS = ['right', 'left']
+OFFSETS_X = np.arange(start=0, stop=9.1, step=0.1)
 OFFSETS_Y = [0]
 OFFSETS_Z = [0]
 ROI_LENGTHS = [1]
 ROI_HEIGHTS = [1]
 ROI_WIDTHS = [1]
-CELLS_IDS = ['left_cell', 'right_cell']
+CELLS_IDS = ['cell']
 
 
 def main(_experiment, _series_id, _group, _group_properties, _time_point):
@@ -28,7 +28,10 @@ def main(_experiment, _series_id, _group, _group_properties, _time_point):
             _cell_diameter_in_microns = AVERAGE_CELL_DIAMETER_IN_MICRONS
         else:
             _cell_diameter_in_microns = load.mean_distance_to_surface_in_microns(
-                _experiment, _series_id, _group_properties['cells_ids'][_cell_id]) * 2
+                _experiment=_experiment,
+                _series_id=_series_id,
+                _cell_id=_group_properties['cells_ids'][_cell_id]) * 2 if _cell_id != 'cell' else \
+                _group_properties['cell_id'] * 2
         _roi = compute.roi_by_microns(
             _resolution_x=_group_properties['time_points'][_time_point]['resolutions']['x'],
             _resolution_y=_group_properties['time_points'][_time_point]['resolutions']['y'],

@@ -127,7 +127,8 @@ def roi_fibers_density_time_point(_experiment, _series_id, _group, _length_x, _l
         _cell_diameter_in_microns = load.mean_distance_to_surface_in_microns(
             _experiment=_experiment,
             _series_id=_series_id,
-            _cell_id=_group_properties['cells_ids'][_cell_id]) * 2
+            _cell_id=_group_properties['cells_ids'][_cell_id]) * 2 if _cell_id != 'cell' else \
+            _group_properties['cell_id'] * 2
     _time_point_roi = roi_by_microns(
         _resolution_x=_group_properties['time_points'][_time_point]['resolutions']['x'],
         _resolution_y=_group_properties['time_points'][_time_point]['resolutions']['y'],
