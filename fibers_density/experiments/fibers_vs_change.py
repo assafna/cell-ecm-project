@@ -6,6 +6,7 @@ import numpy as np
 import seaborn
 from scipy.stats import stats, pearsonr
 import plotly.graph_objs as go
+from tqdm import tqdm
 
 import libs.compute_lib
 from libs import compute_lib
@@ -51,6 +52,36 @@ Z_MIN = 0
 Z_MAX = 0.2
 
 
+def compute_fibers_densities(_experiments):
+    _arguments = []
+    for _tuple in _experiments:
+        _experiment, _series_id, _group = _tuple
+        _arguments.append({
+            'experiment': _experiment,
+            'series_id': _series_id,
+            'group': _group,
+            'length_x': ROI_LENGTH,
+            'length_y': ROI_HEIGHT,
+            'length_z': ROI_WIDTH,
+            'offset_x': OFFSET_X,
+            'offset_y': OFFSET_Y,
+            'offset_z': OFFSET_Z,
+            'direction': DIRECTION
+        })
+
+    _fibers_densities = {}
+    with Pool(CPUS_TO_USE) as _p:
+        for _keys, _value in tqdm(
+                _p.imap_unordered(compute.roi_fibers_density_by_time_pairs, _arguments), total=len(_arguments)):
+            _fibers_densities[
+                (_keys['experiment'], _keys['series_id'], _keys['group'])
+            ] = _value
+        _p.close()
+        _p.join()
+
+    return _fibers_densities
+
+
 def main():
     _experiments = load.experiments_groups_as_tuples(EXPERIMENTS)
     _experiments = filtering.by_distances(_experiments, CELLS_DISTANCES)
@@ -59,20 +90,7 @@ def main():
     if BAND:
         _experiments = filtering.by_band(_experiments)
 
-    # prepare data in mp
-    _fibers_densities = {}
-    _arguments = []
-    for _tuple in _experiments:
-        _experiment, _series, _group = _tuple
-        _arguments.append((_experiment, _series, _group, ROI_LENGTH, ROI_HEIGHT, ROI_WIDTH,
-                           OFFSET_X, OFFSET_Y, OFFSET_Z, DIRECTION, MINIMUM_TIME_POINTS))
-    _p = Pool(CPUS_TO_USE)
-    _answers = _p.starmap(compute.roi_fibers_density_by_time_pairs, _arguments)
-    _p.close()
-    for _index in range(len(_arguments)):
-        _tuple = _experiments[_index]
-        _answer = _answers[_index]
-        _fibers_densities[_tuple] = _answer
+    _fibers_densities = compute_fibers_densities(_experiments)
 
     _experiments_by_distance = organize.by_cells_distance(_experiments)
     _fibers_densities_by_distance = {}

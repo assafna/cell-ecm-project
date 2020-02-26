@@ -1,4 +1,5 @@
 import os
+import sys
 from itertools import product
 from multiprocessing.pool import Pool
 
@@ -6,6 +7,7 @@ import numpy as np
 import plotly
 import seaborn as sns
 from scipy.stats import wilcoxon
+from tqdm import tqdm
 
 from libs import compute_lib
 from libs.config_lib import CPUS_TO_USE, USE_MULTIPROCESSING
@@ -19,19 +21,49 @@ EXPERIMENTS_STR = '_'.join(EXPERIMENTS)
 REAL_CELLS = True
 STATIC = False
 BAND = True
-VALUES_BY_CELL_DIAMETER = np.array(
-    [-1, -0.9, -0.8, -0.7, -0.6, -0.5, -0.4, -0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1])
+VALUES_BY_CELL_DIAMETER = [round(_value, 10) for _value in np.arange(start=0, stop=2.1, step=0.1) - 1]
 OFFSET_X = 0
 DERIVATIVE = 2
 CELLS_DISTANCES = [6, 7, 8, 9]
 DIRECTION = 'inside'
-MAXIMUM_P_VALUE = 0.05
 MINIMUM_CORRELATION_TIME_POINTS = {
     'SN16': 15,
     'SN18': 15,
     'SN41': 50,
     'SN44': 50
 }
+
+
+def compute_fibers_densities(_experiments):
+    _arguments = []
+    for _tuple in _experiments:
+        _experiment, _series_id, _group = _tuple
+        for _offset_y, _offset_z in product(VALUES_BY_CELL_DIAMETER, VALUES_BY_CELL_DIAMETER):
+            _arguments.append({
+                'experiment': _experiment,
+                'series_id': _series_id,
+                'group': _group,
+                'length_x': ROI_LENGTH,
+                'length_y': ROI_HEIGHT,
+                'length_z': ROI_WIDTH,
+                'offset_x': OFFSET_X,
+                'offset_y': _offset_y,
+                'offset_z': _offset_z,
+                'direction': DIRECTION,
+                'save': False
+            })
+
+    _fibers_densities = {}
+    with Pool(CPUS_TO_USE) as _p:
+        for _keys, _value in tqdm(
+                _p.imap_unordered(compute.roi_fibers_density_by_time_pairs, _arguments), total=len(_arguments)):
+            _fibers_densities[
+                (_keys['experiment'], _keys['series_id'], _keys['group'], _keys['offset_y'], _keys['offset_z'])
+            ] = _value
+        _p.close()
+        _p.join()
+
+    return _fibers_densities
 
 
 def main():
@@ -42,37 +74,12 @@ def main():
     if BAND:
         _experiments = filtering.by_band(_experiments)
 
+    _fibers_densities = compute_fibers_densities(_experiments)
+
     _z_array = np.zeros(shape=(len(VALUES_BY_CELL_DIAMETER), len(VALUES_BY_CELL_DIAMETER)))
-    _text_array = [['' for _j in range(len(VALUES_BY_CELL_DIAMETER))] for _i in range(len(VALUES_BY_CELL_DIAMETER))]
+    _annotations_array = []
     for (_offset_y_index, _offset_y), (_offset_z_index, _offset_z) in \
             product(enumerate(VALUES_BY_CELL_DIAMETER), enumerate(VALUES_BY_CELL_DIAMETER)):
-
-        # prepare data in mp
-        _fibers_densities = {}
-        if USE_MULTIPROCESSING:
-            _arguments = []
-            _answers_keys = []
-            for _tuple in _experiments:
-                _experiment, _series, _group = _tuple
-                _arguments.append((_experiment, _series, _group, ROI_LENGTH, ROI_HEIGHT, ROI_WIDTH,
-                                   OFFSET_X, _offset_y, _offset_z, DIRECTION))
-                _answers_keys.append((_experiment, _series, _group))
-
-            _p = Pool(CPUS_TO_USE)
-            _answers = _p.starmap(compute.roi_fibers_density_by_time_pairs, _arguments)
-            _p.close()
-
-            # stop if needed
-            if os.path.isfile(os.path.join(paths.EXPERIMENTS, 'stop.txt')):
-                print('STOPPED!')
-                return
-
-            if NO_RETURN:
-                print(_offset_y, _offset_z)
-                continue
-
-            for _answer_key, _answer in zip(_answers_keys, _answers):
-                _fibers_densities[_answer_key] = _answer
 
         _master_correlations_array = []
         _slave_correlations_array = []
@@ -80,17 +87,10 @@ def main():
             _master_tuple = _experiments[_master_index]
             _master_experiment, _master_series, _master_group = _master_tuple
 
-            if not USE_MULTIPROCESSING:
-                _fibers_densities[(_master_experiment, _master_series, _master_group)] = \
-                    compute.roi_fibers_density_by_time_pairs(
-                        _master_experiment, _master_series, _master_group, ROI_LENGTH, ROI_HEIGHT, ROI_WIDTH,
-                         OFFSET_X, _offset_y, _offset_z, DIRECTION
-                    )
-
-            _master_left_cell_fibers_densities = \
-                _fibers_densities[(_master_experiment, _master_series, _master_group)]['left_cell']
-            _master_right_cell_fibers_densities = \
-                _fibers_densities[(_master_experiment, _master_series, _master_group)]['right_cell']
+            _master_left_cell_fibers_densities = _fibers_densities[
+                (_master_experiment, _master_series, _master_group, _offset_y, _offset_z)]['left_cell']
+            _master_right_cell_fibers_densities = _fibers_densities[
+                (_master_experiment, _master_series, _master_group, _offset_y, _offset_z)]['right_cell']
 
             _master_properties = load.group_properties(_master_experiment, _master_series, _master_group)
             _master_left_cell_fibers_densities = compute.remove_blacklist(
@@ -118,19 +118,12 @@ def main():
                     _slave_tuple = _experiments[_slave_index]
                     _slave_experiment, _slave_series, _slave_group = _slave_tuple
 
-                    if not USE_MULTIPROCESSING:
-                        _fibers_densities[(_slave_experiment, _slave_series, _slave_group)] = \
-                            compute.roi_fibers_density_by_time_pairs(
-                                _slave_experiment, _slave_series, _slave_group, ROI_LENGTH, ROI_HEIGHT, ROI_WIDTH,
-                                OFFSET_X, _offset_y, _offset_z, DIRECTION
-                            )
-
                     for _master_cell_id, _slave_cell_id in product(['left_cell', 'right_cell'],
                                                                    ['left_cell', 'right_cell']):
-                        _master_fibers_densities = \
-                            _fibers_densities[(_master_experiment, _master_series, _master_group)][_master_cell_id]
-                        _slave_fibers_densities = \
-                            _fibers_densities[(_slave_experiment, _slave_series, _slave_group)][_slave_cell_id]
+                        _master_fibers_densities = _fibers_densities[
+                            (_master_experiment, _master_series, _master_group, _offset_y, _offset_z)][_master_cell_id]
+                        _slave_fibers_densities = _fibers_densities[
+                            (_slave_experiment, _slave_series, _slave_group, _offset_y, _offset_z)][_slave_cell_id]
 
                         _slave_properties = load.group_properties(_slave_experiment, _slave_series, _slave_group)
                         _master_fibers_densities = compute.remove_blacklist(
@@ -163,37 +156,38 @@ def main():
             _master_percentages = round(_master_count / len(_master_minus_slave), 10)
             _wilcoxon = wilcoxon(_master_minus_slave)
             _p_value = _wilcoxon[1]
+            if _p_value > 0.05:
+                _annotations_array.append({
+                    'text': 'X',
+                    'show_arrow': False,
+                    'x': _offset_y,
+                    'y': _offset_z,
+                    'font': {
+                        'size': 10,
+                        'color': 'red'
+                    }
+                })
             print('z:', _offset_y, 'xy:', _offset_z, 'Master:', _master_percentages, 'N:', len(_master_minus_slave),
-                  'Wilcoxon:', _wilcoxon, sep='\t')
+                  'Wilcoxon:', compute_lib.p_value_text(_p_value), sep='\t')
         else:
             _master_percentages = None
             _p_value = None
             print('z:', _offset_y, 'xy:', _offset_z, 'Master:', _master_percentages, 'N:', 0, sep='\t')
 
         _z_array[_offset_z_index, _offset_y_index] = _master_percentages
-        _text_array[_offset_z_index][_offset_y_index] = compute_lib.p_value_text(_p_value)
 
     # plot
-    _fig = heatmap.create_annotated_plot(
+    _fig = heatmap.create_plot(
         _x_labels=VALUES_BY_CELL_DIAMETER,
         _y_labels=VALUES_BY_CELL_DIAMETER,
         _z_array=_z_array,
-        _text_array=_text_array,
         _x_axis_title='Offset in Z axis',
         _y_axis_title='Offset in XY axis',
+        _annotations_array=_annotations_array,
         _color_scale=sns.color_palette('BrBG').as_hex(),
+        _zmin=0,
+        _zmax=1
     )
-
-    # _fig = heatmap.create_plot(
-    #     _x_labels=VALUES_BY_CELL_DIAMETER,
-    #     _y_labels=VALUES_BY_CELL_DIAMETER,
-    #     _z_array=_z_array,
-    #     _x_axis_title='Offset in Z axis',
-    #     _y_axis_title='Offset in XY axis',
-    #     _color_scale=sns.color_palette('BrBG').as_hex(),
-    #     _zmin=0,
-    #     _zmax=1
-    # )
 
     save.to_html(
         _fig=_fig,

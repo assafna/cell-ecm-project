@@ -184,25 +184,51 @@ def roi_fibers_density_by_time(_experiment, _series_id, _group, _length_x, _leng
         return _fibers_densities
 
 
-def roi_fibers_density_by_time_pairs(_experiment, _series_id, _group, _length_x, _length_y, _length_z, _offset_x,
-                                     _offset_y, _offset_z, _direction, _time_points=sys.maxsize, _print=False, _save=True,
-                                     _out_of_borders=True):
+def roi_fibers_density_by_time_pairs(_arguments):
     # stop if needed
     if os.path.isfile(os.path.join(paths.EXPERIMENTS, 'stop.txt')):
         return
 
-    return {
-        'left_cell': roi_fibers_density_by_time(_experiment, _series_id, _group, _length_x, _length_y, _length_z,
-                                                _offset_x, _offset_y, _offset_z, 'left_cell', _direction, _time_points,
-                                                _print, _save, _out_of_borders),
-        'right_cell': roi_fibers_density_by_time(_experiment, _series_id, _group, _length_x, _length_y, _length_z,
-                                                 _offset_x, _offset_y, _offset_z, 'right_cell', _direction,
-                                                 _time_points, _print, _save, _out_of_borders),
+    return _arguments, {
+        'left_cell': roi_fibers_density_by_time(
+            _arguments['experiment'],
+            _arguments['series_id'],
+            _arguments['group'],
+            _arguments['length_x'],
+            _arguments['length_y'],
+            _arguments['length_z'],
+            _arguments['offset_x'],
+            _arguments['offset_y'],
+            _arguments['offset_z'],
+            'left_cell',
+            _arguments['direction'],
+            _arguments['time_points'] if 'time_points' in _arguments else sys.maxsize,
+            _arguments['print'] if 'print' in _arguments else False,
+            _arguments['save'] if 'save' in _arguments else True,
+            _arguments['out_of_borders'] if 'out_of_borders' in _arguments else True
+        ),
+        'right_cell': roi_fibers_density_by_time(
+            _arguments['experiment'],
+            _arguments['series_id'],
+            _arguments['group'],
+            _arguments['length_x'],
+            _arguments['length_y'],
+            _arguments['length_z'],
+            _arguments['offset_x'],
+            _arguments['offset_y'],
+            _arguments['offset_z'],
+            'right_cell',
+            _arguments['direction'],
+            _arguments['time_points'] if 'time_points' in _arguments else sys.maxsize,
+            _arguments['print'] if 'print' in _arguments else False,
+            _arguments['save'] if 'save' in _arguments else True,
+            _arguments['out_of_borders'] if 'out_of_borders' in _arguments else True
+        )
     }
 
 
 def minimum_time_points(_experiments_tuples):
-    _minimum_time_points = 10000
+    _minimum_time_points = sys.maxsize
     for _tuple in _experiments_tuples:
         _experiment, _series_id, _group = _tuple
         _group_properties = load.group_properties(_experiment, _series_id, _group)

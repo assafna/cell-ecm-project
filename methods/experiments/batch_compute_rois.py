@@ -1,3 +1,4 @@
+import sys
 from itertools import product
 from multiprocessing.pool import Pool
 
@@ -5,18 +6,28 @@ import numpy as np
 
 from fibers_density.experiments.master_vs_slave_heatmap import VALUES_BY_CELL_DIAMETER
 from libs.config_lib import CPUS_TO_USE
-from libs.experiments import load, compute, save
+from libs.experiments import load, compute, save, filtering
 from libs.experiments.config import AVERAGE_CELL_DIAMETER_IN_MICRONS, ROI_START_BY_AVERAGE_CELL_DIAMETER
 
-EXPERIMENTS = ['Single_Cell_Ortal']
-DIRECTIONS = ['right', 'left']
-OFFSETS_X = np.arange(start=0, stop=9.1, step=0.1)
-OFFSETS_Y = [0]
-OFFSETS_Z = [0]
+# EXPERIMENTS = ['Single_Cell_Ortal']
+EXPERIMENTS = ['SN16']
+REAL_CELLS = True
+STATIC = False
+BAND = True
+# DIRECTIONS = ['right', 'left']
+DIRECTIONS = ['inside']
+OFFSETS_X = [0]
+OFFSETS_Y = VALUES_BY_CELL_DIAMETER
+OFFSETS_Z = VALUES_BY_CELL_DIAMETER
 ROI_LENGTHS = [1]
 ROI_HEIGHTS = [1]
 ROI_WIDTHS = [1]
-CELLS_IDS = ['cell']
+CELLS_DISTANCES = [6, 7, 8, 9]
+# CELLS_IDS = ['cell']
+CELLS_IDS = ['left_cell', 'right_cell']
+TIME_POINTS_START = 0
+TIME_POINTS_END = sys.maxsize - 1
+# TIME_POINTS_END = 15
 
 
 def main(_experiment, _series_id, _group, _group_properties, _time_point):
@@ -65,10 +76,16 @@ def main(_experiment, _series_id, _group, _group_properties, _time_point):
 
 if __name__ == '__main__':
     _arguments = []
-    for _tuple in load.experiments_groups_as_tuples(EXPERIMENTS):
+    _experiments = load.experiments_groups_as_tuples(EXPERIMENTS)
+    _experiments = filtering.by_distances(_experiments, CELLS_DISTANCES)
+    _experiments = filtering.by_real_cells(_experiments, _real_cells=REAL_CELLS)
+    _experiments = filtering.by_static_cells(_experiments, _static=STATIC)
+    if BAND:
+        _experiments = filtering.by_band(_experiments)
+    for _tuple in _experiments:
         _experiment, _series_id, _group = _tuple
         _group_properties = load.group_properties(_experiment, _series_id, _group)
-        for _time_point in range(len(_group_properties['time_points'])):
+        for _time_point in range(len(_group_properties['time_points']))[TIME_POINTS_START:TIME_POINTS_END + 1]:
             _arguments.append((_experiment, _series_id, _group, _group_properties, _time_point))
     _p = Pool(CPUS_TO_USE)
     _answers = _p.starmap(main, _arguments)

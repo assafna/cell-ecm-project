@@ -7,7 +7,8 @@ from PIL import Image
 from libs.config_lib import CPUS_TO_USE
 from libs.experiments import load, paths, filtering, config
 from libs.experiments.compute import roi_by_microns
-from libs.experiments.config import ROI_LENGTH, ROI_HEIGHT, ROI_WIDTH
+from libs.experiments.config import ROI_LENGTH, ROI_HEIGHT, ROI_WIDTH, ROI_START_BY_AVERAGE_CELL_DIAMETER, \
+    AVERAGE_CELL_DIAMETER_IN_MICRONS
 
 OFFSET_X = 0
 OFFSET_Y = 0
@@ -16,10 +17,11 @@ DIRECTION = 'inside'
 
 
 def get_roi(_experiment, _series_id, _group_properties, _time_point, _cell_id, _direction):
-    _cell_diameter_in_microns = load.mean_distance_to_surface_in_microns(
-        _experiment=_experiment,
-        _series_id=_series_id,
-        _cell_id=_group_properties['cells_ids'][_cell_id]) * 2
+    if ROI_START_BY_AVERAGE_CELL_DIAMETER:
+        _cell_diameter_in_microns = AVERAGE_CELL_DIAMETER_IN_MICRONS
+    else:
+        _cell_diameter_in_microns = load.mean_distance_to_surface_in_microns(
+            _experiment, _series_id, _group_properties['cells_ids'][_cell_id]) * 2
     return roi_by_microns(
         _resolution_x=_group_properties['time_points'][_time_point]['resolutions']['x'],
         _resolution_y=_group_properties['time_points'][_time_point]['resolutions']['y'],
@@ -65,7 +67,7 @@ def draw_borders(_image, _roi):
 
 def process_group(_experiment, _series_id, _group, _mark_cells=True, _draw_borders=True):
     _group_properties = load.group_properties(_experiment, _series_id, _group)
-    _group_path = paths.images(_experiment + ' - No Round + Smooth', 'Series ' + str(_series_id), _group)
+    _group_path = paths.images(_experiment + ' - No Round - New Window', 'Series ' + str(_series_id), _group)
     os.makedirs(_group_path, exist_ok=True)
     for _time_point in range(0, len(_group_properties['time_points']), 1):
         print(_experiment, _series_id, _group, _time_point, sep='\t')
@@ -119,4 +121,4 @@ def process_all_experiments():
 if __name__ == '__main__':
     # process_all_experiments()
     # process_experiments(['SN44'])
-    process_group('SN16', 1, 'cells_0_2')
+    process_group('SN16', 1, 'cells_2_3')

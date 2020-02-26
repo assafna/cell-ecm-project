@@ -14,15 +14,25 @@ def main():
     _roi_width = 1
     _offset_x = 0
     _offset_y = 0
-    _offset_z_ = 0
+    _offset_z = 0
     _direction = 'inside'
     _start_time_point = 0
     _end_time_point = 500
     _derivative = 0
-    _fibers_densities_real = compute.roi_fibers_density_by_time_pairs(
-        _experiment, _series_id, _group_real, _roi_length, _roi_height, _roi_width,
-        _offset_x, _offset_y, _offset_z_, _direction, _end_time_point
-    )
+    _arguments = {
+        'experiment': _experiment,
+        'series_id': _series_id,
+        'group': _group_real,
+        'length_x': _roi_length,
+        'length_y': _roi_height,
+        'length_z': _roi_width,
+        'offset_x': _offset_x,
+        'offset_y': _offset_y,
+        'offset_z': _offset_z,
+        'direction': _direction,
+        'time_points': _end_time_point
+    }
+    _fibers_densities_real = compute.roi_fibers_density_by_time_pairs(_arguments)
     # _fibers_densities_fake, _out_of_boundaries = compute.roi_fibers_density_by_time_pairs(
     #     _experiment, _series_id, _group_fake, _roi_length, _roi_height, _roi_width,
     #     _offset_x, _offset_y, _offset_z_, _direction, _end_time_point

@@ -20,19 +20,21 @@ DERIVATIVE = 2
 
 
 def process_group(_experiment, _series_id, _group):
-    _fibers_densities = compute.roi_fibers_density_by_time_pairs(
-        _experiment=_experiment,
-        _series_id=_series_id,
-        _group=_group,
-        _length_x=ROI_LENGTH,
-        _length_y=ROI_HEIGHT,
-        _length_z=ROI_WIDTH,
-        _offset_x=OFFSET_X,
-        _offset_y=OFFSET_Y,
-        _offset_z=OFFSET_Z,
-        _direction=DIRECTION,
-        _time_points=TIME_POINTS
-    )
+    _arguments = {
+        'experiment': _experiment,
+        'series_id': _series_id,
+        'group': _group,
+        'length_x': ROI_LENGTH,
+        'length_y': ROI_HEIGHT,
+        'length_z': ROI_WIDTH,
+        'offset_x': OFFSET_X,
+        'offset_y': OFFSET_Y,
+        'offset_z': OFFSET_Z,
+        'direction': DIRECTION,
+        'time_points': TIME_POINTS
+    }
+
+    _fibers_densities = compute.roi_fibers_density_by_time_pairs(_arguments)
 
     # remove blacklist
     _fibers_densities = {
