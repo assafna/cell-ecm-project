@@ -113,38 +113,43 @@ def roi_fibers_density(_experiment, _series_id, _group, _time_point, _roi, _time
     return np.mean(_roi_pixels[_non_zero_mask]), _out_of_boundaries
 
 
-def roi_fibers_density_time_point(_experiment, _series_id, _group, _length_x, _length_y, _length_z, _offset_x,
-                                  _offset_y, _offset_z, _cell_id, _direction, _time_point, _group_properties=None,
-                                  _print=False, _save=True):
-    _group_properties = _group_properties if _group_properties is not None else load.group_properties(_experiment,
-                                                                                                      _series_id,
-                                                                                                      _group)
-    _time_point_properties = _group_properties['time_points'][_time_point]
-    _time_point_fibers_densities = load.fibers_densities(_experiment, _series_id, _group, _time_point)
+def roi_fibers_density_time_point(_arguments):
+    # stop if needed
+    if os.path.isfile(os.path.join(paths.EXPERIMENTS, 'stop.txt')):
+        return
+
+    if 'group_properties' not in _arguments:
+        _arguments['group_properties'] = \
+            load.group_properties(_arguments['experiment'], _arguments['series_id'], _arguments['group'])
+
+    _time_point_properties = _arguments['group_properties']['time_points'][_arguments['time_point']]
+    _time_point_fibers_densities = load.fibers_densities(
+        _arguments['experiment'], _arguments['series_id'], _arguments['group'], _arguments['time_point'])
     if ROI_START_BY_AVERAGE_CELL_DIAMETER:
         _cell_diameter_in_microns = AVERAGE_CELL_DIAMETER_IN_MICRONS
     else:
         _cell_diameter_in_microns = load.mean_distance_to_surface_in_microns(
-            _experiment=_experiment,
-            _series_id=_series_id,
-            _cell_id=_group_properties['cells_ids'][_cell_id]) * 2 if _cell_id != 'cell' else \
-            _group_properties['cell_id'] * 2
+            _experiment=_arguments['experiment'],
+            _series_id=_arguments['series_id'],
+            _cell_id=_arguments['group_properties']['cells_ids'][_arguments['cell_id']]) * 2 \
+            if _arguments['cell_id'] != 'cell' else _arguments['group_properties']['cell_id'] * 2
     _time_point_roi = roi_by_microns(
-        _resolution_x=_group_properties['time_points'][_time_point]['resolutions']['x'],
-        _resolution_y=_group_properties['time_points'][_time_point]['resolutions']['y'],
-        _resolution_z=_group_properties['time_points'][_time_point]['resolutions']['z'],
-        _length_x=_length_x,
-        _length_y=_length_y,
-        _length_z=_length_z,
-        _offset_x=_offset_x,
-        _offset_y=_offset_y,
-        _offset_z=_offset_z,
-        _cell_coordinates=_group_properties['time_points'][_time_point][_cell_id]['coordinates'],
+        _resolution_x=_arguments['group_properties']['time_points'][_arguments['time_point']]['resolutions']['x'],
+        _resolution_y=_arguments['group_properties']['time_points'][_arguments['time_point']]['resolutions']['y'],
+        _resolution_z=_arguments['group_properties']['time_points'][_arguments['time_point']]['resolutions']['z'],
+        _length_x=_arguments['length_x'],
+        _length_y=_arguments['length_y'],
+        _length_z=_arguments['length_z'],
+        _offset_x=_arguments['offset_x'],
+        _offset_y=_arguments['offset_y'],
+        _offset_z=_arguments['offset_z'],
+        _cell_coordinates=
+        _arguments['group_properties']['time_points'][_arguments['time_point']][_arguments['cell_id']]['coordinates'],
         _cell_diameter_in_microns=_cell_diameter_in_microns,
         _direction='right' if
-        (_cell_id, _direction) == ('left_cell', 'inside') or
-        (_cell_id, _direction) == ('right_cell', 'outside') or
-        (_cell_id, _direction) == ('cell', 'right') else 'left'
+        (_arguments['cell_id'], _arguments['direction']) == ('left_cell', 'inside') or
+        (_arguments['cell_id'], _arguments['direction']) == ('right_cell', 'outside') or
+        (_arguments['cell_id'], _arguments['direction']) == ('cell', 'right') else 'left'
     )
     if _time_point_roi in _time_point_fibers_densities:
         if NO_RETURN:
@@ -152,14 +157,16 @@ def roi_fibers_density_time_point(_experiment, _series_id, _group, _length_x, _l
         else:
             return _time_point_fibers_densities[_time_point_roi]
     else:
-        if _print:
-            print('Computing:', _experiment, _series_id, _group, _cell_id, 'roi', _time_point_roi, 'direction',
-                  _direction, 'tp', _time_point, sep='\t')
-        _roi_fibers_density = roi_fibers_density(_experiment, _series_id, _group, _time_point,
-                                                 _time_point_roi)
-        if _save:
+        if 'print' in _arguments and _arguments['print']:
+            print('Computing:', _arguments['experiment'], _arguments['series_id'], _arguments['group'],
+                  _arguments['cell_id'], 'roi', _time_point_roi, 'direction', _arguments['direction'], 'tp',
+                  _arguments['time_point'], sep='\t')
+        _roi_fibers_density = roi_fibers_density(_arguments['experiment'], _arguments['series_id'], _arguments['group'],
+                                                 _arguments['time_point'], _time_point_roi)
+        if 'save' in _arguments and _arguments['save']:
             _time_point_fibers_densities[_time_point_roi] = _roi_fibers_density
-            save.fibers_densities(_experiment, _series_id, _group, _time_point, _time_point_fibers_densities)
+            save.fibers_densities(_arguments['experiment'], _arguments['series_id'], _arguments['group'],
+                                  _arguments['time_point'], _time_point_fibers_densities)
 
         if NO_RETURN:
             return None
@@ -172,10 +179,23 @@ def roi_fibers_density_by_time(_experiment, _series_id, _group, _length_x, _leng
                                _out_of_borders=True):
     _group_properties = load.group_properties(_experiment, _series_id, _group)
     _fibers_densities = [
-        roi_fibers_density_time_point(
-            _experiment, _series_id, _group, _length_x, _length_y, _length_z, _offset_x, _offset_y, _offset_z, _cell_id,
-            _direction, _time_point, _group_properties, _print, _save
-        ) for _time_point in range(min(_time_points, len(_group_properties['time_points'])))
+        roi_fibers_density_time_point({
+            'experiment': _experiment,
+            'series_id': _series_id,
+            'group': _group,
+            'length_x': _length_x,
+            'length_y': _length_y,
+            'length_z': _length_z,
+            'offset_x': _offset_x,
+            'offset_y': _offset_y,
+            'offset_z': _offset_z,
+            'cell_id': _cell_id,
+            'direction': _direction,
+            'time_point': _time_point,
+            'group_properties': _group_properties,
+            'print': _print,
+            'save': _save
+        }) for _time_point in range(min(_time_points, len(_group_properties['time_points'])))
     ]
 
     if not _out_of_borders:
