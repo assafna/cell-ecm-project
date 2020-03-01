@@ -66,9 +66,10 @@ def main():
     print('Single Cell')
     _experiments = load.experiments_groups_as_tuples(config.SINGLE_CELL)
     _experiments = filtering.by_time_points_amount(_experiments, TIME_POINT)
-    _experiments = organize.by_single_cell_id(_experiments)
 
     _fibers_densities = compute_fibers_densities(_experiments, 'cell', ['left', 'right'])
+
+    _experiments = organize.by_single_cell_id(_experiments)
 
     _single_cell_fibers_densities = [[] for _i in range(len(OFFSETS_X))]
     for _tuple in _experiments:
