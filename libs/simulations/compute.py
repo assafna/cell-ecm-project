@@ -97,7 +97,8 @@ def rois_fibers_densities(_simulation, _time_point, _rois):
     return _rois_sums
 
 
-def roi_fibers_density_time_point(_simulation, _length_x, _length_y, _offset_x, _offset_y, _cell_id, _direction, _time_point, _simulation_properties=None):
+def roi_fibers_density_time_point(_simulation, _length_x, _length_y, _offset_x, _offset_y, _cell_id, _direction,
+                                  _time_point, _simulation_properties=None, _print=False):
     _simulation_properties = _simulation_properties if _simulation_properties is not None else properties(_simulation)
     _time_point_properties = _simulation_properties['time_points'][_time_point]
     _time_point_fibers_densities = fibers_densities(_simulation, _time_point)
@@ -119,7 +120,9 @@ def roi_fibers_density_time_point(_simulation, _length_x, _length_y, _offset_x, 
     if _time_point_roi in _time_point_fibers_densities:
         return _time_point_fibers_densities[_time_point_roi]
     else:
-        print('Computing:', _simulation, _cell_id, 'roi', _time_point_roi, 'direction', _direction, 'tp', _time_point)
+        if _print:
+            print('Computing:', _simulation, _cell_id, 'roi', _time_point_roi, 'direction', _direction, 'tp',
+                  _time_point)
         _roi_fibers_density = roi_fibers_density(_simulation, _time_point, _time_point_roi)
         _time_point_fibers_densities[_time_point_roi] = _roi_fibers_density
         save.fibers_densities(_simulation, _time_point, _time_point_fibers_densities)
