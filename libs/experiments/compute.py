@@ -155,7 +155,7 @@ def roi_fibers_density_time_point(_arguments):
         if NO_RETURN:
             return None
         else:
-            return _time_point_fibers_densities[_time_point_roi]
+            return _arguments, _time_point_fibers_densities[_time_point_roi]
     else:
         if 'print' in _arguments and _arguments['print']:
             print('Computing:', _arguments['experiment'], _arguments['series_id'], _arguments['group'],
@@ -171,7 +171,7 @@ def roi_fibers_density_time_point(_arguments):
         if NO_RETURN:
             return None
         else:
-            return _roi_fibers_density
+            return _arguments, _roi_fibers_density
 
 
 def roi_fibers_density_by_time(_experiment, _series_id, _group, _length_x, _length_y, _length_z, _offset_x, _offset_y,
@@ -195,7 +195,7 @@ def roi_fibers_density_by_time(_experiment, _series_id, _group, _length_x, _leng
             'group_properties': _group_properties,
             'print': _print,
             'save': _save
-        }) for _time_point in range(min(_time_points, len(_group_properties['time_points'])))
+        })[1] for _time_point in range(min(_time_points, len(_group_properties['time_points'])))
     ]
 
     if not _out_of_borders:
