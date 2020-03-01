@@ -23,16 +23,16 @@ def run(_simulations, _cell_id, _directions):
         for _offset_x in np.arange(start=0, stop=OFFSET_X_END, step=OFFSET_X_STEP):
             _direction_fibers_densities = []
             for _direction in _directions:
-                _fibers_density = compute.roi_fibers_density_time_point(
-                    _simulation=_simulation,
-                    _length_x=ROI_HEIGHT if _direction in ['up', 'down'] else ROI_WIDTH,
-                    _length_y=ROI_WIDTH if _direction in ['up', 'down'] else ROI_HEIGHT,
-                    _offset_x=OFFSET_Y if _direction in ['up', 'down'] else _offset_x,
-                    _offset_y=_offset_x if _direction in ['up', 'down'] else OFFSET_Y,
-                    _cell_id=_cell_id,
-                    _direction=_direction,
-                    _time_point=TIME_POINT
-                )
+                _fibers_density = compute.roi_fibers_density_time_point({
+                    'simulation': _simulation,
+                    'length_x': ROI_HEIGHT if _direction in ['up', 'down'] else ROI_WIDTH,
+                    'length_y': ROI_WIDTH if _direction in ['up', 'down'] else ROI_HEIGHT,
+                    'offset_x': OFFSET_Y if _direction in ['up', 'down'] else _offset_x,
+                    'offset_y': _offset_x if _direction in ['up', 'down'] else OFFSET_Y,
+                    'cell_id': _cell_id,
+                    'direction': _direction,
+                    'time_point': TIME_POINT
+                })[1]
                 _normalized_fibers_density = compute_lib.z_score(
                     _fibers_density,
                     _normalization['average'],

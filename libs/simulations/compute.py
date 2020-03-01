@@ -97,44 +97,53 @@ def rois_fibers_densities(_simulation, _time_point, _rois):
     return _rois_sums
 
 
-def roi_fibers_density_time_point(_simulation, _length_x, _length_y, _offset_x, _offset_y, _cell_id, _direction,
-                                  _time_point, _simulation_properties=None, _print=False):
-    _simulation_properties = _simulation_properties if _simulation_properties is not None else properties(_simulation)
-    _time_point_properties = _simulation_properties['time_points'][_time_point]
-    _time_point_fibers_densities = fibers_densities(_simulation, _time_point)
-    if _direction == 'inside':
-        _new_direction = 'right' if _cell_id == 'left_cell' else 'left'
-    elif _direction == 'outside':
-        _new_direction = 'left' if _cell_id == 'left_cell' else 'right'
+def roi_fibers_density_time_point(_arguments):
+    if 'properties' not in _arguments:
+        _arguments['properties'] = properties(_arguments['simulation'])
+    _time_point_properties = _arguments['properties']['time_points'][_arguments['time_point']]
+    _time_point_fibers_densities = fibers_densities(_arguments['simulation'], _arguments['time_point'])
+    if _arguments['direction'] == 'inside':
+        _new_direction = 'right' if _arguments['cell_id'] == 'left_cell' else 'left'
+    elif _arguments['direction'] == 'outside':
+        _new_direction = 'left' if _arguments['cell_id'] == 'left_cell' else 'right'
     else:
-        _new_direction = _direction
+        _new_direction = _arguments['direction']
     _time_point_roi = roi(
-        _length_x=_length_x * CELL_DIAMETER,
-        _length_y=_length_y * CELL_DIAMETER,
-        _offset_x=_offset_x * CELL_DIAMETER,
-        _offset_y=_offset_y * CELL_DIAMETER,
-        _cell_coordinates=_time_point_properties[_cell_id]['coordinates'],
-        _cell_diameter=_time_point_properties[_cell_id]['diameter'],
+        _length_x=_arguments['length_x'] * CELL_DIAMETER,
+        _length_y=_arguments['length_y'] * CELL_DIAMETER,
+        _offset_x=_arguments['offset_x'] * CELL_DIAMETER,
+        _offset_y=_arguments['offset_y'] * CELL_DIAMETER,
+        _cell_coordinates=_time_point_properties[_arguments['cell_id']]['coordinates'],
+        _cell_diameter=_time_point_properties[_arguments['cell_id']]['diameter'],
         _direction=_new_direction
     )
     if _time_point_roi in _time_point_fibers_densities:
-        return _time_point_fibers_densities[_time_point_roi]
+        return _arguments, _time_point_fibers_densities[_time_point_roi]
     else:
-        if _print:
-            print('Computing:', _simulation, _cell_id, 'roi', _time_point_roi, 'direction', _direction, 'tp',
-                  _time_point)
-        _roi_fibers_density = roi_fibers_density(_simulation, _time_point, _time_point_roi)
-        _time_point_fibers_densities[_time_point_roi] = _roi_fibers_density
-        save.fibers_densities(_simulation, _time_point, _time_point_fibers_densities)
-        return _roi_fibers_density
+        if 'print' in _arguments and _arguments['print']:
+            print('Computing:', _arguments['simulation'], _arguments['cell_id'], 'roi', _time_point_roi, 'direction', _arguments['direction'], 'tp',
+                  _arguments['time_point'])
+        _roi_fibers_density = roi_fibers_density(_arguments['simulation'], _arguments['time_point'], _time_point_roi)
+        if 'save' in _arguments and _arguments['save']:
+            _time_point_fibers_densities[_time_point_roi] = _roi_fibers_density
+            save.fibers_densities(_arguments['simulation'], _arguments['time_point'], _time_point_fibers_densities)
+        return _arguments, _roi_fibers_density
 
 
 def roi_fibers_density_by_time(_simulation, _length_x, _length_y, _offset_x, _offset_y, _cell_id, _direction, _time_points):
     _simulation_properties = properties(_simulation)
     return [
-        roi_fibers_density_time_point(
-            _simulation, _length_x, _length_y, _offset_x, _offset_y, _cell_id, _direction, _time_point, _simulation_properties
-        ) for _time_point in range(min(_time_points, len(_simulation_properties['time_points'])))
+        roi_fibers_density_time_point({
+            'simulation': _simulation,
+            'length_x': _length_x,
+            'length_y': _length_y,
+            'offset_x': _offset_x,
+            'offset_y': _offset_y,
+            'cell_id': _cell_id,
+            'direction': _direction,
+            'time_point': _time_point,
+            'properties': _simulation_properties
+        })[1] for _time_point in range(min(_time_points, len(_simulation_properties['time_points'])))
     ]
 
 

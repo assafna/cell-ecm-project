@@ -32,61 +32,61 @@ def main():
         _offset_index = 0
         _normalization = load.normalization(_simulation)
         for _offset_x in np.arange(start=OFFSET_X_START, stop=OFFSET_X_END, step=OFFSET_X_STEP):
-            _fibers_density_right = compute.roi_fibers_density_time_point(
-                _simulation=_simulation,
-                _length_x=ROI_WIDTH,
-                _length_y=ROI_HEIGHT,
-                _offset_x=_offset_x,
-                _offset_y=OFFSET_Y,
-                _cell_id='cell',
-                _direction='right',
-                _time_point=TIME_POINT
-            )
+            _fibers_density_right = compute.roi_fibers_density_time_point({
+                'simulation': _simulation,
+                'length_x': ROI_WIDTH,
+                'length_y': ROI_HEIGHT,
+                'offset_x': _offset_x,
+                'offset_y': OFFSET_Y,
+                'cell_id': 'cell',
+                'direction': 'right',
+                'time_point': TIME_POINT
+            })[1]
             _normalized_fibers_density_right = compute_lib.z_score(
                 _fibers_density_right,
                 _normalization['average'],
                 _normalization['std']
             )
-            _fibers_density_left = compute.roi_fibers_density_time_point(
-                _simulation=_simulation,
-                _length_x=ROI_WIDTH,
-                _length_y=ROI_HEIGHT,
-                _offset_x=_offset_x,
-                _offset_y=OFFSET_Y,
-                _cell_id='cell',
-                _direction='left',
-                _time_point=TIME_POINT
-            )
+            _fibers_density_left = compute.roi_fibers_density_time_point({
+                'simulation': _simulation,
+                'length_x': ROI_WIDTH,
+                'length_y': ROI_HEIGHT,
+                'offset_x': _offset_x,
+                'offset_y': OFFSET_Y,
+                'cell_id': 'cell',
+                'direction': 'left',
+                'time_point': TIME_POINT
+            })[1]
             _normalized_fibers_density_left = compute_lib.z_score(
                 _fibers_density_left,
                 _normalization['average'],
                 _normalization['std']
             )
-            _fibers_density_up = compute.roi_fibers_density_time_point(
-                _simulation=_simulation,
-                _length_x=ROI_HEIGHT,
-                _length_y=ROI_WIDTH,
-                _offset_x=OFFSET_Y,
-                _offset_y=_offset_x,
-                _cell_id='cell',
-                _direction='up',
-                _time_point=TIME_POINT
-            )
+            _fibers_density_up = compute.roi_fibers_density_time_point({
+                'simulation': _simulation,
+                'length_x': ROI_HEIGHT,
+                'length_y': ROI_WIDTH,
+                'offset_x': OFFSET_Y,
+                'offset_y': _offset_x,
+                'cell_id': 'cell',
+                'direction': 'up',
+                'time_point': TIME_POINT
+            })[1]
             _normalized_fibers_density_up = compute_lib.z_score(
                 _fibers_density_up,
                 _normalization['average'],
                 _normalization['std']
             )
-            _fibers_density_down = compute.roi_fibers_density_time_point(
-                _simulation=_simulation,
-                _length_x=ROI_HEIGHT,
-                _length_y=ROI_WIDTH,
-                _offset_x=OFFSET_Y,
-                _offset_y=_offset_x,
-                _cell_id='cell',
-                _direction='down',
-                _time_point=TIME_POINT
-            )
+            _fibers_density_down = compute.roi_fibers_density_time_point({
+                'simulation': _simulation,
+                'length_x': ROI_HEIGHT,
+                'length_y': ROI_WIDTH,
+                'offset_x': OFFSET_Y,
+                'offset_y': _offset_x,
+                'cell_id': 'cell',
+                'direction': 'down',
+                'time_point': TIME_POINT
+            })[1]
             _normalized_fibers_density_down = compute_lib.z_score(
                 _fibers_density_down,
                 _normalization['average'],

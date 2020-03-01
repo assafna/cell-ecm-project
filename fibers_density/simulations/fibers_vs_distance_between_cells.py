@@ -32,16 +32,16 @@ def main():
         _offset_index = 0
         _normalization = load.normalization(_simulation)
         for _offset_x in np.arange(start=0, stop=OFFSET_X_END, step=OFFSET_X_STEP):
-            _fibers_density = compute.roi_fibers_density_time_point(
-                _simulation=_simulation,
-                _length_x=ROI_WIDTH,
-                _length_y=ROI_HEIGHT,
-                _offset_x=_offset_x,
-                _offset_y=OFFSET_Y,
-                _cell_id='left_cell',
-                _direction='right',
-                _time_point=TIME_POINT
-            )
+            _fibers_density = compute.roi_fibers_density_time_point({
+                'simulation': _simulation,
+                'length_x': ROI_WIDTH,
+                'length_y': ROI_HEIGHT,
+                'offset_x': _offset_x,
+                'offset_y': OFFSET_Y,
+                'cell_id': 'left_cell',
+                'direction': 'right',
+                'time_point': TIME_POINT
+            })[1]
             _normalized_fibers_density = compute_lib.z_score(
                 _fibers_density,
                 _normalization['average'],
