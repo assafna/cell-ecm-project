@@ -18,10 +18,13 @@ from plotting import scatter, save, heatmap, contour
 
 EXPERIMENTS = ['SN16']
 EXPERIMENTS_STR = '_'.join(EXPERIMENTS)
-REAL_CELLS = True
+REAL_CELLS = False
 STATIC = False
 BAND = True
-VALUES_BY_CELL_DIAMETER = [round(_value, 10) for _value in np.arange(start=0, stop=2.1, step=0.1) - 1]
+DOMAIN_ABSOLUTE_VALUE = 10
+VALUES_BY_CELL_DIAMETER = [
+    round(_value, 10) for _value in
+    np.arange(start=0, stop=DOMAIN_ABSOLUTE_VALUE + 0.1, step=0.1) - DOMAIN_ABSOLUTE_VALUE / 2]
 OFFSET_X = 0
 DERIVATIVE = 2
 CELLS_DISTANCES = [6, 7, 8, 9]
