@@ -5,6 +5,7 @@ from multiprocessing.pool import Pool
 import numpy as np
 from tqdm import tqdm
 
+from fibers_density.fibers_vs_distance_pairs import EXPERIMENTS_OFFSETS_X, SIMULATIONS_OFFSETS_X
 from libs import compute_lib, paths_lib
 from libs.config_lib import CPUS_TO_USE
 from libs.experiments import compute as experiments_compute
@@ -19,7 +20,7 @@ from libs.simulations import load as simulations_load
 from plotting import scatter, save, edit
 
 OFFSET_X_STEP = 0.1
-OFFSET_X_END = 7
+OFFSET_X_END = max(EXPERIMENTS_OFFSETS_X[-1], SIMULATIONS_OFFSETS_X[-1])
 OFFSETS_X = np.arange(start=0, stop=OFFSET_X_END + OFFSET_X_STEP, step=OFFSET_X_STEP)
 OFFSET_Y = 0
 

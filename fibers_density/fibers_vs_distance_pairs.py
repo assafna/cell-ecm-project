@@ -6,17 +6,14 @@ from tqdm import tqdm
 
 from libs import compute_lib, paths_lib
 from libs.config_lib import CPUS_TO_USE
-from libs.experiments import load as experiments_load
 from libs.experiments import compute as experiments_compute
 from libs.experiments import config as experiments_config
 from libs.experiments import filtering as experiments_filtering
-
-from libs.simulations import load as simulations_load
+from libs.experiments import load as experiments_load
 from libs.simulations import compute as simulations_compute
 from libs.simulations import config as simulations_config
 from libs.simulations import filtering as simulations_filtering
-
-from libs.simulations.config import CELL_DIAMETER
+from libs.simulations import load as simulations_load
 from plotting import scatter, save, edit
 
 CELLS_DISTANCE = 7
