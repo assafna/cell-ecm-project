@@ -1,3 +1,4 @@
+import os
 import platform
 
 
@@ -16,3 +17,6 @@ def working_directory():
             return '/data/work/assafna/'
         else:
             return None
+
+
+PLOTS = os.path.join(working_directory(), 'Plots')
