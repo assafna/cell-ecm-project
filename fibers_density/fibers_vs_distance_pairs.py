@@ -17,7 +17,7 @@ from libs.simulations import config as simulations_config
 from libs.simulations import filtering as simulations_filtering
 
 from libs.simulations.config import CELL_DIAMETER
-from plotting import scatter, save
+from plotting import scatter, save, edit
 
 CELLS_DISTANCE = 7
 OFFSET_X_STEP = 0.1
@@ -180,6 +180,11 @@ def main():
         _dashes_array=['dash', 'solid'],
         _x_axis_title='Distance from Left Cell (cell size)',
         _y_axis_title='Fibers Density Z-score'
+    )
+
+    _fig = edit.update_y_axis(
+        _fig=_fig,
+        _range=[-1.5, 9]
     )
 
     save.to_html(
