@@ -108,10 +108,10 @@ def roi_fibers_density_time_point(_simulation, _length_x, _length_y, _offset_x, 
     else:
         _new_direction = _direction
     _time_point_roi = roi(
-        _length_x=_length_x,
-        _length_y=_length_y,
-        _offset_x=_offset_x,
-        _offset_y=_offset_y,
+        _length_x=_length_x * CELL_DIAMETER,
+        _length_y=_length_y * CELL_DIAMETER,
+        _offset_x=_offset_x * CELL_DIAMETER,
+        _offset_y=_offset_y * CELL_DIAMETER,
         _cell_coordinates=_time_point_properties[_cell_id]['coordinates'],
         _cell_diameter=_time_point_properties[_cell_id]['diameter'],
         _direction=_new_direction
