@@ -6,7 +6,8 @@ PAIRS = [
     'SN16',
     'SN18',
     'SN41',
-    'SN44'
+    'SN44',
+    'SN45'
 ]
 
 FIBERS_CHANNEL_INDEX = 0
