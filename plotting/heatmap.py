@@ -1,5 +1,4 @@
 import plotly.graph_objs as go
-import plotly.figure_factory as ff
 
 
 def create_plot(_x_labels, _y_labels, _z_array, _x_axis_title, _y_axis_title, _annotations_array=None,
