@@ -2,7 +2,7 @@ import numpy as np
 import plotly.graph_objs as go
 
 
-def create_error_bars_plot(_x_array, _y_array, _names_array, _modes_array, _dashes_array, _x_axis_title, _y_axis_title, _title):
+def create_error_bars_plot(_x_array, _y_array, _names_array, _modes_array, _dashes_array, _x_axis_title, _y_axis_title, _title=None):
     _fig = go.Figure()
 
     for _x, _y, _name, _mode, _dash in zip(_x_array, _y_array, _names_array, _modes_array, _dashes_array):
