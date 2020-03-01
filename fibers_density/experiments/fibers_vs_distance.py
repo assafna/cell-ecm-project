@@ -4,6 +4,7 @@ from itertools import product
 
 import numpy as np
 from multiprocess.pool import Pool
+from tqdm import tqdm
 
 from libs import compute_lib
 from libs.config_lib import USE_MULTIPROCESSING, CPUS_TO_USE
@@ -26,10 +27,38 @@ OFFSET_Z = 0
 OUT_OF_BOUNDARIES = False
 
 
-def compute_offsets(_experiment, _series_id, _group, _cell_id, _directions):
-    for _offset_x, _direction in product(OFFSETS_X, _directions):
-        compute.roi_fibers_density_time_point(_experiment, _series_id, _group, ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT,
-                                              _offset_x, OFFSET_Y, OFFSET_Z, _cell_id, _direction, TIME_POINT - 1)
+def compute_fibers_densities(_experiments, _cell_id, _directions):
+    _arguments = []
+    for _tuple in _experiments:
+        _experiment, _series_id, _group = _tuple
+        for _offset_x, _direction in product(OFFSETS_X, _directions):
+            _arguments.append({
+                'experiment': _experiment,
+                'series_id': _series_id,
+                'group': _group,
+                'length_x': ROI_LENGTH,
+                'length_y': ROI_HEIGHT,
+                'length_z': ROI_WIDTH,
+                'offset_x': _offset_x,
+                'offset_y': OFFSET_Y,
+                'offset_z': OFFSET_Z,
+                'cell_id': _cell_id,
+                'direction': _direction,
+                'time_point': TIME_POINT - 1,
+                'save': False
+            })
+
+    _fibers_densities = {}
+    with Pool(CPUS_TO_USE) as _p:
+        for _keys, _value in tqdm(
+                _p.imap_unordered(compute.roi_fibers_density_time_point, _arguments), total=len(_arguments)):
+            _fibers_densities[
+                (_keys['experiment'], _keys['series_id'], _keys['group'], _keys['offset_x'], _keys['direction'])
+            ] = _value
+        _p.close()
+        _p.join()
+
+    return _fibers_densities
 
 
 def main():
@@ -39,18 +68,7 @@ def main():
     _experiments = filtering.by_time_points_amount(_experiments, TIME_POINT)
     _experiments = organize.by_single_cell_id(_experiments)
 
-    # prepare data in mp
-    if USE_MULTIPROCESSING:
-        _arguments = []
-        for _tuple in _experiments:
-            _experiment, _series_id, _cell_id = _tuple
-            for _cell_tuple in _experiments[_tuple]:
-                _, _, _group = _cell_tuple
-                _arguments.append((_experiment, _series_id, _group, 'cell', ['left', 'right']))
-
-        _p = Pool(CPUS_TO_USE)
-        _p.starmap(compute_offsets, _arguments)
-        _p.close()
+    _fibers_densities = compute_fibers_densities(_experiments, 'cell', ['left', 'right'])
 
     _single_cell_fibers_densities = [[] for _i in range(len(OFFSETS_X))]
     for _tuple in _experiments:
@@ -63,10 +81,7 @@ def main():
             for _cell_tuple in _experiments[_tuple]:
                 _, _, _group = _cell_tuple
                 for _direction in ['left', 'right']:
-                    _fibers_density = compute.roi_fibers_density_time_point(_experiment, _series_id, _group, ROI_LENGTH,
-                                                                            ROI_WIDTH, ROI_HEIGHT, _offset_x, OFFSET_Y,
-                                                                            OFFSET_Z, 'cell', _direction, TIME_POINT - 1
-                                                                            )
+                    _fibers_density = _fibers_densities[(_experiment, _series_id, _group, _offset_x, _direction)]
                     if not OUT_OF_BOUNDARIES and _fibers_density[1]:
                         continue
 
@@ -91,16 +106,7 @@ def main():
     if PAIRS_BAND:
         _experiments = filtering.by_band(_experiments)
 
-    # prepare data in mp
-    if USE_MULTIPROCESSING:
-        _arguments = []
-        for _tuple in _experiments:
-            _experiment, _series_id, _group = _tuple
-            _arguments.append((_experiment, _series_id, _group, 'left_cell', ['inside']))
-
-        _p = Pool(CPUS_TO_USE)
-        _p.starmap(compute_offsets, _arguments)
-        _p.close()
+    _fibers_densities = compute_fibers_densities(_experiments, 'left_cell', ['inside'])
 
     _pairs_fibers_densities = [[] for _i in range(len(OFFSETS_X))]
     for _tuple in _experiments:
@@ -121,10 +127,7 @@ def main():
         for _offset_x in OFFSETS_X:
             if _offset_x > _max_x_offset:
                 break
-            _fibers_density = compute.roi_fibers_density_time_point(_experiment, _series_id, _group, ROI_LENGTH,
-                                                                    ROI_WIDTH, ROI_HEIGHT, _offset_x, OFFSET_Y,
-                                                                    OFFSET_Z, 'left_cell', 'inside', TIME_POINT - 1
-                                                                    )
+            _fibers_density = _fibers_densities[(_experiment, _series_id, _group, _offset_x, 'inside')]
             if not OUT_OF_BOUNDARIES and _fibers_density[1]:
                 continue
 
