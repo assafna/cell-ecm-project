@@ -31,7 +31,8 @@ OFFSET_Z = 0
 OUT_OF_BOUNDARIES = False
 EXPERIMENTS_OFFSET_X_END = {
     5: 2.8,
-    7: 5.3
+    7: 5.3,
+    9: 6.5
 }
 EXPERIMENTS_OFFSETS_X = \
     np.arange(start=0, stop=EXPERIMENTS_OFFSET_X_END[CELLS_DISTANCE] + OFFSET_X_STEP, step=OFFSET_X_STEP)
@@ -77,8 +78,7 @@ def compute_experiments_fibers_densities(_experiments):
 
 def compute_simulations_fibers_densities(_simulations):
     _fibers_densities = list([None] * len(SIMULATIONS_OFFSETS_X))
-    for _simulation in _simulations:
-        print(_simulation)
+    for _simulation in tqdm(_simulations):
         _offset_index = 0
         _normalization = simulations_load.normalization(_simulation)
         for _offset_x in SIMULATIONS_OFFSETS_X:
@@ -109,6 +109,7 @@ def compute_simulations_fibers_densities(_simulations):
 
 def main():
     # experiments
+    print('Experiments')
     _experiments = experiments_load.experiments_groups_as_tuples(EXPERIMENTS)
     _experiments = experiments_filtering.by_time_points_amount(_experiments, EXPERIMENTS_TIME_POINT)
     _experiments = experiments_filtering.by_real_cells(_experiments)
@@ -122,7 +123,6 @@ def main():
     _experiments_fibers_densities = [[] for _i in range(len(EXPERIMENTS_OFFSETS_X))]
     for _tuple in _experiments:
         _experiment, _series_id, _group = _tuple
-        print('Experiment:', _experiment, 'Series ID:', _series_id, 'Group:', _group, sep='\t')
         _offset_index = 0
         _normalization = experiments_load.normalization_series_file_data(_experiment, 'Series ' + str(_series_id))
 
@@ -141,6 +141,7 @@ def main():
             _offset_index += 1
 
     # simulations
+    print('Simulations')
     _simulations = simulations_load.structured()
     _simulations = simulations_filtering.by_time_points_amount(_simulations, _time_points=SIMULATIONS_TIME_POINT)
     _simulations = simulations_filtering.by_categories(
@@ -157,7 +158,7 @@ def main():
 
     # plot
     _fig = scatter.create_error_bars_plot(
-        _x_array=[np.arange(start=0, stop=1000, step=OFFSET_X_STEP)] * 2,
+        _x_array=[EXPERIMENTS_OFFSETS_X, SIMULATIONS_OFFSETS_X],
         _y_array=[_experiments_fibers_densities, _simulations_fibers_densities],
         _names_array=['Experiments', 'Simulations'],
         _modes_array=['lines+markers'] * 2,
@@ -169,7 +170,7 @@ def main():
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths_lib.PLOTS, save.get_module_name()),
-        _filename='plot'
+        _filename='plot_cells_distance_' + str(CELLS_DISTANCE)
     )
 
 
