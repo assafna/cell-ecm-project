@@ -76,6 +76,10 @@ def main():
     _rois_dictionary, _rois_to_compute = compute.rois(_arguments, _keys=['experiment', 'series_id', 'group', 'cell_id'])
     _fibers_densities = compute.fibers_densities(_rois_to_compute)
 
+    _experiments_fibers_densities = {}
+    for _key in tqdm(_rois_dictionary):
+        _experiments_fibers_densities[_key] = [_fibers_densities[_tuple] for _tuple in _rois_dictionary[_key]]
+
     _master_correlations_array = []
     _slave_correlations_array = []
     for _master_index in tqdm(range(len(_experiments)), desc='Master Loop'):
@@ -83,11 +87,9 @@ def main():
         _master_experiment, _master_series, _master_group = _master_tuple
 
         _master_left_cell_fibers_densities = \
-            [_fibers_densities[_tuple] for _tuple in
-             _rois_dictionary[(_master_experiment, _master_series, _master_group, 'left_cell')]]
+            _experiments_fibers_densities[(_master_experiment, _master_series, _master_group, 'left_cell')]
         _master_right_cell_fibers_densities = \
-            [_fibers_densities[_tuple] for _tuple in
-             _rois_dictionary[(_master_experiment, _master_series, _master_group, 'right_cell')]]
+            _experiments_fibers_densities[(_master_experiment, _master_series, _master_group, 'right_cell')]
 
         _master_properties = load.group_properties(_master_experiment, _master_series, _master_group)
         _master_left_cell_fibers_densities = compute.remove_blacklist(
@@ -115,11 +117,10 @@ def main():
                 for _master_cell_id, _slave_cell_id in product(['left_cell', 'right_cell'],
                                                                ['left_cell', 'right_cell']):
                     _master_fibers_densities = \
-                        [_fibers_densities[_tuple] for _tuple in
-                         _rois_dictionary[(_master_experiment, _master_series, _master_group, _master_cell_id)]]
+                        _experiments_fibers_densities[(_master_experiment, _master_series, _master_group,
+                                                       _master_cell_id)]
                     _slave_fibers_densities = \
-                        [_fibers_densities[_tuple] for _tuple in
-                         _rois_dictionary[(_slave_experiment, _slave_series, _slave_group, _slave_cell_id)]]
+                        _experiments_fibers_densities[(_slave_experiment, _slave_series, _slave_group, _slave_cell_id)]
 
                     _slave_properties = load.group_properties(_slave_experiment, _slave_series, _slave_group)
                     _master_fibers_densities = compute.remove_blacklist(
