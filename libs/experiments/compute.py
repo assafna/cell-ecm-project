@@ -372,10 +372,10 @@ def fibers_densities(_tuples):
     for _key in _organized_tuples:
         _arguments.append((_key, _organized_tuples[_key]))
 
-    print('Computing fibers densities')
     _fibers_densities = {}
     with Pool(CPUS_TO_USE) as _p:
-        for _rois in tqdm(_p.imap_unordered(rois_fibers_densities, _arguments), total=len(_arguments)):
+        for _rois in tqdm(_p.imap_unordered(rois_fibers_densities, _arguments), total=len(_arguments),
+                          desc='Computing Fibers Densities'):
             _fibers_densities.update(_rois)
 
     return _fibers_densities
@@ -443,10 +443,9 @@ def rois_by_time_pairs(_arguments):
 
 
 def rois(_arguments):
-    print('Computing rois')
     _rois = []
     with Pool(CPUS_TO_USE) as _p:
-        for _value in tqdm(_p.imap_unordered(rois_by_time, _arguments), total=len(_arguments)):
+        for _value in tqdm(_p.imap_unordered(rois_by_time, _arguments), total=len(_arguments), desc='Computing Rois'):
             _rois += _value
         _p.close()
         _p.join()
