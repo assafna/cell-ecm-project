@@ -78,8 +78,8 @@ def main():
                 'direction': DIRECTION
             })
 
-    _rois = compute.rois(_arguments)
-    _fibers_densities = compute.fibers_densities(_rois)
+    _rois_dictionary, _rois_to_compute = compute.rois(_arguments, _keys=['experiment', 'series_id', 'group', 'cell_id'])
+    _fibers_densities = compute.fibers_densities(_rois_to_compute)
 
     _experiments_by_distance = organize.by_cells_distance(_experiments)
     _fibers_densities_by_distance = {}
@@ -95,21 +95,8 @@ def main():
             _series_normalization = load.normalization_series_file_data(_experiment, 'Series ' + str(_series_id))
             _series_normalization = [_series_normalization['average'], _series_normalization['std']]
             for _cell_id in ['left_cell', 'right_cell']:
-                _arguments = {
-                    'experiment': _experiment,
-                    'series_id': _series_id,
-                    'group': _group,
-                    'length_x': ROI_LENGTH,
-                    'length_y': ROI_HEIGHT,
-                    'length_z': ROI_WIDTH,
-                    'offset_x': OFFSET_X,
-                    'offset_y': OFFSET_Y,
-                    'offset_z': OFFSET_Z,
-                    'direction': DIRECTION,
-                    'cell_id': _cell_id
-                }
-                _rois_by_time = compute.rois_by_time(_arguments)
-                _fibers_densities_by_time = [_fibers_densities[_tuple] for _tuple in _rois_by_time]
+                _fibers_densities_by_time = [_fibers_densities[_tuple] for _tuple in
+                                             _rois_dictionary[(_experiment, _series_id, _group, _cell_id)]]
                 _cell_fibers_densities = \
                     _fibers_densities_by_time[START_TIME_POINT[_experiment]:END_TIME_POINT[_experiment]]
                 _properties = load.group_properties(_experiment, _series_id, _group)
