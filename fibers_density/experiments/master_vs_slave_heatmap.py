@@ -64,8 +64,9 @@ def main():
                 'direction': DIRECTION
             })
 
-    _rois = compute.rois(_arguments)
-    _fibers_densities = compute.fibers_densities(_rois)
+    _rois_dictionary, _rois_to_compute =\
+        compute.rois(_arguments, _keys=['experiment', 'series_id', 'group', 'offset_y', 'offset_z', 'cell_id'])
+    _fibers_densities = compute.fibers_densities(_rois_to_compute)
 
     _z_array = np.zeros(shape=(len(VALUES_BY_CELL_DIAMETER), len(VALUES_BY_CELL_DIAMETER)))
     _annotations_array = []
@@ -80,39 +81,14 @@ def main():
             _master_tuple = _experiments[_master_index]
             _master_experiment, _master_series, _master_group = _master_tuple
 
-            _arguments = {
-                'experiment': _master_experiment,
-                'series_id': _master_series,
-                'group': _master_group,
-                'length_x': ROI_LENGTH,
-                'length_y': ROI_HEIGHT,
-                'length_z': ROI_WIDTH,
-                'offset_x': OFFSET_X,
-                'offset_y': _offset_y,
-                'offset_z': _offset_z,
-                'cell_id': 'left_cell',
-                'direction': DIRECTION
-            }
-            _master_left_cell_rois_by_time = compute.rois_by_time(_arguments)
-            _master_left_cell_fibers_densities = [_fibers_densities[_tuple] for _tuple in
-                                                  _master_left_cell_rois_by_time]
-
-            _arguments = {
-                'experiment': _master_experiment,
-                'series_id': _master_series,
-                'group': _master_group,
-                'length_x': ROI_LENGTH,
-                'length_y': ROI_HEIGHT,
-                'length_z': ROI_WIDTH,
-                'offset_x': OFFSET_X,
-                'offset_y': _offset_y,
-                'offset_z': _offset_z,
-                'cell_id': 'right_cell',
-                'direction': DIRECTION
-            }
-            _master_right_cell_rois_by_time = compute.rois_by_time(_arguments)
-            _master_right_cell_fibers_densities = [_fibers_densities[_tuple] for _tuple in
-                                                   _master_right_cell_rois_by_time]
+            _master_left_cell_fibers_densities = \
+                [_fibers_densities[_tuple] for _tuple in
+                 _rois_dictionary[
+                     (_master_experiment, _master_series, _master_group, _offset_y, _offset_z, 'left_cell')]]
+            _master_right_cell_fibers_densities = \
+                [_fibers_densities[_tuple] for _tuple in
+                 _rois_dictionary[
+                     (_master_experiment, _master_series, _master_group, _offset_y, _offset_z, 'right_cell')]]
 
             _master_properties = load.group_properties(_master_experiment, _master_series, _master_group)
             _master_left_cell_fibers_densities = compute.remove_blacklist(
@@ -142,38 +118,16 @@ def main():
 
                     for _master_cell_id, _slave_cell_id in product(['left_cell', 'right_cell'],
                                                                    ['left_cell', 'right_cell']):
-
-                        _arguments = {
-                            'experiment': _master_experiment,
-                            'series_id': _master_series,
-                            'group': _master_group,
-                            'length_x': ROI_LENGTH,
-                            'length_y': ROI_HEIGHT,
-                            'length_z': ROI_WIDTH,
-                            'offset_x': OFFSET_X,
-                            'offset_y': _offset_y,
-                            'offset_z': _offset_z,
-                            'cell_id': _master_cell_id,
-                            'direction': DIRECTION
-                        }
-                        _master_rois_by_time = compute.rois_by_time(_arguments)
-                        _master_fibers_densities = [_fibers_densities[_tuple] for _tuple in _master_rois_by_time]
-
-                        _arguments = {
-                            'experiment': _slave_experiment,
-                            'series_id': _slave_series,
-                            'group': _slave_group,
-                            'length_x': ROI_LENGTH,
-                            'length_y': ROI_HEIGHT,
-                            'length_z': ROI_WIDTH,
-                            'offset_x': OFFSET_X,
-                            'offset_y': _offset_y,
-                            'offset_z': _offset_z,
-                            'cell_id': _slave_cell_id,
-                            'direction': DIRECTION
-                        }
-                        _slave_rois_by_time = compute.rois_by_time(_arguments)
-                        _slave_fibers_densities = [_fibers_densities[_tuple] for _tuple in _slave_rois_by_time]
+                        _master_fibers_densities = \
+                            [_fibers_densities[_tuple] for _tuple in
+                             _rois_dictionary[
+                                 (_master_experiment, _master_series, _master_group, _offset_y, _offset_z,
+                                  _master_cell_id)]]
+                        _slave_fibers_densities = \
+                            [_fibers_densities[_tuple] for _tuple in
+                             _rois_dictionary[
+                                 (_slave_experiment, _slave_series, _slave_group, _offset_y, _offset_z,
+                                  _slave_cell_id)]]
 
                         _slave_properties = load.group_properties(_slave_experiment, _slave_series, _slave_group)
                         _master_fibers_densities = compute.remove_blacklist(
