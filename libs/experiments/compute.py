@@ -377,6 +377,8 @@ def fibers_densities(_tuples):
         for _rois in tqdm(_p.imap_unordered(rois_fibers_densities, _arguments), total=len(_arguments),
                           desc='Computing Fibers Densities'):
             _fibers_densities.update(_rois)
+        _p.close()
+        _p.join()
 
     return _fibers_densities
 
