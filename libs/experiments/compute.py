@@ -427,27 +427,19 @@ def rois_by_time(_arguments):
         _arguments['time_point'] = _time_point
         _rois.append(roi_time_point(_arguments))
 
-    return _rois
+    return _arguments, _rois
 
 
-def rois_by_time_pairs(_arguments):
-    if 'time_points' not in _arguments:
-        _arguments['time_points'] = sys.maxsize
-
-    _arguments['cell_id'] = 'left_cell'
-    _left_cell_rois = rois_by_time(_arguments)
-    _arguments['cell_id'] = 'right_cell'
-    _right_cell_rois = rois_by_time(_arguments)
-
-    return _left_cell_rois + _right_cell_rois
-
-
-def rois(_arguments):
-    _rois = []
+def rois(_arguments, _keys):
+    _rois_to_compute = []
+    _rois_dictionary = {}
     with Pool(CPUS_TO_USE) as _p:
-        for _value in tqdm(_p.imap_unordered(rois_by_time, _arguments), total=len(_arguments), desc='Computing Rois'):
-            _rois += _value
+        for _argument_keys, _value in tqdm(_p.imap_unordered(rois_by_time, _arguments), total=len(_arguments),
+                                           desc='Computing Rois'):
+            _key = tuple(_argument_keys[_argument] for _argument in _keys)
+            _rois_dictionary[_key] = _value
+            _rois_to_compute += _value
         _p.close()
         _p.join()
 
-    return _rois
+    return _rois_dictionary, _rois_to_compute
