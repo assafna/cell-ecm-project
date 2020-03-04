@@ -52,8 +52,9 @@ def main():
                 'time_point': TIME_POINT - 1
             })
 
-    _rois = compute.rois(_arguments)
-    _fibers_densities = compute.fibers_densities(_rois)
+    _rois_dictionary, _rois_to_compute = \
+        compute.rois(_arguments, _keys=['experiment', 'series_id', 'group', 'offset_x', 'direction'])
+    _fibers_densities = compute.fibers_densities(_rois_to_compute)
 
     _experiments = organize.by_single_cell_id(_experiments)
 
@@ -68,22 +69,9 @@ def main():
             for _cell_tuple in _experiments[_tuple]:
                 _, _, _group = _cell_tuple
                 for _direction in ['left', 'right']:
-                    _arguments = {
-                        'experiment': _experiment,
-                        'series_id': _series_id,
-                        'group': _group,
-                        'length_x': ROI_LENGTH,
-                        'length_y': ROI_HEIGHT,
-                        'length_z': ROI_WIDTH,
-                        'offset_x': _offset_x,
-                        'offset_y': OFFSET_Y,
-                        'offset_z': OFFSET_Z,
-                        'cell_id': 'cell',
-                        'direction': _direction,
-                        'time_point': TIME_POINT - 1
-                    }
-                    _roi = compute.roi_time_point(_arguments)
-                    _fibers_density = _fibers_densities[_roi]
+                    _fibers_density = _fibers_densities[
+                        _rois_dictionary[(_experiment, _series_id, _group, _offset_x, _direction)][TIME_POINT - 1]
+                    ]
 
                     if not OUT_OF_BOUNDARIES and _fibers_density[1]:
                         continue
@@ -128,8 +116,9 @@ def main():
                 'time_point': TIME_POINT - 1
             })
 
-    _rois = compute.rois(_arguments)
-    _fibers_densities = compute.fibers_densities(_rois)
+    _rois_dictionary, _rois_to_compute = \
+        compute.rois(_arguments, _keys=['experiment', 'series_id', 'group', 'offset_x'])
+    _fibers_densities = compute.fibers_densities(_rois_to_compute)
 
     _pairs_fibers_densities = [[] for _i in range(len(OFFSETS_X))]
     for _tuple in _experiments:
@@ -151,22 +140,9 @@ def main():
             if _offset_x > _max_x_offset:
                 break
 
-            _arguments = {
-                'experiment': _experiment,
-                'series_id': _series_id,
-                'group': _group,
-                'length_x': ROI_LENGTH,
-                'length_y': ROI_HEIGHT,
-                'length_z': ROI_WIDTH,
-                'offset_x': _offset_x,
-                'offset_y': OFFSET_Y,
-                'offset_z': OFFSET_Z,
-                'cell_id': 'left_cell',
-                'direction': 'inside',
-                'time_point': TIME_POINT - 1
-            }
-            _roi = compute.roi_time_point(_arguments)
-            _fibers_density = _fibers_densities[_roi]
+            _fibers_density = _fibers_densities[
+                _rois_dictionary[(_experiment, _series_id, _group, _offset_x)][TIME_POINT - 1]
+            ]
 
             if not OUT_OF_BOUNDARIES and _fibers_density[1]:
                 continue
