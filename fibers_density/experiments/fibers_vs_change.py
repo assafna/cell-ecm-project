@@ -63,32 +63,20 @@ def main():
     _arguments = []
     for _tuple in _experiments:
         _experiment, _series_id, _group = _tuple
-        _arguments.append({
-            'experiment': _experiment,
-            'series_id': _series_id,
-            'group': _group,
-            'length_x': ROI_LENGTH,
-            'length_y': ROI_HEIGHT,
-            'length_z': ROI_WIDTH,
-            'offset_x': OFFSET_X,
-            'offset_y': OFFSET_Y,
-            'offset_z': OFFSET_Z,
-            'cell_id': 'left_cell',
-            'direction': DIRECTION
-        })
-        _arguments.append({
-            'experiment': _experiment,
-            'series_id': _series_id,
-            'group': _group,
-            'length_x': ROI_LENGTH,
-            'length_y': ROI_HEIGHT,
-            'length_z': ROI_WIDTH,
-            'offset_x': OFFSET_X,
-            'offset_y': OFFSET_Y,
-            'offset_z': OFFSET_Z,
-            'cell_id': 'right_cell',
-            'direction': DIRECTION
-        })
+        for _cell_id in ['left_cell', 'right_cell']:
+            _arguments.append({
+                'experiment': _experiment,
+                'series_id': _series_id,
+                'group': _group,
+                'length_x': ROI_LENGTH,
+                'length_y': ROI_HEIGHT,
+                'length_z': ROI_WIDTH,
+                'offset_x': OFFSET_X,
+                'offset_y': OFFSET_Y,
+                'offset_z': OFFSET_Z,
+                'cell_id': _cell_id,
+                'direction': DIRECTION
+            })
 
     _rois = compute.rois(_arguments)
     _fibers_densities = compute.fibers_densities(_rois)
@@ -122,9 +110,8 @@ def main():
                 }
                 _rois_by_time = compute.rois_by_time(_arguments)
                 _fibers_densities_by_time = [_fibers_densities[_tuple] for _tuple in _rois_by_time]
-                _cell_fibers_densities = _fibers_densities_by_time[
-                                         START_TIME_POINT[_experiment]:END_TIME_POINT[_experiment]
-                                         ]
+                _cell_fibers_densities = \
+                    _fibers_densities_by_time[START_TIME_POINT[_experiment]:END_TIME_POINT[_experiment]]
                 _properties = load.group_properties(_experiment, _series_id, _group)
                 _cell_fibers_densities = compute.remove_blacklist(
                     _experiment, _series_id, _properties['cells_ids'][_cell_id], _cell_fibers_densities)
