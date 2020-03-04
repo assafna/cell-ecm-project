@@ -101,8 +101,9 @@ def main():
                 'time_point': EXPERIMENTS_TIME_POINT - 1
             })
 
-    _rois = compute.rois(_arguments)
-    _fibers_densities = compute.fibers_densities(_rois)
+    _rois_dictionary, _rois_to_compute = \
+        compute.rois(_arguments, _keys=['experiment', 'series_id', 'group', 'offset_x'])
+    _fibers_densities = compute.fibers_densities(_rois_to_compute)
 
     _experiments_fibers_densities = [[] for _i in range(len(EXPERIMENTS_OFFSETS_X))]
     for _tuple in tqdm(_experiments, desc='Experiments Loop'):
@@ -111,23 +112,9 @@ def main():
         _normalization = experiments_load.normalization_series_file_data(_experiment, 'Series ' + str(_series_id))
 
         for _offset_x in EXPERIMENTS_OFFSETS_X:
-
-            _arguments = {
-                'experiment': _experiment,
-                'series_id': _series_id,
-                'group': _group,
-                'length_x': experiments_config.ROI_LENGTH,
-                'length_y': experiments_config.ROI_HEIGHT,
-                'length_z': experiments_config.ROI_WIDTH,
-                'offset_x': _offset_x,
-                'offset_y': OFFSET_Y,
-                'offset_z': OFFSET_Z,
-                'cell_id': 'left_cell',
-                'direction': 'inside',
-                'time_point': EXPERIMENTS_TIME_POINT - 1
-            }
-            _roi = compute.roi_time_point(_arguments)
-            _fibers_density = _fibers_densities[_roi]
+            _fibers_density = _fibers_densities[
+                _rois_dictionary[(_experiment, _series_id, _group, _offset_x)][EXPERIMENTS_TIME_POINT - 1]
+            ]
 
             if not OUT_OF_BOUNDARIES and _fibers_density[1]:
                 continue
