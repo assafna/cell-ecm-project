@@ -52,7 +52,14 @@ Z_MIN = 0
 Z_MAX = 0.2
 
 
-def compute_fibers_densities(_experiments):
+def main():
+    _experiments = load.experiments_groups_as_tuples(EXPERIMENTS)
+    _experiments = filtering.by_distances(_experiments, CELLS_DISTANCES)
+    _experiments = filtering.by_real_cells(_experiments, _real_cells=REAL_CELLS)
+    _experiments = filtering.by_static_cells(_experiments, _static=STATIC)
+    if BAND:
+        _experiments = filtering.by_band(_experiments)
+
     _arguments = []
     for _tuple in _experiments:
         _experiment, _series_id, _group = _tuple
@@ -66,31 +73,25 @@ def compute_fibers_densities(_experiments):
             'offset_x': OFFSET_X,
             'offset_y': OFFSET_Y,
             'offset_z': OFFSET_Z,
+            'cell_id': 'left_cell',
+            'direction': DIRECTION
+        })
+        _arguments.append({
+            'experiment': _experiment,
+            'series_id': _series_id,
+            'group': _group,
+            'length_x': ROI_LENGTH,
+            'length_y': ROI_HEIGHT,
+            'length_z': ROI_WIDTH,
+            'offset_x': OFFSET_X,
+            'offset_y': OFFSET_Y,
+            'offset_z': OFFSET_Z,
+            'cell_id': 'right_cell',
             'direction': DIRECTION
         })
 
-    _fibers_densities = {}
-    with Pool(CPUS_TO_USE) as _p:
-        for _keys, _value in tqdm(
-                _p.imap_unordered(compute.roi_fibers_density_by_time_pairs, _arguments), total=len(_arguments)):
-            _fibers_densities[
-                (_keys['experiment'], _keys['series_id'], _keys['group'])
-            ] = _value
-        _p.close()
-        _p.join()
-
-    return _fibers_densities
-
-
-def main():
-    _experiments = load.experiments_groups_as_tuples(EXPERIMENTS)
-    _experiments = filtering.by_distances(_experiments, CELLS_DISTANCES)
-    _experiments = filtering.by_real_cells(_experiments, _real_cells=REAL_CELLS)
-    _experiments = filtering.by_static_cells(_experiments, _static=STATIC)
-    if BAND:
-        _experiments = filtering.by_band(_experiments)
-
-    _fibers_densities = compute_fibers_densities(_experiments)
+    _rois = compute.rois(_arguments)
+    _fibers_densities = compute.fibers_densities(_rois)
 
     _experiments_by_distance = organize.by_cells_distance(_experiments)
     _fibers_densities_by_distance = {}
@@ -106,7 +107,22 @@ def main():
             _series_normalization = load.normalization_series_file_data(_experiment, 'Series ' + str(_series_id))
             _series_normalization = [_series_normalization['average'], _series_normalization['std']]
             for _cell_id in ['left_cell', 'right_cell']:
-                _cell_fibers_densities = _fibers_densities[_tuple][_cell_id][
+                _arguments = {
+                    'experiment': _experiment,
+                    'series_id': _series_id,
+                    'group': _group,
+                    'length_x': ROI_LENGTH,
+                    'length_y': ROI_HEIGHT,
+                    'length_z': ROI_WIDTH,
+                    'offset_x': OFFSET_X,
+                    'offset_y': OFFSET_Y,
+                    'offset_z': OFFSET_Z,
+                    'direction': DIRECTION,
+                    'cell_id': _cell_id
+                }
+                _rois_by_time = compute.rois_by_time(_arguments)
+                _fibers_densities_by_time = [_fibers_densities[_tuple] for _tuple in _rois_by_time]
+                _cell_fibers_densities = _fibers_densities_by_time[
                                          START_TIME_POINT[_experiment]:END_TIME_POINT[_experiment]
                                          ]
                 _properties = load.group_properties(_experiment, _series_id, _group)

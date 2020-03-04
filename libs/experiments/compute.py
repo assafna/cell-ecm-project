@@ -2,11 +2,14 @@ import math
 import os
 import sys
 from itertools import product
+from multiprocessing.pool import Pool
 
 import numpy as np
 from scipy.ndimage import rotate
+from tqdm import tqdm
 
 from libs.compute_lib import roi
+from libs.config_lib import CPUS_TO_USE
 from libs.experiments import load, save, paths
 from libs.experiments.config import AVERAGE_CELL_DIAMETER_IN_MICRONS, ROI_START_BY_AVERAGE_CELL_DIAMETER, NO_RETURN
 
@@ -342,3 +345,110 @@ def smooth_coordinates_in_time(_coordinates, _n=5):
         _coordinates_smoothed.append(coordinates_mean(_current_coordinates))
 
     return _coordinates_smoothed
+
+
+def rois_fibers_densities(_tuple):
+    _key, _rois = _tuple
+    _experiment, _series_id, _group, _time_point = _key
+    _time_point_image = load.structured_image(_experiment, _series_id, _group, _time_point)
+    return {
+        (_experiment, _series_id, _group, _time_point, _roi):
+            roi_fibers_density(_experiment, _series_id, _group, _time_point, _roi, _time_point_image)
+        for _roi in _rois
+    }
+
+
+def fibers_densities(_tuples):
+    _organized_tuples = {}
+    for _tuple in _tuples:
+        _experiment, _series_id, _group, _time_point, _roi = _tuple
+        _key, _value = (_experiment, _series_id, _group, _time_point), _roi
+        if _key in _organized_tuples:
+            _organized_tuples[_key].append(_value)
+        else:
+            _organized_tuples[_key] = [_value]
+
+    _arguments = []
+    for _key in _organized_tuples:
+        _arguments.append((_key, _organized_tuples[_key]))
+
+    print('Computing fibers densities')
+    _fibers_densities = {}
+    with Pool(CPUS_TO_USE) as _p:
+        for _rois in tqdm(_p.imap_unordered(rois_fibers_densities, _arguments), total=len(_arguments)):
+            _fibers_densities.update(_rois)
+
+    return _fibers_densities
+
+
+def roi_time_point(_arguments):
+    if 'group_properties' not in _arguments:
+        _arguments['group_properties'] = \
+            load.group_properties(_arguments['experiment'], _arguments['series_id'], _arguments['group'])
+    _time_point_properties = _arguments['group_properties']['time_points'][_arguments['time_point']]
+    _time_point_fibers_densities = load.fibers_densities(
+        _arguments['experiment'], _arguments['series_id'], _arguments['group'], _arguments['time_point'])
+    if ROI_START_BY_AVERAGE_CELL_DIAMETER:
+        _cell_diameter_in_microns = AVERAGE_CELL_DIAMETER_IN_MICRONS
+    else:
+        _cell_diameter_in_microns = load.mean_distance_to_surface_in_microns(
+            _experiment=_arguments['experiment'],
+            _series_id=_arguments['series_id'],
+            _cell_id=_arguments['group_properties']['cells_ids'][_arguments['cell_id']]) * 2 \
+            if _arguments['cell_id'] != 'cell' else _arguments['group_properties']['cell_id'] * 2
+    _time_point_roi = roi_by_microns(
+        _resolution_x=_arguments['group_properties']['time_points'][_arguments['time_point']]['resolutions']['x'],
+        _resolution_y=_arguments['group_properties']['time_points'][_arguments['time_point']]['resolutions']['y'],
+        _resolution_z=_arguments['group_properties']['time_points'][_arguments['time_point']]['resolutions']['z'],
+        _length_x=_arguments['length_x'],
+        _length_y=_arguments['length_y'],
+        _length_z=_arguments['length_z'],
+        _offset_x=_arguments['offset_x'],
+        _offset_y=_arguments['offset_y'],
+        _offset_z=_arguments['offset_z'],
+        _cell_coordinates=
+        _arguments['group_properties']['time_points'][_arguments['time_point']][_arguments['cell_id']]['coordinates'],
+        _cell_diameter_in_microns=_cell_diameter_in_microns,
+        _direction='right' if
+        (_arguments['cell_id'], _arguments['direction']) == ('left_cell', 'inside') or
+        (_arguments['cell_id'], _arguments['direction']) == ('right_cell', 'outside') or
+        (_arguments['cell_id'], _arguments['direction']) == ('cell', 'right') else 'left'
+    )
+
+    return _arguments['experiment'], _arguments['series_id'], _arguments['group'], _arguments['time_point'], _time_point_roi
+
+
+def rois_by_time(_arguments):
+    _group_properties = load.group_properties(_arguments['experiment'], _arguments['series_id'], _arguments['group'])
+    if 'time_points' not in _arguments:
+        _arguments['time_points'] = sys.maxsize
+    _rois = []
+    for _time_point in range(min(_arguments['time_points'], len(_group_properties['time_points']))):
+        _arguments['time_point'] = _time_point
+        _rois.append(roi_time_point(_arguments))
+
+    return _rois
+
+
+def rois_by_time_pairs(_arguments):
+    if 'time_points' not in _arguments:
+        _arguments['time_points'] = sys.maxsize
+
+    _arguments['cell_id'] = 'left_cell'
+    _left_cell_rois = rois_by_time(_arguments)
+    _arguments['cell_id'] = 'right_cell'
+    _right_cell_rois = rois_by_time(_arguments)
+
+    return _left_cell_rois + _right_cell_rois
+
+
+def rois(_arguments):
+    print('Computing rois')
+    _rois = []
+    with Pool(CPUS_TO_USE) as _p:
+        for _value in tqdm(_p.imap_unordered(rois_by_time, _arguments), total=len(_arguments)):
+            _rois += _value
+        _p.close()
+        _p.join()
+
+    return _rois
