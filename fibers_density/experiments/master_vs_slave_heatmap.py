@@ -18,9 +18,9 @@ from plotting import scatter, save, heatmap, contour
 
 EXPERIMENTS = ['SN16']
 EXPERIMENTS_STR = '_'.join(EXPERIMENTS)
-REAL_CELLS = True
-STATIC = False
-BAND = True
+REAL_CELLS = False
+STATIC = True
+BAND = False
 DOMAIN_ABSOLUTE_VALUE = 5
 VALUES_BY_CELL_DIAMETER = [
     round(_value, 10) for _value in
@@ -36,9 +36,21 @@ MINIMUM_CORRELATION_TIME_POINTS = {
     'SN44': 50
 }
 
+# globals
+_experiments = None
+_arguments = None
+_rois_dictionary = None
+_rois_to_compute = None
+_fibers_densities = None
+_experiments_fibers_densities = None
+_z_array = None
+_annotations_array = None
+
 
 def compute_data(_arguments):
-    _experiments_fibers_densities, _experiments, _offset_y_index, _offset_y, _offset_z_index, _offset_z = _arguments
+    global _experiments, _experiments_fibers_densities
+
+    _offset_y_index, _offset_y, _offset_z_index, _offset_z = _arguments
     _master_correlations_array = []
     _slave_correlations_array = []
     for _master_index in range(len(_experiments)):
@@ -138,6 +150,9 @@ def compute_data(_arguments):
 
 
 def main():
+    global _experiments, _arguments, _rois_dictionary, _rois_to_compute, _fibers_densities,\
+        _experiments_fibers_densities, _z_array, _annotations_array
+
     _experiments = load.experiments_groups_as_tuples(EXPERIMENTS)
     _experiments = filtering.by_distances(_experiments, CELLS_DISTANCES)
     _experiments = filtering.by_real_cells(_experiments, _real_cells=REAL_CELLS)
@@ -169,14 +184,14 @@ def main():
     _fibers_densities = compute.fibers_densities(_rois_to_compute)
 
     _experiments_fibers_densities = {}
-    for _key in tqdm(_rois_dictionary):
+    for _key in tqdm(_rois_dictionary, desc='Organizing Fibers Densities'):
         _experiments_fibers_densities[_key] = [_fibers_densities[_tuple] for _tuple in _rois_dictionary[_key]]
 
     _arguments = []
     for (_offset_y_index, _offset_y), (_offset_z_index, _offset_z) in \
             product(enumerate(VALUES_BY_CELL_DIAMETER), enumerate(VALUES_BY_CELL_DIAMETER)):
         _arguments.append(
-            (_experiments_fibers_densities, _experiments, _offset_y_index, _offset_y, _offset_z_index, _offset_z))
+            (_offset_y_index, _offset_y, _offset_z_index, _offset_z))
 
     _z_array = np.zeros(shape=(len(VALUES_BY_CELL_DIAMETER), len(VALUES_BY_CELL_DIAMETER)))
     _annotations_array = []
