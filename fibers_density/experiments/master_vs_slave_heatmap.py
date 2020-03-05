@@ -38,10 +38,6 @@ MINIMUM_CORRELATION_TIME_POINTS = {
 
 # globals
 _experiments = []
-_arguments = None
-_rois_dictionary = None
-_rois_to_compute = None
-_fibers_densities = None
 _experiments_fibers_densities = None
 _z_array = None
 _annotations_array = None
@@ -148,8 +144,7 @@ def compute_data(_arguments):
 
 
 def main():
-    global _experiments, _arguments, _rois_dictionary, _rois_to_compute, _fibers_densities,\
-        _experiments_fibers_densities, _z_array, _annotations_array
+    global _experiments, _experiments_fibers_densities, _z_array, _annotations_array
 
     _experiments = load.experiments_groups_as_tuples(EXPERIMENTS)
     _experiments = filtering.by_distances(_experiments, CELLS_DISTANCES)
@@ -184,6 +179,11 @@ def main():
     _experiments_fibers_densities = {}
     for _key in tqdm(_rois_dictionary, desc='Organizing Fibers Densities'):
         _experiments_fibers_densities[_key] = [_fibers_densities[_tuple] for _tuple in _rois_dictionary[_key]]
+
+    # clean
+    _fibers_densities = None
+    _rois_dictionary = None
+    _rois_to_compute = None
 
     _arguments = []
     for (_offset_y_index, _offset_y), (_offset_z_index, _offset_z) in \
