@@ -44,8 +44,6 @@ SIMULATIONS_OFFSETS_X = \
 def compute_simulations_fibers_densities(_simulations):
     _arguments = []
     for _simulation in _simulations:
-        _offset_index = 0
-        _normalization = simulations_load.normalization(_simulation)
         for _offset_x in SIMULATIONS_OFFSETS_X:
             _arguments.append({
                 'simulation': _simulation,
