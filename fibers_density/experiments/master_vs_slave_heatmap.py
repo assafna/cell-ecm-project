@@ -16,7 +16,7 @@ from libs.experiments.config import ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT, NO_RETURN
 from methods.experiments import export_video
 from plotting import scatter, save, heatmap, contour
 
-EXPERIMENTS = ['SN16']
+EXPERIMENTS = ['SN41']
 EXPERIMENTS_STR = '_'.join(EXPERIMENTS)
 REAL_CELLS = False
 STATIC = True
@@ -37,7 +37,7 @@ MINIMUM_CORRELATION_TIME_POINTS = {
 }
 
 # globals
-_experiments = None
+_experiments = []
 _arguments = None
 _rois_dictionary = None
 _rois_to_compute = None
@@ -48,8 +48,6 @@ _annotations_array = None
 
 
 def compute_data(_arguments):
-    global _experiments, _experiments_fibers_densities
-
     _offset_y_index, _offset_y, _offset_z_index, _offset_z = _arguments
     _master_correlations_array = []
     _slave_correlations_array = []
@@ -186,6 +184,8 @@ def main():
     _experiments_fibers_densities = {}
     for _key in tqdm(_rois_dictionary, desc='Organizing Fibers Densities'):
         _experiments_fibers_densities[_key] = [_fibers_densities[_tuple] for _tuple in _rois_dictionary[_key]]
+
+    shared_memory
 
     _arguments = []
     for (_offset_y_index, _offset_y), (_offset_z_index, _offset_z) in \
