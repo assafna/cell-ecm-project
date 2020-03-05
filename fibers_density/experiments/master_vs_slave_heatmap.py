@@ -185,8 +185,6 @@ def main():
     for _key in tqdm(_rois_dictionary, desc='Organizing Fibers Densities'):
         _experiments_fibers_densities[_key] = [_fibers_densities[_tuple] for _tuple in _rois_dictionary[_key]]
 
-    shared_memory
-
     _arguments = []
     for (_offset_y_index, _offset_y), (_offset_z_index, _offset_z) in \
             product(enumerate(VALUES_BY_CELL_DIAMETER), enumerate(VALUES_BY_CELL_DIAMETER)):
