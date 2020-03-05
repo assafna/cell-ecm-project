@@ -13,6 +13,7 @@ from libs.experiments.config import ROI_LENGTH, ROI_HEIGHT, ROI_WIDTH
 from plotting import heatmap, save
 
 EXPERIMENTS = ['SN16']
+TIME_POINT = 18
 EXPERIMENTS_STR = '_'.join(EXPERIMENTS)
 REAL_CELLS = True
 STATIC = False
@@ -24,7 +25,6 @@ VALUES_BY_CELL_DIAMETER = [
 OFFSET_X = 0
 CELLS_DISTANCES = [6, 7, 8, 9]
 DIRECTION = 'inside'
-TIME_POINT = 18
 
 # globals
 _experiments = []
@@ -126,6 +126,8 @@ def main():
         _x_axis_title='Offset in Z axis',
         _y_axis_title='Offset in XY axis',
         _color_scale=sns.color_palette('BrBG').as_hex(),
+        _zmin=-6,
+        _zmax=6
     )
 
     save.to_html(
