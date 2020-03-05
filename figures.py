@@ -6,6 +6,7 @@ import fibers_density
 def figure_1():
     fibers_density.fibers_vs_distance_pairs.main()
     fibers_density.fibers_vs_distance_single_cells.main()
+    simulations.fibers_vs_distance_multiple_cell_distances.main()
 
 
 def figure_2():
