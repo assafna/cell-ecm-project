@@ -41,7 +41,7 @@ OFFSET_Z = 0
 DERIVATIVE = 1
 
 PLOT = True
-CONDITIONAL_NORMALIZATION = True
+CONDITIONAL_NORMALIZATION = False
 X_LABELS_START = -3
 X_LABELS_END = 15
 Y_LABELS_START = -1.5
@@ -49,7 +49,11 @@ Y_LABELS_END = 3
 X_BINS = 1
 Y_BINS = 5
 Z_MIN = 0
-Z_MAX = 0.2
+# according to conditional normalization
+Z_MAX = {
+    True: 0.2,
+    False: 0.05
+}
 
 
 def main():
@@ -57,8 +61,7 @@ def main():
     _experiments = filtering.by_distances(_experiments, CELLS_DISTANCES)
     _experiments = filtering.by_real_cells(_experiments, _real_cells=REAL_CELLS)
     _experiments = filtering.by_static_cells(_experiments, _static=STATIC)
-    if BAND:
-        _experiments = filtering.by_band(_experiments)
+    _experiments = filtering.by_band(_experiments, _band=BAND)
 
     _arguments = []
     for _tuple in _experiments:
@@ -168,7 +171,7 @@ def main():
             # _color_scale=seaborn.light_palette("navy", reverse=True).as_hex(),
             _color_scale='Viridis',
             _zmin=Z_MIN,
-            _zmax=Z_MAX
+            _zmax=Z_MAX[CONDITIONAL_NORMALIZATION]
         )
 
         # line of best fit
@@ -193,7 +196,8 @@ def main():
         save.to_html(
             _fig=_fig,
             _path=os.path.join(paths.PLOTS, save.get_module_name()),
-            _filename=DIRECTION + '_points'
+            _filename='plot_real_' + str(REAL_CELLS) + '_static_' + str(STATIC) + '_band_' +
+                      str(BAND) + '_direction_' + DIRECTION
         )
 
         # _fig = scatter.create_plot(
