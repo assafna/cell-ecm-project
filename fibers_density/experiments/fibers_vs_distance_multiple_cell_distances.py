@@ -1,26 +1,25 @@
 import os
 
 import numpy as np
-from tqdm import tqdm
 
 from libs import compute_lib
 from libs.experiments import load, filtering, compute, paths
-from libs.experiments.config import ROI_LENGTH, ROI_HEIGHT, ROI_WIDTH
-from plotting import scatter, save
+from libs.experiments.config import ROI_LENGTH, ROI_HEIGHT, ROI_WIDTH, AVERAGE_CELL_DIAMETER_IN_MICRONS
+from plotting import scatter, save, edit
 
 EXPERIMENTS = ['SN16']
 TIME_POINT = 18
-CELLS_DISTANCES = [5, 6, 7, 9]
-OFFSET_X_STEP = 0.1
+CELLS_DISTANCES = [5, 7, 9]
+OFFSET_X_STEP = 0.2
 BAND = True
 OFFSET_Z = 0
 OFFSET_Y = 0
-OUT_OF_BOUNDARIES = False
+OUT_OF_BOUNDARIES = True
 OFFSET_X_END = {
-    5: 5,
-    6: 6,
-    7: 7,
-    9: 9
+    5: 2.6,
+    6: 4,
+    7: 4.8,
+    9: 6.4
 }
 
 
@@ -67,11 +66,19 @@ def main():
             _experiment, _series_id, _group = _tuple
             _offset_index = 0
             _normalization = load.normalization_series_file_data(_experiment, 'Series ' + str(_series_id))
+            _group_properties = load.group_properties(_experiment, _series_id, _group)
+            _right_cell_coordinates = _group_properties['time_points'][TIME_POINT - 1]['right_cell']['coordinates']
+            _x_cell_diameter = \
+                AVERAGE_CELL_DIAMETER_IN_MICRONS / _group_properties['time_points'][TIME_POINT - 1]['resolutions']['x']
 
             for _offset_x in _offsets_x:
-                _fibers_density = _fibers_densities[
-                    _rois_dictionary[(_experiment, _series_id, _group, _offset_x)][TIME_POINT - 1]
-                ]
+                _roi_tuple = _rois_dictionary[(_experiment, _series_id, _group, _offset_x)][0]
+
+                # make sure not to pass the right cell
+                if _right_cell_coordinates['x'] - _x_cell_diameter / 2 < _roi_tuple[4][3]:
+                    break
+
+                _fibers_density = _fibers_densities[_roi_tuple]
 
                 if not OUT_OF_BOUNDARIES and _fibers_density[1]:
                     continue
@@ -97,6 +104,11 @@ def main():
         _dashes_array=['solid'] * len(CELLS_DISTANCES),
         _x_axis_title='Distance from Left Cell (cell size)',
         _y_axis_title='Fibers Density Z-score'
+    )
+
+    _fig = edit.update_y_axis(
+        _fig=_fig,
+        _range=[-1.5, 17]
     )
 
     save.to_html(

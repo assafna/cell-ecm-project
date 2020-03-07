@@ -19,7 +19,7 @@ from libs.simulations import filtering as simulations_filtering
 from libs.simulations import load as simulations_load
 from plotting import scatter, save, edit
 
-OFFSET_X_STEP = 0.1
+OFFSET_X_STEP = 0.2
 OFFSET_X_END = max(EXPERIMENTS_OFFSETS_X[-1], SIMULATIONS_OFFSETS_X[-1])
 OFFSETS_X = np.arange(start=0, stop=OFFSET_X_END + OFFSET_X_STEP, step=OFFSET_X_STEP)
 OFFSET_Y = 0
@@ -27,7 +27,7 @@ OFFSET_Y = 0
 # experiments
 EXPERIMENTS_TIME_POINT = 18
 OFFSET_Z = 0
-OUT_OF_BOUNDARIES = False
+OUT_OF_BOUNDARIES = True
 
 # simulations
 SIMULATIONS_TIME_POINT = 50
@@ -109,10 +109,8 @@ def main():
             for _cell_tuple in _experiments[_tuple]:
                 _, _, _group = _cell_tuple
                 for _direction in ['left', 'right']:
-                    _fibers_density = _fibers_densities[
-                        _rois_dictionary[(_experiment, _series_id, _group, _offset_x, _direction)]
-                        [EXPERIMENTS_TIME_POINT - 1]
-                    ]
+                    _roi_tuple = _rois_dictionary[(_experiment, _series_id, _group, _offset_x, _direction)][0]
+                    _fibers_density = _fibers_densities[_roi_tuple]
 
                     if not OUT_OF_BOUNDARIES and _fibers_density[1]:
                         continue
@@ -177,7 +175,7 @@ def main():
 
     _fig = edit.update_y_axis(
         _fig=_fig,
-        _range=[-1.5, 9]
+        _range=[-1.5, 17]
     )
 
     save.to_html(

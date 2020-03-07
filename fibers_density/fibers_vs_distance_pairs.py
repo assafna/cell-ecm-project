@@ -10,6 +10,7 @@ from libs.experiments import compute as experiments_compute, compute
 from libs.experiments import config as experiments_config
 from libs.experiments import filtering as experiments_filtering
 from libs.experiments import load as experiments_load
+from libs.experiments.config import AVERAGE_CELL_DIAMETER_IN_MICRONS
 from libs.simulations import compute as simulations_compute
 from libs.simulations import config as simulations_config
 from libs.simulations import filtering as simulations_filtering
@@ -17,7 +18,7 @@ from libs.simulations import load as simulations_load
 from plotting import scatter, save, edit
 
 CELLS_DISTANCE = 7
-OFFSET_X_STEP = 0.1
+OFFSET_X_STEP = 0.2
 OFFSET_Y = 0
 
 # experiments
@@ -25,11 +26,11 @@ EXPERIMENTS = ['SN16']
 EXPERIMENTS_TIME_POINT = 18
 BAND = True
 OFFSET_Z = 0
-OUT_OF_BOUNDARIES = False
+OUT_OF_BOUNDARIES = True
 EXPERIMENTS_OFFSET_X_END = {
-    5: 2.8,
-    7: 5.3,
-    9: 6.5
+    5: 2.6,
+    7: 4.8,
+    9: 6.4
 }
 EXPERIMENTS_OFFSETS_X = \
     np.arange(start=0, stop=EXPERIMENTS_OFFSET_X_END[CELLS_DISTANCE] + OFFSET_X_STEP, step=OFFSET_X_STEP)
@@ -108,11 +109,21 @@ def main():
         _experiment, _series_id, _group = _tuple
         _offset_index = 0
         _normalization = experiments_load.normalization_series_file_data(_experiment, 'Series ' + str(_series_id))
+        _group_properties = experiments_load.group_properties(_experiment, _series_id, _group)
+        _right_cell_coordinates = \
+            _group_properties['time_points'][EXPERIMENTS_TIME_POINT - 1]['right_cell']['coordinates']
+        _x_cell_diameter = \
+            AVERAGE_CELL_DIAMETER_IN_MICRONS / \
+            _group_properties['time_points'][EXPERIMENTS_TIME_POINT - 1]['resolutions']['x']
 
         for _offset_x in EXPERIMENTS_OFFSETS_X:
-            _fibers_density = _fibers_densities[
-                _rois_dictionary[(_experiment, _series_id, _group, _offset_x)][EXPERIMENTS_TIME_POINT - 1]
-            ]
+            _roi_tuple = _rois_dictionary[(_experiment, _series_id, _group, _offset_x)][0]
+
+            # make sure not to pass the right cell
+            if _right_cell_coordinates['x'] - _x_cell_diameter / 2 < _roi_tuple[4][3]:
+                break
+
+            _fibers_density = _fibers_densities[_roi_tuple]
 
             if not OUT_OF_BOUNDARIES and _fibers_density[1]:
                 continue
@@ -172,7 +183,7 @@ def main():
 
     _fig = edit.update_y_axis(
         _fig=_fig,
-        _range=[-1.5, 9]
+        _range=[-1.5, 17]
     )
 
     save.to_html(
