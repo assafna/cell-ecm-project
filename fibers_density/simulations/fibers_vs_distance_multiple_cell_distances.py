@@ -8,11 +8,11 @@ from libs import compute_lib
 from libs.config_lib import CPUS_TO_USE
 from libs.simulations import load, filtering, compute, paths
 from libs.simulations.config import ROI_WIDTH, ROI_HEIGHT
-from plotting import scatter, save
+from plotting import scatter, save, edit
 
 TIME_POINT = 50
 CELLS_DISTANCES = [5.0, 7.0, 9.0]
-OFFSET_X_STEP = 0.1
+OFFSET_X_STEP = 0.2
 OFFSET_Y = 0
 
 
@@ -98,6 +98,11 @@ def main():
         _dashes_array=['solid'] * len(CELLS_DISTANCES),
         _x_axis_title='Distance from Left Cell (cell size)',
         _y_axis_title='Fibers Density Z-score'
+    )
+
+    _fig = edit.update_y_axis(
+        _fig=_fig,
+        _range=[-1.5, 17]
     )
 
     save.to_html(
