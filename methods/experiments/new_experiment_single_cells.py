@@ -18,6 +18,9 @@ SMOOTH_AMOUNT = 0
 DEGREES_XY = [0, 45, 90, 135]
 DEGREES_Z = [0, 45, 90, 135]
 
+# global
+_arguments = None
+
 # PROCESS:
 # Same as in "new_experiment_pairs"
 
@@ -80,8 +83,6 @@ def process_group(_experiment, _series_id, _cell_id, _degrees_xy, _degrees_z, _c
         _padding_x, _padding_y = compute.axes_padding(_2d_image_shape=_time_point_image[0].shape, _angle=_degrees_xy)
         _cell_coordinates[0] += _padding_x
         _cell_coordinates[1] += _padding_y
-        _cell_coordinates[0] += _padding_x
-        _cell_coordinates[1] += _padding_y
 
         # rotate image and change axes
         _time_point_image_rotated = np.array([rotate(_z, _degrees_xy) for _z in _time_point_image])
@@ -98,11 +99,8 @@ def process_group(_experiment, _series_id, _cell_id, _degrees_xy, _degrees_z, _c
             _angle_in_radians=math.radians(_degrees_xy),
             _around_point=_image_center
         )
-        _fixed_y = _cell_coordinates[1]
-        # y is now z
-        _cell_coordinates[1] = _cell_coordinates[2]
-        # z is now y
-        _cell_coordinates[2] = _fixed_y
+        # y is now z, z is now y
+        _cell_coordinates[1], _cell_coordinates[2] = _cell_coordinates[2], _cell_coordinates[1]
 
         if SHOW_PLOTS:
             plt.imshow(_time_point_image_swapped[int(round(_cell_coordinates[2]))])
@@ -117,8 +115,6 @@ def process_group(_experiment, _series_id, _cell_id, _degrees_xy, _degrees_z, _c
 
         # second rotate, compute padding z
         _padding_x, _padding_y = compute.axes_padding(_2d_image_shape=_time_point_image_swapped[0].shape, _angle=_degrees_z)
-        _cell_coordinates[0] += _padding_x
-        _cell_coordinates[1] += _padding_y
         _cell_coordinates[0] += _padding_x
         _cell_coordinates[1] += _padding_y
 
@@ -195,39 +191,29 @@ def process_group(_experiment, _series_id, _cell_id, _degrees_xy, _degrees_z, _c
     save_lib.to_json(_properties_data, _properties_json_path)
 
 
-def process_series(_experiment, _series_id, _overwrite=False):
-    _series_image_path = paths.serieses(_experiment, 'series_' + str(_series_id) + '_bc.tif')
-    _image_properties = load.image_properties(_experiment, _series_id)
-    _series_image = tifffile.imread(_series_image_path)
-    _cells_coordinates = load.cell_coordinates_tracked_series_file_data(
-        _experiment, 'series_' + str(_series_id) + '.txt'
-    )
-    _series_image_by_time_points = [
-        np.array([_z[FIBERS_CHANNEL_INDEX] for _z in _series_image[_time_point]])
-        for _time_point in range(_series_image.shape[0])
-    ]
-    for _cell_id in range(len(_cells_coordinates)):
-        for _degrees_xy, _degrees_z in product(DEGREES_XY, DEGREES_Z):
-            process_group(
-                _experiment=_experiment,
-                _series_id=_series_id,
-                _cell_id=_cell_id,
-                _degrees_xy=_degrees_xy,
-                _degrees_z=_degrees_z,
-                _cell_coordinates=_cells_coordinates,
-                _series_image_by_time_points=_series_image_by_time_points,
-                _resolutions=_image_properties['resolutions'],
-                _overwrite=_overwrite
-            )
-
-
 def process_experiment(_experiment, _overwrite=False):
-    _arguments = [
-        (_experiment, int(_series.split('_')[1]), _overwrite)
-        for _series in paths.image_files(paths.serieses(_experiment))
-    ]
+    global _arguments
+
+    _arguments = []
+    for _series in paths.image_files(paths.serieses(_experiment)):
+        _series_id = int(_series.split('_')[1])
+        _series_image_path = paths.serieses(_experiment, 'series_' + str(_series_id) + '_bc.tif')
+        _image_properties = load.image_properties(_experiment, _series_id)
+        _series_image = tifffile.imread(_series_image_path)
+        _cells_coordinates = load.cell_coordinates_tracked_series_file_data(
+            _experiment, 'series_' + str(_series_id) + '.txt'
+        )
+        _series_image_by_time_points = [
+            np.array([_z[FIBERS_CHANNEL_INDEX] for _z in _series_image[_time_point]])
+            for _time_point in range(_series_image.shape[0])
+        ]
+        for _cell_id in range(len(_cells_coordinates)):
+            for _degrees_xy, _degrees_z in product(DEGREES_XY, DEGREES_Z):
+                _arguments.append((_experiment, _series_id, _cell_id, _degrees_xy, _degrees_z, _cells_coordinates,
+                                   _series_image_by_time_points, _image_properties['resolutions'], _overwrite))
+
     _p = Pool(CPUS_TO_USE)
-    _p.starmap(process_series, _arguments)
+    _p.starmap(process_group, _arguments)
     _p.close()
 
 
