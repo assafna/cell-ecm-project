@@ -8,7 +8,7 @@ from tqdm import tqdm
 from fibers_density.fibers_vs_distance_pairs import EXPERIMENTS_OFFSETS_X, SIMULATIONS_OFFSETS_X
 from libs import compute_lib, paths_lib
 from libs.config_lib import CPUS_TO_USE
-from libs.experiments import compute as experiments_compute, compute
+from libs.experiments import compute as experiments_compute
 from libs.experiments import config as experiments_config
 from libs.experiments import filtering as experiments_filtering
 from libs.experiments import load as experiments_load
@@ -36,8 +36,6 @@ SIMULATIONS_TIME_POINT = 50
 def compute_simulations_fibers_densities(_simulations):
     _arguments = []
     for _simulation in _simulations:
-        _offset_index = 0
-        _normalization = simulations_load.normalization(_simulation)
         for _offset_x, _direction in product(OFFSETS_X, ['left', 'right', 'up', 'down']):
             _arguments.append({
                 'simulation': _simulation,
@@ -93,8 +91,8 @@ def main():
             })
 
     _rois_dictionary, _rois_to_compute = \
-        compute.rois(_arguments, _keys=['experiment', 'series_id', 'group', 'offset_x', 'direction'])
-    _fibers_densities = compute.fibers_densities(_rois_to_compute)
+        experiments_compute.rois(_arguments, _keys=['experiment', 'series_id', 'group', 'offset_x', 'direction'])
+    _fibers_densities = experiments_compute.fibers_densities(_rois_to_compute)
 
     _experiments = experiments_organize.by_single_cell_id(_experiments)
 
@@ -121,7 +119,8 @@ def main():
                         _std=_normalization['std']
                     )
 
-                    _cell_fibers_densities.append(_normalized_fibers_density)
+                    if not np.isnan(_normalized_fibers_density):
+                        _cell_fibers_densities.append(_normalized_fibers_density)
 
             if len(_cell_fibers_densities) > 0:
                 _experiments_fibers_densities[_offset_index].append(np.mean(_cell_fibers_densities))
@@ -175,7 +174,12 @@ def main():
 
     _fig = edit.update_y_axis(
         _fig=_fig,
-        _range=[-1.5, 17]
+        _range=[-1, 10]
+    )
+
+    _fig = edit.update_x_axis(
+        _fig=_fig,
+        _range=[-0.25, 6]
     )
 
     save.to_html(
