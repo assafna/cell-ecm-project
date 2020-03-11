@@ -6,7 +6,7 @@ from tqdm import tqdm
 
 from libs import compute_lib, paths_lib
 from libs.config_lib import CPUS_TO_USE
-from libs.experiments import compute as experiments_compute, compute
+from libs.experiments import compute as experiments_compute
 from libs.experiments import config as experiments_config
 from libs.experiments import filtering as experiments_filtering
 from libs.experiments import load as experiments_load
@@ -101,8 +101,8 @@ def main():
             })
 
     _rois_dictionary, _rois_to_compute = \
-        compute.rois(_arguments, _keys=['experiment', 'series_id', 'group', 'offset_x'])
-    _fibers_densities = compute.fibers_densities(_rois_to_compute)
+        experiments_compute.rois(_arguments, _keys=['experiment', 'series_id', 'group', 'offset_x'])
+    _fibers_densities = experiments_compute.fibers_densities(_rois_to_compute)
 
     _experiments_fibers_densities = [[] for _i in range(len(EXPERIMENTS_OFFSETS_X))]
     for _tuple in tqdm(_experiments, desc='Experiments Loop'):
@@ -183,7 +183,12 @@ def main():
 
     _fig = edit.update_y_axis(
         _fig=_fig,
-        _range=[-1.5, 17]
+        _range=[-1, 10]
+    )
+
+    _fig = edit.update_x_axis(
+        _fig=_fig,
+        _range=[-0.25, 6]
     )
 
     save.to_html(
