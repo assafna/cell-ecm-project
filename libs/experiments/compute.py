@@ -25,6 +25,16 @@ def cells_distance_in_cell_size(_experiment, _series_id, _cell_1_coordinates, _c
     return math.sqrt((_x1 - _x2) ** 2 + (_y1 - _y2) ** 2 + (_z1 - _z2) ** 2) / AVERAGE_CELL_DIAMETER_IN_MICRONS
 
 
+def cells_distance_in_cell_size_time_point(_experiment, _series_id, _group, _time_point):
+    _group_properties = load.group_properties(_experiment, _series_id, _group)
+    _left_cell_coordinates = \
+        [list(_group_properties['time_points'][_time_point]['left_cell']['coordinates'].values())]
+    _right_cell_coordinates = \
+        [list(_group_properties['time_points'][_time_point]['right_cell']['coordinates'].values())]
+
+    return cells_distance_in_cell_size(_experiment, _series_id, _left_cell_coordinates, _right_cell_coordinates)
+
+
 def angle_between_three_points(_a, _b, _c):
     _angle = abs(math.degrees(math.atan2(_c[1] - _b[1], _c[0] - _b[0]) - math.atan2(_a[1] - _b[1], _a[0] - _b[0])))
     return _angle if _b[1] <= _a[1] else -_angle
@@ -422,6 +432,12 @@ def roi_time_point(_arguments):
 
 def rois_by_time(_arguments):
     _group_properties = load.group_properties(_arguments['experiment'], _arguments['series_id'], _arguments['group'])
+
+    # single time point
+    if 'time_point' in _arguments:
+        return _arguments, [roi_time_point(_arguments)]
+
+    # multiple time points
     if 'time_points' not in _arguments:
         _arguments['time_points'] = sys.maxsize
     _rois = []
