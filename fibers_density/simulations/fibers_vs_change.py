@@ -65,7 +65,7 @@ def main():
         _y_array=_change_in_fibers_densities_by_distance.values(),
         _names_array=['Distance ' + str(_distance) for _distance in _fibers_densities_by_distance.keys()],
         _modes_array=['markers'] * len(_fibers_densities_by_distance.keys()),
-        _showlegend_array=[True] * len(_fibers_densities_by_distance.keys()),
+        _show_legend_array=[True] * len(_fibers_densities_by_distance.keys()),
         _x_axis_title='Fibers Densities Z-Score',
         _y_axis_title='Change in Fibers Densities Z-Score',
         _title='Fibers Densities vs. Change in Fibers Densities - ' + DIRECTION.capitalize()
@@ -94,7 +94,7 @@ def main():
         _y_array=_best_fit_lines_y_array,
         _names_array=['Distance ' + str(_distance) for _distance in _simulations_by_distance],
         _modes_array=['lines'] * len(_simulations_by_distance),
-        _showlegend_array=[True] * len(_simulations_by_distance),
+        _show_legend_array=[True] * len(_simulations_by_distance),
         _x_axis_title='Fibers Densities Z-Score',
         _y_axis_title='Change in Fibers Densities Z-Score',
         _title='Fibers Densities vs. Change in Fibers Densities - ' + DIRECTION.capitalize() + ' - Line of Best Fit'

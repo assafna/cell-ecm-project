@@ -35,7 +35,7 @@ def plot(_experiment, _series, _group, _z_group, _fibers_density, _normalization
             'lines+markers',
             'lines+markers'
         ],
-        _showlegend_array=[True] * 2,
+        _show_legend_array=[True] * 2,
         _x_axis_title='Distance from Left Cell (cell size)',
         _y_axis_title='Fibers Density Z-score',
         _title=_experiment + ' - ' + _series + ' - ' + _group + ' - ' + _z_group + ' - TP First vs. Last'

@@ -152,7 +152,7 @@ def main():
             _y_array=[_slave_correlations_array],
             _names_array=['Master, Slave'],
             _modes_array=['markers'],
-            _showlegend_array=[False],
+            _show_legend_array=[False],
             _x_axis_title='Master Network Correlation',
             _y_axis_title='Slave Network Correlation',
             _title=None
