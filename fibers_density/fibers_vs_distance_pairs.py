@@ -42,37 +42,7 @@ SIMULATIONS_OFFSETS_X = \
     np.arange(start=0, stop=SIMULATIONS_OFFSET_X_END + OFFSET_X_STEP, step=OFFSET_X_STEP)
 
 
-def compute_simulations_fibers_densities(_simulations):
-    _arguments = []
-    for _simulation in _simulations:
-        for _offset_x in SIMULATIONS_OFFSETS_X:
-            _arguments.append({
-                'simulation': _simulation,
-                'length_x': simulations_config.ROI_WIDTH,
-                'length_y': simulations_config.ROI_HEIGHT,
-                'offset_x': _offset_x,
-                'offset_y': OFFSET_Y,
-                'cell_id': 'left_cell',
-                'direction': 'inside',
-                'time_point': SIMULATIONS_TIME_POINT
-            })
-
-    _fibers_densities = {}
-    with Pool(CPUS_TO_USE) as _p:
-        for _keys, _value in tqdm(
-                _p.imap_unordered(simulations_compute.roi_fibers_density_time_point, _arguments),
-                total=len(_arguments), desc='Computing Rois & Fibers Densities'):
-            _fibers_densities[
-                (_keys['simulation'], _keys['offset_x'])] = _value
-        _p.close()
-        _p.join()
-
-    return _fibers_densities
-
-
-def main():
-    # experiments
-    print('Experiments')
+def compute_experiments_data():
     _experiments = experiments_load.experiments_groups_as_tuples(EXPERIMENTS)
     _experiments = experiments_filtering.by_time_points_amount(_experiments, EXPERIMENTS_TIME_POINT)
     _experiments = experiments_filtering.by_real_cells(_experiments)
@@ -137,8 +107,38 @@ def main():
             _experiments_fibers_densities[_offset_index].append(_normalized_fibers_density)
             _offset_index += 1
 
-    # simulations
-    print('Simulations')
+    return _experiments_fibers_densities
+
+
+def compute_simulations_fibers_densities(_simulations):
+    _arguments = []
+    for _simulation in _simulations:
+        for _offset_x in SIMULATIONS_OFFSETS_X:
+            _arguments.append({
+                'simulation': _simulation,
+                'length_x': simulations_config.ROI_WIDTH,
+                'length_y': simulations_config.ROI_HEIGHT,
+                'offset_x': _offset_x,
+                'offset_y': OFFSET_Y,
+                'cell_id': 'left_cell',
+                'direction': 'inside',
+                'time_point': SIMULATIONS_TIME_POINT
+            })
+
+    _fibers_densities = {}
+    with Pool(CPUS_TO_USE) as _p:
+        for _keys, _value in tqdm(
+                _p.imap_unordered(simulations_compute.roi_fibers_density_time_point, _arguments),
+                total=len(_arguments), desc='Computing Rois & Fibers Densities'):
+            _fibers_densities[
+                (_keys['simulation'], _keys['offset_x'])] = _value
+        _p.close()
+        _p.join()
+
+    return _fibers_densities
+
+
+def compute_simulations_data():
     _simulations = simulations_load.structured()
     _simulations = simulations_filtering.by_time_points_amount(_simulations, _time_points=SIMULATIONS_TIME_POINT)
     _simulations = simulations_filtering.by_categories(
@@ -169,6 +169,16 @@ def main():
 
             _simulations_fibers_densities[_offset_index].append(_normalized_fibers_density)
             _offset_index += 1
+
+    return _simulations_fibers_densities
+
+
+def main():
+    print('Experiments')
+    _experiments_fibers_densities = compute_experiments_data()
+
+    print('Simulations')
+    _simulations_fibers_densities = compute_simulations_data()
 
     # plot
     _fig = scatter.create_error_bars_plot(

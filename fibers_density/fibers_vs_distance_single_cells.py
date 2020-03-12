@@ -33,41 +33,7 @@ OUT_OF_BOUNDARIES = True
 SIMULATIONS_TIME_POINT = 50
 
 
-def compute_simulations_fibers_densities(_simulations):
-    _arguments = []
-    for _simulation in _simulations:
-        for _offset_x, _direction in product(OFFSETS_X, ['left', 'right', 'up', 'down']):
-            _arguments.append({
-                'simulation': _simulation,
-                'length_x': simulations_config.ROI_HEIGHT
-                if _direction in ['up', 'down'] else simulations_config.ROI_WIDTH,
-                'length_y': simulations_config.ROI_WIDTH
-                if _direction in ['up', 'down'] else simulations_config.ROI_HEIGHT,
-                'offset_x': OFFSET_Y if _direction in ['up', 'down'] else _offset_x,
-                'offset_y': _offset_x if _direction in ['up', 'down'] else OFFSET_Y,
-                'cell_id': 'cell',
-                'direction': _direction,
-                'time_point': SIMULATIONS_TIME_POINT
-            })
-
-    _fibers_densities = {}
-    with Pool(CPUS_TO_USE) as _p:
-        for _keys, _value in tqdm(
-                _p.imap_unordered(simulations_compute.roi_fibers_density_time_point, _arguments),
-                total=len(_arguments), desc='Computing Rois & Fibers Densities'):
-            if _keys['direction'] in ['up', 'down']:
-                _fibers_densities[(_keys['simulation'], _keys['offset_y'], _keys['direction'])] = _value
-            else:
-                _fibers_densities[(_keys['simulation'], _keys['offset_x'], _keys['direction'])] = _value
-        _p.close()
-        _p.join()
-
-    return _fibers_densities
-
-
-def main():
-    # experiments
-    print('Experiments')
+def compute_experiments_data():
     _experiments = experiments_load.experiments_groups_as_tuples(experiments_config.SINGLE_CELL)
     _experiments = experiments_filtering.by_time_points_amount(_experiments, EXPERIMENTS_TIME_POINT)
 
@@ -126,8 +92,42 @@ def main():
                 _experiments_fibers_densities[_offset_index].append(np.mean(_cell_fibers_densities))
             _offset_index += 1
 
-    # simulations
-    print('Simulations')
+    return _experiments_fibers_densities
+
+
+def compute_simulations_fibers_densities(_simulations):
+    _arguments = []
+    for _simulation in _simulations:
+        for _offset_x, _direction in product(OFFSETS_X, ['left', 'right', 'up', 'down']):
+            _arguments.append({
+                'simulation': _simulation,
+                'length_x': simulations_config.ROI_HEIGHT
+                if _direction in ['up', 'down'] else simulations_config.ROI_WIDTH,
+                'length_y': simulations_config.ROI_WIDTH
+                if _direction in ['up', 'down'] else simulations_config.ROI_HEIGHT,
+                'offset_x': OFFSET_Y if _direction in ['up', 'down'] else _offset_x,
+                'offset_y': _offset_x if _direction in ['up', 'down'] else OFFSET_Y,
+                'cell_id': 'cell',
+                'direction': _direction,
+                'time_point': SIMULATIONS_TIME_POINT
+            })
+
+    _fibers_densities = {}
+    with Pool(CPUS_TO_USE) as _p:
+        for _keys, _value in tqdm(
+                _p.imap_unordered(simulations_compute.roi_fibers_density_time_point, _arguments),
+                total=len(_arguments), desc='Computing Rois & Fibers Densities'):
+            if _keys['direction'] in ['up', 'down']:
+                _fibers_densities[(_keys['simulation'], _keys['offset_y'], _keys['direction'])] = _value
+            else:
+                _fibers_densities[(_keys['simulation'], _keys['offset_x'], _keys['direction'])] = _value
+        _p.close()
+        _p.join()
+
+    return _fibers_densities
+
+
+def compute_simulations_data():
     _simulations = simulations_load.structured()
     _simulations = simulations_filtering.by_time_points_amount(_simulations, _time_points=SIMULATIONS_TIME_POINT)
     _simulations = simulations_filtering.by_categories(
@@ -160,6 +160,16 @@ def main():
 
             _simulations_fibers_densities[_offset_index].append(np.mean(_direction_fibers_densities))
             _offset_index += 1
+
+    return _simulations_fibers_densities
+
+
+def main():
+    print('Experiments')
+    _experiments_fibers_densities = compute_experiments_data()
+
+    print('Simulations')
+    _simulations_fibers_densities = compute_simulations_data()
 
     # plot
     _fig = scatter.create_error_bars_plot(
