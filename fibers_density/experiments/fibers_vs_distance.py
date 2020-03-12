@@ -69,9 +69,8 @@ def main():
             for _cell_tuple in _experiments[_tuple]:
                 _, _, _group = _cell_tuple
                 for _direction in ['left', 'right']:
-                    _fibers_density = _fibers_densities[
-                        _rois_dictionary[(_experiment, _series_id, _group, _offset_x, _direction)][TIME_POINT - 1]
-                    ]
+                    _roi_tuple = _rois_dictionary[(_experiment, _series_id, _group, _offset_x, _direction)][0]
+                    _fibers_density = _fibers_densities[_roi_tuple]
 
                     if not OUT_OF_BOUNDARIES and _fibers_density[1]:
                         continue
