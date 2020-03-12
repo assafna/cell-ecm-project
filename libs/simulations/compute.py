@@ -130,46 +130,14 @@ def roi_fibers_density_time_point(_arguments):
         return _arguments, _roi_fibers_density
 
 
-def roi_fibers_density_by_time(_simulation, _length_x, _length_y, _offset_x, _offset_y, _cell_id, _direction, _time_points):
-    _simulation_properties = properties(_simulation)
-    return [
-        roi_fibers_density_time_point({
-            'simulation': _simulation,
-            'length_x': _length_x,
-            'length_y': _length_y,
-            'offset_x': _offset_x,
-            'offset_y': _offset_y,
-            'cell_id': _cell_id,
-            'direction': _direction,
-            'time_point': _time_point,
-            'properties': _simulation_properties
-        })[1] for _time_point in range(min(_time_points, len(_simulation_properties['time_points'])))
-    ]
+def roi_fibers_density_by_time(_arguments):
+    _simulation_properties = properties(_arguments['simulation'])
+    _rois = []
+    for _time_point in range(min(_arguments['time_points'], len(_simulation_properties['time_points']))):
+        _arguments['time_point'] = _time_point
+        _rois.append(roi_fibers_density_time_point(_arguments)[1])
 
-
-def pairs_roi_fibers_density_by_time(_simulation, _length_x, _length_y, _offset_x, _offset_y, _direction, _time_points):
-    return {
-        'left_cell': roi_fibers_density_by_time(
-            _simulation=_simulation,
-            _length_x=_length_x,
-            _length_y=_length_y,
-            _offset_x=_offset_x,
-            _offset_y=_offset_y,
-            _cell_id='left_cell',
-            _direction=_direction,
-            _time_points=_time_points
-        ),
-        'right_cell': roi_fibers_density_by_time(
-            _simulation=_simulation,
-            _length_x=_length_x,
-            _length_y=_length_y,
-            _offset_x=_offset_x,
-            _offset_y=_offset_y,
-            _cell_id='right_cell',
-            _direction=_direction,
-            _time_points=_time_points
-        )
-    }
+    return _arguments, _rois
 
 
 def cells_distance(_properties):
