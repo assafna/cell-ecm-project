@@ -11,7 +11,7 @@ from libs.simulations.config import ROI_WIDTH, ROI_HEIGHT
 from plotting import scatter, save, edit
 
 TIME_POINT = 50
-CELLS_DISTANCES = [5.0, 7.0, 9.0]
+CELLS_DISTANCES = [5, 7, 9]
 OFFSET_X_STEP = 0.2
 OFFSET_Y = 0
 
@@ -103,6 +103,11 @@ def main():
     _fig = edit.update_y_axis(
         _fig=_fig,
         _range=[-1.5, 17]
+    )
+
+    _fig = edit.update_x_axis(
+        _fig=_fig,
+        _range=[-0.25, 8]
     )
 
     save.to_html(

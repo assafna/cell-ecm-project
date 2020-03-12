@@ -111,6 +111,11 @@ def main():
         _range=[-1.5, 17]
     )
 
+    _fig = edit.update_x_axis(
+        _fig=_fig,
+        _range=[-0.25, 8]
+    )
+
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
