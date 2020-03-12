@@ -17,31 +17,31 @@ CELLS_DISTANCES = [5.0, 7.0, 9.0, 12.0]
 
 def run(_simulation, _direction):
     _normalization = load.normalization(_simulation)
-    _left_cell_fibers_densities = compute.roi_fibers_density_by_time(
-        _simulation=_simulation,
-        _length_x=ROI_WIDTH,
-        _length_y=ROI_HEIGHT,
-        _offset_x=OFFSET_X,
-        _offset_y=OFFSET_Y,
-        _cell_id='left_cell',
-        _direction=_direction,
-        _time_points=TIME_POINTS
-    )
+    _left_cell_fibers_densities = compute.roi_fibers_density_by_time({
+        'simulation': _simulation,
+        'length_x': ROI_WIDTH,
+        'length_y': ROI_HEIGHT,
+        'offset_x': OFFSET_X,
+        'offset_y': OFFSET_Y,
+        'cell_id': 'left_cell',
+        'direction': _direction,
+        'time_points': TIME_POINTS
+    })
     _left_cell_fibers_densities_normalized = compute_lib.z_score(
         _left_cell_fibers_densities,
         _normalization['average'],
         _normalization['std']
     )
-    _right_cell_fibers_densities = compute.roi_fibers_density_by_time(
-        _simulation=_simulation,
-        _length_x=ROI_WIDTH,
-        _length_y=ROI_HEIGHT,
-        _offset_x=OFFSET_X,
-        _offset_y=OFFSET_Y,
-        _cell_id='right_cell',
-        _direction=_direction,
-        _time_points=TIME_POINTS
-    )
+    _right_cell_fibers_densities = compute.roi_fibers_density_by_time({
+        'simulation': _simulation,
+        'length_x': ROI_WIDTH,
+        'length_y': ROI_HEIGHT,
+        'offset_x': OFFSET_X,
+        'offset_y': OFFSET_Y,
+        'cell_id': 'right_cell',
+        'direction': _direction,
+        'time_points': TIME_POINTS
+    })
     _right_cell_fibers_densities_normalized = compute_lib.z_score(
         _right_cell_fibers_densities,
         _normalization['average'],

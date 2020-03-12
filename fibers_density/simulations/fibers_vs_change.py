@@ -40,16 +40,16 @@ def main():
             _simulation_normalization = load.normalization(_simulation)
             _simulation_normalization = [_simulation_normalization['average'], _simulation_normalization['std']]
             for _cell_id in ['left_cell', 'right_cell']:
-                _cell_fibers_densities = compute.roi_fibers_density_by_time(
-                    _simulation=_simulation,
-                    _length_x=ROI_WIDTH,
-                    _length_y=ROI_HEIGHT,
-                    _offset_x=OFFSET_X,
-                    _offset_y=OFFSET_Y,
-                    _cell_id=_cell_id,
-                    _direction=DIRECTION,
-                    _time_points=TIME_POINTS
-                )
+                _cell_fibers_densities = compute.roi_fibers_density_by_time({
+                    'simulation': _simulation,
+                    'length_x': ROI_WIDTH,
+                    'length_y': ROI_HEIGHT,
+                    'offset_x': OFFSET_X,
+                    'offset_y': OFFSET_Y,
+                    'cell_id': _cell_id,
+                    'direction': DIRECTION,
+                    'time_points': TIME_POINTS
+                })
                 _z_score_fibers_density = compute_lib.z_score_fibers_densities_array(
                     _cell_fibers_densities, _simulation_normalization
                 )

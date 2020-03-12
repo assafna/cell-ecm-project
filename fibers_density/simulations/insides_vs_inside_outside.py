@@ -18,46 +18,46 @@ def main():
     _insides_correlations_array = []
     _inside_outside_correlations_array = []
     for _simulation in _simulations:
-        _left_cell_inside_fibers_densities = compute.roi_fibers_density_by_time(
-            _simulation=_simulation,
-            _length_x=ROI_WIDTH,
-            _length_y=ROI_HEIGHT,
-            _offset_x=OFFSET_X,
-            _offset_y=OFFSET_Y,
-            _cell_id='left_cell',
-            _direction='inside',
-            _time_points=TIME_POINTS
-        )
-        _left_cell_outside_fibers_densities = compute.roi_fibers_density_by_time(
-            _simulation=_simulation,
-            _length_x=ROI_WIDTH,
-            _length_y=ROI_HEIGHT,
-            _offset_x=OFFSET_X,
-            _offset_y=OFFSET_Y,
-            _cell_id='left_cell',
-            _direction='outside',
-            _time_points=TIME_POINTS
-        )
-        _right_cell_inside_fibers_densities = compute.roi_fibers_density_by_time(
-            _simulation=_simulation,
-            _length_x=ROI_WIDTH,
-            _length_y=ROI_HEIGHT,
-            _offset_x=OFFSET_X,
-            _offset_y=OFFSET_Y,
-            _cell_id='right_cell',
-            _direction='inside',
-            _time_points=TIME_POINTS
-        )
-        _right_cell_outside_fibers_densities = compute.roi_fibers_density_by_time(
-            _simulation=_simulation,
-            _length_x=ROI_WIDTH,
-            _length_y=ROI_HEIGHT,
-            _offset_x=OFFSET_X,
-            _offset_y=OFFSET_Y,
-            _cell_id='right_cell',
-            _direction='outside',
-            _time_points=TIME_POINTS
-        )
+        _left_cell_inside_fibers_densities = compute.roi_fibers_density_by_time({
+            'simulation': _simulation,
+            'length_x': ROI_WIDTH,
+            'length_y': ROI_HEIGHT,
+            'offset_x': OFFSET_X,
+            'offset_y': OFFSET_Y,
+            'cell_id': 'left_cell',
+            'direction': 'inside',
+            'time_points': TIME_POINTS
+        })
+        _left_cell_outside_fibers_densities = compute.roi_fibers_density_by_time({
+            'simulation': _simulation,
+            'length_x': ROI_WIDTH,
+            'length_y': ROI_HEIGHT,
+            'offset_x': OFFSET_X,
+            'offset_y': OFFSET_Y,
+            'cell_id': 'left_cell',
+            'direction': 'outside',
+            'time_points': TIME_POINTS
+        })
+        _right_cell_inside_fibers_densities = compute.roi_fibers_density_by_time({
+            'simulation': _simulation,
+            'length_x': ROI_WIDTH,
+            'length_y': ROI_HEIGHT,
+            'offset_x': OFFSET_X,
+            'offset_y': OFFSET_Y,
+            'cell_id': 'right_cell',
+            'direction': 'inside',
+            'time_points': TIME_POINTS
+        })
+        _right_cell_outside_fibers_densities = compute.roi_fibers_density_by_time({
+            'simulation': _simulation,
+            'length_x': ROI_WIDTH,
+            'length_y': ROI_HEIGHT,
+            'offset_x': OFFSET_X,
+            'offset_y': OFFSET_Y,
+            'cell_id': 'right_cell',
+            'direction': 'outside',
+            'time_points': TIME_POINTS
+        })
         # left cell
         _insides_correlations_array.append(compute_lib.correlation(
             compute_lib.derivative(_left_cell_inside_fibers_densities, _n=DERIVATIVE),

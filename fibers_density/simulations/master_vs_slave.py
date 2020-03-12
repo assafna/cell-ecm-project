@@ -35,26 +35,26 @@ def main():
     _slave_correlations_array = []
     for _master_index in range(len(_simulations)):
         _master_simulation = _simulations[_master_index]
-        _master_left_cell_fibers_densities = compute.roi_fibers_density_by_time(
-            _simulation=_master_simulation,
-            _length_x=ROI_WIDTH,
-            _length_y=ROI_HEIGHT,
-            _offset_x=OFFSET_X,
-            _offset_y=OFFSET_Y,
-            _cell_id='left_cell',
-            _direction=DIRECTION,
-            _time_points=MINIMUM_TIME_POINTS
-        )
-        _master_right_cell_fibers_densities = compute.roi_fibers_density_by_time(
-            _simulation=_master_simulation,
-            _length_x=ROI_WIDTH,
-            _length_y=ROI_HEIGHT,
-            _offset_x=OFFSET_X,
-            _offset_y=OFFSET_Y,
-            _cell_id='right_cell',
-            _direction=DIRECTION,
-            _time_points=MINIMUM_TIME_POINTS
-        )
+        _master_left_cell_fibers_densities = compute.roi_fibers_density_by_time({
+            'simulation': _master_simulation,
+            'length_x': ROI_WIDTH,
+            'length_y': ROI_HEIGHT,
+            'offset_x': OFFSET_X,
+            'offset_y': OFFSET_Y,
+            'cell_id': 'left_cell',
+            'direction': DIRECTION,
+            'time_points': MINIMUM_TIME_POINTS
+        })
+        _master_right_cell_fibers_densities = compute.roi_fibers_density_by_time({
+            'simulation': _master_simulation,
+            'length_x': ROI_WIDTH,
+            'length_y': ROI_HEIGHT,
+            'offset_x': OFFSET_X,
+            'offset_y': OFFSET_Y,
+            'cell_id': 'right_cell',
+            'direction': DIRECTION,
+            'time_points': MINIMUM_TIME_POINTS
+        })
         _master_correlation = compute_lib.correlation(
             compute_lib.derivative(_master_left_cell_fibers_densities, _n=DERIVATIVE),
             compute_lib.derivative(_master_right_cell_fibers_densities, _n=DERIVATIVE)
@@ -63,16 +63,16 @@ def main():
             if _master_index != _slave_index:
                 _slave_simulation = _simulations[_slave_index]
                 print(_master_simulation, _slave_simulation, sep='\t')
-                _slave_left_cell_fibers_densities = compute.roi_fibers_density_by_time(
-                    _simulation=_slave_simulation,
-                    _length_x=ROI_WIDTH,
-                    _length_y=ROI_HEIGHT,
-                    _offset_x=OFFSET_X,
-                    _offset_y=OFFSET_Y,
-                    _cell_id='left_cell',
-                    _direction=DIRECTION,
-                    _time_points=MINIMUM_TIME_POINTS
-                )
+                _slave_left_cell_fibers_densities = compute.roi_fibers_density_by_time({
+                    'simulation': _slave_simulation,
+                    'length_x': ROI_WIDTH,
+                    'length_y': ROI_HEIGHT,
+                    'offset_x': OFFSET_X,
+                    'offset_y': OFFSET_Y,
+                    'cell_id': 'left_cell',
+                    'direction': DIRECTION,
+                    'time_points': MINIMUM_TIME_POINTS
+                })
                 _slave_correlations_array.append(compute_lib.correlation(
                     compute_lib.derivative(_master_left_cell_fibers_densities, _n=DERIVATIVE),
                     compute_lib.derivative(_slave_left_cell_fibers_densities, _n=DERIVATIVE)
