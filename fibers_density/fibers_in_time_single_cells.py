@@ -91,7 +91,6 @@ def main():
     _experiments_fibers_densities = [[] for _i in range(EXPERIMENTS_TIME_POINTS)]
     for _tuple in tqdm(_experiments, desc='Experiments Loop'):
         _experiment, _series_id, _group = _tuple
-        _time_point_index = 0
         _normalization = experiments_load.normalization_series_file_data(_experiment, 'Series ' + str(_series_id))
 
         for _time_point in range(EXPERIMENTS_TIME_POINTS):
@@ -115,8 +114,7 @@ def main():
                         _cell_fibers_densities.append(_normalized_fibers_density)
 
             if len(_cell_fibers_densities) > 0:
-                _experiments_fibers_densities[_time_point_index].append(np.mean(_cell_fibers_densities))
-            _time_point_index += 1
+                _experiments_fibers_densities[_time_point].append(np.mean(_cell_fibers_densities))
 
     # simulations
     print('Simulations')
@@ -135,7 +133,6 @@ def main():
 
     _simulations_fibers_densities = [[] for _i in range(SIMULATIONS_TIME_POINTS)]
     for _simulation in tqdm(_simulations, desc='Simulations Loop'):
-        _time_point_index = 0
         _normalization = simulations_load.normalization(_simulation)
 
         for _time_point in range(SIMULATIONS_TIME_POINTS):
@@ -150,8 +147,7 @@ def main():
                 )
                 _direction_fibers_densities.append(_normalized_fibers_density)
 
-            _simulations_fibers_densities[_time_point_index].append(np.mean(_direction_fibers_densities))
-            _time_point_index += 1
+            _simulations_fibers_densities[_time_point].append(np.mean(_direction_fibers_densities))
 
     # plot
     _fig = scatter.create_error_bars_plot(
@@ -173,7 +169,7 @@ def main():
 
     _fig = edit.update_y_axis(
         _fig=_fig,
-        _range=[-1.5, 17]
+        _range=[-1.5, 9]
     )
 
     save.to_html(
