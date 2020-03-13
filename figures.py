@@ -4,15 +4,16 @@ import fibers_density
 
 
 def figure_1():
-    fibers_density.fibers_vs_distance_pairs.main()
     fibers_density.fibers_vs_distance_single_cells.main()
+    fibers_density.fibers_vs_distance_pairs.main()
     fibers_density.fibers_vs_distance_differences.main()
     simulations.fibers_vs_distance_multiple_cell_distances.main()
     experiments.fibers_vs_distance_multiple_cell_distances.main()
 
 
 def figure_2():
-    simulations.fibers_in_time.main()
+    fibers_density.fibers_in_time_single_cells.main()
+    fibers_density.fibers_in_time_pairs.main()
 
 
 def figure_3():
