@@ -5,7 +5,7 @@ import numpy as np
 from libs import compute_lib
 from libs.experiments import load, filtering, compute, paths
 from libs.experiments.config import ROI_LENGTH, ROI_HEIGHT, ROI_WIDTH, AVERAGE_CELL_DIAMETER_IN_MICRONS
-from plotting import scatter, save, edit
+from plotting import scatter, save, update
 
 EXPERIMENTS = ['SN16']
 TIME_POINT = 18
@@ -106,12 +106,12 @@ def main():
         _y_axis_title='Fibers Density Z-score'
     )
 
-    _fig = edit.update_y_axis(
+    _fig = update.y_axis(
         _fig=_fig,
         _range=[-1.5, 17]
     )
 
-    _fig = edit.update_x_axis(
+    _fig = update.x_axis(
         _fig=_fig,
         _range=[-0.25, 8]
     )

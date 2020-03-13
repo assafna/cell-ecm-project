@@ -17,7 +17,7 @@ from libs.simulations import compute as simulations_compute
 from libs.simulations import config as simulations_config
 from libs.simulations import filtering as simulations_filtering
 from libs.simulations import load as simulations_load
-from plotting import scatter, save, edit
+from plotting import scatter, save, update
 
 OFFSET_X_STEP = 0.2
 OFFSET_X_END = max(EXPERIMENTS_OFFSETS_X[-1], SIMULATIONS_OFFSETS_X[-1])
@@ -182,12 +182,12 @@ def main():
         _y_axis_title='Fibers Density Z-score'
     )
 
-    _fig = edit.update_y_axis(
+    _fig = update.y_axis(
         _fig=_fig,
         _range=[-1, 10]
     )
 
-    _fig = edit.update_x_axis(
+    _fig = update.x_axis(
         _fig=_fig,
         _range=[-0.25, 6]
     )

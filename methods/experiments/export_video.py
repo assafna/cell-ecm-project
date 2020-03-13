@@ -67,7 +67,7 @@ def draw_borders(_image, _roi):
 
 def process_group(_experiment, _series_id, _group, _mark_cells=True, _draw_borders=True):
     _group_properties = load.group_properties(_experiment, _series_id, _group)
-    _group_path = paths.images(_experiment + ' - No Round - New Window', 'Series ' + str(_series_id), _group)
+    _group_path = paths.images(_experiment + ' - All TPs', 'Series ' + str(_series_id), _group)
     os.makedirs(_group_path, exist_ok=True)
     for _time_point in range(0, len(_group_properties['time_points']), 1):
         print(_experiment, _series_id, _group, _time_point, sep='\t')
@@ -76,9 +76,9 @@ def process_group(_experiment, _series_id, _group, _mark_cells=True, _draw_borde
         _right_cell_coordinates = _group_properties['time_points'][_time_point]['right_cell']['coordinates']
         _left_cell_id = _group_properties['cells_ids']['left_cell']
         _right_cell_id = _group_properties['cells_ids']['right_cell']
-        _left_cell_diameter_in_microns = load.mean_distance_to_surface_in_microns(_experiment, _series_id, _left_cell_id) * 2
-        _right_cell_diameter_in_microns = load.mean_distance_to_surface_in_microns(_experiment, _series_id, _right_cell_id) * 2
-        _cell_diameter_in_microns = (_left_cell_diameter_in_microns + _right_cell_diameter_in_microns) / 2
+        # _left_cell_diameter_in_microns = load.mean_distance_to_surface_in_microns(_experiment, _series_id, _left_cell_id) * 2
+        # _right_cell_diameter_in_microns = load.mean_distance_to_surface_in_microns(_experiment, _series_id, _right_cell_id) * 2
+        _cell_diameter_in_microns = AVERAGE_CELL_DIAMETER_IN_MICRONS
         _z_cell_diameter = _cell_diameter_in_microns / _group_properties['time_points'][_time_point]['resolutions']['z']
         _z_image = _time_point_image[
                    int(round(_left_cell_coordinates['z'] - _z_cell_diameter / 2)):
@@ -87,14 +87,16 @@ def process_group(_experiment, _series_id, _group, _mark_cells=True, _draw_borde
         _average_across_z = np.rint(np.mean(_z_image, axis=0))
 
         if _mark_cells:
-            _average_across_z = mark_cells(_average_across_z, _group_properties, _time_point, _left_cell_coordinates, _left_cell_diameter_in_microns)
-            _average_across_z = mark_cells(_average_across_z, _group_properties, _time_point, _right_cell_coordinates, _right_cell_diameter_in_microns)
+            _average_across_z = mark_cells(_average_across_z, _group_properties, _time_point, _left_cell_coordinates, AVERAGE_CELL_DIAMETER_IN_MICRONS)
+            _average_across_z = mark_cells(_average_across_z, _group_properties, _time_point, _right_cell_coordinates, AVERAGE_CELL_DIAMETER_IN_MICRONS)
 
         if _draw_borders:
             _left_roi = get_roi(_experiment, _series_id, _group_properties, _time_point, 'left_cell', DIRECTION)
             _right_roi = get_roi(_experiment, _series_id, _group_properties, _time_point, 'right_cell', DIRECTION)
             _average_across_z = draw_borders(_average_across_z, _left_roi)
             _average_across_z = draw_borders(_average_across_z, _right_roi)
+            # _roi = (456, 13, 381, 489, 21, 417)
+            # _average_across_z = draw_borders(_average_across_z, _roi)
 
         # _z_image_stretched = np.repeat(
         #     _average_across_z, repeats=int(round(_average_across_z.shape[1] / _average_across_z.shape[0])), axis=0
@@ -120,5 +122,5 @@ def process_all_experiments():
 
 if __name__ == '__main__':
     # process_all_experiments()
-    # process_experiments(['SN44'])
-    process_group('SN16', 1, 'cells_2_3')
+    process_experiments(['SN45'])
+    # process_group('SN16', 2, 'cells_0_1')

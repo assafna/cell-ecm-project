@@ -1,4 +1,4 @@
-def update_y_axis(_fig, _range, _color=None, _width=None):
+def y_axis(_fig, _range, _color=None, _width=None):
     _fig.update_layout(
         yaxis=dict(
             zerolinecolor=_color,
@@ -10,7 +10,7 @@ def update_y_axis(_fig, _range, _color=None, _width=None):
     return _fig
 
 
-def update_x_axis(_fig, _range, _color=None, _width=None):
+def x_axis(_fig, _range, _color=None, _width=None):
     _fig.update_layout(
         xaxis=dict(
             zerolinecolor=_color,

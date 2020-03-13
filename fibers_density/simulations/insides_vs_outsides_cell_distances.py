@@ -5,7 +5,7 @@ from scipy.stats import wilcoxon
 from libs import compute_lib
 from libs.simulations import load, filtering, organize, compute, paths
 from libs.simulations.config import ROI_WIDTH, ROI_HEIGHT, CELL_DIAMETER
-from plotting import box, save, edit
+from plotting import box, save, update
 
 TIME_POINTS = 50
 OFFSET_X = CELL_DIAMETER * 1
@@ -98,7 +98,7 @@ def main():
         _title='Insides & Outsides Correlation by Cell Distance'
     )
 
-    _fig = edit.update_y_axis(
+    _fig = update.y_axis(
         _fig=_fig,
         _range=[-0.5, 1.0]
     )

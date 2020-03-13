@@ -14,7 +14,7 @@ from libs.simulations import compute as simulations_compute
 from libs.simulations import config as simulations_config
 from libs.simulations import filtering as simulations_filtering
 from libs.simulations import load as simulations_load
-from plotting import scatter, save, edit
+from plotting import scatter, save, update
 
 CELLS_DISTANCE = 7
 OFFSET_X = 0
@@ -163,7 +163,7 @@ def main():
         _y_axis_title='Fibers Density Z-score'
     )
 
-    _fig = edit.update_y_axis(
+    _fig = update.y_axis(
         _fig=_fig,
         _range=[-1.5, 9]
     )

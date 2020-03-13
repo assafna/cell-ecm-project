@@ -8,7 +8,7 @@ from libs import compute_lib
 from libs.config_lib import CPUS_TO_USE
 from libs.simulations import load, filtering, compute, paths
 from libs.simulations.config import ROI_WIDTH, ROI_HEIGHT
-from plotting import scatter, save, edit
+from plotting import scatter, save, update
 
 TIME_POINT = 50
 CELLS_DISTANCES = [5, 7, 9]
@@ -100,12 +100,12 @@ def main():
         _y_axis_title='Fibers Density Z-score'
     )
 
-    _fig = edit.update_y_axis(
+    _fig = update.y_axis(
         _fig=_fig,
         _range=[-1.5, 17]
     )
 
-    _fig = edit.update_x_axis(
+    _fig = update.x_axis(
         _fig=_fig,
         _range=[-0.25, 8]
     )
