@@ -3,6 +3,7 @@ import os
 from itertools import product
 
 import numpy as np
+import plotly.graph_objs as go
 from multiprocess.pool import Pool
 from tqdm import tqdm
 
@@ -139,9 +140,7 @@ def main():
             if _offset_x > _max_x_offset:
                 break
 
-            _fibers_density = _fibers_densities[
-                _rois_dictionary[(_experiment, _series_id, _group, _offset_x)][TIME_POINT - 1]
-            ]
+            _fibers_density = _fibers_densities[_rois_dictionary[(_experiment, _series_id, _group, _offset_x)][0]]
 
             if not OUT_OF_BOUNDARIES and _fibers_density[1]:
                 continue
@@ -156,15 +155,37 @@ def main():
             _offset_index += 1
 
     # plot
-    _fig = scatter.create_error_bars_plot(
-        _x_array=[OFFSETS_X] * 2,
-        _y_array=[_pairs_fibers_densities, _single_cell_fibers_densities],
-        _names_array=['Pairs', 'Single Cell'],
-        _modes_array=['lines+markers'] * 2,
-        _dashes_array=['solid', 'dash'],
-        _x_axis_title='Distance from Left Cell (cell size)',
-        _y_axis_title='Fibers Density Z-score',
-        _title='Fibers Densities vs. Distance from Cell'
+    _fig = go.Figure(
+        data=[
+            go.Scatter(
+                x=OFFSETS_X,
+                y=[np.mean(_array) for _array in _pairs_fibers_densities],
+                name='Pairs',
+                error_y={
+                    'type': 'data',
+                    'array': [np.std(_array) for _array in _pairs_fibers_densities],
+                    'thickness': 1
+                },
+                mode='lines+markers',
+                line={'dash': 'solid'}
+            ),
+            go.Scatter(
+                x=OFFSETS_X,
+                y=[np.mean(_array) for _array in _single_cell_fibers_densities],
+                name='Single Cell',
+                error_y={
+                    'type': 'data',
+                    'array': [np.std(_array) for _array in _single_cell_fibers_densities],
+                    'thickness': 1
+                },
+                mode='lines+markers',
+                line={'dash': 'dash'}
+            )
+        ],
+        layout={
+            'xaxis_title': 'Distance from Left Cell (cell size)',
+            'yaxis_title': 'Fibers Density Z-score'
+        }
     )
 
     save.to_html(
