@@ -42,8 +42,14 @@ def to_html(_fig, _path, _filename, _and_to_image=True):
     # options: plotly_white, presentation, none
     _fig.update_layout(
         template='presentation',
-        xaxis_showgrid=False,
-        yaxis_showgrid=False,
+        xaxis={
+            'showgrid': False,
+            'zerolinewidth': 2
+        },
+        yaxis={
+            'showgrid': False,
+            'zerolinewidth': 2
+        },
         font={
             'family': 'Arial',
             'size': 10,
