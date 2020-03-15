@@ -20,7 +20,9 @@ from plotting import save
 CELLS_DISTANCE = 7
 OFFSET_X_STEP = 0.2
 OFFSET_X_END = {
-    7: 2.6
+    5: 1.6,
+    7: 2.6,
+    9: 3.6
 }
 OFFSETS_X = np.arange(start=0, stop=OFFSET_X_END[CELLS_DISTANCE] + OFFSET_X_STEP, step=OFFSET_X_STEP)
 OFFSET_Y = 0
