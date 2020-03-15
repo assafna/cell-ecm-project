@@ -6,7 +6,7 @@ import numpy as np
 import plotly.graph_objs as go
 from tqdm import tqdm
 
-from fibers_density.fibers_vs_distance_pairs import EXPERIMENTS_OFFSETS_X, SIMULATIONS_OFFSETS_X
+from fibers_density.fibers_vs_distance_pairs import OFFSETS_X
 from libs import compute_lib, paths_lib
 from libs.config_lib import CPUS_TO_USE
 from libs.experiments import compute as experiments_compute
@@ -18,17 +18,15 @@ from libs.simulations import compute as simulations_compute
 from libs.simulations import config as simulations_config
 from libs.simulations import filtering as simulations_filtering
 from libs.simulations import load as simulations_load
-from plotting import scatter, save, update
+from plotting import save
 
 OFFSET_X_STEP = 0.2
-OFFSET_X_END = max(EXPERIMENTS_OFFSETS_X[-1], SIMULATIONS_OFFSETS_X[-1])
-OFFSETS_X = np.arange(start=0, stop=OFFSET_X_END + OFFSET_X_STEP, step=OFFSET_X_STEP)
 OFFSET_Y = 0
 
 # experiments
 EXPERIMENTS_TIME_POINT = 18
 OFFSET_Z = 0
-OUT_OF_BOUNDARIES = True
+OUT_OF_BOUNDARIES = False
 
 # simulations
 SIMULATIONS_TIME_POINT = 50
@@ -201,8 +199,7 @@ def main():
         ],
         layout={
             'xaxis': {
-                'title': 'Distance from Left Cell (cell size)',
-                'range': [-0.25, 6]
+                'title': 'Distance from Cell (cell size)'
             },
             'yaxis': {
                 'title': 'Fibers Density Z-score',
