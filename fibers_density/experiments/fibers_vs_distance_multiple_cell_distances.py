@@ -114,12 +114,12 @@ def main():
             ) for _x, _y, _name in zip(_x_array, _y_array, _names_array)
         ],
         layout={
-            'xaxis_title': 'Distance from Left Cell (cell size)',
             'xaxis': {
+                'title': 'Distance from Left Cell (cell size)',
                 'range': [-0.25, 8]
             },
-            'yaxis_title': 'Fibers Density Z-score',
             'yaxis': {
+                'title': 'Fibers Density Z-score',
                 'range': [-1.5, 17]
             }
         }
