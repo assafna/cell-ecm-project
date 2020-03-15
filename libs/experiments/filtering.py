@@ -81,3 +81,15 @@ def by_static_cells(_experiments_tuples, _static=True):
             _experiments_tuples_filtered.append(_tuple)
 
     return _experiments_tuples_filtered
+
+
+def by_main_cell(_experiments_tuples):
+    _experiments_tuples_filtered = []
+    for _tuple in _experiments_tuples:
+        _experiment, _series_id, _group = _tuple
+        _cell_id = int(_group.split('_')[1])
+        _series_properties = load.image_properties(_experiment, _series_id)
+        if _cell_id == _series_properties['main_cell_id']:
+            _experiments_tuples_filtered.append(_tuple)
+
+    return _experiments_tuples_filtered
