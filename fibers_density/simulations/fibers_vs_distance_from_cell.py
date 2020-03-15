@@ -2,6 +2,7 @@ import os
 import time
 
 import numpy as np
+import plotly.graph_objs as go
 
 from libs import compute_lib
 from libs.simulations import load, filtering, compute, paths
@@ -103,15 +104,30 @@ def main():
                 _fibers_densities[_offset_index].append(_fibers_densities_average)
             _offset_index += 1
 
-    _fig = scatter.create_error_bars_plot(
-        _x_array=[np.arange(start=OFFSET_X_START, stop=OFFSET_X_END, step=OFFSET_X_STEP) / CELL_DIAMETER],
-        _y_array=[_fibers_densities],
-        _names_array=['Time-Point Last'],
-        _modes_array=['lines+markers'],
-        _dashes_array=['solid'],
-        _x_axis_title='Distance from Cell (cell size)',
-        _y_axis_title='Fibers Density Z-score',
-        _title='Fibers Densities vs. Distance from Cell'
+    # plot
+    _fig = go.Figure(
+        data=[
+            go.Scatter(
+                x=np.arange(start=OFFSET_X_START, stop=OFFSET_X_END, step=OFFSET_X_STEP) / CELL_DIAMETER,
+                y=[np.mean(_array) for _array in _fibers_densities],
+                name='Time-Point Last',
+                error_y={
+                    'type': 'data',
+                    'array': [np.std(_array) for _array in _fibers_densities],
+                    'thickness': 1
+                },
+                mode='lines+markers',
+                line={'dash': 'solid'}
+            )
+        ],
+        layout={
+            'xaxis': {
+                'title': 'Distance from Left Cell (cell size)'
+            },
+            'yaxis': {
+                'title': 'Fibers Density Z-score'
+            }
+        }
     )
 
     save.to_html(
