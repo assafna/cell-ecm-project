@@ -185,8 +185,7 @@ def main():
                     'array': [np.std(_array) for _array in _experiments_fibers_densities],
                     'thickness': 1
                 },
-                mode='lines+markers',
-                line={'dash': 'dash'}
+                mode='markers'
             ),
             go.Scatter(
                 x=OFFSETS_X,
@@ -197,8 +196,7 @@ def main():
                     'array': [np.std(_array) for _array in _simulations_fibers_densities],
                     'thickness': 1
                 },
-                mode='lines+markers',
-                line={'dash': 'solid'}
+                mode='markers'
             )
         ],
         layout={
@@ -209,6 +207,12 @@ def main():
             'yaxis': {
                 'title': 'Fibers Density Z-score',
                 'range': [-1, 10]
+            },
+            'legend': {
+                'xanchor': 'right',
+                'yanchor': 'top',
+                'bordercolor': 'black',
+                'borderwidth': 2
             }
         }
     )
