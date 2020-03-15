@@ -1,41 +1,67 @@
 import os
 
 import numpy as np
+import plotly.graph_objs as go
 
 from fibers_density import fibers_vs_distance_pairs, fibers_vs_distance_single_cells
+from fibers_density.fibers_vs_distance_pairs import OFFSETS_X
 from libs import paths_lib
 from plotting import scatter, save
 
 OFFSET_X_STEP = 0.2
-OFFSETS_X = np.arange(start=0, stop=100, step=OFFSET_X_STEP)
 
 
 def main():
     print('Experiments')
     _experiments_pairs_fibers_densities = fibers_vs_distance_pairs.compute_experiments_data()
     _experiments_single_cells_fibers_densities = fibers_vs_distance_single_cells.compute_experiments_data()
-    _minimum_length = min(len(_experiments_pairs_fibers_densities), len(_experiments_single_cells_fibers_densities))
+
+    _experiments_pairs_fibers_densities_averages = \
+        np.array([np.mean(_array) for _array in _experiments_pairs_fibers_densities])
+    _experiments_single_cells_fibers_densities_averages = \
+        np.array([np.mean(_array) for _array in _experiments_single_cells_fibers_densities])
+
     _experiments_fibers_densities_differences = \
-        np.mean(_experiments_pairs_fibers_densities, axis=1)[:_minimum_length] - \
-        np.mean(_experiments_single_cells_fibers_densities, axis=1)[:_minimum_length]
+        _experiments_pairs_fibers_densities_averages - _experiments_single_cells_fibers_densities_averages
 
     print('Simulations')
     _simulations_pairs_fibers_densities = fibers_vs_distance_pairs.compute_simulations_data()
     _simulations_single_cells_fibers_densities = fibers_vs_distance_single_cells.compute_simulations_data()
-    _minimum_length = min(len(_simulations_pairs_fibers_densities), len(_simulations_single_cells_fibers_densities))
     _simulations_fibers_densities_differences = \
-        np.mean(_simulations_pairs_fibers_densities, axis=1)[:_minimum_length] - \
-        np.mean(_simulations_single_cells_fibers_densities, axis=1)[:_minimum_length]
+        np.mean(_simulations_pairs_fibers_densities, axis=1) - \
+        np.mean(_simulations_single_cells_fibers_densities, axis=1)
 
     # plot
-    _fig = scatter.create_plot(
-        _x_array=[OFFSETS_X] * 2,
-        _y_array=[_experiments_fibers_densities_differences, _simulations_fibers_densities_differences],
-        _names_array=['Experiments', 'Simulations'],
-        _modes_array=['lines+markers'] * 2,
-        _show_legend_array=[True] * 2,
-        _x_axis_title='Distance from Left Cell (cell size)',
-        _y_axis_title='Fibers Density Z-score Difference'
+    _fig = go.Figure(
+        data=[
+            go.Scatter(
+                x=OFFSETS_X,
+                y=_experiments_fibers_densities_differences,
+                name='Experiments',
+                mode='markers'
+            ),
+            go.Scatter(
+                x=OFFSETS_X,
+                y=_simulations_fibers_densities_differences,
+                name='Simulations',
+                mode='markers'
+            )
+        ],
+        layout={
+            'xaxis': {
+                'title': 'Distance from Cell (cell size)'
+            },
+            'yaxis': {
+                'title': 'Fibers Density Z-score Difference',
+                'range': [-0.25, 3]
+            },
+            'legend': {
+                'xanchor': 'right',
+                'yanchor': 'top',
+                'bordercolor': 'black',
+                'borderwidth': 2
+            }
+        }
     )
 
     save.to_html(
