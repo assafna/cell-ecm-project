@@ -2,6 +2,8 @@ import os
 from multiprocessing.pool import Pool
 
 import numpy as np
+import plotly
+import plotly.graph_objs as go
 from tqdm import tqdm
 
 from libs import compute_lib, paths_lib
@@ -146,26 +148,63 @@ def main():
                 _simulations_fibers_densities[_time_point].append(_normalized_fibers_density)
 
     # plot
-    _fig = scatter.create_error_bars_plot(
-        _x_array=[
-            np.arange(
-                start=0,
-                stop=SIMULATIONS_TIME_POINTS + 1,
-                step=(SIMULATIONS_TIME_POINTS - 1) / (EXPERIMENTS_TIME_POINTS - 1)
+    _fig = go.Figure(
+        data=[
+            go.Scatter(
+                x=np.array(range(EXPERIMENTS_TIME_POINTS)) * 15,
+                y=[np.mean(_array) for _array in _experiments_fibers_densities],
+                name='Experiments',
+                error_y={
+                    'type': 'data',
+                    'array': [np.std(_array) for _array in _experiments_fibers_densities],
+                    'thickness': 1
+                },
+                mode='lines+markers',
+                line={'dash': 'dash'}
             ),
-            list(range(SIMULATIONS_TIME_POINTS))
+            go.Scatter(
+                x=list(range(SIMULATIONS_TIME_POINTS)),
+                xaxis='x2',
+                y=[np.mean(_array) for _array in _simulations_fibers_densities],
+                name='Simulations',
+                error_y={
+                    'type': 'data',
+                    'array': [np.std(_array) for _array in _simulations_fibers_densities],
+                    'thickness': 1
+                },
+                mode='lines+markers',
+                line={'dash': 'solid'}
+            )
         ],
-        _y_array=[_experiments_fibers_densities, _simulations_fibers_densities],
-        _names_array=['Experiments', 'Simulations'],
-        _modes_array=['lines+markers'] * 2,
-        _dashes_array=['dash', 'solid'],
-        _x_axis_title='Time',
-        _y_axis_title='Fibers Density Z-score'
-    )
-
-    _fig = update.y_axis(
-        _fig=_fig,
-        _range=[-1.5, 9]
+        layout={
+            'xaxis': {
+                'title': 'Time (minutes)',
+                'titlefont': {
+                    'color': 'rgb(31, 119, 180)'
+                },
+                'tickfont': {
+                    'color': 'rgb(31, 119, 180)'
+                },
+                'side': 'top'
+            },
+            'xaxis2': {
+                'title': 'Cell contraction (percentages)',
+                'titlefont': {
+                    'color': 'rgb(255, 127, 14)'
+                },
+                'tickfont': {
+                    'color': 'rgb(255, 127, 14)'
+                },
+                # 'anchor': 'free',
+                'overlaying': 'x',
+                'side': 'bottom'
+            },
+            'yaxis': {
+                'title': 'Fibers Density Z-score',
+                # 'domain': [0.3, 1],
+                'range': [-1.5, 9]
+            }
+        }
     )
 
     save.to_html(
