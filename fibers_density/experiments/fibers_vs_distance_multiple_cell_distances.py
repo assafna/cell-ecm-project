@@ -6,7 +6,7 @@ import plotly.graph_objs as go
 from libs import compute_lib
 from libs.experiments import load, filtering, compute, paths
 from libs.experiments.config import ROI_LENGTH, ROI_HEIGHT, ROI_WIDTH, AVERAGE_CELL_DIAMETER_IN_MICRONS
-from plotting import scatter, save, update
+from plotting import save
 
 EXPERIMENTS = ['SN16']
 TIME_POINT = 18
@@ -15,12 +15,11 @@ OFFSET_X_STEP = 0.2
 BAND = True
 OFFSET_Z = 0
 OFFSET_Y = 0
-OUT_OF_BOUNDARIES = True
+OUT_OF_BOUNDARIES = False
 OFFSET_X_END = {
-    5: 2.6,
-    6: 4,
-    7: 4.8,
-    9: 6.4
+    5: 1.6,
+    7: 2.6,
+    9: 3.6
 }
 
 
@@ -43,23 +42,24 @@ def main():
         for _tuple in _experiments:
             _experiment, _series_id, _group = _tuple
             for _offset_x in _offsets_x:
-                _arguments.append({
-                    'experiment': _experiment,
-                    'series_id': _series_id,
-                    'group': _group,
-                    'length_x': ROI_LENGTH,
-                    'length_y': ROI_HEIGHT,
-                    'length_z': ROI_WIDTH,
-                    'offset_x': _offset_x,
-                    'offset_y': OFFSET_Y,
-                    'offset_z': OFFSET_Z,
-                    'cell_id': 'left_cell',
-                    'direction': 'inside',
-                    'time_point': TIME_POINT - 1
-                })
+                for _cell_id in ['left_cell', 'right_cell']:
+                    _arguments.append({
+                        'experiment': _experiment,
+                        'series_id': _series_id,
+                        'group': _group,
+                        'length_x': ROI_LENGTH,
+                        'length_y': ROI_HEIGHT,
+                        'length_z': ROI_WIDTH,
+                        'offset_x': _offset_x,
+                        'offset_y': OFFSET_Y,
+                        'offset_z': OFFSET_Z,
+                        'cell_id': _cell_id,
+                        'direction': 'inside',
+                        'time_point': TIME_POINT - 1
+                    })
 
         _rois_dictionary, _rois_to_compute = \
-            compute.rois(_arguments, _keys=['experiment', 'series_id', 'group', 'offset_x'])
+            compute.rois(_arguments, _keys=['experiment', 'series_id', 'group', 'offset_x', 'cell_id'])
         _fibers_densities = compute.fibers_densities(_rois_to_compute)
 
         _cells_distance_fibers_densities = [[] for _i in range(len(_offsets_x))]
@@ -67,30 +67,22 @@ def main():
             _experiment, _series_id, _group = _tuple
             _offset_index = 0
             _normalization = load.normalization_series_file_data(_experiment, 'Series ' + str(_series_id))
-            _group_properties = load.group_properties(_experiment, _series_id, _group)
-            _right_cell_coordinates = _group_properties['time_points'][TIME_POINT - 1]['right_cell']['coordinates']
-            _x_cell_diameter = \
-                AVERAGE_CELL_DIAMETER_IN_MICRONS / _group_properties['time_points'][TIME_POINT - 1]['resolutions']['x']
 
             for _offset_x in _offsets_x:
-                _roi_tuple = _rois_dictionary[(_experiment, _series_id, _group, _offset_x)][0]
+                for _cell_id in ['left_cell', 'right_cell']:
+                    _roi_tuple = _rois_dictionary[(_experiment, _series_id, _group, _offset_x, _cell_id)][0]
+                    _fibers_density = _fibers_densities[_roi_tuple]
 
-                # make sure not to pass the right cell
-                if _right_cell_coordinates['x'] - _x_cell_diameter / 2 < _roi_tuple[4][3]:
-                    break
+                    if not OUT_OF_BOUNDARIES and _fibers_density[1]:
+                        continue
 
-                _fibers_density = _fibers_densities[_roi_tuple]
+                    _normalized_fibers_density = compute_lib.z_score(
+                        _x=_fibers_density[0],
+                        _average=_normalization['average'],
+                        _std=_normalization['std']
+                    )
+                    _cells_distance_fibers_densities[_offset_index].append(_normalized_fibers_density)
 
-                if not OUT_OF_BOUNDARIES and _fibers_density[1]:
-                    continue
-
-                _normalized_fibers_density = compute_lib.z_score(
-                    _x=_fibers_density[0],
-                    _average=_normalization['average'],
-                    _std=_normalization['std']
-                )
-
-                _cells_distance_fibers_densities[_offset_index].append(_normalized_fibers_density)
                 _offset_index += 1
 
         _x_array.append(_offsets_x)
@@ -109,18 +101,22 @@ def main():
                     'array': [np.std(_array) for _array in _y],
                     'thickness': 1
                 },
-                mode='lines+markers',
-                line={'dash': 'solid'}
+                mode='markers'
             ) for _x, _y, _name in zip(_x_array, _y_array, _names_array)
         ],
         layout={
             'xaxis': {
-                'title': 'Distance from Left Cell (cell size)',
-                'range': [-0.25, 8]
+                'title': 'Distance from Cell (cell size)'
             },
             'yaxis': {
                 'title': 'Fibers Density Z-score',
-                'range': [-1.5, 17]
+                'range': [-1.5, 16]
+            },
+            'legend': {
+                'xanchor': 'right',
+                'yanchor': 'top',
+                'bordercolor': 'black',
+                'borderwidth': 2
             }
         }
     )
