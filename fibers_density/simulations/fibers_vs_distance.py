@@ -1,6 +1,7 @@
 import os
 
 import numpy as np
+import plotly.graph_objs as go
 
 from libs import compute_lib
 from libs.simulations import load, filtering, compute, paths
@@ -85,15 +86,41 @@ def main():
     )
 
     # plot
-    _fig = scatter.create_error_bars_plot(
-        _x_array=[np.arange(start=0, stop=OFFSET_X_END, step=OFFSET_X_STEP) / CELL_DIAMETER] * 2,
-        _y_array=[_fibers_densities_single_cells, _fibers_densities_pairs],
-        _names_array=['Single Cell', 'Pair'],
-        _modes_array=['lines+markers'] * 2,
-        _dashes_array=['dash', 'solid'],
-        _x_axis_title='Distance from Left Cell (cell size)',
-        _y_axis_title='Fibers Density Z-score',
-        _title='Fibers Densities vs. Distance from Cell'
+    _fig = go.Figure(
+        data=[
+            go.Scatter(
+                x=np.arange(start=0, stop=OFFSET_X_END, step=OFFSET_X_STEP) / CELL_DIAMETER,
+                y=[np.mean(_array) for _array in _fibers_densities_single_cells],
+                name='Single Cells',
+                error_y={
+                    'type': 'data',
+                    'array': [np.std(_array) for _array in _fibers_densities_single_cells],
+                    'thickness': 1
+                },
+                mode='lines+markers',
+                line={'dash': 'dash'}
+            ),
+            go.Scatter(
+                x=np.arange(start=0, stop=OFFSET_X_END, step=OFFSET_X_STEP) / CELL_DIAMETER,
+                y=[np.mean(_array) for _array in _fibers_densities_pairs],
+                name='Pair',
+                error_y={
+                    'type': 'data',
+                    'array': [np.std(_array) for _array in _fibers_densities_pairs],
+                    'thickness': 1
+                },
+                mode='lines+markers',
+                line={'dash': 'solid'}
+            )
+        ],
+        layout={
+            'xaxis': {
+                'title': 'Distance from Left Cell (cell size)'
+            },
+            'yaxis': {
+                'title': 'Fibers Density Z-score'
+            }
+        }
     )
 
     save.to_html(
