@@ -3,6 +3,7 @@ from itertools import product
 from multiprocessing.pool import Pool
 
 import numpy as np
+import plotly.graph_objs as go
 from tqdm import tqdm
 
 from fibers_density.fibers_vs_distance_pairs import EXPERIMENTS_OFFSETS_X, SIMULATIONS_OFFSETS_X
@@ -172,24 +173,43 @@ def main():
     _simulations_fibers_densities = compute_simulations_data()
 
     # plot
-    _fig = scatter.create_error_bars_plot(
-        _x_array=[OFFSETS_X] * 2,
-        _y_array=[_experiments_fibers_densities, _simulations_fibers_densities],
-        _names_array=['Experiments', 'Simulations'],
-        _modes_array=['lines+markers'] * 2,
-        _dashes_array=['dash', 'solid'],
-        _x_axis_title='Distance from Cell (cell size)',
-        _y_axis_title='Fibers Density Z-score'
-    )
-
-    _fig = update.y_axis(
-        _fig=_fig,
-        _range=[-1, 10]
-    )
-
-    _fig = update.x_axis(
-        _fig=_fig,
-        _range=[-0.25, 6]
+    _fig = go.Figure(
+        data=[
+            go.Scatter(
+                x=OFFSETS_X,
+                y=[np.mean(_array) for _array in _experiments_fibers_densities],
+                name='Experiments',
+                error_y={
+                    'type': 'data',
+                    'array': [np.std(_array) for _array in _experiments_fibers_densities],
+                    'thickness': 1
+                },
+                mode='lines+markers',
+                line={'dash': 'dash'}
+            ),
+            go.Scatter(
+                x=OFFSETS_X,
+                y=[np.mean(_array) for _array in _simulations_fibers_densities],
+                name='Simulations',
+                error_y={
+                    'type': 'data',
+                    'array': [np.std(_array) for _array in _simulations_fibers_densities],
+                    'thickness': 1
+                },
+                mode='lines+markers',
+                line={'dash': 'solid'}
+            )
+        ],
+        layout={
+            'xaxis': {
+                'title': 'Distance from Left Cell (cell size)',
+                'range': [-0.25, 6]
+            },
+            'yaxis': {
+                'title': 'Fibers Density Z-score',
+                'range': [-1, 10]
+            }
+        }
     )
 
     save.to_html(
