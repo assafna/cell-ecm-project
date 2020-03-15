@@ -64,6 +64,7 @@ def main():
     print('Experiments')
     _experiments = experiments_load.experiments_groups_as_tuples(experiments_config.SINGLE_CELL)
     _experiments = experiments_filtering.by_time_points_amount(_experiments, EXPERIMENTS_TIME_POINTS)
+    _experiments = experiments_filtering.by_main_cell(_experiments)
 
     _arguments = []
     for _tuple in _experiments:
