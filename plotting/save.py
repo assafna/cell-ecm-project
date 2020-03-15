@@ -40,7 +40,18 @@ def get_module_name():
 def to_html(_fig, _path, _filename, _and_to_image=True):
     # update theme
     # options: plotly_white, presentation, none
-    _fig.update_layout(template='presentation')
+    _fig.update_layout(
+        template='presentation',
+        xaxis_showgrid=False,
+        yaxis_showgrid=False,
+        font={
+            'family': 'Arial',
+            'size': 10,
+            'color': 'black'
+        },
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)'
+    )
 
     # create div
     _div = plotly.offline.plot(
@@ -75,7 +86,7 @@ def to_html(_fig, _path, _filename, _and_to_image=True):
         to_image(_fig, _path, _filename)
 
 
-def to_image(_fig, _path, _filename, _format='svg', _width=1000, _height=1000):
+def to_image(_fig, _path, _filename, _format='svg', _width=500, _height=500):
     os.makedirs(_path, exist_ok=True)
     _fig.write_image(
         os.path.join(_path, _filename + '.' + _format),
