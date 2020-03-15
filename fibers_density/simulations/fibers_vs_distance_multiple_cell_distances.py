@@ -2,6 +2,7 @@ import os
 from multiprocessing.pool import Pool
 
 import numpy as np
+import plotly.graph_objs as go
 from tqdm import tqdm
 
 from libs import compute_lib
@@ -90,24 +91,32 @@ def main():
         _y_array.append(_cells_distance_fibers_densities)
         _names_array.append('Cells Distance ' + str(_distance))
 
-    _fig = scatter.create_error_bars_plot(
-        _x_array=_x_array,
-        _y_array=_y_array,
-        _names_array=_names_array,
-        _modes_array=['lines+markers'] * len(CELLS_DISTANCES),
-        _dashes_array=['solid'] * len(CELLS_DISTANCES),
-        _x_axis_title='Distance from Left Cell (cell size)',
-        _y_axis_title='Fibers Density Z-score'
-    )
-
-    _fig = update.y_axis(
-        _fig=_fig,
-        _range=[-1.5, 17]
-    )
-
-    _fig = update.x_axis(
-        _fig=_fig,
-        _range=[-0.25, 8]
+    # plot
+    _fig = go.Figure(
+        data=[
+            go.Scatter(
+                x=_x,
+                y=[np.mean(_array) for _array in _y],
+                name=_name,
+                error_y={
+                    'type': 'data',
+                    'array': [np.std(_array) for _array in _y],
+                    'thickness': 1
+                },
+                mode='lines+markers',
+                line={'dash': 'solid'}
+            ) for _x, _y, _name in zip(_x_array, _y_array, _names_array)
+        ],
+        layout={
+            'xaxis': {
+                'title': 'Distance from Left Cell (cell size)',
+                'range': [-0.25, 8]
+            },
+            'yaxis': {
+                'title': 'Fibers Density Z-score',
+                'range': [-1.5, 17]
+            }
+        }
     )
 
     save.to_html(
