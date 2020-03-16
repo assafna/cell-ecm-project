@@ -24,10 +24,11 @@ OFFSET_Y = 0
 # experiments
 EXPERIMENTS_TIME_POINTS = 18
 OFFSET_Z = 0
-OUT_OF_BOUNDARIES = True
+OUT_OF_BOUNDARIES = False
 
 # simulations
 SIMULATIONS_TIME_POINTS = 50
+SIMULATIONS_STEP = int(round(SIMULATIONS_TIME_POINTS / EXPERIMENTS_TIME_POINTS))
 
 
 def compute_simulations_fibers_densities(_simulations):
@@ -163,21 +164,19 @@ def main():
                     'array': [np.std(_array) for _array in _experiments_fibers_densities],
                     'thickness': 1
                 },
-                mode='lines+markers',
-                line={'dash': 'dash'}
+                mode='markers'
             ),
             go.Scatter(
-                x=list(range(SIMULATIONS_TIME_POINTS)),
+                x=list(range(SIMULATIONS_TIME_POINTS))[::SIMULATIONS_STEP],
                 xaxis='x2',
-                y=[np.mean(_array) for _array in _simulations_fibers_densities],
+                y=[np.mean(_array) for _array in _simulations_fibers_densities][::SIMULATIONS_STEP],
                 name='Simulations',
                 error_y={
                     'type': 'data',
-                    'array': [np.std(_array) for _array in _simulations_fibers_densities],
+                    'array': [np.std(_array) for _array in _simulations_fibers_densities][::SIMULATIONS_STEP],
                     'thickness': 1
                 },
-                mode='lines+markers',
-                line={'dash': 'solid'}
+                mode='markers'
             )
         ],
         layout={
@@ -201,12 +200,20 @@ def main():
                 },
                 # 'anchor': 'free',
                 'overlaying': 'x',
-                'side': 'bottom'
+                'side': 'bottom',
+                'showgrid': False
             },
             'yaxis': {
                 'title': 'Fibers Density Z-score',
                 # 'domain': [0.3, 1],
-                'range': [-1.5, 9]
+                'range': [-1, 11]
+            },
+            'legend': {
+                'xanchor': 'left',
+                'x': 0.1,
+                'yanchor': 'top',
+                'bordercolor': 'black',
+                'borderwidth': 2
             }
         }
     )
