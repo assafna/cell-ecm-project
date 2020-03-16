@@ -2,7 +2,6 @@ import os
 from multiprocessing.pool import Pool
 
 import numpy as np
-import plotly
 import plotly.graph_objs as go
 from tqdm import tqdm
 
@@ -16,7 +15,7 @@ from libs.simulations import compute as simulations_compute
 from libs.simulations import config as simulations_config
 from libs.simulations import filtering as simulations_filtering
 from libs.simulations import load as simulations_load
-from plotting import scatter, save, update
+from plotting import save
 
 CELLS_DISTANCE = 7
 OFFSET_X = 0
@@ -34,36 +33,7 @@ SIMULATIONS_TIME_POINTS = 50
 SIMULATIONS_STEP = int(round(SIMULATIONS_TIME_POINTS / EXPERIMENTS_TIME_POINTS))
 
 
-def compute_simulations_fibers_densities(_simulations):
-    _arguments = []
-    for _simulation in _simulations:
-        for _cell_id in ['left_cell', 'right_cell']:
-            _arguments.append({
-                'simulation': _simulation,
-                'length_x': simulations_config.ROI_WIDTH,
-                'length_y': simulations_config.ROI_HEIGHT,
-                'offset_x': OFFSET_X,
-                'offset_y': OFFSET_Y,
-                'cell_id': _cell_id,
-                'direction': 'inside',
-                'time_points': SIMULATIONS_TIME_POINTS
-            })
-
-    _fibers_densities = {}
-    with Pool(CPUS_TO_USE) as _p:
-        for _keys, _value in tqdm(
-                _p.imap_unordered(simulations_compute.roi_fibers_density_by_time, _arguments),
-                total=len(_arguments), desc='Computing Rois & Fibers Densities'):
-            _fibers_densities[(_keys['simulation'], _keys['cell_id'])] = _value
-        _p.close()
-        _p.join()
-
-    return _fibers_densities
-
-
-def main():
-    # experiments
-    print('Experiments')
+def compute_experiments_data():
     _experiments = experiments_load.experiments_groups_as_tuples(EXPERIMENTS)
     _experiments = experiments_filtering.by_time_points_amount(_experiments, EXPERIMENTS_TIME_POINTS)
     _experiments = experiments_filtering.by_real_cells(_experiments)
@@ -116,8 +86,37 @@ def main():
                 if not np.isnan(_normalized_fibers_density):
                     _experiments_fibers_densities[_time_point].append(_normalized_fibers_density)
 
-    # simulations
-    print('Simulations')
+    return _experiments_fibers_densities
+
+
+def compute_simulations_fibers_densities(_simulations):
+    _arguments = []
+    for _simulation in _simulations:
+        for _cell_id in ['left_cell', 'right_cell']:
+            _arguments.append({
+                'simulation': _simulation,
+                'length_x': simulations_config.ROI_WIDTH,
+                'length_y': simulations_config.ROI_HEIGHT,
+                'offset_x': OFFSET_X,
+                'offset_y': OFFSET_Y,
+                'cell_id': _cell_id,
+                'direction': 'inside',
+                'time_points': SIMULATIONS_TIME_POINTS
+            })
+
+    _fibers_densities = {}
+    with Pool(CPUS_TO_USE) as _p:
+        for _keys, _value in tqdm(
+                _p.imap_unordered(simulations_compute.roi_fibers_density_by_time, _arguments),
+                total=len(_arguments), desc='Computing Rois & Fibers Densities'):
+            _fibers_densities[(_keys['simulation'], _keys['cell_id'])] = _value
+        _p.close()
+        _p.join()
+
+    return _fibers_densities
+
+
+def compute_simulations_data():
     _simulations = simulations_load.structured()
     _simulations = simulations_filtering.by_time_points_amount(_simulations, _time_points=SIMULATIONS_TIME_POINTS)
     _simulations = simulations_filtering.by_categories(
@@ -147,6 +146,16 @@ def main():
                 )
 
                 _simulations_fibers_densities[_time_point].append(_normalized_fibers_density)
+
+    return _simulations_fibers_densities
+
+
+def main():
+    print('Experiments')
+    _experiments_fibers_densities = compute_experiments_data()
+
+    print('Simulations')
+    _simulations_fibers_densities = compute_simulations_data()
 
     # plot
     _fig = go.Figure(
