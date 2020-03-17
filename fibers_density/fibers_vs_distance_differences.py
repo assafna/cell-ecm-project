@@ -36,31 +36,65 @@ def main():
         data=[
             go.Scatter(
                 x=OFFSETS_X,
-                y=_experiments_fibers_densities_differences,
-                name='Experiments',
-                mode='markers'
+                y=_simulations_fibers_densities_differences,
+                name='Simulations',
+                mode='markers',
+                marker={
+                    'size': 15
+                },
+                opacity=0.7
             ),
             go.Scatter(
                 x=OFFSETS_X,
-                y=_simulations_fibers_densities_differences,
-                name='Simulations',
-                mode='markers'
+                y=_experiments_fibers_densities_differences,
+                name='Experiments',
+                mode='markers',
+                marker={
+                    'size': 15
+                },
+                opacity=0.7
             )
         ],
         layout={
             'xaxis': {
-                'title': 'Distance from Cell (cell size)'
+                'title': 'Distance from Cell (cell size)',
+                'zeroline': False
             },
             'yaxis': {
                 'title': 'Fibers Density Z-score Difference',
-                'range': [-0.25, 3]
+                'range': [-0.2, 3.5],
+                'zeroline': False
             },
             'legend': {
                 'xanchor': 'right',
                 'yanchor': 'top',
                 'bordercolor': 'black',
                 'borderwidth': 2
-            }
+            },
+            'shapes': [
+                {
+                    'type': 'line',
+                    'x0': -OFFSET_X_STEP,
+                    'y0': 0,
+                    'x1': OFFSETS_X[-1] + OFFSET_X_STEP,
+                    'y1': 0,
+                    'line': {
+                        'color': 'black',
+                        'width': 2
+                    }
+                },
+                {
+                    'type': 'line',
+                    'x0': -OFFSET_X_STEP,
+                    'y0': 0,
+                    'x1': -OFFSET_X_STEP,
+                    'y1': 3.5,
+                    'line': {
+                        'color': 'black',
+                        'width': 2
+                    }
+                }
+            ]
         }
     )
 
