@@ -182,7 +182,7 @@ def main(_low_connectivity=False):
                 error_y={
                     'type': 'data',
                     'array': [np.std(_array) for _array in _simulations_fibers_densities],
-                    'thickness': 2
+                    'thickness': 1
                 },
                 mode='markers',
                 marker={
@@ -197,7 +197,7 @@ def main(_low_connectivity=False):
                 error_y={
                     'type': 'data',
                     'array': [np.std(_array) for _array in _experiments_fibers_densities],
-                    'thickness': 2
+                    'thickness': 1
                 },
                 mode='markers',
                 marker={
