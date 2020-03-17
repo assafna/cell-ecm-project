@@ -10,6 +10,10 @@ def figure_1():
     simulations.fibers_vs_distance_multiple_cell_distances.main()
     experiments.fibers_vs_distance_multiple_cell_distances.main()
 
+    # sup
+    fibers_density.fibers_vs_distance_pairs.main(_low_connectivity=True)
+    simulations.fibers_vs_distance_multiple_cell_distances.main(_low_connectivity=True)
+
 
 def figure_2():
     fibers_density.fibers_in_time_single_cells.main()
