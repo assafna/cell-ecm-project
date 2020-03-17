@@ -11,7 +11,10 @@ from libs.simulations import load, filtering, compute, paths
 from libs.simulations.config import ROI_WIDTH, ROI_HEIGHT
 from plotting import scatter, save, update
 
-TIME_POINT = 50
+TIME_POINT = {
+    False: 50,
+    True: 35
+}
 CELLS_DISTANCES = [5, 7, 9]
 OFFSET_X_STEP = 0.2
 OFFSET_X_END = {
@@ -22,7 +25,7 @@ OFFSET_X_END = {
 OFFSET_Y = 0
 
 
-def compute_simulations_fibers_densities(_simulations, _offsets_x):
+def compute_simulations_fibers_densities(_simulations, _offsets_x, _low_connectivity):
     _arguments = []
     for _simulation in _simulations:
         for _offset_x in _offsets_x:
@@ -35,7 +38,7 @@ def compute_simulations_fibers_densities(_simulations, _offsets_x):
                     'offset_y': OFFSET_Y,
                     'cell_id': _cell_id,
                     'direction': 'inside',
-                    'time_point': TIME_POINT
+                    'time_point': TIME_POINT[_low_connectivity]
                 })
 
     _fibers_densities = {}
@@ -51,7 +54,7 @@ def compute_simulations_fibers_densities(_simulations, _offsets_x):
     return _fibers_densities
 
 
-def main():
+def main(_low_connectivity=False):
     _x_array = []
     _y_array = []
     _names_array = []
@@ -62,15 +65,15 @@ def main():
             _simulations,
             _is_single_cell=False,
             _is_heterogeneity=False,
-            _is_low_connectivity=False,
+            _is_low_connectivity=_low_connectivity,
             _is_causality=False,
             _is_dominant_passive=False
         )
         _simulations = filtering.by_distance(_simulations, _distance=_distance)
-        _simulations = filtering.by_time_points_amount(_simulations, _time_points=TIME_POINT)
+        _simulations = filtering.by_time_points_amount(_simulations, _time_points=TIME_POINT[_low_connectivity])
 
         _offsets_x = np.arange(start=0, stop=OFFSET_X_END[_distance] + OFFSET_X_STEP, step=OFFSET_X_STEP)
-        _fibers_densities = compute_simulations_fibers_densities(_simulations, _offsets_x)
+        _fibers_densities = compute_simulations_fibers_densities(_simulations, _offsets_x, _low_connectivity)
 
         _cells_distance_fibers_densities = [[] for _i in range(len(_offsets_x))]
         for _simulation in _simulations:
@@ -158,7 +161,7 @@ def main():
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        _filename='plot'
+        _filename='plot_low_con_' + str(_low_connectivity)
     )
 
 
