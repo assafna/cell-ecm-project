@@ -91,7 +91,7 @@ def main():
 
         _x_array.append(_offsets_x)
         _y_array.append(_cells_distance_fibers_densities)
-        _names_array.append('Cells Distance ' + str(_distance))
+        _names_array.append('Distance ' + str(_distance))
 
     # plot
     _fig = go.Figure(

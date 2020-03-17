@@ -87,7 +87,7 @@ def main():
 
         _x_array.append(_offsets_x)
         _y_array.append(_cells_distance_fibers_densities)
-        _names_array.append('Cells Distance ' + str(_distance))
+        _names_array.append('Distance ' + str(_distance))
 
     # plot
     _fig = go.Figure(
@@ -99,25 +99,55 @@ def main():
                 error_y={
                     'type': 'data',
                     'array': [np.std(_array) for _array in _y],
-                    'thickness': 1
+                    'thickness': 2
                 },
-                mode='markers'
+                mode='markers',
+                marker={
+                    'size': 15
+                },
+                opacity=0.7
             ) for _x, _y, _name in zip(_x_array, _y_array, _names_array)
         ],
         layout={
             'xaxis': {
-                'title': 'Distance from Cell (cell size)'
+                'title': 'Distance from Cell (cell size)',
+                'zeroline': False
             },
             'yaxis': {
                 'title': 'Fibers Density Z-score',
-                'range': [-1.5, 16]
+                'range': [-1.7, 16],
+                'zeroline': False
             },
             'legend': {
                 'xanchor': 'right',
                 'yanchor': 'top',
                 'bordercolor': 'black',
                 'borderwidth': 2
-            }
+            },
+            'shapes': [
+                {
+                    'type': 'line',
+                    'x0': -OFFSET_X_STEP,
+                    'y0': -1.5,
+                    'x1': max([OFFSET_X_END[_distance] for _distance in CELLS_DISTANCES]) + OFFSET_X_STEP,
+                    'y1': -1.5,
+                    'line': {
+                        'color': 'black',
+                        'width': 2
+                    }
+                },
+                {
+                    'type': 'line',
+                    'x0': -OFFSET_X_STEP,
+                    'y0': -1.5,
+                    'x1': -OFFSET_X_STEP,
+                    'y1': 16,
+                    'line': {
+                        'color': 'black',
+                        'width': 2
+                    }
+                }
+            ]
         }
     )
 
