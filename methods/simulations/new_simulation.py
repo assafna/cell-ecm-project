@@ -68,7 +68,7 @@ def create_elements(_simulation):
 
 def create_time_point(_simulation, _time_point):
     _simulation_path = paths.raw(_simulation)
-    _time_point_path = os.path.join(_simulation_path, str(_time_point) + '.txt')
+    _time_point_path = os.path.join(_simulation_path, 'tp_' + str(_time_point) + '.txt')
     _intersections = [0]
     try:
         with open(_time_point_path, 'r') as _f:
