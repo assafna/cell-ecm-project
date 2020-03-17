@@ -214,7 +214,7 @@ def main():
             },
             'yaxis': {
                 'title': 'Fibers Density Z-score',
-                # 'range': [-1.1, 10],
+                'range': [-1.2, 10],
                 'zeroline': False
             },
             'legend': {
@@ -235,16 +235,16 @@ def main():
                         'width': 2
                     }
                 },
-                    {
-                        'type': 'line',
-                        'x0': -OFFSET_X_STEP,
-                        'y0': -1,
-                        'x1': -OFFSET_X_STEP,
-                        'y1': 10,
-                        'line': {
-                            'color': 'black',
-                            'width': 2
-                        }
+                {
+                    'type': 'line',
+                    'x0': -OFFSET_X_STEP,
+                    'y0': -1,
+                    'x1': -OFFSET_X_STEP,
+                    'y1': 10,
+                    'line': {
+                        'color': 'black',
+                        'width': 2
+                    }
                 }
             ]
         }
