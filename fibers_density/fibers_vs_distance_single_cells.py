@@ -176,41 +176,77 @@ def main():
         data=[
             go.Scatter(
                 x=OFFSETS_X,
-                y=[np.mean(_array) for _array in _experiments_fibers_densities],
-                name='Experiments',
-                error_y={
-                    'type': 'data',
-                    'array': [np.std(_array) for _array in _experiments_fibers_densities],
-                    'thickness': 1
-                },
-                mode='markers'
-            ),
-            go.Scatter(
-                x=OFFSETS_X,
                 y=[np.mean(_array) for _array in _simulations_fibers_densities],
                 name='Simulations',
                 error_y={
                     'type': 'data',
                     'array': [np.std(_array) for _array in _simulations_fibers_densities],
-                    'thickness': 1
+                    'thickness': 2
                 },
-                mode='markers'
+                mode='markers',
+                marker={
+                    'size': 15
+                },
+                opacity=0.7
+            ),
+            go.Scatter(
+                x=OFFSETS_X,
+                y=[np.mean(_array) for _array in _experiments_fibers_densities],
+                name='Experiments',
+                error_y={
+                    'type': 'data',
+                    'array': [np.std(_array) for _array in _experiments_fibers_densities],
+                    'thickness': 2
+                },
+                mode='markers',
+                marker={
+                    'size': 15,
+                    # 'symbol': 'triangle-up'
+                },
+                opacity=0.7
             )
         ],
         layout={
             'xaxis': {
-                'title': 'Distance from Cell (cell size)'
+                'title': 'Distance from Cell (cell size)',
+                # 'range': [0, OFFSETS_X[-1] + OFFSET_X_STEP],
+                'zeroline': False
             },
             'yaxis': {
                 'title': 'Fibers Density Z-score',
-                'range': [-1, 10]
+                # 'range': [-1.1, 10],
+                'zeroline': False
             },
             'legend': {
                 'xanchor': 'right',
                 'yanchor': 'top',
                 'bordercolor': 'black',
                 'borderwidth': 2
-            }
+            },
+            'shapes': [
+                {
+                    'type': 'line',
+                    'x0': -OFFSET_X_STEP,
+                    'y0': -1,
+                    'x1': OFFSETS_X[-1] + OFFSET_X_STEP,
+                    'y1': -1,
+                    'line': {
+                        'color': 'black',
+                        'width': 2
+                    }
+                },
+                    {
+                        'type': 'line',
+                        'x0': -OFFSET_X_STEP,
+                        'y0': -1,
+                        'x1': -OFFSET_X_STEP,
+                        'y1': 10,
+                        'line': {
+                            'color': 'black',
+                            'width': 2
+                        }
+                }
+            ]
         }
     )
 
