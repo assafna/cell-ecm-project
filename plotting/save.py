@@ -44,15 +44,18 @@ def to_html(_fig, _path, _filename, _and_to_image=True):
         template='presentation',
         xaxis={
             'showgrid': False,
-            'zerolinewidth': 2
+            'zerolinewidth': 2,
+            'zerolinecolor': 'black'
         },
         yaxis={
             'showgrid': False,
-            'zerolinewidth': 2
+            'zerolinewidth': 2,
+            'zerolinecolor': 'black',
+            'tickangle': -90
         },
         font={
             'family': 'Arial',
-            'size': 10,
+            'size': 25,
             'color': 'black'
         },
         paper_bgcolor='rgba(0,0,0,0)',
