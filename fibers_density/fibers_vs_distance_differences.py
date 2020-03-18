@@ -11,7 +11,7 @@ from plotting import scatter, save
 OFFSET_X_STEP = 0.2
 
 
-def main():
+def main(_low_connectivity=False):
     print('Experiments')
     _experiments_pairs_fibers_densities = fibers_vs_distance_pairs.compute_experiments_data()
     _experiments_single_cells_fibers_densities = fibers_vs_distance_single_cells.compute_experiments_data()
@@ -25,8 +25,10 @@ def main():
         _experiments_pairs_fibers_densities_averages - _experiments_single_cells_fibers_densities_averages
 
     print('Simulations')
-    _simulations_pairs_fibers_densities = fibers_vs_distance_pairs.compute_simulations_data()
-    _simulations_single_cells_fibers_densities = fibers_vs_distance_single_cells.compute_simulations_data()
+    _simulations_pairs_fibers_densities = \
+        fibers_vs_distance_pairs.compute_simulations_data(_low_connectivity)
+    _simulations_single_cells_fibers_densities = \
+        fibers_vs_distance_single_cells.compute_simulations_data(_low_connectivity)
     _simulations_fibers_densities_differences = \
         np.mean(_simulations_pairs_fibers_densities, axis=1) - \
         np.mean(_simulations_single_cells_fibers_densities, axis=1)
@@ -101,7 +103,7 @@ def main():
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths_lib.PLOTS, save.get_module_name()),
-        _filename='plot'
+        _filename='plot_low_con_' + str(_low_connectivity)
     )
 
 
