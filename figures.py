@@ -11,7 +11,9 @@ def figure_1():
     experiments.fibers_vs_distance_multiple_cell_distances.main()
 
     # sup
+    fibers_density.fibers_vs_distance_single_cells.main(_low_connectivity=True)
     fibers_density.fibers_vs_distance_pairs.main(_low_connectivity=True)
+    fibers_density.fibers_vs_distance_differences.main(_low_connectivity=True)
     simulations.fibers_vs_distance_multiple_cell_distances.main(_low_connectivity=True)
 
 
