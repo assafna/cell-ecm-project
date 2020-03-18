@@ -31,7 +31,7 @@ OUT_OF_BOUNDARIES = False
 # simulations
 SIMULATIONS_TIME_POINT = {
     False: 50,
-    True: 35
+    True: 21
 }
 
 
