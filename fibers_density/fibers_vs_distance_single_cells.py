@@ -29,7 +29,10 @@ OFFSET_Z = 0
 OUT_OF_BOUNDARIES = False
 
 # simulations
-SIMULATIONS_TIME_POINT = 50
+SIMULATIONS_TIME_POINT = {
+    False: 50,
+    True: 35
+}
 
 
 def compute_experiments_data():
@@ -95,7 +98,7 @@ def compute_experiments_data():
     return _experiments_fibers_densities
 
 
-def compute_simulations_fibers_densities(_simulations):
+def compute_simulations_fibers_densities(_simulations, _low_connectivity):
     _arguments = []
     for _simulation in _simulations:
         for _offset_x, _direction in product(OFFSETS_X, ['left', 'right', 'up', 'down']):
@@ -109,7 +112,7 @@ def compute_simulations_fibers_densities(_simulations):
                 'offset_y': _offset_x if _direction in ['up', 'down'] else OFFSET_Y,
                 'cell_id': 'cell',
                 'direction': _direction,
-                'time_point': SIMULATIONS_TIME_POINT
+                'time_point': SIMULATIONS_TIME_POINT[_low_connectivity]
             })
 
     _fibers_densities = {}
@@ -127,19 +130,20 @@ def compute_simulations_fibers_densities(_simulations):
     return _fibers_densities
 
 
-def compute_simulations_data():
+def compute_simulations_data(_low_connectivity):
     _simulations = simulations_load.structured()
-    _simulations = simulations_filtering.by_time_points_amount(_simulations, _time_points=SIMULATIONS_TIME_POINT)
+    _simulations = \
+        simulations_filtering.by_time_points_amount(_simulations, _time_points=SIMULATIONS_TIME_POINT[_low_connectivity])
     _simulations = simulations_filtering.by_categories(
         _simulations,
         _is_single_cell=True,
         _is_heterogeneity=False,
-        _is_low_connectivity=False,
+        _is_low_connectivity=_low_connectivity,
         _is_causality=False,
         _is_dominant_passive=False
     )
 
-    _fibers_densities = compute_simulations_fibers_densities(_simulations)
+    _fibers_densities = compute_simulations_fibers_densities(_simulations, _low_connectivity)
 
     _simulations_fibers_densities = [[] for _i in range(len(OFFSETS_X))]
     for _simulation in tqdm(_simulations, desc='Simulations Loop'):
@@ -164,12 +168,12 @@ def compute_simulations_data():
     return _simulations_fibers_densities
 
 
-def main():
+def main(_low_connectivity=False):
+    print('Simulations')
+    _simulations_fibers_densities = compute_simulations_data(_low_connectivity)
+
     print('Experiments')
     _experiments_fibers_densities = compute_experiments_data()
-
-    print('Simulations')
-    _simulations_fibers_densities = compute_simulations_data()
 
     # plot
     _fig = go.Figure(
@@ -253,7 +257,7 @@ def main():
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths_lib.PLOTS, save.get_module_name()),
-        _filename='plot'
+        _filename='plot_low_con_' + str(_low_connectivity)
     )
 
 
