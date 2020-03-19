@@ -182,11 +182,13 @@ def main(_low_connectivity=False):
                 error_y={
                     'type': 'data',
                     'array': [np.std(_array) for _array in _simulations_fibers_densities],
-                    'thickness': 1
+                    'thickness': 1,
+                    'color': '#005b96'
                 },
                 mode='markers',
                 marker={
-                    'size': 15
+                    'size': 15,
+                    'color': '#005b96'
                 },
                 opacity=0.7
             ),
@@ -197,11 +199,13 @@ def main(_low_connectivity=False):
                 error_y={
                     'type': 'data',
                     'array': [np.std(_array) for _array in _experiments_fibers_densities],
-                    'thickness': 1
+                    'thickness': 1,
+                    'color': '#ea8500'
                 },
                 mode='markers',
                 marker={
-                    'size': 15
+                    'size': 15,
+                    'color': '#ea8500'
                 },
                 opacity=0.7
             )
@@ -214,7 +218,9 @@ def main(_low_connectivity=False):
             'yaxis': {
                 'title': 'Fibers Density Z-score',
                 'range': [-1.2, 10],
-                'zeroline': False
+                'zeroline': False,
+                'tickmode': 'array',
+                'tickvals': [0, 2, 4, 6, 8]
             },
             'legend': {
                 'xanchor': 'right',
