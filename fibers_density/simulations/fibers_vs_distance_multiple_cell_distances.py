@@ -126,7 +126,9 @@ def main(_low_connectivity=False):
             'yaxis': {
                 'title': 'Fibers Density Z-score',
                 'range': [-1.7, 16],
-                'zeroline': False
+                'zeroline': False,
+                'tickmode': 'array',
+                'tickvals': [0, 4, 8, 10, 12]
             },
             'legend': {
                 'xanchor': 'right',
