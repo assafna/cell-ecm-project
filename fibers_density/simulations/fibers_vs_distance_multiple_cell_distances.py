@@ -97,6 +97,7 @@ def main(_low_connectivity=False):
         _names_array.append('Distance ' + str(_distance))
 
     # plot
+    _colors_array = ['#011f4b', '#005b96', '#74c2e8']
     _fig = go.Figure(
         data=[
             go.Scatter(
@@ -106,14 +107,16 @@ def main(_low_connectivity=False):
                 error_y={
                     'type': 'data',
                     'array': [np.std(_array) for _array in _y],
-                    'thickness': 1
+                    'thickness': 1,
+                    'color': _color
                 },
                 mode='markers',
                 marker={
-                    'size': 15
+                    'size': 15,
+                    'color': _color
                 },
                 opacity=0.7
-            ) for _x, _y, _name in zip(_x_array, _y_array, _names_array)
+            ) for _x, _y, _name, _color in zip(_x_array, _y_array, _names_array, _colors_array)
         ],
         layout={
             'xaxis': {

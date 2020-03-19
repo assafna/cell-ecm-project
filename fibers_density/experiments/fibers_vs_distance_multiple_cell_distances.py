@@ -5,7 +5,7 @@ import plotly.graph_objs as go
 
 from libs import compute_lib
 from libs.experiments import load, filtering, compute, paths
-from libs.experiments.config import ROI_LENGTH, ROI_HEIGHT, ROI_WIDTH, AVERAGE_CELL_DIAMETER_IN_MICRONS
+from libs.experiments.config import ROI_LENGTH, ROI_HEIGHT, ROI_WIDTH
 from plotting import save
 
 EXPERIMENTS = ['SN16']
@@ -90,6 +90,7 @@ def main():
         _names_array.append('Distance ' + str(_distance))
 
     # plot
+    _colors_array = ['#844b00', '#ea8500', '#edbc80']
     _fig = go.Figure(
         data=[
             go.Scatter(
@@ -99,14 +100,16 @@ def main():
                 error_y={
                     'type': 'data',
                     'array': [np.std(_array) for _array in _y],
-                    'thickness': 1
+                    'thickness': 1,
+                    'color': _color
                 },
                 mode='markers',
                 marker={
-                    'size': 15
+                    'size': 15,
+                    'color': _color
                 },
                 opacity=0.7
-            ) for _x, _y, _name in zip(_x_array, _y_array, _names_array)
+            ) for _x, _y, _name, _color in zip(_x_array, _y_array, _names_array, _colors_array)
         ],
         layout={
             'xaxis': {
