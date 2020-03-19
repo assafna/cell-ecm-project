@@ -164,13 +164,6 @@ def compute_simulations_data(_cells_distance):
 
 
 def main():
-    print('Experiments')
-    _experiments_y_array = []
-    for _cells_distance in CELLS_DISTANCES:
-        print('Cells Distance:', _cells_distance)
-        _experiments_fibers_densities = compute_experiments_data(_cells_distance)
-        _experiments_y_array.append(_experiments_fibers_densities)
-
     print('Simulations')
     _simulations_y_array = []
     for _cells_distance in CELLS_DISTANCES:
@@ -178,38 +171,68 @@ def main():
         _simulations_fibers_densities = compute_simulations_data(_cells_distance)
         _simulations_y_array.append(_simulations_fibers_densities)
 
+    print('Experiments')
+    _experiments_y_array = []
+    for _cells_distance in CELLS_DISTANCES:
+        print('Cells Distance:', _cells_distance)
+        _experiments_fibers_densities = compute_experiments_data(_cells_distance)
+        _experiments_y_array.append(_experiments_fibers_densities)
+
     # plot
     _fig = go.Figure(
         data=[
             go.Scatter(
-                x=CELLS_DISTANCES,
+                x=np.array(CELLS_DISTANCES) - 0.1,
+                y=[np.mean(_array) for _array in _simulations_y_array],
+                name='Simulations',
+                error_y={
+                    'type': 'data',
+                    'array': [np.std(_array) for _array in _simulations_y_array],
+                    'thickness': 1
+                },
+                mode='markers',
+                marker={
+                    'size': 15
+                },
+                opacity=0.7
+            ),
+            go.Scatter(
+                x=np.array(CELLS_DISTANCES) + 0.1,
                 y=[np.mean(_array) * 15 for _array in _experiments_y_array],
+                yaxis='y2',
                 name='Experiments',
                 error_y={
                     'type': 'data',
                     'array': [np.std(_array) * 15 for _array in _experiments_y_array],
                     'thickness': 1
                 },
-                mode='markers'
-            ),
-            go.Scatter(
-                x=np.array(CELLS_DISTANCES) + 0.2,
-                y=[np.mean(_array) for _array in _simulations_y_array],
-                name='Simulations',
-                yaxis='y2',
-                error_y={
-                    'type': 'data',
-                    'array': [np.std(_array) for _array in _simulations_y_array],
-                    'thickness': 1
+                mode='markers',
+                marker={
+                    'size': 15
                 },
-                mode='markers'
+                opacity=0.7
             )
         ],
         layout={
             'xaxis': {
-                'title': 'Cells Distance (cell size)'
+                'title': 'Cells Distance (cell size)',
+                'tickmode': 'array',
+                'tickvals': CELLS_DISTANCES
             },
             'yaxis': {
+                'title': 'Cell contraction<br>to z-score ' + str(SIMULATIONS_Z_SCORE_GOAL) + ' (percentages)',
+                'titlefont': {
+                    'color': 'rgb(255, 127, 14)'
+                },
+                'tickfont': {
+                    'color': 'rgb(255, 127, 14)'
+                },
+                'range': [14, 50],
+                # 'anchor': 'free',
+                'showgrid': False,
+                'zeroline': False
+            },
+            'yaxis2': {
                 'title': 'Time to z-score ' + str(EXPERIMENTS_Z_SCORE_GOAL) + ' (minutes)',
                 'titlefont': {
                     'color': 'rgb(31, 119, 180)'
@@ -217,21 +240,10 @@ def main():
                 'tickfont': {
                     'color': 'rgb(31, 119, 180)'
                 },
-                'range': [0, 100]
-            },
-            'yaxis2': {
-                'title': 'Cell contraction to z-score ' + str(SIMULATIONS_Z_SCORE_GOAL) + ' (percentages)',
-                'titlefont': {
-                    'color': 'rgb(255, 127, 14)'
-                },
-                'tickfont': {
-                    'color': 'rgb(255, 127, 14)'
-                },
-                'range': [14, 42],
-                # 'anchor': 'free',
+                'range': [0, 120],
                 'overlaying': 'y',
                 'side': 'right',
-                'showgrid': False
+                'zeroline': False
             },
             'legend': {
                 'xanchor': 'left',
