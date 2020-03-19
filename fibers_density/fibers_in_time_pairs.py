@@ -151,29 +151,17 @@ def compute_simulations_data():
 
 
 def main():
-    print('Experiments')
-    _experiments_fibers_densities = compute_experiments_data()
-
     print('Simulations')
     _simulations_fibers_densities = compute_simulations_data()
+
+    print('Experiments')
+    _experiments_fibers_densities = compute_experiments_data()
 
     # plot
     _fig = go.Figure(
         data=[
             go.Scatter(
-                x=np.array(range(EXPERIMENTS_TIME_POINTS)) * 15,
-                y=[np.mean(_array) for _array in _experiments_fibers_densities],
-                name='Experiments',
-                error_y={
-                    'type': 'data',
-                    'array': [np.std(_array) for _array in _experiments_fibers_densities],
-                    'thickness': 1
-                },
-                mode='markers'
-            ),
-            go.Scatter(
                 x=list(range(SIMULATIONS_TIME_POINTS))[::SIMULATIONS_STEP],
-                xaxis='x2',
                 y=[np.mean(_array) for _array in _simulations_fibers_densities][::SIMULATIONS_STEP],
                 name='Simulations',
                 error_y={
@@ -181,22 +169,42 @@ def main():
                     'array': [np.std(_array) for _array in _simulations_fibers_densities][::SIMULATIONS_STEP],
                     'thickness': 1
                 },
-                mode='markers'
+                mode='markers',
+                marker={
+                    'size': 15
+                },
+                opacity=0.7
+            ),
+            go.Scatter(
+                x=np.array(range(EXPERIMENTS_TIME_POINTS)) * 15,
+                xaxis='x2',
+                y=[np.mean(_array) for _array in _experiments_fibers_densities],
+                name='Experiments',
+                error_y={
+                    'type': 'data',
+                    'array': [np.std(_array) for _array in _experiments_fibers_densities],
+                    'thickness': 1
+                },
+                mode='markers',
+                marker={
+                    'size': 15
+                },
+                opacity=0.7
             )
         ],
         layout={
             'xaxis': {
-                'title': 'Time (minutes)',
+                'title': 'Cell contraction (percentages)',
                 'titlefont': {
                     'color': 'rgb(31, 119, 180)'
                 },
                 'tickfont': {
                     'color': 'rgb(31, 119, 180)'
                 },
-                'side': 'top'
+                'zeroline': False
             },
             'xaxis2': {
-                'title': 'Cell contraction (percentages)',
+                'title': 'Time (minutes)',
                 'titlefont': {
                     'color': 'rgb(255, 127, 14)'
                 },
@@ -205,13 +213,15 @@ def main():
                 },
                 # 'anchor': 'free',
                 'overlaying': 'x',
-                'side': 'bottom',
-                'showgrid': False
+                'side': 'top',
+                'showgrid': False,
+                'zeroline': False
             },
             'yaxis': {
                 'title': 'Fibers Density Z-score',
                 # 'domain': [0.3, 1],
-                'range': [-1, 11]
+                'range': [-1.7, 14],
+                'zeroline': False
             },
             'legend': {
                 'xanchor': 'left',
@@ -219,7 +229,31 @@ def main():
                 'yanchor': 'top',
                 'bordercolor': 'black',
                 'borderwidth': 2
-            }
+            },
+            'shapes': [
+                {
+                    'type': 'line',
+                    'x0': -2,
+                    'y0': -1.5,
+                    'x1': SIMULATIONS_TIME_POINTS + SIMULATIONS_STEP,
+                    'y1': -1.5,
+                    'line': {
+                        'color': 'black',
+                        'width': 2
+                    }
+                },
+                {
+                    'type': 'line',
+                    'x0': -2,
+                    'y0': -1.5,
+                    'x1': -2,
+                    'y1': 14,
+                    'line': {
+                        'color': 'black',
+                        'width': 2
+                    }
+                }
+            ]
         }
     )
 
