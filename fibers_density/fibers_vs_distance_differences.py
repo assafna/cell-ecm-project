@@ -42,7 +42,8 @@ def main(_low_connectivity=False):
                 name='Simulations',
                 mode='markers',
                 marker={
-                    'size': 15
+                    'size': 15,
+                    'color': '#005b96'
                 },
                 opacity=0.7
             ),
@@ -52,7 +53,8 @@ def main(_low_connectivity=False):
                 name='Experiments',
                 mode='markers',
                 marker={
-                    'size': 15
+                    'size': 15,
+                    'color': '#ea8500'
                 },
                 opacity=0.7
             )
@@ -65,7 +67,8 @@ def main(_low_connectivity=False):
             'yaxis': {
                 'title': 'Fibers Density Z-score Difference',
                 'range': [-0.2, 3.5],
-                'zeroline': False
+                'zeroline': False,
+                'tickvals': [0, 1, 2, 3]
             },
             'legend': {
                 'xanchor': 'right',
