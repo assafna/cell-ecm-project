@@ -45,7 +45,7 @@ CONDITIONAL_NORMALIZATION = False
 X_LABELS_START = -3
 X_LABELS_END = 15
 Y_LABELS_START = -1.5
-Y_LABELS_END = 3
+Y_LABELS_END = 1.5
 X_BINS = 1
 Y_BINS = 5
 Z_MIN = 0
@@ -162,36 +162,62 @@ def main():
             _z_array_plot[_z_array_plot == 0] = None
             _z_array_plot = list(zip(*_z_array_plot))
 
-        _fig = heatmap.create_plot(
-            _x_labels=np.arange(start=X_LABELS_START, stop=X_LABELS_END, step=1 / X_BINS),
-            _y_labels=np.arange(start=Y_LABELS_START, stop=Y_LABELS_END, step=1 / Y_BINS),
-            _z_array=_z_array_plot,
-            _x_axis_title='Fibers Densities Z-Score',
-            _y_axis_title='Change in Fibers Densities Z-Score',
-            # _color_scale=seaborn.light_palette("navy", reverse=True).as_hex(),
-            _color_scale='Viridis',
-            _zmin=Z_MIN,
-            _zmax=Z_MAX[CONDITIONAL_NORMALIZATION]
+        _fig = go.Figure(
+            data=go.Heatmap(
+                x=np.arange(start=X_LABELS_START, stop=X_LABELS_END, step=1 / X_BINS),
+                y=np.arange(start=Y_LABELS_START, stop=Y_LABELS_END, step=1 / Y_BINS),
+                z=_z_array,
+                colorscale='Viridis',
+                colorbar={
+                    'tickmode': 'array',
+                    'tickvals': [0, 0.025, 0.05],
+                    'ticktext': ['0%', '2.5%', '5%'],
+                    'tickangle': 90
+                },
+                zmin=Z_MIN,
+                zmax=Z_MAX[CONDITIONAL_NORMALIZATION]
+            ),
+            layout={
+                'xaxis': {
+                    'title': 'Fibers Densities Z-Score',
+                    'zeroline': False,
+                    'range': [-1.2, 12],
+                    'tickmode': 'array',
+                    'tickvals': [0, 5, 10]
+                },
+                'yaxis': {
+                    'title': 'Change in Fibers Densities Z-Score',
+                    'zeroline': False,
+                    'range': [-1.6, 1.5],
+                    'tickmode': 'array',
+                    'tickvals': [-1, 0, 1]
+                },
+                'shapes': [
+                    {
+                        'type': 'line',
+                        'x0': -1,
+                        'y0': Y_LABELS_START,
+                        'x1': X_LABELS_END,
+                        'y1': Y_LABELS_START,
+                        'line': {
+                            'color': 'black',
+                            'width': 2
+                        }
+                    },
+                    {
+                        'type': 'line',
+                        'x0': -1,
+                        'y0': Y_LABELS_START,
+                        'x1': -1,
+                        'y1': Y_LABELS_END,
+                        'line': {
+                            'color': 'black',
+                            'width': 2
+                        }
+                    }
+                ]
+            }
         )
-
-        # line of best fit
-        # _best_fit_lines_x_array = []
-        # _best_fit_lines_y_array = []
-        # _x_array = _heatmap_fibers
-        # _y_array = _heatmap_fibers_change
-        # _slope, _intercept, _r_value, _p_value, _std_err = stats.linregress(_x_array, _y_array)
-        # _x1, _x2 = max(_x_labels_start, min(_x_array)), min(_x_labels_end, max(_x_array))
-        # _y1, _y2 = _slope * _x1 + _intercept, _slope * _x2 + _intercept
-        # _best_fit_lines_x_array.append([_x1, _x2])
-        # _best_fit_lines_y_array.append([_y1, _y2])
-        #
-        # _fig.add_trace(go.Scatter(
-        #     x=_best_fit_lines_x_array[0],
-        #     y=_best_fit_lines_y_array[0],
-        #     name=None,
-        #     mode='lines',
-        #     showlegend=False
-        # ))
 
         save.to_html(
             _fig=_fig,
@@ -199,52 +225,6 @@ def main():
             _filename='plot_real_' + str(REAL_CELLS) + '_static_' + str(STATIC) + '_band_' +
                       str(BAND) + '_direction_' + DIRECTION
         )
-
-        # _fig = scatter.create_plot(
-        #     _x_array=_fibers_densities_by_distance.values(),
-        #     _y_array=_change_in_fibers_densities_by_distance.values(),
-        #     _names_array=['Distance ' + str(_distance) for _distance in _fibers_densities_by_distance.keys()],
-        #     _modes_array=['markers'] * len(_fibers_densities_by_distance.keys()),
-        #     _showlegend_array=[True] * len(_fibers_densities_by_distance.keys()),
-        #     _x_axis_title='Fibers Densities Z-Score',
-        #     _y_axis_title='Change in Fibers Densities Z-Score',
-        #     _title='Fibers Densities vs. Change in Fibers Densities - ' + DIRECTION.capitalize()
-        # )
-        #
-        # save.to_html(
-        #     _fig=_fig,
-        #     _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        #     _filename=DIRECTION + '_points'
-        # )
-
-        # line of best fit
-        # _best_fit_lines_x_array = []
-        # _best_fit_lines_y_array = []
-        # for _distance in _experiments_by_distance:
-        #     _x_array = _fibers_densities_by_distance[_distance]
-        #     _y_array = _change_in_fibers_densities_by_distance[_distance]
-        #     _slope, _intercept, _r_value, _p_value, _std_err = stats.linregress(_x_array, _y_array)
-        #     _x1, _x2 = min(_x_array), max(_x_array)
-        #     _y1, _y2 = _slope * _x1 + _intercept, _slope * _x2 + _intercept
-        #     _best_fit_lines_x_array.append([_x1, _x2])
-        #     _best_fit_lines_y_array.append([_y1, _y2])
-        #
-        # _fig = scatter.create_plot(
-        #     _x_array=_best_fit_lines_x_array,
-        #     _y_array=_best_fit_lines_y_array,
-        #     _names_array=['Distance ' + str(_distance) for _distance in _experiments_by_distance],
-        #     _modes_array=['lines'] * len(_experiments_by_distance),
-        #     _showlegend_array=[True] * len(_experiments_by_distance),
-        #     _x_axis_title='Fibers Densities Z-Score',
-        #     _y_axis_title='Change in Fibers Densities Z-Score',
-        #     _title='Fibers Densities vs. Change in Fibers Densities - ' + DIRECTION.capitalize() + ' - Line of Best Fit'
-        # )
-        #
-        # save.to_html(
-        #     _fig=_fig,
-        #     _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        #     _filename=DIRECTION + '_best_fit'
-        # )
 
 
 if __name__ == '__main__':
