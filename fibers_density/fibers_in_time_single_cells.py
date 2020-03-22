@@ -162,11 +162,13 @@ def main():
                 error_y={
                     'type': 'data',
                     'array': [np.std(_array) for _array in _simulations_fibers_densities][::SIMULATIONS_STEP],
-                    'thickness': 1
+                    'thickness': 1,
+                    'color': '#005b96'
                 },
                 mode='markers',
                 marker={
-                    'size': 15
+                    'size': 15,
+                    'color': '#005b96'
                 },
                 opacity=0.7
             ),
@@ -178,11 +180,13 @@ def main():
                 error_y={
                     'type': 'data',
                     'array': [np.std(_array) for _array in _experiments_fibers_densities],
-                    'thickness': 1
+                    'thickness': 1,
+                    'color': '#ea8500'
                 },
                 mode='markers',
                 marker={
-                    'size': 15
+                    'size': 15,
+                    'color': '#ea8500'
                 },
                 opacity=0.7
             )
@@ -191,20 +195,20 @@ def main():
             'xaxis': {
                 'title': 'Cell contraction (percentages)',
                 'titlefont': {
-                    'color': 'rgb(31, 119, 180)'
+                    'color': '#005b96'
                 },
                 'tickfont': {
-                    'color': 'rgb(31, 119, 180)'
+                    'color': '#005b96'
                 },
                 'zeroline': False
             },
             'xaxis2': {
                 'title': 'Time (minutes)',
                 'titlefont': {
-                    'color': 'rgb(255, 127, 14)'
+                    'color': '#ea8500'
                 },
                 'tickfont': {
-                    'color': 'rgb(255, 127, 14)'
+                    'color': '#ea8500'
                 },
                 # 'anchor': 'free',
                 'overlaying': 'x',
@@ -216,7 +220,9 @@ def main():
                 'title': 'Fibers Density Z-score',
                 # 'domain': [0.3, 1],
                 'range': [-1.7, 14],
-                'zeroline': False
+                'zeroline': False,
+                'tickmode': 'array',
+                'tickvals': [0, 4, 8, 12]
             },
             'legend': {
                 'xanchor': 'left',
