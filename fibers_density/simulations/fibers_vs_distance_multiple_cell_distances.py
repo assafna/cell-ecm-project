@@ -25,7 +25,7 @@ OFFSET_X_END = {
 OFFSET_Y = 0
 
 
-def compute_simulations_fibers_densities(_simulations, _offsets_x, _low_connectivity):
+def compute_fibers_densities(_simulations, _offsets_x, _low_connectivity):
     _arguments = []
     for _simulation in _simulations:
         for _offset_x in _offsets_x:
@@ -73,7 +73,7 @@ def main(_low_connectivity=False):
         _simulations = filtering.by_time_points_amount(_simulations, _time_points=TIME_POINT[_low_connectivity])
 
         _offsets_x = np.arange(start=0, stop=OFFSET_X_END[_distance] + OFFSET_X_STEP, step=OFFSET_X_STEP)
-        _fibers_densities = compute_simulations_fibers_densities(_simulations, _offsets_x, _low_connectivity)
+        _fibers_densities = compute_fibers_densities(_simulations, _offsets_x, _low_connectivity)
 
         _cells_distance_fibers_densities = [[] for _i in range(len(_offsets_x))]
         for _simulation in _simulations:
