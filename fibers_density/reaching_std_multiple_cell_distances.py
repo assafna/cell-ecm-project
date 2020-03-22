@@ -188,11 +188,13 @@ def main():
                 error_y={
                     'type': 'data',
                     'array': [np.std(_array) for _array in _simulations_y_array],
-                    'thickness': 1
+                    'thickness': 1,
+                    'color': '#005b96'
                 },
                 mode='markers',
                 marker={
-                    'size': 15
+                    'size': 15,
+                    'color': '#005b96'
                 },
                 opacity=0.7
             ),
@@ -204,11 +206,13 @@ def main():
                 error_y={
                     'type': 'data',
                     'array': [np.std(_array) * 15 for _array in _experiments_y_array],
-                    'thickness': 1
+                    'thickness': 1,
+                    'color': '#ea8500'
                 },
                 mode='markers',
                 marker={
-                    'size': 15
+                    'size': 15,
+                    'color': '#ea8500'
                 },
                 opacity=0.7
             )
@@ -222,28 +226,32 @@ def main():
             'yaxis': {
                 'title': 'Cell contraction<br>to z-score ' + str(SIMULATIONS_Z_SCORE_GOAL) + ' (percentages)',
                 'titlefont': {
-                    'color': 'rgb(255, 127, 14)'
+                    'color': '#005b96'
                 },
                 'tickfont': {
-                    'color': 'rgb(255, 127, 14)'
+                    'color': '#005b96'
                 },
                 'range': [14, 50],
                 # 'anchor': 'free',
                 'showgrid': False,
-                'zeroline': False
+                'zeroline': False,
+                'tickmode': 'array',
+                'tickvals': [15, 25, 35, 45]
             },
             'yaxis2': {
                 'title': 'Time to z-score ' + str(EXPERIMENTS_Z_SCORE_GOAL) + ' (minutes)',
                 'titlefont': {
-                    'color': 'rgb(31, 119, 180)'
+                    'color': '#ea8500'
                 },
                 'tickfont': {
-                    'color': 'rgb(31, 119, 180)'
+                    'color': '#ea8500'
                 },
                 'range': [0, 120],
                 'overlaying': 'y',
                 'side': 'right',
-                'zeroline': False
+                'zeroline': False,
+                'tickmode': 'array',
+                'tickvals': [20, 60, 100]
             },
             'legend': {
                 'xanchor': 'left',
