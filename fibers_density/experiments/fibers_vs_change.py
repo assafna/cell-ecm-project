@@ -39,9 +39,9 @@ DERIVATIVE = 1
 PLOT = True
 CONDITIONAL_NORMALIZATION = False
 X_LABELS_START = -3
-X_LABELS_END = 15
-Y_LABELS_START = -1.5
-Y_LABELS_END = 1.5
+X_LABELS_END = 14
+Y_LABELS_START = -1.1
+Y_LABELS_END = 3.4
 X_BINS = 1
 Y_BINS = 5
 Z_MIN = 0
@@ -123,21 +123,21 @@ def main():
     print(pearsonr(_heatmap_fibers, _heatmap_fibers_change))
 
     if PLOT:
-        _x_shape = int(round((X_LABELS_END - X_LABELS_START) * X_BINS))
         _y_shape = int(round((Y_LABELS_END - Y_LABELS_START) * Y_BINS))
+        _x_shape = int(round((X_LABELS_END - X_LABELS_START) * X_BINS))
         _total_points = 0
-        _z_array = np.zeros(shape=(_x_shape, _y_shape))
-        for _x, _y in zip(_heatmap_fibers, _heatmap_fibers_change):
-            _x_rounded, _y_rounded = int(round(_x * X_BINS)), int(round(_y * Y_BINS))
-            _x_index, _y_index = int(_x_rounded - X_LABELS_START * X_BINS), int(_y_rounded - Y_LABELS_START * Y_BINS)
-            if 0 <= _x_index < _z_array.shape[0] and 0 <= _y_index < _z_array.shape[1]:
-                _z_array[_x_index][_y_index] += 1
+        _z_array = np.zeros(shape=(_y_shape, _x_shape))
+        for _y, _x in zip(_heatmap_fibers_change, _heatmap_fibers):
+            _y_rounded, _x_rounded = int(round(_y * Y_BINS)), int(round(_x * X_BINS))
+            _y_index, _x_index = int(_y_rounded - Y_LABELS_START * Y_BINS), int(_x_rounded - X_LABELS_START * X_BINS)
+            if 0 <= _y_index < _z_array.shape[0] and 0 <= _x_index < _z_array.shape[1]:
+                _z_array[_y_index][_x_index] += 1
                 _total_points += 1
         _z_array = _z_array / _total_points
 
         if not CONDITIONAL_NORMALIZATION:
             _z_array[_z_array == 0] = None
-            _z_array_plot = list(zip(*_z_array))
+            # _z_array_plot = list(zip(*_z_array))
         else:
             _z_array_plot = np.zeros(shape=np.array(_z_array).shape)
             for _fibers_index, _fibers_density_z_score in enumerate(_z_array):
@@ -146,7 +146,7 @@ def main():
                     _z_array_plot[_fibers_index][_change_index] = (_change_z_score / _sum) if _sum != 0 else 0
 
             _z_array_plot[_z_array_plot == 0] = None
-            _z_array_plot = list(zip(*_z_array_plot))
+            # _z_array_plot = list(zip(*_z_array_plot))
 
         _fig = go.Figure(
             data=go.Heatmap(
@@ -167,21 +167,21 @@ def main():
                 'xaxis': {
                     'title': 'Fibers Densities Z-Score',
                     'zeroline': False,
-                    'range': [-1.2, 12],
-                    'tickmode': 'array',
-                    'tickvals': [0, 5, 10]
+                    # 'range': [-1.2, 12],
+                    # 'tickmode': 'array',
+                    # 'tickvals': [0, 5, 10]
                 },
                 'yaxis': {
                     'title': 'Change in Fibers Densities Z-Score',
                     'zeroline': False,
-                    'range': [-1.6, 1.5],
-                    'tickmode': 'array',
-                    'tickvals': [-1, 0, 1]
+                    # 'range': [-1.6, 1.5],
+                    # 'tickmode': 'array',
+                    # 'tickvals': [-1, 0, 1]
                 },
                 'shapes': [
                     {
                         'type': 'line',
-                        'x0': -1,
+                        'x0': X_LABELS_START,
                         'y0': Y_LABELS_START,
                         'x1': X_LABELS_END,
                         'y1': Y_LABELS_START,
@@ -192,9 +192,9 @@ def main():
                     },
                     {
                         'type': 'line',
-                        'x0': -1,
+                        'x0': X_LABELS_START,
                         'y0': Y_LABELS_START,
-                        'x1': -1,
+                        'x1': X_LABELS_START,
                         'y1': Y_LABELS_END,
                         'line': {
                             'color': 'black',
