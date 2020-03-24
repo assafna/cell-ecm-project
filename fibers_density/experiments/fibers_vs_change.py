@@ -11,7 +11,7 @@ from libs.experiments import load, filtering, compute, paths
 from libs.experiments.config import ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT
 from plotting import save
 
-EXPERIMENTS = ['SN16', 'SN41']
+EXPERIMENTS = ['SN16']
 MINIMUM_TIME_POINTS = sys.maxsize
 START_TIME_POINT = {
     'SN16': 0,
