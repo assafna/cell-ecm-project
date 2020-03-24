@@ -95,7 +95,7 @@ def compute_data(_arguments):
                     _non_communicated_tuple
 
                 for _communicated_cell_id, _non_communicated_cell_id in product(['left_cell', 'right_cell'],
-                                                               ['left_cell', 'right_cell']):
+                                                                                ['left_cell', 'right_cell']):
                     _communicated_fibers_densities = _experiments_fibers_densities[(
                         _communicated_experiment,
                         _communicated_series,
