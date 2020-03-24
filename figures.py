@@ -32,8 +32,8 @@ def figure_3():
 def figure_4():
     # TODO: create a single graph for all derivatives
     simulations.communicated_vs_non_communicated.main()
-    experiments.master_vs_slave.main()
-    simulations.master_vs_slave_cell_distances.main()
+    experiments.communicated_vs_non_communicated.main()
+    simulations.communicated_vs_non_communicated_cell_distances.main()
 
 
 if __name__ == '__main__':
