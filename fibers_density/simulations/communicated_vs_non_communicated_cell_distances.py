@@ -1,5 +1,4 @@
 import os
-import random
 
 import numpy as np
 from scipy.stats import wilcoxon
@@ -7,7 +6,7 @@ from scipy.stats import wilcoxon
 from libs import compute_lib
 from libs.simulations import compute, filtering, load, paths, organize
 from libs.simulations.config import ROI_WIDTH, ROI_HEIGHT
-from plotting import scatter, save, box
+from plotting import save, box
 
 MINIMUM_TIME_POINTS = 50
 OFFSET_X = 0
@@ -19,12 +18,12 @@ DIRECTION = 'inside'
 
 
 def run(_simulations):
-    _master_correlations_array = []
-    _slave_correlations_array = []
-    for _master_index in range(len(_simulations)):
-        _master_simulation = _simulations[_master_index]
-        _master_left_cell_fibers_densities = compute.roi_fibers_density_by_time({
-            'simulation': _master_simulation,
+    _communicated_correlations_array = []
+    _non_communicated_correlations_array = []
+    for _communicated_index in range(len(_simulations)):
+        _communicated_simulation = _simulations[_communicated_index]
+        _communicated_left_cell_fibers_densities = compute.roi_fibers_density_by_time({
+            'simulation': _communicated_simulation,
             'length_x': ROI_WIDTH,
             'length_y': ROI_HEIGHT,
             'offset_x': OFFSET_X,
@@ -33,8 +32,8 @@ def run(_simulations):
             'direction': DIRECTION,
             'time_points': MINIMUM_TIME_POINTS
         })
-        _master_right_cell_fibers_densities = compute.roi_fibers_density_by_time({
-            'simulation': _master_simulation,
+        _communicated_right_cell_fibers_densities = compute.roi_fibers_density_by_time({
+            'simulation': _communicated_simulation,
             'length_x': ROI_WIDTH,
             'length_y': ROI_HEIGHT,
             'offset_x': OFFSET_X,
@@ -43,15 +42,15 @@ def run(_simulations):
             'direction': DIRECTION,
             'time_points': MINIMUM_TIME_POINTS
         })
-        _master_correlation = compute_lib.correlation(
-            compute_lib.derivative(_master_left_cell_fibers_densities, _n=DERIVATIVE),
-            compute_lib.derivative(_master_right_cell_fibers_densities, _n=DERIVATIVE)
+        _communicated_correlation = compute_lib.correlation(
+            compute_lib.derivative(_communicated_left_cell_fibers_densities, _n=DERIVATIVE),
+            compute_lib.derivative(_communicated_right_cell_fibers_densities, _n=DERIVATIVE)
         )
-        for _slave_index in range(_master_index + 1, len(_simulations)):
-            _slave_simulation = _simulations[_slave_index]
-            print(_master_simulation, _slave_simulation, sep='\t')
-            _slave_left_cell_fibers_densities = compute.roi_fibers_density_by_time({
-                'simulation': _slave_simulation,
+        for _non_communicated_index in range(_communicated_index + 1, len(_simulations)):
+            _non_communicated_simulation = _simulations[_non_communicated_index]
+            print(_communicated_simulation, _non_communicated_simulation, sep='\t')
+            _non_communicated_left_cell_fibers_densities = compute.roi_fibers_density_by_time({
+                'simulation': _non_communicated_simulation,
                 'length_x': ROI_WIDTH,
                 'length_y': ROI_HEIGHT,
                 'offset_x': OFFSET_X,
@@ -60,13 +59,13 @@ def run(_simulations):
                 'direction': DIRECTION,
                 'time_points': MINIMUM_TIME_POINTS
             })
-            _slave_correlations_array.append(compute_lib.correlation(
-                compute_lib.derivative(_master_left_cell_fibers_densities, _n=DERIVATIVE),
-                compute_lib.derivative(_slave_left_cell_fibers_densities, _n=DERIVATIVE)
+            _non_communicated_correlations_array.append(compute_lib.correlation(
+                compute_lib.derivative(_communicated_left_cell_fibers_densities, _n=DERIVATIVE),
+                compute_lib.derivative(_non_communicated_left_cell_fibers_densities, _n=DERIVATIVE)
             ))
-            _master_correlations_array.append(_master_correlation)
+            _communicated_correlations_array.append(_communicated_correlation)
 
-    return np.array(_master_correlations_array) - np.array(_slave_correlations_array)
+    return np.array(_communicated_correlations_array) - np.array(_non_communicated_correlations_array)
 
 
 def main():
@@ -90,8 +89,8 @@ def main():
         _y_array=_y_arrays,
         _names_array=CELLS_DISTANCES,
         _x_axis_title='Cells Distance',
-        _y_axis_title='master minus slave',
-        _title='master minus slave Network Correlations by Cell Distance'
+        _y_axis_title='Communicated minus Non-communicated',
+        _title='Communicated minus Non-communicated Pair Correlations by Cell Distance'
     )
 
     save.to_html(
