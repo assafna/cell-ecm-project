@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" autoUpload="Always" serverName="assafna@localhost:6002">
+    <serverData>
+      <paths name="assafna@localhost:6001">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/data/home/assafna/cell-ecm-project" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="assafna@localhost:6002">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/cell-ecm-project" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="assafna@localhost:6003">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/cell-ecm-project" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="assafna@localhost:6004">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/assafna/cell-ecm-project" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+    </serverData>
+    <option name="myAutoUpload" value="ALWAYS" />
+  </component>
+</project>
