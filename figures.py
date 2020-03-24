@@ -2,16 +2,37 @@ import fibers_density
 
 
 def figure_1():
+    print('Panel B-ii')
     fibers_density.fibers_vs_distance_single_cells.main()
+
+    print('Panel C-ii')
     fibers_density.fibers_vs_distance_pairs.main()
+
+    print('Panel C-iii')
     fibers_density.fibers_vs_distance_differences.main()
+
+    print('Panel E-i')
     fibers_density.simulations.fibers_vs_distance_multiple_cell_distances.main()
+
+    print('Panel E-ii')
     fibers_density.experiments.fibers_vs_distance_multiple_cell_distances.main()
 
 
 def figure_2():
+    print('Panel A-ii')
     fibers_density.fibers_in_time_single_cells.main()
+
+    print('Panel B-ii')
     fibers_density.fibers_in_time_pairs.main()
+
+    print('Panel B-iii')
+    fibers_density.reaching_std_multiple_cell_distances.main()
+
+    print('Panel C-i')
+    fibers_density.simulations.fibers_vs_change.main()
+
+    print('Panel C-ii')
+    fibers_density.experiments.fibers_vs_change.main()
 
 
 def figure_3():
@@ -29,7 +50,14 @@ def figure_4():
 
 
 if __name__ == '__main__':
+    print('Figure 1')
     figure_1()
+
+    print('Figure 2')
     figure_2()
+
+    print('Figure 3')
     figure_3()
+
+    print('Figure 4')
     figure_4()
