@@ -81,7 +81,7 @@ def main():
     _correlations_array_derivative_2 = []
     for _index_1 in tqdm(range(len(_experiments_ids)), desc='Main Loop'):
         _tuple_1 = _experiments_ids[_index_1]
-        _experiment_1, _series_id_1, _ = _tuple_1
+        _experiment_1, _series_id_1, _cell_id_1 = _tuple_1
         _fibers_densities_1 = compute_single_cell_mean(
             _experiment=_experiment_1,
             _series_id=_series_id_1,
@@ -91,7 +91,7 @@ def main():
         )
         for _index_2 in range(_index_1 + 1, len(_experiments_ids)):
             _tuple_2 = _experiments_ids[_index_2]
-            _experiment_2, _series_id_2, _ = _tuple_2
+            _experiment_2, _series_id_2, _cell_id_2 = _tuple_2
             _fibers_densities_2 = compute_single_cell_mean(
                 _experiment=_experiment_2,
                 _series_id=_series_id_2,
