@@ -67,7 +67,7 @@ def compute_experiments_data():
 
     _experiments_fibers_densities = [[] for _i in range(len(OFFSETS_X))]
     for _tuple in tqdm(_experiments, desc='Experiments Loop'):
-        _experiment, _series_id, _group = _tuple
+        _experiment, _series_id, _cell_id = _tuple
         _offset_index = 0
         _normalization = experiments_load.normalization_series_file_data(_experiment, 'Series ' + str(_series_id))
 
