@@ -115,7 +115,8 @@ def main():
                 'offset_y': OFFSET_Y,
                 'offset_z': OFFSET_Z,
                 'cell_id': 'cell',
-                'direction': _direction
+                'direction': _direction,
+                'time_points': EXPERIMENTS_TIME_POINTS
             })
 
     _rois_dictionary, _rois_to_compute = \
@@ -126,7 +127,7 @@ def main():
 
     _experiments_fibers_densities = [[] for _i in range(EXPERIMENTS_TIME_POINTS)]
     for _tuple in tqdm(_experiments, desc='Experiments Loop'):
-        _experiment, _series_id, _group = _tuple
+        _experiment, _series_id, _ = _tuple
         _normalization = experiments_load.normalization_series_file_data(_experiment, 'Series ' + str(_series_id))
 
         for _time_point in range(EXPERIMENTS_TIME_POINTS):
