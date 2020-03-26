@@ -8,9 +8,10 @@ import numpy as np
 from scipy.ndimage import rotate
 from tqdm import tqdm
 
+from libs import compute_lib
 from libs.compute_lib import roi
 from libs.config_lib import CPUS_TO_USE
-from libs.experiments import load, save, paths
+from libs.experiments import load, save, paths, organize
 from libs.experiments.config import AVERAGE_CELL_DIAMETER_IN_MICRONS, ROI_START_BY_AVERAGE_CELL_DIAMETER, NO_RETURN
 
 
@@ -461,3 +462,60 @@ def rois(_arguments, _keys):
         _p.join()
 
     return _rois_dictionary, _rois_to_compute
+
+
+def single_cell_fibers_densities_mean_time_point(_experiment, _series_id, _cell_id, _rois_dictionary, _fibers_densities,
+                                                 _time_point, _cell_tuples=None, _normalization=None,
+                                                 _out_of_boundaries=False):
+    if _normalization is None:
+        _normalization = load.normalization_series_file_data(_experiment, 'Series ' + str(_series_id))
+
+    if _cell_tuples is None:
+        _cell_tuples = organize.by_single_cell_id(load.experiment_groups_as_tuples(_experiment))[
+            (_experiment, _series_id, _cell_id)
+        ]
+
+    _time_point_fibers_densities = []
+    for _cell_tuple in _cell_tuples:
+        _, _, _group = _cell_tuple
+        for _direction in ['left', 'right']:
+            _roi_tuple = _rois_dictionary[(_experiment, _series_id, _group, _direction)][_time_point]
+            _fibers_density = _fibers_densities[_roi_tuple]
+
+            if not _out_of_boundaries and _fibers_density[1]:
+                continue
+
+            _normalized_fibers_density = compute_lib.z_score(
+                _x=_fibers_density[0],
+                _average=_normalization['average'],
+                _std=_normalization['std']
+            )
+
+            if not np.isnan(_normalized_fibers_density):
+                _time_point_fibers_densities.append(_normalized_fibers_density)
+
+    return np.mean(_time_point_fibers_densities)
+
+
+def single_cell_fibers_densities_mean_by_time(_experiment, _series_id, _cell_id, _rois_dictionary, _fibers_densities,
+                                              _time_points, _cell_tuples=None, _normalization=None,
+                                              _out_of_boundaries=False):
+    if _normalization is None:
+        _normalization = load.normalization_series_file_data(_experiment, 'Series ' + str(_series_id))
+
+    if _cell_tuples is None:
+        _cell_tuples = organize.by_single_cell_id(load.experiment_groups_as_tuples(_experiment))[
+            (_experiment, _series_id, _cell_id)
+        ]
+
+    return [single_cell_fibers_densities_mean_time_point(
+        _experiment=_experiment,
+        _series_id=_series_id,
+        _cell_id=_cell_id,
+        _rois_dictionary=_rois_dictionary,
+        _fibers_densities=_fibers_densities,
+        _time_point=_time_point,
+        _cell_tuples=_cell_tuples,
+        _normalization=_normalization,
+        _out_of_boundaries=_out_of_boundaries
+    ) for _time_point in range(_time_points)]
