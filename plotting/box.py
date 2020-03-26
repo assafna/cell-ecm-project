@@ -1,7 +1,7 @@
 import plotly.graph_objs as go
 
 
-def create_plot(_y_array, _names_array, _x_axis_title, _y_axis_title, _title):
+def create_plot(_y_array, _names_array, _x_axis_title, _y_axis_title, _title=None):
     _data = []
     for _y, _name in zip(_y_array, _names_array):
         _data.append(
