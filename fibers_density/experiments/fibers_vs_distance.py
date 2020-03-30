@@ -1,17 +1,13 @@
-import math
 import os
 from itertools import product
 
 import numpy as np
 import plotly.graph_objs as go
-from multiprocess.pool import Pool
-from tqdm import tqdm
 
 from libs import compute_lib
-from libs.config_lib import USE_MULTIPROCESSING, CPUS_TO_USE
 from libs.experiments import load, compute, config, filtering, organize, paths
 from libs.experiments.config import ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT
-from plotting import scatter, save
+from plotting import save
 
 PAIRS_EXPERIMENTS = ['SN16']
 PAIRS_CELLS_DISTANCE = 7
