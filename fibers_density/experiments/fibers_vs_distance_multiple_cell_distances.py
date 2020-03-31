@@ -16,23 +16,18 @@ OFFSET_X_STEP = 0.2
 OFFSET_Z = 0
 OFFSET_Y = 0
 OUT_OF_BOUNDARIES = False
-OFFSET_X_END = {
-    (4, 6): 6,
-    (6, 8): 8,
-    (8, 10): 10
-}
 
 
 def main():
     _x_array = []
     _y_array = []
     _names_array = []
-    for _distance in CELLS_DISTANCE_RANGES:
-        print('Cells Distance ' + str(_distance))
+    for _distances_range in CELLS_DISTANCE_RANGES:
+        print('Cells Distance ' + str(_distances_range))
         _experiments = load.experiments_groups_as_tuples(EXPERIMENTS)
         _experiments = filtering.by_time_points_amount(_experiments, TIME_POINT)
         _experiments = filtering.by_real_cells(_experiments)
-        _experiments = filtering.by_distance_range(_experiments, _distance)
+        _experiments = filtering.by_distance_range(_experiments, _distances_range)
         if BAND:
             _experiments = filtering.by_band(_experiments)
 
@@ -90,7 +85,7 @@ def main():
 
         _x_array.append(_max_offsets_x)
         _y_array.append(_cells_distance_fibers_densities)
-        _names_array.append('Distance ' + str(_distance))
+        _names_array.append('Distances ' + str(_distances_range[0]) + '-' + str(_distances_range[1]))
 
     # plot
     _colors_array = ['#844b00', '#ea8500', '#edbc80']
@@ -130,14 +125,15 @@ def main():
                 'xanchor': 'right',
                 'yanchor': 'top',
                 'bordercolor': 'black',
-                'borderwidth': 2
+                'borderwidth': 2,
+                'bgcolor': 'white'
             },
             'shapes': [
                 {
                     'type': 'line',
                     'x0': -OFFSET_X_STEP,
                     'y0': -1.5,
-                    'x1': max([OFFSET_X_END[_distance] for _distance in CELLS_DISTANCE_RANGES]) + OFFSET_X_STEP,
+                    'x1': 3.2,
                     'y1': -1.5,
                     'line': {
                         'color': 'black',
