@@ -6,7 +6,6 @@ import numpy as np
 import plotly.graph_objs as go
 from tqdm import tqdm
 
-from fibers_density.fibers_vs_distance_pairs import OFFSETS_X
 from libs import compute_lib, paths_lib
 from libs.config_lib import CPUS_TO_USE
 from libs.experiments import compute as experiments_compute
@@ -20,7 +19,9 @@ from libs.simulations import filtering as simulations_filtering
 from libs.simulations import load as simulations_load
 from plotting import save
 
+OFFSETS_X_END = 2.4
 OFFSET_X_STEP = 0.2
+OFFSETS_X = np.arange(start=0, stop=OFFSETS_X_END + OFFSET_X_STEP, step=OFFSET_X_STEP)
 OFFSET_Y = 0
 
 # experiments
@@ -68,10 +69,9 @@ def compute_experiments_data():
     _experiments_fibers_densities = [[] for _i in range(len(OFFSETS_X))]
     for _tuple in tqdm(_experiments, desc='Experiments Loop'):
         _experiment, _series_id, _cell_id = _tuple
-        _offset_index = 0
         _normalization = experiments_load.normalization_series_file_data(_experiment, 'Series ' + str(_series_id))
 
-        for _offset_x in OFFSETS_X:
+        for _offset_x_index, _offset_x in enumerate(OFFSETS_X):
             _cell_fibers_densities = []
             for _cell_tuple in _experiments[_tuple]:
                 _, _, _group = _cell_tuple
@@ -92,8 +92,7 @@ def compute_experiments_data():
                         _cell_fibers_densities.append(_normalized_fibers_density)
 
             if len(_cell_fibers_densities) > 0:
-                _experiments_fibers_densities[_offset_index].append(np.mean(_cell_fibers_densities))
-            _offset_index += 1
+                _experiments_fibers_densities[_offset_x_index].append(np.mean(_cell_fibers_densities))
 
     return _experiments_fibers_densities
 
@@ -132,8 +131,9 @@ def compute_simulations_fibers_densities(_simulations, _low_connectivity):
 
 def compute_simulations_data(_low_connectivity):
     _simulations = simulations_load.structured()
-    _simulations = \
-        simulations_filtering.by_time_points_amount(_simulations, _time_points=SIMULATIONS_TIME_POINT[_low_connectivity])
+    _simulations = simulations_filtering.by_time_points_amount(
+        _simulations, _time_points=SIMULATIONS_TIME_POINT[_low_connectivity]
+    )
     _simulations = simulations_filtering.by_categories(
         _simulations,
         _is_single_cell=True,
@@ -147,10 +147,9 @@ def compute_simulations_data(_low_connectivity):
 
     _simulations_fibers_densities = [[] for _i in range(len(OFFSETS_X))]
     for _simulation in tqdm(_simulations, desc='Simulations Loop'):
-        _offset_index = 0
         _normalization = simulations_load.normalization(_simulation)
 
-        for _offset_x in OFFSETS_X:
+        for _offset_x_index, _offset_x in enumerate(OFFSETS_X):
             _direction_fibers_densities = []
             for _direction in ['left', 'right', 'up', 'down']:
                 _fibers_density = _fibers_densities[(_simulation, _offset_x, _direction)]
@@ -162,8 +161,7 @@ def compute_simulations_data(_low_connectivity):
                 )
                 _direction_fibers_densities.append(_normalized_fibers_density)
 
-            _simulations_fibers_densities[_offset_index].append(np.mean(_direction_fibers_densities))
-            _offset_index += 1
+            _simulations_fibers_densities[_offset_x_index].append(np.mean(_direction_fibers_densities))
 
     return _simulations_fibers_densities
 
@@ -215,15 +213,15 @@ def main(_low_connectivity=False):
         ],
         layout={
             'xaxis': {
-                'title': 'Distance from Cell (cell size)',
+                'title': 'Distance from cell (cell diameter)',
                 'zeroline': False
             },
             'yaxis': {
-                'title': 'Fibers Density Z-score',
-                'range': [-1.2, 10],
+                'title': 'Fibers density z-score',
+                'range': [-1.2, 13],
                 'zeroline': False,
                 'tickmode': 'array',
-                'tickvals': [0, 2, 4, 6, 8]
+                'tickvals': [0, 4, 8, 12]
             },
             'legend': {
                 'xanchor': 'right',
@@ -248,7 +246,7 @@ def main(_low_connectivity=False):
                     'x0': -OFFSET_X_STEP,
                     'y0': -1,
                     'x1': -OFFSET_X_STEP,
-                    'y1': 10,
+                    'y1': 13,
                     'line': {
                         'color': 'black',
                         'width': 2
