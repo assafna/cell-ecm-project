@@ -30,6 +30,7 @@ OUT_OF_BOUNDARIES = False
 
 # simulations
 CELLS_DISTANCE = 7
+# TODO: change the 0.25 according to contraction percentages
 SIMULATIONS_OFFSETS_X = \
     np.arange(start=0, stop=CELLS_DISTANCE / 2 - 0.25 - simulations_config.ROI_WIDTH, step=OFFSET_X_STEP)
 SIMULATIONS_TIME_POINT = {
