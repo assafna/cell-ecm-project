@@ -2,6 +2,7 @@ import os
 
 import numpy as np
 import plotly.graph_objs as go
+from scipy.stats import pearsonr
 
 from libs import compute_lib
 from libs.experiments import load, filtering, compute, paths
@@ -10,7 +11,6 @@ from plotting import save
 
 EXPERIMENTS = ['SN16']
 TIME_POINT = 18
-# CELLS_DISTANCES = [7]
 OFFSET_X_STEP = 0.2
 BAND = True
 OFFSET_Z = 0
@@ -22,7 +22,6 @@ def main():
     _experiments = load.experiments_groups_as_tuples(EXPERIMENTS)
     _experiments = filtering.by_time_points_amount(_experiments, TIME_POINT)
     _experiments = filtering.by_real_cells(_experiments)
-    # _experiments = filtering.by_distances(_experiments, CELLS_DISTANCES)
     if BAND:
         _experiments = filtering.by_band(_experiments)
 
@@ -33,7 +32,7 @@ def main():
         _cells_distance = \
             compute.cells_distance_in_cell_size_time_point(_experiment, _series_id, _group, _time_point=TIME_POINT - 1)
         _offsets_x = \
-            np.arange(start=0, stop=_cells_distance / 2 - 0.5 - ROI_LENGTH + OFFSET_X_STEP, step=OFFSET_X_STEP)
+            np.arange(start=0, stop=_cells_distance / 2 - 0.5 - ROI_LENGTH, step=OFFSET_X_STEP)
         if len(_offsets_x) > len(_max_offsets_x):
             _max_offsets_x = _offsets_x
         for _offset_x in _offsets_x:
@@ -59,6 +58,9 @@ def main():
 
     _x_array = []
     _y_array = []
+    _n_array = []
+    _p_value_array = []
+    _colors_array = []
     for _offset_x in _max_offsets_x:
         _cells_distances = []
         _z_scores = []
@@ -85,8 +87,14 @@ def main():
                                                                            _time_point=0)
                         )
                         _z_scores.append(_normalized_fibers_density)
-        _x_array.append(_offset_x)
-        _y_array.append(compute_lib.correlation(_cells_distances, _z_scores))
+
+        if len(_cells_distances) > 2:
+            _x_array.append(_offset_x)
+            _correlation = pearsonr(_cells_distances, _z_scores)
+            _y_array.append(_correlation[0])
+            _colors_array.append('black' if _correlation[1] < 0.05 else 'red')
+            _n_array.append(len(_cells_distances))
+            _p_value_array.append(_correlation[1])
 
     # plot
     _fig = go.Figure(
@@ -94,6 +102,7 @@ def main():
             x=_x_array,
             y=_y_array,
             mode='markers',
+            marker_color=_colors_array,
             marker={
                 'size': 15
             },
@@ -101,15 +110,10 @@ def main():
         ),
         layout={
             'xaxis': {
-                'title': 'Distance from Cell (cell size)',
-                # 'zeroline': False
+                'title': 'Distance from Cell (cell size)'
             },
             'yaxis': {
-                'title': 'Correlation',
-                # 'range': [-1.7, 16],
-                # 'zeroline': False,
-                # 'tickmode': 'array',
-                # 'tickvals': [0, 4, 8, 12]
+                'title': 'Correlation'
             }
         }
     )
