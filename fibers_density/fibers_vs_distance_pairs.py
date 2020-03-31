@@ -17,17 +17,11 @@ from libs.simulations import filtering as simulations_filtering
 from libs.simulations import load as simulations_load
 from plotting import save
 
-CELLS_DISTANCE = 7
 OFFSET_X_STEP = 0.2
-OFFSET_X_END = {
-    5: 1.6,
-    7: 2.6,
-    9: 3.6
-}
-OFFSETS_X = np.arange(start=0, stop=OFFSET_X_END[CELLS_DISTANCE] + OFFSET_X_STEP, step=OFFSET_X_STEP)
 OFFSET_Y = 0
 
 # experiments
+CELLS_DISTANCE_RANGE = (6, 8)
 EXPERIMENTS = ['SN16']
 EXPERIMENTS_TIME_POINT = 18
 BAND = True
@@ -35,6 +29,9 @@ OFFSET_Z = 0
 OUT_OF_BOUNDARIES = False
 
 # simulations
+CELLS_DISTANCE = 7
+SIMULATIONS_OFFSETS_X = \
+    np.arange(start=0, stop=CELLS_DISTANCE / 2 - 0.25 - simulations_config.ROI_WIDTH, step=OFFSET_X_STEP)
 SIMULATIONS_TIME_POINT = {
     False: 50,
     True: 35
@@ -46,14 +43,22 @@ def compute_experiments_data():
     _experiments = experiments_filtering.by_time_points_amount(_experiments, EXPERIMENTS_TIME_POINT)
     _experiments = experiments_filtering.by_real_cells(_experiments)
     _experiments = experiments_filtering.by_distance(
-        _experiments, CELLS_DISTANCE, _time_point=EXPERIMENTS_TIME_POINT - 1)
+        _experiments, CELLS_DISTANCE)
     if BAND:
         _experiments = experiments_filtering.by_band(_experiments)
 
+    _max_offsets_x = []
     _arguments = []
     for _tuple in _experiments:
         _experiment, _series_id, _group = _tuple
-        for _offset_x in OFFSETS_X:
+        _cells_distance = experiments_compute.cells_distance_in_cell_size_time_point(
+            _experiment, _series_id, _group, EXPERIMENTS_TIME_POINT - 1
+        )
+        _offsets_x = \
+            np.arange(start=0, stop=_cells_distance / 2 - 0.5 - experiments_config.ROI_LENGTH, step=OFFSET_X_STEP)
+        if len(_offsets_x) > len(_max_offsets_x):
+            _max_offsets_x = _offsets_x
+        for _offset_x in _offsets_x:
             for _cell_id in ['left_cell', 'right_cell']:
                 _arguments.append({
                     'experiment': _experiment,
@@ -74,36 +79,36 @@ def compute_experiments_data():
         experiments_compute.rois(_arguments, _keys=['experiment', 'series_id', 'group', 'offset_x', 'cell_id'])
     _fibers_densities = experiments_compute.fibers_densities(_rois_to_compute)
 
-    _experiments_fibers_densities = [[] for _i in range(len(OFFSETS_X))]
+    _experiments_fibers_densities = [[] for _i in range(len(_max_offsets_x))]
     for _tuple in tqdm(_experiments, desc='Experiments Loop'):
         _experiment, _series_id, _group = _tuple
-        _offset_index = 0
-        _normalization = experiments_load.normalization_series_file_data(_experiment, 'Series ' + str(_series_id))
-
-        for _offset_x in OFFSETS_X:
+        for _offset_x_index, _offset_x in enumerate(_max_offsets_x):
             for _cell_id in ['left_cell', 'right_cell']:
-                _roi_tuple = _rois_dictionary[(_experiment, _series_id, _group, _offset_x, _cell_id)][0]
-                _fibers_density = _fibers_densities[_roi_tuple]
+                if (_experiment, _series_id, _group, _offset_x, _cell_id) in _rois_dictionary:
+                    _normalization = \
+                        experiments_load.normalization_series_file_data(_experiment, 'Series ' + str(_series_id))
+                    _roi_tuple = _rois_dictionary[(_experiment, _series_id, _group, _offset_x, _cell_id)][0]
+                    _fibers_density = _fibers_densities[_roi_tuple]
 
-                if not OUT_OF_BOUNDARIES and _fibers_density[1]:
-                    continue
+                    if not OUT_OF_BOUNDARIES and _fibers_density[1]:
+                        continue
 
-                _normalized_fibers_density = compute_lib.z_score(
-                    _x=_fibers_density[0],
-                    _average=_normalization['average'],
-                    _std=_normalization['std']
-                )
-                _experiments_fibers_densities[_offset_index].append(_normalized_fibers_density)
+                    _normalized_fibers_density = compute_lib.z_score(
+                        _x=_fibers_density[0],
+                        _average=_normalization['average'],
+                        _std=_normalization['std']
+                    )
 
-            _offset_index += 1
+                    if not np.isnan(_normalized_fibers_density):
+                        _experiments_fibers_densities[_offset_x_index].append(_normalized_fibers_density)
 
-    return _experiments_fibers_densities
+    return _experiments_fibers_densities, _max_offsets_x
 
 
 def compute_simulations_fibers_densities(_simulations, _low_connectivity):
     _arguments = []
     for _simulation in _simulations:
-        for _offset_x in OFFSETS_X:
+        for _offset_x in SIMULATIONS_OFFSETS_X:
             for _cell_id in ['left_cell', 'right_cell']:
                 _arguments.append({
                     'simulation': _simulation,
@@ -144,12 +149,11 @@ def compute_simulations_data(_low_connectivity):
 
     _fibers_densities = compute_simulations_fibers_densities(_simulations, _low_connectivity)
 
-    _simulations_fibers_densities = [[] for _i in range(len(OFFSETS_X))]
+    _simulations_fibers_densities = [[] for _i in range(len(SIMULATIONS_OFFSETS_X))]
     for _simulation in tqdm(_simulations, desc='Simulations Loop'):
-        _offset_index = 0
         _normalization = simulations_load.normalization(_simulation)
 
-        for _offset_x in OFFSETS_X:
+        for _offset_x_index, _offset_x in enumerate(SIMULATIONS_OFFSETS_X):
             for _cell_id in ['left_cell', 'right_cell']:
                 _fibers_density = _fibers_densities[(_simulation, _offset_x, _cell_id)]
 
@@ -158,9 +162,7 @@ def compute_simulations_data(_low_connectivity):
                     _normalization['average'],
                     _normalization['std']
                 )
-                _simulations_fibers_densities[_offset_index].append(_normalized_fibers_density)
-
-            _offset_index += 1
+                _simulations_fibers_densities[_offset_x_index].append(_normalized_fibers_density)
 
     return _simulations_fibers_densities
 
@@ -170,13 +172,13 @@ def main(_low_connectivity=False):
     _simulations_fibers_densities = compute_simulations_data(_low_connectivity)
 
     print('Experiments')
-    _experiments_fibers_densities = compute_experiments_data()
+    _experiments_fibers_densities, _experiments_offsets_x = compute_experiments_data()
 
     # plot
     _fig = go.Figure(
         data=[
             go.Scatter(
-                x=OFFSETS_X,
+                x=SIMULATIONS_OFFSETS_X,
                 y=[np.mean(_array) for _array in _simulations_fibers_densities],
                 name='Simulations',
                 error_y={
@@ -193,7 +195,7 @@ def main(_low_connectivity=False):
                 opacity=0.7
             ),
             go.Scatter(
-                x=OFFSETS_X,
+                x=_experiments_offsets_x,
                 y=[np.mean(_array) for _array in _experiments_fibers_densities],
                 name='Experiments',
                 error_y={
@@ -212,15 +214,15 @@ def main(_low_connectivity=False):
         ],
         layout={
             'xaxis': {
-                'title': 'Distance from Cell (cell size)',
+                'title': 'Distance from cell (cell diameter)',
                 'zeroline': False
             },
             'yaxis': {
-                'title': 'Fibers Density Z-score',
-                'range': [-1.2, 10],
+                'title': 'Fibers density z-score',
+                'range': [-1.2, 13],
                 'zeroline': False,
                 'tickmode': 'array',
-                'tickvals': [0, 2, 4, 6, 8]
+                'tickvals': [0, 4, 8, 12]
             },
             'legend': {
                 'xanchor': 'right',
@@ -233,7 +235,7 @@ def main(_low_connectivity=False):
                     'type': 'line',
                     'x0': -OFFSET_X_STEP,
                     'y0': -1,
-                    'x1': OFFSETS_X[-1] + OFFSET_X_STEP,
+                    'x1': _experiments_offsets_x[-1] + OFFSET_X_STEP,
                     'y1': -1,
                     'line': {
                         'color': 'black',
@@ -245,7 +247,7 @@ def main(_low_connectivity=False):
                     'x0': -OFFSET_X_STEP,
                     'y0': -1,
                     'x1': -OFFSET_X_STEP,
-                    'y1': 10,
+                    'y1': 13,
                     'line': {
                         'color': 'black',
                         'width': 2
