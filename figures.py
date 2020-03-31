@@ -5,10 +5,10 @@ def figure_1():
     print('Panel B-ii')
     fibers_density.fibers_vs_distance_single_cells.main()
 
-    print('Panel C-ii')
+    print('Panel D-ii')
     fibers_density.fibers_vs_distance_pairs.main()
 
-    print('Panel C-iii')
+    print('Panel D-iii')
     fibers_density.fibers_vs_distance_differences.main()
 
     print('Panel E-i')
