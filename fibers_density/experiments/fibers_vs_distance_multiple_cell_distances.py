@@ -10,16 +10,16 @@ from plotting import save
 
 EXPERIMENTS = ['SN16']
 TIME_POINT = 18
-CELLS_DISTANCES = [5, 7, 9]
-OFFSET_X_STEP = 0.2
+CELLS_DISTANCE_RANGES = [(4, 6), (6, 8), (8, 10)]
 BAND = True
+OFFSET_X_STEP = 0.2
 OFFSET_Z = 0
 OFFSET_Y = 0
 OUT_OF_BOUNDARIES = False
 OFFSET_X_END = {
-    5: 1.6,
-    7: 2.6,
-    9: 3.6
+    (4, 6): 6,
+    (6, 8): 8,
+    (8, 10): 10
 }
 
 
@@ -27,20 +27,24 @@ def main():
     _x_array = []
     _y_array = []
     _names_array = []
-    for _distance in CELLS_DISTANCES:
+    for _distance in CELLS_DISTANCE_RANGES:
         print('Cells Distance ' + str(_distance))
         _experiments = load.experiments_groups_as_tuples(EXPERIMENTS)
         _experiments = filtering.by_time_points_amount(_experiments, TIME_POINT)
         _experiments = filtering.by_real_cells(_experiments)
-        _experiments = filtering.by_distance(_experiments, _distance, _time_point=TIME_POINT - 1)
+        _experiments = filtering.by_distance_range(_experiments, _distance)
         if BAND:
             _experiments = filtering.by_band(_experiments)
 
-        _offsets_x = np.arange(start=0, stop=OFFSET_X_END[_distance] + OFFSET_X_STEP, step=OFFSET_X_STEP)
-
+        _max_offsets_x = []
         _arguments = []
         for _tuple in _experiments:
             _experiment, _series_id, _group = _tuple
+            _cells_distance = \
+                compute.cells_distance_in_cell_size_time_point(_experiment, _series_id, _group, TIME_POINT - 1)
+            _offsets_x = np.arange(start=0, stop=_cells_distance / 2 - 0.5 - ROI_LENGTH, step=OFFSET_X_STEP)
+            if len(_offsets_x) > len(_max_offsets_x):
+                _max_offsets_x = _offsets_x
             for _offset_x in _offsets_x:
                 for _cell_id in ['left_cell', 'right_cell']:
                     _arguments.append({
@@ -62,30 +66,29 @@ def main():
             compute.rois(_arguments, _keys=['experiment', 'series_id', 'group', 'offset_x', 'cell_id'])
         _fibers_densities = compute.fibers_densities(_rois_to_compute)
 
-        _cells_distance_fibers_densities = [[] for _i in range(len(_offsets_x))]
+        _cells_distance_fibers_densities = [[] for _i in range(len(_max_offsets_x))]
         for _tuple in _experiments:
             _experiment, _series_id, _group = _tuple
-            _offset_index = 0
-            _normalization = load.normalization_series_file_data(_experiment, 'Series ' + str(_series_id))
-
-            for _offset_x in _offsets_x:
+            for _offset_x_index, _offset_x in enumerate(_max_offsets_x):
                 for _cell_id in ['left_cell', 'right_cell']:
-                    _roi_tuple = _rois_dictionary[(_experiment, _series_id, _group, _offset_x, _cell_id)][0]
-                    _fibers_density = _fibers_densities[_roi_tuple]
+                    if (_experiment, _series_id, _group, _offset_x, _cell_id) in _rois_dictionary:
+                        _normalization = load.normalization_series_file_data(_experiment, 'Series ' + str(_series_id))
+                        _roi_tuple = _rois_dictionary[(_experiment, _series_id, _group, _offset_x, _cell_id)][0]
+                        _fibers_density = _fibers_densities[_roi_tuple]
 
-                    if not OUT_OF_BOUNDARIES and _fibers_density[1]:
-                        continue
+                        if not OUT_OF_BOUNDARIES and _fibers_density[1]:
+                            continue
 
-                    _normalized_fibers_density = compute_lib.z_score(
-                        _x=_fibers_density[0],
-                        _average=_normalization['average'],
-                        _std=_normalization['std']
-                    )
-                    _cells_distance_fibers_densities[_offset_index].append(_normalized_fibers_density)
+                        _normalized_fibers_density = compute_lib.z_score(
+                            _x=_fibers_density[0],
+                            _average=_normalization['average'],
+                            _std=_normalization['std']
+                        )
 
-                _offset_index += 1
+                        if not np.isnan(_normalized_fibers_density):
+                            _cells_distance_fibers_densities[_offset_x_index].append(_normalized_fibers_density)
 
-        _x_array.append(_offsets_x)
+        _x_array.append(_max_offsets_x)
         _y_array.append(_cells_distance_fibers_densities)
         _names_array.append('Distance ' + str(_distance))
 
@@ -134,7 +137,7 @@ def main():
                     'type': 'line',
                     'x0': -OFFSET_X_STEP,
                     'y0': -1.5,
-                    'x1': max([OFFSET_X_END[_distance] for _distance in CELLS_DISTANCES]) + OFFSET_X_STEP,
+                    'x1': max([OFFSET_X_END[_distance] for _distance in CELLS_DISTANCE_RANGES]) + OFFSET_X_STEP,
                     'y1': -1.5,
                     'line': {
                         'color': 'black',
