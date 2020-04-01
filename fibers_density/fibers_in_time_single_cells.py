@@ -16,7 +16,7 @@ from libs.simulations import compute as simulations_compute
 from libs.simulations import config as simulations_config
 from libs.simulations import filtering as simulations_filtering
 from libs.simulations import load as simulations_load
-from plotting import scatter, save, update
+from plotting import save
 
 OFFSET_X = 0
 OFFSET_Y = 0
@@ -213,12 +213,12 @@ def main():
                 },
                 # 'anchor': 'free',
                 'overlaying': 'x',
-                'side': 'top',
+                'side': 'bottom',
                 'showgrid': False,
                 'zeroline': False
             },
             'yaxis': {
-                'title': 'Fibers Density Z-score',
+                'title': 'Fibers density z-score',
                 # 'domain': [0.3, 1],
                 'range': [-1.7, 14],
                 'zeroline': False,
@@ -237,7 +237,7 @@ def main():
                     'type': 'line',
                     'x0': -2,
                     'y0': -1.5,
-                    'x1': SIMULATIONS_TIME_POINTS + SIMULATIONS_STEP,
+                    'x1': 53,
                     'y1': -1.5,
                     'line': {
                         'color': 'black',
