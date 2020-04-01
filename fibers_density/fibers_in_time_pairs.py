@@ -17,11 +17,11 @@ from libs.simulations import filtering as simulations_filtering
 from libs.simulations import load as simulations_load
 from plotting import save
 
-CELLS_DISTANCE = 7
 OFFSET_X = 0
 OFFSET_Y = 0
 
 # experiments
+CELLS_DISTANCE_RANGE = (6, 8)
 EXPERIMENTS = ['SN16']
 EXPERIMENTS_TIME_POINTS = 18
 BAND = True
@@ -29,6 +29,7 @@ OFFSET_Z = 0
 OUT_OF_BOUNDARIES = False
 
 # simulations
+CELLS_DISTANCE = 7
 SIMULATIONS_TIME_POINTS = 50
 SIMULATIONS_STEP = int(round(SIMULATIONS_TIME_POINTS / EXPERIMENTS_TIME_POINTS))
 
@@ -37,7 +38,7 @@ def compute_experiments_data():
     _experiments = experiments_load.experiments_groups_as_tuples(EXPERIMENTS)
     _experiments = experiments_filtering.by_time_points_amount(_experiments, EXPERIMENTS_TIME_POINTS)
     _experiments = experiments_filtering.by_real_cells(_experiments)
-    _experiments = experiments_filtering.by_distance(_experiments, CELLS_DISTANCE)
+    _experiments = experiments_filtering.by_distance_range(_experiments, CELLS_DISTANCE_RANGE)
     if BAND:
         _experiments = experiments_filtering.by_band(_experiments)
 
@@ -144,7 +145,6 @@ def compute_simulations_data():
                     _normalization['average'],
                     _normalization['std']
                 )
-
                 _simulations_fibers_densities[_time_point].append(_normalized_fibers_density)
 
     return _simulations_fibers_densities
@@ -217,12 +217,12 @@ def main():
                 },
                 # 'anchor': 'free',
                 'overlaying': 'x',
-                'side': 'top',
+                'side': 'bottom',
                 'showgrid': False,
                 'zeroline': False
             },
             'yaxis': {
-                'title': 'Fibers Density Z-score',
+                'title': 'Fibers density z-score',
                 # 'domain': [0.3, 1],
                 'range': [-1.7, 14],
                 'zeroline': False,
@@ -234,14 +234,15 @@ def main():
                 'x': 0.1,
                 'yanchor': 'top',
                 'bordercolor': 'black',
-                'borderwidth': 2
+                'borderwidth': 2,
+                'bgcolor': 'white'
             },
             'shapes': [
                 {
                     'type': 'line',
                     'x0': -2,
                     'y0': -1.5,
-                    'x1': SIMULATIONS_TIME_POINTS + SIMULATIONS_STEP,
+                    'x1': 53,
                     'y1': -1.5,
                     'line': {
                         'color': 'black',
