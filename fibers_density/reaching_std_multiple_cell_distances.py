@@ -17,11 +17,11 @@ from libs.simulations import filtering as simulations_filtering
 from libs.simulations import load as simulations_load
 from plotting import save
 
-CELLS_DISTANCES = [5, 7, 9]
 OFFSET_X = 0
 OFFSET_Y = 0
 
 # experiments
+CELLS_DISTANCE_RANGES = [(4, 6), (6, 8), (8, 10)]
 EXPERIMENTS = ['SN16']
 EXPERIMENTS_TIME_POINTS = 18
 BAND = True
@@ -30,16 +30,17 @@ OUT_OF_BOUNDARIES = False
 EXPERIMENTS_Z_SCORE_GOAL = 5
 
 # simulations
+CELLS_DISTANCES = [5, 7, 9]
 SIMULATIONS_TIME_POINTS = 50
 SIMULATIONS_STEP = int(round(SIMULATIONS_TIME_POINTS / EXPERIMENTS_TIME_POINTS))
 SIMULATIONS_Z_SCORE_GOAL = 2
 
 
-def compute_experiments_data(_cells_distance):
+def compute_experiments_data(_cells_distance_range):
     _experiments = experiments_load.experiments_groups_as_tuples(EXPERIMENTS)
     _experiments = experiments_filtering.by_time_points_amount(_experiments, EXPERIMENTS_TIME_POINTS)
     _experiments = experiments_filtering.by_real_cells(_experiments)
-    _experiments = experiments_filtering.by_distance(_experiments, _cells_distance)
+    _experiments = experiments_filtering.by_distance_range(_experiments, _cells_distance_range)
     if BAND:
         _experiments = experiments_filtering.by_band(_experiments)
 
@@ -59,7 +60,7 @@ def compute_experiments_data(_cells_distance):
                 'offset_z': OFFSET_Z,
                 'cell_id': _cell_id,
                 'direction': 'inside',
-                'time_points': EXPERIMENTS_TIME_POINTS
+                'time_points': EXPERIMENTS_TIME_POINTS - 1
             })
 
     _rois_dictionary, _rois_to_compute = \
@@ -71,7 +72,7 @@ def compute_experiments_data(_cells_distance):
         _experiment, _series_id, _group = _tuple
         _normalization = experiments_load.normalization_series_file_data(_experiment, 'Series ' + str(_series_id))
 
-        for _time_point in range(EXPERIMENTS_TIME_POINTS):
+        for _time_point in range(EXPERIMENTS_TIME_POINTS - 1):
             for _cell_id in ['left_cell', 'right_cell']:
                 _roi_tuple = _rois_dictionary[(_experiment, _series_id, _group, _cell_id)][_time_point]
                 _fibers_density = _fibers_densities[_roi_tuple]
@@ -173,9 +174,9 @@ def main():
 
     print('Experiments')
     _experiments_y_array = []
-    for _cells_distance in CELLS_DISTANCES:
-        print('Cells Distance:', _cells_distance)
-        _experiments_fibers_densities = compute_experiments_data(_cells_distance)
+    for _cells_distance_range in CELLS_DISTANCE_RANGES:
+        print('Cells Distance:', _cells_distance_range)
+        _experiments_fibers_densities = compute_experiments_data(_cells_distance_range)
         _experiments_y_array.append(_experiments_fibers_densities)
 
     # plot
@@ -219,7 +220,7 @@ def main():
         ],
         layout={
             'xaxis': {
-                'title': 'Cells Distance (cell size)',
+                'title': 'Cells distance (cell diameter)',
                 'tickmode': 'array',
                 'tickvals': CELLS_DISTANCES
             },
@@ -246,12 +247,12 @@ def main():
                 'tickfont': {
                     'color': '#ea8500'
                 },
-                'range': [0, 120],
+                'range': [-20, 120],
                 'overlaying': 'y',
                 'side': 'right',
                 'zeroline': False,
                 'tickmode': 'array',
-                'tickvals': [20, 60, 100]
+                'tickvals': [0, 20, 60, 100]
             },
             'legend': {
                 'xanchor': 'left',
