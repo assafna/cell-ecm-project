@@ -4,16 +4,27 @@ import numpy as np
 import plotly.graph_objs as go
 
 from fibers_density import fibers_vs_distance_pairs, fibers_vs_distance_single_cells
-from fibers_density.fibers_vs_distance_pairs import OFFSETS_X
+from fibers_density.fibers_vs_distance_single_cells import OFFSETS_X, OFFSET_X_STEP
 from libs import paths_lib
-from plotting import scatter, save
-
-OFFSET_X_STEP = 0.2
+from plotting import save
 
 
 def main(_low_connectivity=False):
+    print('Simulations')
+    _simulations_pairs_fibers_densities = \
+        fibers_vs_distance_pairs.compute_simulations_data(_low_connectivity)
+    _simulations_single_cells_fibers_densities = \
+        fibers_vs_distance_single_cells.compute_simulations_data(_low_connectivity)
+
+    _min_simulations_fibers_densities_length = \
+        min(len(_simulations_pairs_fibers_densities), len(_simulations_single_cells_fibers_densities))
+
+    _simulations_fibers_densities_differences = \
+        np.mean(_simulations_pairs_fibers_densities[:_min_simulations_fibers_densities_length], axis=1) - \
+        np.mean(_simulations_single_cells_fibers_densities[:_min_simulations_fibers_densities_length], axis=1)
+
     print('Experiments')
-    _experiments_pairs_fibers_densities = fibers_vs_distance_pairs.compute_experiments_data()
+    _experiments_pairs_fibers_densities, _ = fibers_vs_distance_pairs.compute_experiments_data()
     _experiments_single_cells_fibers_densities = fibers_vs_distance_single_cells.compute_experiments_data()
 
     _experiments_pairs_fibers_densities_averages = \
@@ -21,17 +32,11 @@ def main(_low_connectivity=False):
     _experiments_single_cells_fibers_densities_averages = \
         np.array([np.mean(_array) for _array in _experiments_single_cells_fibers_densities])
 
+    _min_experiments_fibers_densities_length = \
+        min(len(_experiments_pairs_fibers_densities_averages), len(_experiments_single_cells_fibers_densities_averages))
     _experiments_fibers_densities_differences = \
-        _experiments_pairs_fibers_densities_averages - _experiments_single_cells_fibers_densities_averages
-
-    print('Simulations')
-    _simulations_pairs_fibers_densities = \
-        fibers_vs_distance_pairs.compute_simulations_data(_low_connectivity)
-    _simulations_single_cells_fibers_densities = \
-        fibers_vs_distance_single_cells.compute_simulations_data(_low_connectivity)
-    _simulations_fibers_densities_differences = \
-        np.mean(_simulations_pairs_fibers_densities, axis=1) - \
-        np.mean(_simulations_single_cells_fibers_densities, axis=1)
+        _experiments_pairs_fibers_densities_averages[:_min_experiments_fibers_densities_length] - \
+        _experiments_single_cells_fibers_densities_averages[:_min_experiments_fibers_densities_length]
 
     # plot
     _fig = go.Figure(
@@ -61,20 +66,21 @@ def main(_low_connectivity=False):
         ],
         layout={
             'xaxis': {
-                'title': 'Distance from Cell (cell size)',
+                'title': 'Distance from cell (cell diameter)',
                 'zeroline': False
             },
             'yaxis': {
-                'title': 'Fibers Density Z-score Difference',
-                'range': [-0.2, 3.5],
+                'title': 'Fibers density z-score difference',
+                'range': [-0.2, 5],
                 'zeroline': False,
-                'tickvals': [0, 1, 2, 3]
+                'tickvals': [0, 2, 4]
             },
             'legend': {
                 'xanchor': 'right',
                 'yanchor': 'top',
                 'bordercolor': 'black',
-                'borderwidth': 2
+                'borderwidth': 2,
+                'bgcolor': 'white'
             },
             'shapes': [
                 {
@@ -93,7 +99,7 @@ def main(_low_connectivity=False):
                     'x0': -OFFSET_X_STEP,
                     'y0': 0,
                     'x1': -OFFSET_X_STEP,
-                    'y1': 3.5,
+                    'y1': 5,
                     'line': {
                         'color': 'black',
                         'width': 2
