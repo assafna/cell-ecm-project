@@ -71,7 +71,7 @@ def main(_low_connectivity=False):
             },
             'yaxis': {
                 'title': 'Fibers density z-score difference',
-                'range': [-0.2, 5],
+                'range': [-0.2, 6],
                 'zeroline': False,
                 'tickvals': [0, 2, 4]
             },
@@ -85,9 +85,9 @@ def main(_low_connectivity=False):
             'shapes': [
                 {
                     'type': 'line',
-                    'x0': -OFFSET_X_STEP,
+                    'x0': -0.2,
                     'y0': 0,
-                    'x1': OFFSETS_X[-1] + OFFSET_X_STEP,
+                    'x1': 2.6,
                     'y1': 0,
                     'line': {
                         'color': 'black',
@@ -96,10 +96,10 @@ def main(_low_connectivity=False):
                 },
                 {
                     'type': 'line',
-                    'x0': -OFFSET_X_STEP,
+                    'x0': -0.2,
                     'y0': 0,
-                    'x1': -OFFSET_X_STEP,
-                    'y1': 5,
+                    'x1': -0.2,
+                    'y1': 6,
                     'line': {
                         'color': 'black',
                         'width': 2

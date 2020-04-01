@@ -17,11 +17,6 @@ TIME_POINT = {
 }
 CELLS_DISTANCES = [5, 7, 9]
 OFFSET_X_STEP = 0.2
-OFFSET_X_END = {
-    5: 1.6,
-    7: 2.6,
-    9: 3.6
-}
 OFFSET_Y = 0
 
 
@@ -58,6 +53,7 @@ def main(_low_connectivity=False):
     _x_array = []
     _y_array = []
     _names_array = []
+    _max_offsets_x = []
     for _distance in CELLS_DISTANCES:
         print('Cells Distance ' + str(_distance))
         _simulations = load.structured()
@@ -72,7 +68,9 @@ def main(_low_connectivity=False):
         _simulations = filtering.by_distance(_simulations, _distance=_distance)
         _simulations = filtering.by_time_points_amount(_simulations, _time_points=TIME_POINT[_low_connectivity])
 
-        _offsets_x = np.arange(start=0, stop=OFFSET_X_END[_distance] + OFFSET_X_STEP, step=OFFSET_X_STEP)
+        _offsets_x = np.arange(start=0, stop=_distance / 2 - 0.25 - ROI_WIDTH, step=OFFSET_X_STEP)
+        if len(_offsets_x) > len(_max_offsets_x):
+            _max_offsets_x = _offsets_x
         _fibers_densities = compute_fibers_densities(_simulations, _offsets_x, _low_connectivity)
 
         _cells_distance_fibers_densities = [[] for _i in range(len(_offsets_x))]
@@ -120,12 +118,12 @@ def main(_low_connectivity=False):
         ],
         layout={
             'xaxis': {
-                'title': 'Distance from Cell (cell size)',
+                'title': 'Distance from cell (cell diameter)',
                 'zeroline': False
             },
             'yaxis': {
-                'title': 'Fibers Density Z-score',
-                'range': [-1.7, 16],
+                'title': 'Fibers density z-score',
+                'range': [-1.7, 13],
                 'zeroline': False,
                 'tickmode': 'array',
                 'tickvals': [0, 4, 8, 12]
@@ -139,9 +137,9 @@ def main(_low_connectivity=False):
             'shapes': [
                 {
                     'type': 'line',
-                    'x0': -OFFSET_X_STEP,
+                    'x0': -0.2,
                     'y0': -1.5,
-                    'x1': max([OFFSET_X_END[_distance] for _distance in CELLS_DISTANCES]) + OFFSET_X_STEP,
+                    'x1': 3.4,
                     'y1': -1.5,
                     'line': {
                         'color': 'black',
@@ -150,10 +148,10 @@ def main(_low_connectivity=False):
                 },
                 {
                     'type': 'line',
-                    'x0': -OFFSET_X_STEP,
+                    'x0': -0.2,
                     'y0': -1.5,
-                    'x1': -OFFSET_X_STEP,
-                    'y1': 16,
+                    'x1': -0.2,
+                    'y1': 13,
                     'line': {
                         'color': 'black',
                         'width': 2

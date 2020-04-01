@@ -111,12 +111,12 @@ def main():
         ],
         layout={
             'xaxis': {
-                'title': 'Distance from Cell (cell size)',
+                'title': 'Distance from cell (cell diameter)',
                 'zeroline': False
             },
             'yaxis': {
-                'title': 'Fibers Density Z-score',
-                'range': [-1.7, 16],
+                'title': 'Fibers density z-score',
+                'range': [-1.7, 13],
                 'zeroline': False,
                 'tickmode': 'array',
                 'tickvals': [0, 4, 8, 12]
@@ -131,9 +131,9 @@ def main():
             'shapes': [
                 {
                     'type': 'line',
-                    'x0': -OFFSET_X_STEP,
+                    'x0': -0.2,
                     'y0': -1.5,
-                    'x1': 3.2,
+                    'x1': 3.4,
                     'y1': -1.5,
                     'line': {
                         'color': 'black',
@@ -142,10 +142,10 @@ def main():
                 },
                 {
                     'type': 'line',
-                    'x0': -OFFSET_X_STEP,
+                    'x0': -0.2,
                     'y0': -1.5,
-                    'x1': -OFFSET_X_STEP,
-                    'y1': 16,
+                    'x1': -0.2,
+                    'y1': 13,
                     'line': {
                         'color': 'black',
                         'width': 2
