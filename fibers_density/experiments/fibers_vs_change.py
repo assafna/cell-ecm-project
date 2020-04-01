@@ -25,7 +25,7 @@ END_TIME_POINT = {
     'SN41': 18,
     'SN44': 18
 }
-CELLS_DISTANCES = range(5, 18)
+CELLS_DISTANCE_RANGE = (5, 18)
 DIRECTION = 'inside'
 REAL_CELLS = True
 STATIC = False
@@ -54,7 +54,7 @@ Z_MAX = {
 
 def main():
     _experiments = load.experiments_groups_as_tuples(EXPERIMENTS)
-    _experiments = filtering.by_distances(_experiments, CELLS_DISTANCES)
+    _experiments = filtering.by_distance_range(_experiments, CELLS_DISTANCE_RANGE)
     _experiments = filtering.by_real_cells(_experiments, _real_cells=REAL_CELLS)
     _experiments = filtering.by_static_cells(_experiments, _static=STATIC)
     _experiments = filtering.by_band(_experiments, _band=BAND)
@@ -137,7 +137,6 @@ def main():
 
         if not CONDITIONAL_NORMALIZATION:
             _z_array[_z_array == 0] = None
-            # _z_array_plot = list(zip(*_z_array))
         else:
             _z_array_plot = np.zeros(shape=np.array(_z_array).shape)
             for _fibers_index, _fibers_density_z_score in enumerate(_z_array):
@@ -146,7 +145,6 @@ def main():
                     _z_array_plot[_fibers_index][_change_index] = (_change_z_score / _sum) if _sum != 0 else 0
 
             _z_array_plot[_z_array_plot == 0] = None
-            # _z_array_plot = list(zip(*_z_array_plot))
 
         _fig = go.Figure(
             data=go.Heatmap(
@@ -157,26 +155,20 @@ def main():
                 colorbar={
                     'tickmode': 'array',
                     'tickvals': [0, 0.025, 0.05],
-                    'ticktext': ['0%', '2.5%', '5%'],
-                    'tickangle': 90
+                    'ticktext': ['0', 'Fraction', '0.05'],
+                    'tickangle': -90
                 },
                 zmin=Z_MIN,
                 zmax=Z_MAX[CONDITIONAL_NORMALIZATION]
             ),
             layout={
                 'xaxis': {
-                    'title': 'Fibers Densities Z-Score',
-                    'zeroline': False,
-                    # 'range': [-1.2, 12],
-                    # 'tickmode': 'array',
-                    # 'tickvals': [0, 5, 10]
+                    'title': 'Fibers densities z-score',
+                    'zeroline': False
                 },
                 'yaxis': {
-                    'title': 'Change in Fibers Densities Z-Score',
-                    'zeroline': False,
-                    # 'range': [-1.6, 1.5],
-                    # 'tickmode': 'array',
-                    # 'tickvals': [-1, 0, 1]
+                    'title': 'Change in fibers<br>densities z-score',
+                    'zeroline': False
                 },
                 'shapes': [
                     {
