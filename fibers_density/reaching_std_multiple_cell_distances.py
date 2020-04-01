@@ -23,6 +23,7 @@ OFFSET_Y = 0
 # experiments
 CELLS_DISTANCE_RANGES = [(4, 6), (6, 8), (8, 10)]
 EXPERIMENTS = ['SN16']
+EXPERIMENTS_TIME_INTERVAL = 15
 EXPERIMENTS_TIME_POINTS = 18
 BAND = True
 OFFSET_Z = 0
@@ -73,6 +74,7 @@ def compute_experiments_data(_cells_distance_range):
         _normalization = experiments_load.normalization_series_file_data(_experiment, 'Series ' + str(_series_id))
 
         for _time_point in range(EXPERIMENTS_TIME_POINTS - 1):
+            _reached = False
             for _cell_id in ['left_cell', 'right_cell']:
                 _roi_tuple = _rois_dictionary[(_experiment, _series_id, _group, _cell_id)][_time_point]
                 _fibers_density = _fibers_densities[_roi_tuple]
@@ -88,11 +90,11 @@ def compute_experiments_data(_cells_distance_range):
 
                 if not np.isnan(_normalized_fibers_density):
                     if _normalized_fibers_density > EXPERIMENTS_Z_SCORE_GOAL:
-                        _experiments_time_points.append(max(0, _time_point - 1))
-                        break
-            else:
-                continue
-            break
+                        _experiments_time_points.append(max(0, (_time_point - 1)) * EXPERIMENTS_TIME_INTERVAL)
+                        _reached = True
+                        continue
+            if _reached:
+                break
 
     return _experiments_time_points
 
@@ -139,11 +141,12 @@ def compute_simulations_data(_cells_distance):
 
     _fibers_densities = compute_simulations_fibers_densities(_simulations)
 
-    _simulations_fibers_densities = []
+    _simulations_time_points = []
     for _simulation in tqdm(_simulations, desc='Simulations Loop'):
         _normalization = simulations_load.normalization(_simulation)
 
         for _time_point in range(SIMULATIONS_TIME_POINTS):
+            _reached = False
             for _cell_id in ['left_cell', 'right_cell']:
                 _fibers_density = _fibers_densities[(_simulation, _cell_id)][_time_point]
 
@@ -155,13 +158,13 @@ def compute_simulations_data(_cells_distance):
 
                 if not np.isnan(_normalized_fibers_density):
                     if _normalized_fibers_density > SIMULATIONS_Z_SCORE_GOAL:
-                        _simulations_fibers_densities.append(max(0, _time_point - 1))
-                        break
-            else:
-                continue
-            break
+                        _reached = True
+                        _simulations_time_points.append(max(0, _time_point - 1))
+                        continue
+            if _reached:
+                break
 
-    return _simulations_fibers_densities
+    return _simulations_time_points
 
 
 def main():
@@ -169,15 +172,15 @@ def main():
     _simulations_y_array = []
     for _cells_distance in CELLS_DISTANCES:
         print('Cells Distance:', _cells_distance)
-        _simulations_fibers_densities = compute_simulations_data(_cells_distance)
-        _simulations_y_array.append(_simulations_fibers_densities)
+        _simulations_time_points = compute_simulations_data(_cells_distance)
+        _simulations_y_array.append(_simulations_time_points)
 
     print('Experiments')
     _experiments_y_array = []
     for _cells_distance_range in CELLS_DISTANCE_RANGES:
         print('Cells Distance:', _cells_distance_range)
-        _experiments_fibers_densities = compute_experiments_data(_cells_distance_range)
-        _experiments_y_array.append(_experiments_fibers_densities)
+        _experiments_time_points = compute_experiments_data(_cells_distance_range)
+        _experiments_y_array.append(_experiments_time_points)
 
     # plot
     _fig = go.Figure(
@@ -201,12 +204,12 @@ def main():
             ),
             go.Scatter(
                 x=np.array(CELLS_DISTANCES) + 0.1,
-                y=[np.mean(_array) * 15 for _array in _experiments_y_array],
+                y=[np.mean(_array) for _array in _experiments_y_array],
                 yaxis='y2',
                 name='Experiments',
                 error_y={
                     'type': 'data',
-                    'array': [np.std(_array) * 15 for _array in _experiments_y_array],
+                    'array': [np.std(_array) for _array in _experiments_y_array],
                     'thickness': 1,
                     'color': '#ea8500'
                 },
@@ -237,7 +240,7 @@ def main():
                 'showgrid': False,
                 'zeroline': False,
                 'tickmode': 'array',
-                'tickvals': [15, 25, 35, 45]
+                'tickvals': [15, 30, 45]
             },
             'yaxis2': {
                 'title': 'Time to z-score ' + str(EXPERIMENTS_Z_SCORE_GOAL) + ' (minutes)',
@@ -247,19 +250,22 @@ def main():
                 'tickfont': {
                     'color': '#ea8500'
                 },
-                'range': [-20, 120],
+                'range': [-20, 100],
                 'overlaying': 'y',
                 'side': 'right',
+                'showgrid': False,
                 'zeroline': False,
                 'tickmode': 'array',
-                'tickvals': [0, 20, 60, 100]
+                'tickvals': [0, 40, 80],
+                'tickangle': -90
             },
             'legend': {
                 'xanchor': 'left',
                 'x': 0.1,
                 'yanchor': 'top',
                 'bordercolor': 'black',
-                'borderwidth': 2
+                'borderwidth': 2,
+                'bgcolor': 'white'
             }
         }
     )
