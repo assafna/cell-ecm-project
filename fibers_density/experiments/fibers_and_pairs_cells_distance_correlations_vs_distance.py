@@ -60,7 +60,6 @@ def main():
     _y_array = []
     _n_array = []
     _p_value_array = []
-    _colors_array = []
     for _offset_x in _max_offsets_x:
         _cells_distances = []
         _z_scores = []
@@ -92,29 +91,70 @@ def main():
             _x_array.append(_offset_x)
             _correlation = pearsonr(_cells_distances, _z_scores)
             _y_array.append(_correlation[0])
-            _colors_array.append('black' if _correlation[1] < 0.05 else 'red')
             _n_array.append(len(_cells_distances))
             _p_value_array.append(_correlation[1])
 
     # plot
+    _significant_x_array = [_x for _x, _p_value in zip(_x_array, _p_value_array) if _p_value < 0.05]
     _fig = go.Figure(
-        data=go.Scatter(
-            x=_x_array,
-            y=_y_array,
-            mode='markers',
-            marker_color=_colors_array,
-            marker={
-                'size': 15
-            },
-            opacity=0.7
-        ),
+        data=[
+            go.Scatter(
+                x=_x_array,
+                y=_y_array,
+                mode='markers',
+                marker={
+                    'size': 15,
+                    'color': 'black'
+                },
+                showlegend=False
+            ),
+            go.Scatter(
+                x=_significant_x_array,
+                y=[-0.79] * len(_significant_x_array),
+                mode='text',
+                text='*',
+                textfont={
+                    'color': 'red'
+                },
+                showlegend=False
+            )
+        ],
         layout={
             'xaxis': {
-                'title': 'Distance from Cell (cell size)'
+                'title': 'Distance from cell (cell diameter)',
+                'zeroline': False
             },
             'yaxis': {
-                'title': 'Correlation'
-            }
+                'title': 'Correlation:<br>pairs cells distance vs. fiber density',
+                'zeroline': False,
+                'range': [-0.82, 0.3],
+                'tickmode': 'array',
+                'tickvals': [-0.75, -0.25, 0.25]
+            },
+            'shapes': [
+                {
+                    'type': 'line',
+                    'x0': -0.2,
+                    'y0': -0.8,
+                    'x1': 3.2,
+                    'y1': -0.8,
+                    'line': {
+                        'color': 'black',
+                        'width': 2
+                    }
+                },
+                {
+                    'type': 'line',
+                    'x0': -0.2,
+                    'y0': -0.8,
+                    'x1': -0.2,
+                    'y1': 0.3,
+                    'line': {
+                        'color': 'black',
+                        'width': 2
+                    }
+                }
+            ]
         }
     )
 
