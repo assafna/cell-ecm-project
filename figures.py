@@ -17,6 +17,16 @@ def figure_1():
     print('Panel E-ii')
     fibers_density.experiments.fibers_vs_distance_multiple_cell_distances.main()
 
+    # supp
+    print('?')
+    fibers_density.experiments.fibers_and_pairs_cells_distance_correlations_vs_distance.main()
+
+    print('?')
+    fibers_density.experiments.fibers_vs_pairs_cells_distance_in_offset.main(_offset_x=1)
+
+    print('?')
+    fibers_density.experiments.fibers_vs_pairs_cells_distance_in_offset.main(_offset_x=2.5)
+
 
 def figure_2():
     print('Panel A-ii')
