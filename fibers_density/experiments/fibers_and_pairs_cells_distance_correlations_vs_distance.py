@@ -88,11 +88,11 @@ def main():
                         _z_scores.append(_normalized_fibers_density)
 
         if len(_cells_distances) > 2:
-            _x_array.append(_offset_x)
+            _x_array.append(round(_offset_x, 1))
             _correlation = pearsonr(_cells_distances, _z_scores)
-            _y_array.append(_correlation[0])
+            _y_array.append(round(_correlation[0], 2))
             _n_array.append(len(_cells_distances))
-            _p_value_array.append(_correlation[1])
+            _p_value_array.append(round(_correlation[1], 2))
 
     # plot
     _significant_x_array = [_x for _x, _p_value in zip(_x_array, _p_value_array) if _p_value < 0.05]
@@ -163,6 +163,12 @@ def main():
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
         _filename='plot'
     )
+
+    # table
+    print('Distance from cell (cell diameter)', 'Correlation: pairs cells distance vs. fiber density', 'N', 'P-value',
+          sep='\t')
+    for _x, _y, _n, _p_value in zip(_x_array, _y_array, _n_array, _p_value_array):
+        print(_x, _y, _n, _p_value, sep='\t')
 
 
 if __name__ == '__main__':
