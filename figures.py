@@ -2,7 +2,7 @@ import fibers_density
 
 
 def figure_1():
-    print('Panel B-ii')
+    print('Panel C-ii')
     fibers_density.fibers_vs_distance_single_cells.main()
 
     print('Panel D-ii')
@@ -18,13 +18,14 @@ def figure_1():
     fibers_density.experiments.fibers_vs_distance_multiple_cell_distances.main()
 
     # supp
-    print('?')
+    print('Correlation')
+    print('Panel B')
     fibers_density.experiments.fibers_and_pairs_cells_distance_correlations_vs_distance.main()
 
-    print('?')
+    print('Panel D-i')
     fibers_density.experiments.fibers_vs_pairs_cells_distance_in_offset.main(_offset_x=1)
 
-    print('?')
+    print('Panel D-ii')
     fibers_density.experiments.fibers_vs_pairs_cells_distance_in_offset.main(_offset_x=2.5)
 
 
@@ -35,8 +36,8 @@ def figure_2():
     print('Panel B-ii')
     fibers_density.fibers_in_time_pairs.main()
 
-    print('Panel B-iii')
-    fibers_density.reaching_std_multiple_cell_distances.main()
+    # print('Panel B-iii')
+    # fibers_density.reaching_std_multiple_cell_distances.main()
 
     print('Panel C-i')
     fibers_density.simulations.fibers_vs_change.main()
@@ -48,12 +49,10 @@ def figure_2():
 def figure_3():
     fibers_density.simulations.fibers_vs_derivatives_single_cell.main()
     fibers_density.simulations.insides_vs_outsides_stds.main()
-    # TODO: run when simulations are available
     fibers_density.simulations.insides_vs_outsides_cell_distances.main()
 
 
 def figure_4():
-    # TODO: create a single graph for all derivatives
     fibers_density.simulations.communicated_vs_non_communicated.main()
     fibers_density.experiments.communicated_vs_non_communicated.main()
     fibers_density.simulations.communicated_vs_non_communicated_cell_distances.main()
