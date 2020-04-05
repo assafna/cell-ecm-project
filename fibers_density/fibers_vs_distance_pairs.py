@@ -47,6 +47,7 @@ def compute_experiments_data():
         _experiments, CELLS_DISTANCE)
     if BAND:
         _experiments = experiments_filtering.by_band(_experiments)
+    print('Total experiments:', len(_experiments))
 
     _max_offsets_x = []
     _arguments = []
@@ -147,6 +148,7 @@ def compute_simulations_data(_low_connectivity):
         _is_dominant_passive=False
     )
     _simulations = simulations_filtering.by_distance(_simulations, _distance=CELLS_DISTANCE)
+    print('Total simulations:', len(_simulations))
 
     _fibers_densities = compute_simulations_fibers_densities(_simulations, _low_connectivity)
 
