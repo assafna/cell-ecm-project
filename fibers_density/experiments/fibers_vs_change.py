@@ -58,6 +58,7 @@ def main():
     _experiments = filtering.by_real_cells(_experiments, _real_cells=REAL_CELLS)
     _experiments = filtering.by_static_cells(_experiments, _static=STATIC)
     _experiments = filtering.by_band(_experiments, _band=BAND)
+    print('Total experiments:', len(_experiments))
 
     _arguments = []
     for _tuple in _experiments:
