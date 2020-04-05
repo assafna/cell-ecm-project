@@ -77,6 +77,7 @@ def main():
         _is_dominant_passive=False
     )
     _simulations = filtering.by_distances(_simulations, CELLS_DISTANCES)
+    print('Total simulations:', len(_simulations))
 
     _fibers_densities = compute_fibers_densities(_simulations)
 
