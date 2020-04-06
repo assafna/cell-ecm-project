@@ -25,7 +25,7 @@ def by_heterogeneity(_simulations, _std):
     return [_simulation for _simulation in _simulations if
             (_std == 0 and 'heterogeneity' not in _simulation)
             or (_std == 0.25 and 'std_025' in _simulation)
-            or (_std == 0.5 and 'std' not in _simulation)
+            or (_std == 0.5 and 'heterogeneity' in _simulation and 'std' not in _simulation)
             or (_std == 0.75 and 'std_075' in _simulation)]
 
 
