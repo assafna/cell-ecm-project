@@ -18,7 +18,7 @@ def figure_1():
     fibers_density.experiments.fibers_vs_distance_multiple_cell_distances.main()
 
 
-def figure_1_supp_correlation_distance_density_offset():
+def figure_si_1_correlation_distance_density_offset():
     print('Panel B')
     fibers_density.experiments.fibers_and_pairs_cells_distance_correlations_vs_distance.main()
 
@@ -26,7 +26,7 @@ def figure_1_supp_correlation_distance_density_offset():
     fibers_density.experiments.fibers_vs_pairs_cells_distance_in_offset.main(_offset_x=1)
 
     print('Panel D-ii')
-    fibers_density.experiments.fibers_vs_pairs_cells_distance_in_offset.main(_offset_x=2.5)
+    fibers_density.experiments.fibers_vs_pairs_cells_distance_in_offset.main(_offset_x=2.6)
 
 
 def figure_2():
@@ -71,8 +71,8 @@ if __name__ == '__main__':
     print('Figure 1')
     figure_1()
 
-    print('Figure 1 Supporting Information - Correlation Distance Density Offset')
-    figure_1_supp_correlation_distance_density_offset()
+    print('Figure SI 1 - Correlation Distance Density Offset')
+    figure_si_1_correlation_distance_density_offset()
 
     print('Figure 2')
     figure_2()
