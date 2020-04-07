@@ -23,6 +23,7 @@ def main(_offset_x=0):
     _experiments = filtering.by_real_cells(_experiments)
     if BAND:
         _experiments = filtering.by_band(_experiments)
+    print('Total experiments:', len(_experiments))
 
     _arguments = []
     for _tuple in _experiments:
@@ -75,6 +76,7 @@ def main(_offset_x=0):
                     _x_array.append(_cells_distance)
                     _y_array.append(_normalized_fibers_density)
 
+    print('Total points:', len(_x_array))
     print(pearsonr(_x_array, _y_array))
 
     # plot
