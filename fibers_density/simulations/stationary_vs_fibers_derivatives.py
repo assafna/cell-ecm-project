@@ -102,11 +102,19 @@ def main():
                     y=_y,
                     name=_derivative,
                     boxpoints='all',
-                    jitter=0.3,
-                    pointpos=-1.8,
+                    jitter=1,
+                    pointpos=0,
+                    line={
+                        'width': 0
+                    },
+                    fillcolor='white',
                     marker={
-                        'size': 15,
-                        'color': _color
+                        'size': 10,
+                        'color': _color,
+                        # 'line': {
+                        #     'width': 1,
+                        #     'color': 'white'
+                        # }
                     },
                     opacity=0.7,
                     showlegend=False
