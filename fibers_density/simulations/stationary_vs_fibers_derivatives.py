@@ -105,7 +105,7 @@ def main():
                     jitter=1,
                     pointpos=0,
                     line={
-                        'width': 0
+                        'width': 1
                     },
                     fillcolor='white',
                     marker={
