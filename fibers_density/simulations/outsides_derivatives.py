@@ -102,9 +102,10 @@ def main():
             },
             'yaxis': {
                 'title': 'Outsides correlation',
+                'range': [-1, 1],
                 'zeroline': False,
                 'tickmode': 'array',
-                'tickvals': [-0.5, 0, 0.5, 1]
+                'tickvals': [-1, -0.5, 0, 0.5, 1]
             }
         }
     )
