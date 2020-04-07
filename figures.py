@@ -49,6 +49,7 @@ def figure_2():
 def figure_3():
     print('?')
     fibers_density.simulations.stationary_vs_fibers_derivatives.main()
+    fibers_density.simulations.fibers_vs_time_derivatives.main()
 
     print('?')
     fibers_density.simulations.insides_vs_outsides_derivatives.main()
