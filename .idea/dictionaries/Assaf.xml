@@ -2,10 +2,24 @@
   <dictionary name="Assaf">
     <words>
       <w>assaf</w>
+      <w>bgcolor</w>
+      <w>bordercolor</w>
+      <w>borderwidth</w>
       <w>heatmap</w>
       <w>heterogeneities</w>
+      <w>kpss</w>
       <w>serieses</w>
+      <w>showgrid</w>
+      <w>stds</w>
+      <w>tickmode</w>
+      <w>tickvals</w>
+      <w>titlefont</w>
+      <w>xanchor</w>
+      <w>xaxis</w>
+      <w>yanchor</w>
+      <w>yaxis</w>
       <w>yoni</w>
+      <w>zeroline</w>
     </words>
   </dictionary>
 </component>

@@ -20,8 +20,12 @@ def get_roi(_experiment, _series_id, _group_properties, _time_point, _cell_id, _
     if ROI_START_BY_AVERAGE_CELL_DIAMETER:
         _cell_diameter_in_microns = AVERAGE_CELL_DIAMETER_IN_MICRONS
     else:
-        _cell_diameter_in_microns = load.mean_distance_to_surface_in_microns(
-            _experiment, _series_id, _group_properties['cells_ids'][_cell_id]) * 2
+        if _cell_id == 'cell':
+            _cell_diameter_in_microns = load.mean_distance_to_surface_in_microns(
+                _experiment, _series_id, _group_properties['cell_id']) * 2
+        else:
+            _cell_diameter_in_microns = load.mean_distance_to_surface_in_microns(
+                _experiment, _series_id, _group_properties['cells_ids'][_cell_id]) * 2
     return roi_by_microns(
         _resolution_x=_group_properties['time_points'][_time_point]['resolutions']['x'],
         _resolution_y=_group_properties['time_points'][_time_point]['resolutions']['y'],
@@ -65,7 +69,7 @@ def draw_borders(_image, _roi):
     return _image
 
 
-def process_group(_experiment, _series_id, _group, _mark_cells=True, _draw_borders=True):
+def process_group_pairs(_experiment, _series_id, _group, _mark_cells=True, _draw_borders=True):
     _group_properties = load.group_properties(_experiment, _series_id, _group)
     _group_path = paths.images(_experiment + ' - All TPs', 'Series ' + str(_series_id), _group)
     os.makedirs(_group_path, exist_ok=True)
@@ -106,12 +110,48 @@ def process_group(_experiment, _series_id, _group, _mark_cells=True, _draw_borde
         _img.save(_img_path)
 
 
-def process_experiments(_experiments):
+def process_group_single_cells(_experiment, _series_id, _group, _mark_cells=True, _draw_borders=True):
+    _group_properties = load.group_properties(_experiment, _series_id, _group)
+    _group_path = paths.images(_experiment + ' - First TP - Start Not Average', 'Series ' + str(_series_id), _group)
+    os.makedirs(_group_path, exist_ok=True)
+    # for _time_point in range(0, len(_group_properties['time_points']), 1):
+    for _time_point in [0]:
+        print(_experiment, _series_id, _group, _time_point, sep='\t')
+        _time_point_image = load.structured_image(_experiment, _series_id, _group, _time_point)
+        _cell_coordinates = _group_properties['time_points'][_time_point]['cell']['coordinates']
+        _cell_diameter_in_microns = AVERAGE_CELL_DIAMETER_IN_MICRONS
+        _z_cell_diameter = _cell_diameter_in_microns / _group_properties['time_points'][_time_point]['resolutions']['z']
+        _z_image = _time_point_image[
+                   int(round(_cell_coordinates['z'] - _z_cell_diameter / 2)):
+                   int(round(_cell_coordinates['z'] + _z_cell_diameter / 2))
+                   ]
+        _average_across_z = np.rint(np.mean(_z_image, axis=0))
+
+        if _mark_cells:
+            _average_across_z = mark_cells(_average_across_z, _group_properties, _time_point, _cell_coordinates, AVERAGE_CELL_DIAMETER_IN_MICRONS)
+
+        if _draw_borders:
+            for _direction in ['left', 'right', 'up', 'down']:
+                _roi = get_roi(_experiment, _series_id, _group_properties, _time_point, 'cell', _direction)
+                _average_across_z = draw_borders(_average_across_z, _roi)
+
+        # _z_image_stretched = np.repeat(
+        #     _average_across_z, repeats=int(round(_average_across_z.shape[1] / _average_across_z.shape[0])), axis=0
+        # )
+        _img = Image.fromarray(_average_across_z).convert('L')
+        _img_path = os.path.join(_group_path, str(_time_point) + '.png')
+        _img.save(_img_path)
+
+
+def process_experiments(_experiments, _pairs=True):
     _tuples = []
     for _experiment in _experiments:
         _tuples += load.experiment_groups_as_tuples(_experiment)
     _p = Pool(CPUS_TO_USE)
-    _answers = _p.starmap(process_group, _tuples)
+    if _pairs:
+        _answers = _p.starmap(process_group_pairs, _tuples)
+    else:
+        _answers = _p.starmap(process_group_single_cells, _tuples)
     _p.close()
 
 
@@ -122,5 +162,6 @@ def process_all_experiments():
 
 if __name__ == '__main__':
     # process_all_experiments()
-    process_experiments(['SN45'])
+    # process_experiments(['SN45'])
     # process_group('SN16', 2, 'cells_0_1')
+    process_experiments(['Single_Cell_Ortal'], _pairs=False)

@@ -4,7 +4,7 @@ from multiprocessing.pool import Pool
 
 import numpy as np
 
-from fibers_density.experiments.master_vs_slave_heatmap import VALUES_BY_CELL_DIAMETER
+from fibers_density.experiments.communicated_vs_non_communicated_heatmap import VALUES_BY_CELL_DIAMETER
 from libs.config_lib import CPUS_TO_USE
 from libs.experiments import load, compute, save, filtering
 from libs.experiments.config import AVERAGE_CELL_DIAMETER_IN_MICRONS, ROI_START_BY_AVERAGE_CELL_DIAMETER
