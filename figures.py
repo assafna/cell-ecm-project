@@ -63,7 +63,7 @@ def figure_3():
     fibers_density.experiments.outsides_derivatives.main()
 
     # fibers_density.simulations.fibers_vs_derivatives_single_cell.main()
-    # fibers_density.simulations.insides_vs_outsides_stds_box.main()
+    # fibers_density.simulations.insides_vs_outsides_stds_box_old.main()
     # fibers_density.simulations.insides_vs_outsides_cell_distances.main()
 
 
