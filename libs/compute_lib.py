@@ -1,3 +1,5 @@
+import math
+
 import numpy as np
 
 from libs.simulations.config import EPSILON
@@ -69,3 +71,11 @@ def p_value_text(_p_value):
             return 'p-value < ' + str(_value)
 
     return 'p-value > ' + str(_values[-1])
+
+
+def distance_from_a_point_to_a_line(_line, _point):
+    _x1, _y1, _x2, _y2 = _line
+    _x0, _y0 = _point
+
+    return abs((_y2 - _y1) * _x0 - (_x2 - _x1) * _y0 + _x2 * _y1 - _y2 * _x1) / \
+        math.sqrt((_y2 - _y1) ** 2 + (_x2 - _x1) ** 2)
