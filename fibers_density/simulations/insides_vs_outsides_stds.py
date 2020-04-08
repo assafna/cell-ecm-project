@@ -83,64 +83,71 @@ def main():
                     _y_arrays[_std_index].append(_correlation)
 
     # plot
-    # _colors_array = ['#011f4b', '#005b96', '#74c2e8']
+    _colors_array = ['#011f4b', '#00417c', '#2e82bf', '#56caed']
     _fig = go.Figure(
         data=[
             go.Scatter(
                 x=_x,
                 y=_y,
-                name='STD ' + str(_std),
+                name=str(_std),
                 mode='markers',
                 marker={
-                    'size': 15,
-                    # 'color': _color
-                },
-                opacity=0.7,
-                # showlegend=False
-            ) for _x, _y, _std in zip(_x_arrays, _y_arrays, STDS)
+                    'size': 10,
+                    'color': _color
+                }
+            ) for _x, _y, _std, _color in zip(_x_arrays, _y_arrays, STDS, _colors_array)
         ],
         layout={
             'xaxis': {
                 'title': 'Insides correlation',
-                # 'zeroline': False,
-                # 'range': [-0.22, 1.2],
-                # 'tickmode': 'array',
-                # 'tickvals': [0, 0.5, 1]
+                'zeroline': False,
+                'range': [-1.1, 1.2],
+                'tickmode': 'array',
+                'tickvals': [-1, -0.5, 0, 0.5, 1]
             },
             'yaxis': {
                 'title': 'Outsides correlation',
-                # 'zeroline': False,
-                # 'range': [-0.72, 1.2],
-                # 'tickmode': 'array',
-                # 'tickvals': [-0.5, 0, 0.5, 1]
+                'zeroline': False,
+                'range': [-1.1, 1.2],
+                'tickmode': 'array',
+                'tickvals': [-1, -0.5, 0, 0.5, 1]
+            },
+            'legend': {
+                'title': 'STD',
+                'xanchor': 'left',
+                'x': 0.1,
+                'yanchor': 'top',
+                'bordercolor': 'black',
+                'borderwidth': 2,
+                'bgcolor': 'white'
             },
             'shapes': [
-                # {
-                #     'type': 'line',
-                #     'x0': -0.2,
-                #     'y0': -0.7,
-                #     'x1': -0.2,
-                #     'y1': 1,
-                #     'line': {
-                #         'color': 'black',
-                #         'width': 2
-                #     }
-                # },
-                # {
-                #     'type': 'line',
-                #     'x0': -0.2,
-                #     'y0': -0.7,
-                #     'x1': 1,
-                #     'y1': -0.7,
-                #     'line': {
-                #         'color': 'black',
-                #         'width': 2
-                #     }
-                # },
                 {
                     'type': 'line',
-                    'x0': -0.2,
-                    'y0': -0.2,
+                    'x0': -1,
+                    'y0': -1,
+                    'x1': -1,
+                    'y1': 1,
+                    'line': {
+                        'color': 'black',
+                        'width': 2
+                    }
+                },
+                {
+                    'type': 'line',
+                    'x0': -1,
+                    'y0': -1,
+                    'x1': 1,
+                    'y1': -1,
+                    'line': {
+                        'color': 'black',
+                        'width': 2
+                    }
+                },
+                {
+                    'type': 'line',
+                    'x0': -1,
+                    'y0': -1,
                     'x1': 1,
                     'y1': 1,
                     'line': {
@@ -148,18 +155,6 @@ def main():
                         'width': 2
                     }
                 }
-            ],
-            'annotations': [
-                go.layout.Annotation(
-                    x=np.mean(_x),
-                    y=np.max(_y) + 0.15,
-                    text='STD ' + str(_std),
-                    showarrow=False,
-                    font={
-                        'size': 25,
-                        'color': 'black'
-                    }
-                ) for _x, _y, _std in zip(_x_arrays, _y_arrays, STDS)
             ]
         }
     )
@@ -169,6 +164,85 @@ def main():
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
         _filename='plot'
     )
+
+    for _x, _y, _std, _color in zip(_x_arrays, _y_arrays, STDS, _colors_array):
+        _fig = go.Figure(
+            data=go.Scatter(
+                x=_x,
+                y=_y,
+                name='STD ' + str(_std),
+                mode='markers',
+                marker={
+                    'size': 10,
+                    'color': _color
+                }
+            ),
+            layout={
+                'xaxis': {
+                    'title': 'Insides correlation',
+                    'zeroline': False,
+                    'range': [-1.1, 1.2],
+                    'tickmode': 'array',
+                    'tickvals': [-1, -0.5, 0, 0.5, 1]
+                },
+                'yaxis': {
+                    'title': 'Outsides correlation',
+                    'zeroline': False,
+                    'range': [-1.1, 1.2],
+                    'tickmode': 'array',
+                    'tickvals': [-1, -0.5, 0, 0.5, 1]
+                },
+                'legend': {
+                    'xanchor': 'left',
+                    'x': 0.1,
+                    'yanchor': 'top',
+                    'bordercolor': 'black',
+                    'borderwidth': 2,
+                    'bgcolor': 'white'
+                },
+                'shapes': [
+                    {
+                        'type': 'line',
+                        'x0': -1,
+                        'y0': -1,
+                        'x1': -1,
+                        'y1': 1,
+                        'line': {
+                            'color': 'black',
+                            'width': 2
+                        }
+                    },
+                    {
+                        'type': 'line',
+                        'x0': -1,
+                        'y0': -1,
+                        'x1': 1,
+                        'y1': -1,
+                        'line': {
+                            'color': 'black',
+                            'width': 2
+                        }
+                    },
+                    {
+                        'type': 'line',
+                        'x0': -1,
+                        'y0': -1,
+                        'x1': 1,
+                        'y1': 1,
+                        'line': {
+                            'color': 'red',
+                            'width': 2
+                        }
+                    }
+                ]
+            }
+        )
+
+        save.to_html(
+            _fig=_fig,
+            _path=os.path.join(paths.PLOTS, save.get_module_name()),
+            _filename='plot_std_' + str(_std)
+        )
 
 
 if __name__ == '__main__':
