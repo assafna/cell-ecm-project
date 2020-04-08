@@ -3,6 +3,7 @@ from itertools import product
 
 import numpy as np
 import plotly.graph_objs as go
+from scipy.stats import wilcoxon
 from tqdm import tqdm
 
 from libs import compute_lib
@@ -133,6 +134,10 @@ def main():
                 ))
 
     print('Total pairs:', len(_x_arrays[0]))
+    print('Wilcoxon of insides minus outsides around the zero')
+    for _x_array, _y_array, _derivative in zip(_x_arrays, _y_arrays, DERIVATIVES):
+        _x_minus_y = np.array(_x_array) - np.array(_y_array)
+        print('Derivative:', _derivative, wilcoxon(_x_minus_y))
 
     # plot
     _colors_array = ['#844b00', '#ea8500', '#edbc80']
