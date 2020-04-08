@@ -106,23 +106,23 @@ def main():
             'xaxis': {
                 'title': 'Insides correlation',
                 'zeroline': False,
-                'range': [-0.22, 1.2],
+                'range': [-1.1, 1.2],
                 'tickmode': 'array',
-                'tickvals': [0, 0.5, 1]
+                'tickvals': [-1, -0.5, 0, 0.5, 1]
             },
             'yaxis': {
                 'title': 'Outsides correlation',
                 'zeroline': False,
-                'range': [-0.72, 1.2],
+                'range': [-1.1, 1.2],
                 'tickmode': 'array',
-                'tickvals': [-0.5, 0, 0.5, 1]
+                'tickvals': [-1, -0.5, 0, 0.5, 1]
             },
             'shapes': [
                 {
                     'type': 'line',
-                    'x0': -0.2,
-                    'y0': -0.7,
-                    'x1': -0.2,
+                    'x0': -1,
+                    'y0': -1,
+                    'x1': -1,
                     'y1': 1,
                     'line': {
                         'color': 'black',
@@ -131,10 +131,10 @@ def main():
                 },
                 {
                     'type': 'line',
-                    'x0': -0.2,
-                    'y0': -0.7,
+                    'x0': -1,
+                    'y0': -1,
                     'x1': 1,
-                    'y1': -0.7,
+                    'y1': -1,
                     'line': {
                         'color': 'black',
                         'width': 2
@@ -142,8 +142,8 @@ def main():
                 },
                 {
                     'type': 'line',
-                    'x0': -0.2,
-                    'y0': -0.2,
+                    'x0': -1,
+                    'y0': -1,
                     'x1': 1,
                     'y1': 1,
                     'line': {
