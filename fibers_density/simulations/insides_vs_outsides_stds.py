@@ -2,7 +2,9 @@ import os
 from itertools import product
 from multiprocessing.pool import Pool
 
+import numpy as np
 import plotly.graph_objs as go
+from scipy.stats import wilcoxon
 from tqdm import tqdm
 
 from libs import compute_lib
@@ -80,6 +82,11 @@ def main():
                     _x_arrays[_std_index].append(_correlation)
                 else:
                     _y_arrays[_std_index].append(_correlation)
+
+    print('Wilcoxon of insides minus outsides around the zero')
+    for _x_array, _y_array, _std in zip(_x_arrays, _y_arrays, STDS):
+        _x_minus_y = np.array(_x_array) - np.array(_y_array)
+        print('STD:', _std, wilcoxon(_x_minus_y))
 
     # 2d plots
     _colors_array = ['#011f4b', '#00417c', '#2e82bf', '#56caed']
