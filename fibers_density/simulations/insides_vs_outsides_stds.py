@@ -2,7 +2,6 @@ import os
 from itertools import product
 from multiprocessing.pool import Pool
 
-import numpy as np
 import plotly.graph_objs as go
 from tqdm import tqdm
 
@@ -82,7 +81,7 @@ def main():
                 else:
                     _y_arrays[_std_index].append(_correlation)
 
-    # plot
+    # 2d plots
     _colors_array = ['#011f4b', '#00417c', '#2e82bf', '#56caed']
     _fig = go.Figure(
         data=[
@@ -244,6 +243,53 @@ def main():
             _path=os.path.join(paths.PLOTS, save.get_module_name()),
             _filename='plot_std_' + str(_std)
         )
+
+    # box plot
+    _box_y_arrays = [[] for _i in STDS]
+    for _x_array, _y_array, _std_index in zip(_x_arrays, _y_arrays, range(len(STDS))):
+        for _x, _y in zip(_x_array, _y_array):
+            _point_distance = compute_lib.distance_from_a_point_to_a_line(_line=[-1, -1, 1, 1], _point=[_x, _y])
+            if _x > _y:
+                _box_y_arrays[_std_index].append(_point_distance)
+            else:
+                _box_y_arrays[_std_index].append(-_point_distance)
+
+    _fig = go.Figure(
+        data=[
+            go.Box(
+                y=_y,
+                name=_std,
+                boxpoints='all',
+                jitter=1,
+                pointpos=0,
+                line={
+                    'width': 1
+                },
+                fillcolor='white',
+                marker={
+                    'size': 10,
+                    'color': _color
+                },
+                showlegend=False
+            ) for _y, _std, _color in zip(_box_y_arrays, STDS, _colors_array)
+        ],
+        layout={
+            'xaxis': {
+                'title': 'STD',
+                'zeroline': False
+            },
+            'yaxis': {
+                'title': 'Distance from y = x',
+                'zeroline': False
+            }
+        }
+    )
+
+    save.to_html(
+        _fig=_fig,
+        _path=os.path.join(paths.PLOTS, save.get_module_name()),
+        _filename='plot_box'
+    )
 
 
 if __name__ == '__main__':
