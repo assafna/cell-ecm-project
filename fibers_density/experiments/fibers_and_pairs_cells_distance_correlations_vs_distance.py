@@ -94,6 +94,9 @@ def main():
             _n_array.append(len(_cells_distances))
             _p_value_array.append(round(_correlation[1], 2))
 
+    print('Pearson:')
+    print(pearsonr(_x_array, _y_array))
+
     # plot
     _significant_x_array = [_x for _x, _p_value in zip(_x_array, _p_value_array) if _p_value < 0.05]
     _fig = go.Figure(
