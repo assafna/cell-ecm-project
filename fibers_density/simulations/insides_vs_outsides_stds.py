@@ -175,7 +175,8 @@ def main():
                 marker={
                     'size': 10,
                     'color': _color
-                }
+                },
+                showlegend=True
             ),
             layout={
                 'xaxis': {
