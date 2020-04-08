@@ -1,6 +1,7 @@
 import os
 
 import plotly.graph_objs as go
+from scipy.stats import wilcoxon
 from tqdm import tqdm
 
 from libs import compute_lib
@@ -99,6 +100,9 @@ def main():
             ))
 
     print('Total pairs:', len(_y_arrays[0]))
+    print('Wilcoxon around the zero')
+    for _y_array, _derivative in zip(_y_arrays, DERIVATIVES):
+        print('Derivative:', _derivative, wilcoxon(_y_array))
 
     # plot
     _colors_array = ['#844b00', '#ea8500', '#edbc80']
