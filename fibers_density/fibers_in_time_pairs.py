@@ -41,6 +41,7 @@ def compute_experiments_data():
     _experiments = experiments_filtering.by_distance_range(_experiments, CELLS_DISTANCE_RANGE)
     if BAND:
         _experiments = experiments_filtering.by_band(_experiments)
+    print('Total experiments:', len(_experiments))
 
     _arguments = []
     for _tuple in _experiments:
@@ -87,6 +88,8 @@ def compute_experiments_data():
                 if not np.isnan(_normalized_fibers_density):
                     _experiments_fibers_densities[_time_point].append(_normalized_fibers_density)
 
+    print('Total experiments pairs:', len(_experiments_fibers_densities[0]))
+
     return _experiments_fibers_densities
 
 
@@ -129,6 +132,7 @@ def compute_simulations_data():
         _is_dominant_passive=False
     )
     _simulations = simulations_filtering.by_distance(_simulations, _distance=CELLS_DISTANCE)
+    print('Total simulations:', len(_simulations))
 
     _fibers_densities = compute_simulations_fibers_densities(_simulations)
 
@@ -146,6 +150,8 @@ def compute_simulations_data():
                     _normalization['std']
                 )
                 _simulations_fibers_densities[_time_point].append(_normalized_fibers_density)
+
+    print('Total simulations pairs:', len(_simulations_fibers_densities[0]))
 
     return _simulations_fibers_densities
 
