@@ -73,6 +73,7 @@ def main():
         _is_causality=False,
         _is_dominant_passive=False
     )
+    print('Total simulations:', len(_simulations))
 
     _fibers_densities = compute_simulations_fibers_densities(_simulations)
 
@@ -93,6 +94,8 @@ def main():
                 _direction_fibers_densities.append(_normalized_fibers_density)
 
             _simulations_fibers_densities[_time_point].append(np.mean(_direction_fibers_densities))
+
+    print('Total simulations cells:', len(_simulations_fibers_densities[0]))
 
     # experiments
     print('Experiments')
@@ -124,6 +127,7 @@ def main():
     _fibers_densities = experiments_compute.fibers_densities(_rois_to_compute)
 
     _experiments = experiments_organize.by_single_cell_id(_experiments)
+    print('Total experiments:', len(_experiments))
 
     _experiments_fibers_densities = [[] for _i in range(EXPERIMENTS_TIME_POINTS)]
     for _tuple in tqdm(_experiments, desc='Experiments Loop'):
@@ -152,6 +156,8 @@ def main():
 
             if len(_cell_fibers_densities) > 0:
                 _experiments_fibers_densities[_time_point].append(np.mean(_cell_fibers_densities))
+
+    print('Total experiments cells:', len(_experiments_fibers_densities[0]))
 
     # plot
     _fig = go.Figure(
