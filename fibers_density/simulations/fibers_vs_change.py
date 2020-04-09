@@ -9,7 +9,7 @@ from tqdm import tqdm
 
 from libs import compute_lib
 from libs.config_lib import CPUS_TO_USE
-from libs.simulations import filtering, load, compute, paths
+from libs.simulations import filtering, load, compute, paths, organize
 from libs.simulations.config import ROI_WIDTH, ROI_HEIGHT
 from plotting import save
 
@@ -78,6 +78,9 @@ def main():
     )
     _simulations = filtering.by_distances(_simulations, CELLS_DISTANCES)
     print('Total simulations:', len(_simulations))
+    _simulations_by_distances = organize.by_distances(_simulations)
+    for _distance in _simulations_by_distances:
+        print('Distance ', _distance, ', total simulations:', len(_simulations_by_distances[_distance]))
 
     _fibers_densities = compute_fibers_densities(_simulations)
 
