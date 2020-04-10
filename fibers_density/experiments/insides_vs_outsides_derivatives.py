@@ -24,7 +24,7 @@ MINIMUM_CORRELATION_TIME_POINTS = {
     'SN44': 50
 }
 DERIVATIVES = [0, 1, 2]
-DERIVATIVES_TEXT = ['I', 'I\'', 'I\'\'']
+DERIVATIVES_TEXT = ['D', 'D\'', 'D\'\'']
 
 
 def main():

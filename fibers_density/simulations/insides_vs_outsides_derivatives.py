@@ -18,7 +18,7 @@ OFFSET_Y = 0
 CELLS_DISTANCE = 7
 SIMULATIONS_TIME_POINTS = 50
 DERIVATIVES = [0, 1, 2]
-DERIVATIVES_TEXT = ['I', 'I\'', 'I\'\'']
+DERIVATIVES_TEXT = ['D', 'D\'', 'D\'\'']
 
 
 def compute_fibers_densities(_simulations):
@@ -66,7 +66,7 @@ def main():
 
     _x_arrays = [[] for _i in DERIVATIVES]
     _y_arrays = [[] for _i in DERIVATIVES]
-    for _simulation in tqdm(_simulations, desc='Simulations Loop'):
+    for _simulation in tqdm(_simulations, desc='Simulations loop'):
         _normalization = load.normalization(_simulation)
         _normalization = [_normalization['average'], _normalization['std']]
         for _direction in ['inside', 'outside']:

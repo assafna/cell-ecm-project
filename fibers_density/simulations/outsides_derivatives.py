@@ -16,7 +16,7 @@ OFFSET_Y = 0
 CELLS_DISTANCE = 7
 SIMULATIONS_TIME_POINTS = 50
 DERIVATIVES = [0, 1, 2]
-DERIVATIVES_TEXT = ['I', 'I\'', 'I\'\'']
+DERIVATIVES_TEXT = ['D', 'D\'', 'D\'\'']
 
 
 def compute_fibers_densities(_simulations):

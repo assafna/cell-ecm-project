@@ -110,7 +110,7 @@ def main():
             ),
             layout={
                 'xaxis': {
-                    'title': 'Cell contraction (percentages)',
+                    'title': 'Cell contraction (%)',
                     'zeroline': False
                 },
                 'yaxis': {

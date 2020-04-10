@@ -17,7 +17,7 @@ OFFSET_Z = 0
 BAND = True
 OUT_OF_BOUNDARIES = False
 DERIVATIVES = [0, 1, 2]
-DERIVATIVES_TEXT = ['I', 'I\'', 'I\'\'']
+DERIVATIVES_TEXT = ['D', 'D\'', 'D\'\'']
 
 
 def main():
