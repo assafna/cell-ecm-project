@@ -228,7 +228,7 @@ def main():
                 'tickvals': CELLS_DISTANCES
             },
             'yaxis': {
-                'title': 'Cell contraction<br>to z-score ' + str(SIMULATIONS_Z_SCORE_GOAL) + ' (percentages)',
+                'title': 'Cell contraction<br>to z-score ' + str(SIMULATIONS_Z_SCORE_GOAL) + ' (%)',
                 'titlefont': {
                     'color': '#005b96'
                 },

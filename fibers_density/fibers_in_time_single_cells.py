@@ -200,7 +200,7 @@ def main():
         ],
         layout={
             'xaxis': {
-                'title': 'Cell contraction (percentages)',
+                'title': 'Cell contraction (%)',
                 'titlefont': {
                     'color': '#005b96'
                 },
