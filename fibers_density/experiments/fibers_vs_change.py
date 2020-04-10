@@ -13,17 +13,37 @@ from plotting import save
 
 EXPERIMENTS = ['SN16']
 MINIMUM_TIME_POINTS = sys.maxsize
-START_TIME_POINT = {
-    'SN16': 0,
-    'SN18': 0,
-    'SN41': 0,
-    'SN44': 0
-}
-END_TIME_POINT = {
-    'SN16': 6,
-    'SN18': 6,
-    'SN41': 18,
-    'SN44': 18
+EARLY_TIME_POINTS = {
+    True: {
+        'start': {
+            'SN16': 0,
+            'SN18': 0,
+            'SN41': 0,
+            'SN44': 0
+        },
+        'end': {
+            'SN16': 6,
+            'SN18': 6,
+            'SN41': 18,
+            'SN44': 18
+        }
+    },
+    False: {
+        'start': {
+            'SN16': 6,
+            # TODO: update if needed
+            'SN18': 0,
+            'SN41': 0,
+            'SN44': 0
+        },
+        'end': {
+            'SN16': 12,
+            # TODO: update if needed
+            'SN18': 6,
+            'SN41': 18,
+            'SN44': 18
+        }
+    }
 }
 CELLS_DISTANCE_RANGE = (5, 18)
 DIRECTION = 'inside'
@@ -52,7 +72,7 @@ Z_MAX = {
 }
 
 
-def main():
+def main(_early_time_points=False):
     _experiments = load.experiments_groups_as_tuples(EXPERIMENTS)
     _experiments = filtering.by_distance_range(_experiments, CELLS_DISTANCE_RANGE)
     _experiments = filtering.by_real_cells(_experiments, _real_cells=REAL_CELLS)
@@ -84,7 +104,6 @@ def main():
     _heatmap_fibers = []
     _heatmap_fibers_change = []
     for _tuple in _experiments:
-        print(_tuple)
         _experiment, _series_id, _group = _tuple
         _series_normalization = load.normalization_series_file_data(_experiment, 'Series ' + str(_series_id))
         _series_normalization = [_series_normalization['average'], _series_normalization['std']]
@@ -92,7 +111,8 @@ def main():
             _fibers_densities_by_time = [_fibers_densities[_tuple] for _tuple in
                                          _rois_dictionary[(_experiment, _series_id, _group, _cell_id)]]
             _cell_fibers_densities = \
-                _fibers_densities_by_time[START_TIME_POINT[_experiment]:END_TIME_POINT[_experiment]]
+                _fibers_densities_by_time[EARLY_TIME_POINTS[_early_time_points]['start'][_experiment]:
+                                          EARLY_TIME_POINTS[_early_time_points]['end'][_experiment]]
             _properties = load.group_properties(_experiment, _series_id, _group)
             _cell_fibers_densities = compute.remove_blacklist(
                 _experiment, _series_id, _properties['cells_ids'][_cell_id], _cell_fibers_densities)
@@ -202,7 +222,7 @@ def main():
             _fig=_fig,
             _path=os.path.join(paths.PLOTS, save.get_module_name()),
             _filename='plot_real_' + str(REAL_CELLS) + '_static_' + str(STATIC) + '_band_' +
-                      str(BAND) + '_direction_' + DIRECTION
+                      str(BAND) + '_direction_' + DIRECTION + '_early_' + str(_early_time_points)
         )
 
 
