@@ -92,7 +92,7 @@ def main():
         _x_array=[_x_array] * 2,
         _y_array=[_insides_correlations, _outsides_correlations],
         _names_array=['Insides', 'Outsides'],
-        _x_axis_title='STDs',
+        _x_axis_title='Heterogeneity (std.)',
         _y_axis_title='Correlation',
         _title='Insides & Outsides Correlation by Cell Contractions STDs'
     )

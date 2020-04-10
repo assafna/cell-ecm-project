@@ -119,7 +119,7 @@ def main():
                 'tickvals': [-1, -0.5, 0, 0.5, 1]
             },
             'legend': {
-                'title': 'STD',
+                'title': 'Heterogeneity (std.)',
                 'xanchor': 'left',
                 'x': 0.1,
                 'yanchor': 'top',
@@ -282,7 +282,7 @@ def main():
         ],
         layout={
             'xaxis': {
-                'title': 'STD',
+                'title': 'Heterogeneity (std.)',
                 'zeroline': False
             },
             'yaxis': {
