@@ -22,11 +22,8 @@ def figure_si_1_correlation_distance_density_offset():
     print('Panel B')
     fibers_density.experiments.fibers_and_pairs_cells_distance_correlations_vs_distance.main()
 
-    print('Panel D-i')
-    fibers_density.experiments.fibers_vs_pairs_cells_distance_in_offset.main(_offset_x=1)
-
-    print('Panel D-ii')
-    fibers_density.experiments.fibers_vs_pairs_cells_distance_in_offset.main(_offset_x=2.6)
+    print('Panel D')
+    fibers_density.experiments.fibers_vs_pairs_cells_distance_in_offset.main()
 
 
 def figure_2():
@@ -47,24 +44,11 @@ def figure_2():
 
 
 def figure_3():
-    print('?')
-    fibers_density.simulations.stationary_vs_fibers_derivatives.main()
-    fibers_density.simulations.fibers_vs_time_derivatives.main()
+    print('Panel B')
+    fibers_density.simulations.correlations_by_derivatives.main()
 
-    print('?')
-    fibers_density.experiments.stationary_vs_fibers_derivatives.main()
-
-    print('?')
-    fibers_density.simulations.insides_vs_outsides_derivatives.main()
-    fibers_density.simulations.outsides_derivatives.main()
-
-    print('?')
-    fibers_density.experiments.insides_vs_outsides_derivatives.main()
-    fibers_density.experiments.outsides_derivatives.main()
-
-    # fibers_density.simulations.fibers_vs_derivatives_single_cell.main()
-    # fibers_density.simulations.insides_vs_outsides_stds_box_old.main()
-    # fibers_density.simulations.insides_vs_outsides_cell_distances.main()
+    print('Panels C & D')
+    fibers_density.simulations.insides_vs_outsides_stds.main()
 
 
 def figure_4():
