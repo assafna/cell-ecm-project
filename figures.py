@@ -56,7 +56,7 @@ def figure_si_3_stationary_and_detrending():
     fibers_density.simulations.fibers_vs_time_derivatives.main()
 
     print('Panel B')
-    fibers_density.simulations.stationary_vs_fibers_derivatives.main()
+    fibers_density.simulations.stationary_vs_fibers_derivatives_pairs.main()
 
 
 def figure_4():
