@@ -53,9 +53,9 @@ def main():
         compute.rois(_arguments, _keys=['experiment', 'series_id', 'group', 'cell_id', 'offset_x'])
     _fibers_densities = compute.fibers_densities(_rois_to_compute)
 
-    _offsets_x_arrays = [[] for _i in OFFSETS_X]
-    _offsets_y_arrays = [[] for _i in OFFSETS_X]
-    for _offset_x_index, _offset_x in enumerate(OFFSETS_X):
+    for _offset_x in OFFSETS_X:
+        _x_array = []
+        _y_array = []
         for _tuple in _experiments:
             _experiment, _series_id, _group = _tuple
             for _cell_id in ['left_cell', 'right_cell']:
@@ -76,18 +76,18 @@ def main():
                     )
 
                     if not np.isnan(_normalized_fibers_density):
-                        _offsets_x_arrays[_offset_x_index].append(_cells_distance)
-                        _offsets_y_arrays[_offset_x_index].append(_normalized_fibers_density)
+                        _x_array.append(_cells_distance)
+                        _y_array.append(_normalized_fibers_density)
 
         print('Offset x (cell diameter):', _offset_x)
-        print('Total pairs:', len(_offsets_x_arrays[_offset_x_index]))
-        print(pearsonr(_offsets_x_arrays[_offset_x_index], _offsets_y_arrays[_offset_x_index]))
+        print('Total pairs:', len(_x_array))
+        print(pearsonr(_x_array, _y_array))
 
         # plot
         _fig = go.Figure(
             data=go.Scatter(
-                x=_offsets_x_arrays[_offset_x_index],
-                y=_offsets_y_arrays[_offset_x_index],
+                x=_x_array,
+                y=_y_array,
                 mode='markers',
                 marker={
                     'size': 15,
