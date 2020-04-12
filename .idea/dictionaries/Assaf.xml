@@ -5,6 +5,7 @@
       <w>bgcolor</w>
       <w>bordercolor</w>
       <w>borderwidth</w>
+      <w>detrending</w>
       <w>heatmap</w>
       <w>heterogeneities</w>
       <w>kpss</w>
