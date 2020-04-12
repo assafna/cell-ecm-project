@@ -64,13 +64,13 @@ def main():
     _fibers_densities = compute_simulations_fibers_densities(_simulations)
 
     _y_arrays = [[] for _i in DERIVATIVES]
-    for _simulation_1_index in tqdm(range(len(_simulations)), desc='Simulations loop'):
-        _simulation_1 = _simulations[_simulation_1_index]
+    for _index_1 in tqdm(range(len(_simulations)), desc='Simulations loop'):
+        _simulation_1 = _simulations[_index_1]
         _cell_1_fibers_densities = \
             [_fibers_densities[(_simulation_1, _direction)] for _direction in ['left', 'right', 'up', 'down']]
         _cell_1_fibers_densities = np.mean(_cell_1_fibers_densities, axis=0)
-        for _simulation_2_index in range(_simulation_1_index + 1, len(_simulations)):
-            _simulation_2 = _simulations[_simulation_2_index]
+        for _index_2 in range(_index_1 + 1, len(_simulations)):
+            _simulation_2 = _simulations[_index_2]
             _cell_2_fibers_densities = \
                 [_fibers_densities[(_simulation_2, _direction)] for _direction in ['left', 'right', 'up', 'down']]
             _cell_2_fibers_densities = np.mean(_cell_2_fibers_densities, axis=0)
