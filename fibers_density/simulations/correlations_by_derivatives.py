@@ -19,7 +19,7 @@ DERIVATIVES = [0, 1, 2]
 DERIVATIVES_TEXT = ['D', 'D\'', 'D\'\'']
 
 
-def compute_fibers_densities(_simulations):
+def compute_fibers_densities(_simulations, _direction):
     _arguments = []
     for _simulation in _simulations:
         for _cell_id in ['left_cell', 'right_cell']:
@@ -30,7 +30,7 @@ def compute_fibers_densities(_simulations):
                 'offset_x': OFFSET_X,
                 'offset_y': OFFSET_Y,
                 'cell_id': _cell_id,
-                'direction': 'outside',
+                'direction': _direction,
                 'time_points': SIMULATIONS_TIME_POINTS
             })
 
@@ -46,7 +46,7 @@ def compute_fibers_densities(_simulations):
     return _fibers_densities
 
 
-def main():
+def main(_direction='inside'):
     _simulations = load.structured()
     _simulations = filtering.by_time_points_amount(_simulations, _time_points=SIMULATIONS_TIME_POINTS)
     _simulations = filtering.by_categories(
@@ -60,7 +60,7 @@ def main():
     _simulations = filtering.by_distance(_simulations, _distance=CELLS_DISTANCE)
     print('Total simulations:', len(_simulations))
 
-    _fibers_densities = compute_fibers_densities(_simulations)
+    _fibers_densities = compute_fibers_densities(_simulations, _direction)
 
     _y_arrays = [[] for _i in DERIVATIVES]
     for _simulation in tqdm(_simulations, desc='Simulations loop'):
@@ -105,7 +105,7 @@ def main():
                 'zeroline': False
             },
             'yaxis': {
-                'title': 'Outsides correlation',
+                'title': 'Correlation',
                 'range': [-1, 1],
                 'zeroline': False,
                 'tickmode': 'array',
