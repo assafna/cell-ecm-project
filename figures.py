@@ -59,6 +59,13 @@ def figure_si_3_stationary_and_detrending():
     fibers_density.simulations.stationary_vs_fibers_derivatives_pairs.main()
 
 
+def figure_si_3_single_cell_detrending():
+    print('Panel A')
+    fibers_density.simulations.stationary_vs_fibers_derivatives_single_cells.main()
+
+    print('Panel B')
+
+
 def figure_4():
     fibers_density.simulations.communicated_vs_non_communicated.main()
     fibers_density.experiments.communicated_vs_non_communicated.main()
@@ -80,6 +87,9 @@ if __name__ == '__main__':
 
     print('Figure SI 3 - Stationary & Detrending')
     figure_si_3_stationary_and_detrending()
+
+    print('Figure SI 3 - Single Cell Detrending')
+    figure_si_3_single_cell_detrending()
 
     print('Figure 4')
     figure_4()
