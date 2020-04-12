@@ -45,7 +45,7 @@ def figure_2():
 
 def figure_3():
     print('Panel B')
-    fibers_density.simulations.correlations_by_derivatives.main()
+    fibers_density.simulations.correlations_by_derivatives_pairs.main()
 
     print('Panels C & D')
     fibers_density.simulations.insides_vs_outsides_stds.main()
