@@ -51,6 +51,14 @@ def figure_3():
     fibers_density.simulations.insides_vs_outsides_stds.main()
 
 
+def figure_si_3_stationary_and_detrending():
+    print('Panel A')
+    fibers_density.simulations.fibers_vs_time_derivatives.main()
+
+    print('Panel B')
+    fibers_density.simulations.stationary_vs_fibers_derivatives.main()
+
+
 def figure_4():
     fibers_density.simulations.communicated_vs_non_communicated.main()
     fibers_density.experiments.communicated_vs_non_communicated.main()
@@ -69,6 +77,9 @@ if __name__ == '__main__':
 
     print('Figure 3')
     figure_3()
+
+    print('Figure SI 3 - Stationary & Detrending')
+    figure_si_3_stationary_and_detrending()
 
     print('Figure 4')
     figure_4()
