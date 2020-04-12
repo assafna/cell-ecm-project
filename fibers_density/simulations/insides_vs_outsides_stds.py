@@ -90,18 +90,21 @@ def main():
 
     # 2d plots
     _colors_array = ['#011f4b', '#00417c', '#2e82bf', '#56caed']
+    _legendgroup_array = ['group_1', 'group_1', 'group_2', 'group_2']
     _fig = go.Figure(
         data=[
             go.Scatter(
                 x=_x,
                 y=_y,
-                name=str(_std),
+                name='Std. ' + str(_std),
                 mode='markers',
                 marker={
                     'size': 10,
                     'color': _color
-                }
-            ) for _x, _y, _std, _color in zip(_x_arrays, _y_arrays, STDS, _colors_array)
+                },
+                legendgroup=_legendgroup
+            ) for _x, _y, _std, _color, _legendgroup in
+            zip(_x_arrays, _y_arrays, STDS, _colors_array, _legendgroup_array)
         ],
         layout={
             'xaxis': {
@@ -119,13 +122,14 @@ def main():
                 'tickvals': [-1, -0.5, 0, 0.5, 1]
             },
             'legend': {
-                'title': 'Heterogeneity (std.)',
-                'xanchor': 'left',
                 'x': 0.1,
+                'y': 1,
+                'xanchor': 'left',
                 'yanchor': 'top',
                 'bordercolor': 'black',
                 'borderwidth': 2,
-                'bgcolor': 'white'
+                'bgcolor': 'white',
+                'orientation': 'h'
             },
             'shapes': [
                 {
