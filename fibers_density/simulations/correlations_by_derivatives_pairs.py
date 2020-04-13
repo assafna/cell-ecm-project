@@ -13,7 +13,7 @@ from plotting import save
 
 OFFSET_X = 0
 OFFSET_Y = 0
-CELLS_DISTANCE = 7
+CELLS_DISTANCE = 5
 SIMULATIONS_TIME_POINTS = 50
 DERIVATIVES = [0, 1, 2]
 DERIVATIVES_TEXT = ['D', 'D\'', 'D\'\'']
