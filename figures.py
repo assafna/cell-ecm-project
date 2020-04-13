@@ -33,14 +33,16 @@ def figure_2():
     print('Panel B-ii')
     fibers_density.fibers_in_time_pairs.main()
 
-    # print('Panel B-iii')
-    # fibers_density.reaching_std_multiple_cell_distances.main()
-
     print('Panel C-i')
     fibers_density.simulations.fibers_vs_change.main()
 
     print('Panel C-ii')
     fibers_density.experiments.fibers_vs_change.main()
+
+
+def figure_si_2_density_vs_change_in_density_in_late_time_points():
+    print('Main panel')
+    fibers_density.experiments.fibers_vs_change.main(_early_time_points=False)
 
 
 def figure_3():
@@ -73,6 +75,10 @@ def figure_si_3_single_cell_detrending():
     fibers_density.experiments.correlations_by_derivatives_single_cells.main()
 
 
+def figure_si_3_insides_vs_outsides_offset():
+    print('?')
+
+
 def figure_4():
     fibers_density.simulations.communicated_vs_non_communicated.main()
     fibers_density.experiments.communicated_vs_non_communicated.main()
@@ -89,6 +95,9 @@ if __name__ == '__main__':
     print('Figure 2')
     figure_2()
 
+    print('Figure SI 2 - Density vs. Change in Density in Late Time-points')
+    figure_si_2_density_vs_change_in_density_in_late_time_points()
+
     print('Figure 3')
     figure_3()
 
@@ -97,6 +106,9 @@ if __name__ == '__main__':
 
     print('Figure SI 3 - Single Cell Detrending')
     figure_si_3_single_cell_detrending()
+
+    print('Figure SI 3 - Insides vs. Outsides Offset')
+    figure_si_3_insides_vs_outsides_offset()
 
     print('Figure 4')
     figure_4()
