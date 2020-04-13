@@ -13,38 +13,15 @@ from plotting import save
 
 EXPERIMENTS = ['SN16']
 MINIMUM_TIME_POINTS = sys.maxsize
-EARLY_TIME_POINTS = {
-    True: {
-        'start': {
-            'SN16': 0,
-            'SN18': 0,
-            'SN41': 0,
-            'SN44': 0
-        },
-        'end': {
-            'SN16': 6,
-            'SN18': 6,
-            'SN41': 18,
-            'SN44': 18
-        }
-    },
-    False: {
-        'start': {
-            'SN16': 6,
-            # TODO: update if needed
-            'SN18': 0,
-            'SN41': 0,
-            'SN44': 0
-        },
-        'end': {
-            'SN16': 12,
-            # TODO: update if needed
-            'SN18': 6,
-            'SN41': 18,
-            'SN44': 18
-        }
-    }
+TIME_POINTS = {
+    'early': [0, 6],
+    'late': [17, 23]
 }
+# when using offset 0:
+# TIME_POINTS = {
+#     'early': [0, 6],
+#     'late': [12, 18]
+# }
 CELLS_DISTANCE_RANGE = (5, 18)
 DIRECTION = 'inside'
 REAL_CELLS = True
@@ -111,8 +88,8 @@ def main(_early_time_points=True):
             _fibers_densities_by_time = [_fibers_densities[_tuple] for _tuple in
                                          _rois_dictionary[(_experiment, _series_id, _group, _cell_id)]]
             _cell_fibers_densities = \
-                _fibers_densities_by_time[EARLY_TIME_POINTS[_early_time_points]['start'][_experiment]:
-                                          EARLY_TIME_POINTS[_early_time_points]['end'][_experiment]]
+                _fibers_densities_by_time[TIME_POINTS['early'][0] if _early_time_points else TIME_POINTS['late'][0]:
+                                          TIME_POINTS['early'][1] if _early_time_points else TIME_POINTS['late'][1]]
             _properties = load.group_properties(_experiment, _series_id, _group)
             _cell_fibers_densities = compute.remove_blacklist(
                 _experiment, _series_id, _properties['cells_ids'][_cell_id], _cell_fibers_densities)
