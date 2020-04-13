@@ -286,7 +286,8 @@ def main():
                 'title': 'Cells distance (cell diameter)',
                 'zeroline': False,
                 'tickmode': 'array',
-                'tickvals': CELLS_DISTANCES
+                'tickvals': CELLS_DISTANCES,
+                'type': 'category'
             },
             'yaxis': {
                 'title': 'Distance from y = x',
