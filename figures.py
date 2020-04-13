@@ -75,8 +75,14 @@ def figure_si_3_single_cell_detrending():
     fibers_density.experiments.correlations_by_derivatives_single_cells.main()
 
 
-def figure_si_3_insides_vs_outsides_offset():
-    print('?')
+def figure_si_3_insides_vs_outsides_distances():
+    print('Panels A & B')
+    fibers_density.simulations.insides_vs_outsides_distances.main()
+
+
+def figure_si_3_insides_vs_outsides_offsets():
+    print('Panels A & B')
+    fibers_density.simulations.insides_vs_outsides_offsets.main()
 
 
 def figure_4():
@@ -107,8 +113,11 @@ if __name__ == '__main__':
     print('Figure SI 3 - Single Cell Detrending')
     figure_si_3_single_cell_detrending()
 
-    print('Figure SI 3 - Insides vs. Outsides Offset')
-    figure_si_3_insides_vs_outsides_offset()
+    print('Figure SI 3 - Insides vs. Outsides Distances')
+    figure_si_3_insides_vs_outsides_distances()
+
+    print('Figure SI 3 - Insides vs. Outsides Offsets')
+    figure_si_3_insides_vs_outsides_offsets()
 
     print('Figure 4')
     figure_4()
