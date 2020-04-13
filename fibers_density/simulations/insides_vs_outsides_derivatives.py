@@ -67,19 +67,13 @@ def main():
     _x_arrays = [[] for _i in DERIVATIVES]
     _y_arrays = [[] for _i in DERIVATIVES]
     for _simulation in tqdm(_simulations, desc='Simulations loop'):
-        _normalization = load.normalization(_simulation)
-        _normalization = [_normalization['average'], _normalization['std']]
         for _direction in ['inside', 'outside']:
             _left_cell_fibers_densities = _fibers_densities[(_simulation, 'left_cell', _direction)]
             _right_cell_fibers_densities = _fibers_densities[(_simulation, 'right_cell', _direction)]
-            _left_cell_fibers_densities_normalized = \
-                compute_lib.z_score_fibers_densities_array(_left_cell_fibers_densities, _normalization)
-            _right_cell_fibers_densities_normalized = \
-                compute_lib.z_score_fibers_densities_array(_right_cell_fibers_densities, _normalization)
             for _derivative_index, _derivative in enumerate(DERIVATIVES):
                 _correlation = compute_lib.correlation(
-                    compute_lib.derivative(_left_cell_fibers_densities_normalized, _n=_derivative),
-                    compute_lib.derivative(_right_cell_fibers_densities_normalized, _n=_derivative)
+                    compute_lib.derivative(_left_cell_fibers_densities, _n=_derivative),
+                    compute_lib.derivative(_right_cell_fibers_densities, _n=_derivative)
                 )
                 if _direction == 'inside':
                     _x_arrays[_derivative_index].append(_correlation)
