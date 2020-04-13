@@ -72,7 +72,7 @@ Z_MAX = {
 }
 
 
-def main(_early_time_points=False):
+def main(_early_time_points=True):
     _experiments = load.experiments_groups_as_tuples(EXPERIMENTS)
     _experiments = filtering.by_distance_range(_experiments, CELLS_DISTANCE_RANGE)
     _experiments = filtering.by_real_cells(_experiments, _real_cells=REAL_CELLS)
