@@ -80,9 +80,8 @@ def figure_si_3_insides_vs_outsides_offsets():
 
 
 def figure_4():
-    fibers_density.simulations.communicated_vs_non_communicated.main()
-    fibers_density.experiments.communicated_vs_non_communicated.main()
-    fibers_density.simulations.communicated_vs_non_communicated_cell_distances.main()
+    print('Panel B-i')
+    fibers_density.simulations.same_vs_different.main()
 
 
 def figure_si_4_single_cell_detrending():
