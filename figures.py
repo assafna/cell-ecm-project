@@ -62,10 +62,10 @@ def figure_si_3_stationary_and_detrending():
 
 
 def figure_si_3_single_cell_detrending():
-    print('Panel A')
+    print('Panel A & B')
     fibers_density.simulations.stationary_vs_fibers_derivatives_single_cells.main()
 
-    print('Panel B')
+    print('Panel C')
     fibers_density.simulations.correlations_by_derivatives_single_cells.main()
 
 
@@ -86,10 +86,10 @@ def figure_4():
 
 
 def figure_si_4_single_cell_detrending():
-    print('Panel A')
+    print('Panel A & B')
     fibers_density.experiments.stationary_vs_fibers_derivatives_single_cells.main()
 
-    print('Panel B')
+    print('Panel C')
     fibers_density.experiments.correlations_by_derivatives_single_cells.main()
 
 
