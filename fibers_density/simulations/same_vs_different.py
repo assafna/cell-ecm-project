@@ -72,7 +72,7 @@ def main(_low_connectivity=False):
 
     _same_correlations_array = []
     _different_correlations_array = []
-    for _same_index in range(len(_simulations)):
+    for _same_index in tqdm(range(len(_simulations)), desc='Main loop'):
         _same_simulation = _simulations[_same_index]
         _same_left_cell_fibers_densities = _fibers_densities[(_same_simulation, 'left_cell')]
         _same_right_cell_fibers_densities = _fibers_densities[(_same_simulation, 'right_cell')]
