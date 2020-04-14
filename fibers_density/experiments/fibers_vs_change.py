@@ -13,22 +13,23 @@ from plotting import save
 
 EXPERIMENTS = ['SN16']
 MINIMUM_TIME_POINTS = sys.maxsize
-TIME_POINTS = {
-    'early': [0, 6],
-    'late': [17, 23]
-}
-# when using offset 0:
+# when using offset 0.5
 # TIME_POINTS = {
 #     'early': [0, 6],
-#     'late': [12, 18]
+#     'late': [17, 23]
 # }
+# when using offset 0:
+TIME_POINTS = {
+    'early': [0, 6],
+    'late': [12, 18]
+}
 CELLS_DISTANCE_RANGE = (5, 18)
 DIRECTION = 'inside'
 REAL_CELLS = True
 STATIC = False
 BAND = True
 
-OFFSET_X = 0.5
+OFFSET_X = 0
 OFFSET_Y = 0
 OFFSET_Z = 0
 DERIVATIVE = 1
@@ -37,7 +38,7 @@ PLOT = True
 CONDITIONAL_NORMALIZATION = False
 X_LABELS_START = -3
 X_LABELS_END = 14
-Y_LABELS_START = -1.1
+Y_LABELS_START = -1.5
 Y_LABELS_END = 3.4
 X_BINS = 1
 Y_BINS = 5
