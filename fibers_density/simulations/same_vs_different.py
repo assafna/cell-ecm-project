@@ -21,7 +21,11 @@ TIME_POINT = {
 OFFSET_X = 0
 OFFSET_Y = 0
 DERIVATIVE = 2
-STD = 0.5
+# by low connectivity
+STD = {
+    False: 0.5,
+    True: 0.25
+}
 CELLS_DISTANCE = 7
 
 
@@ -53,7 +57,7 @@ def compute_fibers_densities(_simulations, _low_connectivity):
     return _fibers_densities
 
 
-def main(_low_connectivity=False):
+def main(_low_connectivity=True):
     _simulations = load.structured()
     _simulations = filtering.by_time_points_amount(_simulations, TIME_POINT[_low_connectivity])
     _simulations = filtering.by_categories(
@@ -64,7 +68,7 @@ def main(_low_connectivity=False):
         _is_causality=False,
         _is_dominant_passive=False
     )
-    _simulations = filtering.by_heterogeneity(_simulations, _std=STD)
+    _simulations = filtering.by_heterogeneity(_simulations, _std=STD[_low_connectivity])
     _simulations = filtering.by_distance(_simulations, _distance=CELLS_DISTANCE)
     print('Total simulations:', len(_simulations))
 
