@@ -83,6 +83,9 @@ def figure_4():
     print('Panel B-i')
     fibers_density.simulations.same_vs_different.main()
 
+    print('Panel B-ii')
+    fibers_density.simulations.same_vs_different_distances.main()
+
 
 def figure_si_4_single_cell_detrending():
     print('Panel A & B')
