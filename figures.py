@@ -86,6 +86,13 @@ def figure_4():
     print('Panel B-ii')
     fibers_density.simulations.same_vs_different_distances.main()
 
+    print('Panel C')
+    fibers_density.experiments.same_vs_different.main()
+
+
+def figure_si_4_low_connectivity():
+    print('?')
+
 
 def figure_si_4_single_cell_detrending():
     print('Panel A & B')
@@ -125,6 +132,9 @@ if __name__ == '__main__':
 
     print('Figure 4')
     figure_4()
+
+    print('Figure SI 4 - Low Connectivity')
+    figure_si_4_low_connectivity()
 
     print('Figure SI 4 - Single Cell Detrending')
     figure_si_4_single_cell_detrending()
