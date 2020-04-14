@@ -180,7 +180,7 @@ def main():
             data=go.Scatter(
                 x=_x,
                 y=_y,
-                name='STD ' + str(_std),
+                name='Std. ' + str(_std),
                 mode='markers',
                 marker={
                     'size': 10,
