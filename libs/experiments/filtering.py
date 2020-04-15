@@ -126,3 +126,31 @@ def by_cells_ids(_experiments_tuples, _cells_ids, _both_cells=False):
             _experiments_tuples_filtered.append(_tuple)
 
     return _experiments_tuples_filtered
+
+
+def by_triplets(_experiments_tuples):
+    _experiments_triplets = []
+    for _tuple in _experiments_tuples:
+        _experiment, _series_id, _ = _tuple
+        for _cell_id_1 in range(0, 10):
+            for _cell_id_2 in range(_cell_id_1 + 1, 10):
+                _group_1 = 'cells_' + str(_cell_id_1) + '_' + str(_cell_id_2)
+                for _cell_id_3 in range(_cell_id_2 + 1, 10):
+                    _group_2 = 'cells_' + str(_cell_id_1) + '_' + str(_cell_id_3)
+                    _group_3 = 'cells_' + str(_cell_id_2) + '_' + str(_cell_id_3)
+                    if (_experiment, _series_id, _group_1) in _experiments_tuples and \
+                            (_experiment, _series_id, _group_2) in _experiments_tuples and \
+                            (_experiment, _series_id, _group_3) in _experiments_tuples:
+                        _triplet = [
+                            (_experiment, _series_id, _group_1),
+                            (_experiment, _series_id, _group_2),
+                            (_experiment, _series_id, _group_3)
+                        ]
+                        if _triplet not in _experiments_triplets:
+                            _experiments_triplets.append([
+                                (_experiment, _series_id, _group_1),
+                                (_experiment, _series_id, _group_2),
+                                (_experiment, _series_id, _group_3)
+                            ])
+
+    return _experiments_triplets
