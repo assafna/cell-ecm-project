@@ -291,7 +291,10 @@ def main():
             },
             'yaxis': {
                 'title': 'Distance from y = x',
-                'zeroline': False
+                'zeroline': False,
+                'range': [-0.5, 0.5],
+                'tickmode': 'array',
+                'tickvals': [-0.4, -0.2, 0, 0.2, 0.4]
             }
         }
     )
