@@ -85,7 +85,6 @@ def rois_fibers_densities(_simulation, _time_point, _rois):
         _original_fiber_length = _time_point_0_fibers_lengths[_element_index]
         _current_fiber_length = _time_point_fibers_lengths[_element_index]
         for _roi_index, _roi in enumerate(_rois_to_compute):
-            print('\rElement ' + str(_element_index + 1) + '/' + _elements_len + ' ROI ' + str(_roi_index + 1) + '/' + _rois_to_compute_len, end='')
             _roi_lines = _rois_lines[_roi]
             _fiber = fiber(_x1, _y1, _x2, _y2, _original_fiber_length, _current_fiber_length, _roi, _roi_lines)
             if _fiber is not None:

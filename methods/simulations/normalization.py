@@ -3,6 +3,7 @@ import time
 from multiprocessing.pool import Pool
 
 import numpy as np
+from tqdm import tqdm
 
 from libs.config_lib import CPUS_TO_USE
 from libs.simulations import paths, compute, load, save
@@ -28,7 +29,7 @@ def process_simulation(_simulation, _overwrite=False):
     _fibers_densities = []
     _offsets_x = list(np.arange(OFFSET_X_START, OFFSET_X_END - ROI_WIDTH * CELL_DIAMETER, STEP))
     _offsets_y = list(np.arange(OFFSET_Y_START, CELLS_ZONE_Y_START - ROI_HEIGHT * CELL_DIAMETER, STEP)) + \
-                 list(np.arange(CELLS_ZONE_Y_END, OFFSET_Y_END - ROI_HEIGHT * CELL_DIAMETER, STEP))
+        list(np.arange(CELLS_ZONE_Y_END, OFFSET_Y_END - ROI_HEIGHT * CELL_DIAMETER, STEP))
 
     # prepare rois
     _rois = []
@@ -49,14 +50,14 @@ def process_simulation(_simulation, _overwrite=False):
     }
     save.normalization(_simulation, _normalization)
 
-    print(_simulation, 'Finished!', 'Total ' + str(round(time.time() - _start_time, 2)) + ' seconds')
-
 
 def process_simulations(_simulations, _overwrite=False):
-    _arguments = [(_simulation, _overwrite) for _simulation in _simulations]
-    _p = Pool(CPUS_TO_USE)
-    _p.starmap(process_simulation, _arguments)
-    _p.close()
+    _arguments = [_simulation for _simulation in _simulations]
+    with Pool(CPUS_TO_USE) as _p:
+        for _ in tqdm(_p.imap_unordered(process_simulation, _arguments), total=len(_arguments), desc='Simulations'):
+            continue
+        _p.close()
+        _p.join()
 
 
 def process_all_simulations(_overwrite=False):
