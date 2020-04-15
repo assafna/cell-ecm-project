@@ -12,7 +12,6 @@ from libs.experiments.config import ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT
 from plotting import save
 
 EXPERIMENTS = ['SN16']
-EXPERIMENTS_STR = '_'.join(EXPERIMENTS)
 OFFSET_X = 0
 # TODO: set the offset in y according to the angle in the original Z slices of the cells
 OFFSET_Y = 0.5
