@@ -57,7 +57,7 @@ def compute_fibers_densities(_simulations, _low_connectivity):
     return _fibers_densities
 
 
-def main(_low_connectivity=True):
+def main(_low_connectivity=False):
     _simulations = load.structured()
     _simulations = filtering.by_time_points_amount(_simulations, TIME_POINT[_low_connectivity])
     _simulations = filtering.by_categories(
