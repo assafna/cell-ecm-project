@@ -114,3 +114,15 @@ def by_main_cell(_experiments_tuples):
             _experiments_tuples_filtered.append(_tuple)
 
     return _experiments_tuples_filtered
+
+
+def by_cells_ids(_experiments_tuples, _cells_ids, _both_cells=False):
+    _experiments_tuples_filtered = []
+    for _tuple in _experiments_tuples:
+        _experiment, _series_id, _group = _tuple
+        _tuple_cells_ids = [int(_cell_id) for _cell_id in _group.split('_')[1:]]
+        if (_both_cells and _tuple_cells_ids[0] in _cells_ids and _tuple_cells_ids[1] in _cells_ids) or \
+                (not _both_cells and (_tuple_cells_ids[0] in _cells_ids or _tuple_cells_ids[1] in _cells_ids)):
+            _experiments_tuples_filtered.append(_tuple)
+
+    return _experiments_tuples_filtered
