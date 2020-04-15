@@ -89,6 +89,9 @@ def figure_4():
     print('Panel C')
     fibers_density.experiments.same_vs_different.main()
 
+    print('Panel D')
+    fibers_density.experiments.same_vs_different_triplets.main()
+
 
 def figure_si_4_low_connectivity():
     print('?')
