@@ -69,6 +69,9 @@ def by_time_points_amount(_experiments_tuples, _time_points, _exactly=False):
 
 
 def by_band(_experiments_tuples, _band=True):
+    if _band is None:
+        return _experiments_tuples
+
     _experiments_tuples_filtered = []
     for _tuple in _experiments_tuples:
         _experiment, _series_id, _group = _tuple
