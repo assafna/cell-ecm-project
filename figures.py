@@ -87,13 +87,16 @@ def figure_4():
     fibers_density.simulations.same_vs_different_distances.main(_low_connectivity=False)
 
     print('Panel C')
-    fibers_density.experiments.same_vs_different.main(_high_time_resolution=False)
+    fibers_density.experiments.same_vs_different.main(_band=True, _high_time_resolution=False)
 
     print('Panel D-ii')
     fibers_density.experiments.same_vs_different_triplets.main()
 
     print('Panel E')
-    fibers_density.experiments.same_vs_different.main(_high_time_resolution=True)
+    fibers_density.experiments.same_vs_different.main(_band=True, _high_time_resolution=True)
+
+    print('Panel F')
+    fibers_density.experiments.same_vs_different.main(_band=False, _high_time_resolution=False)
 
 
 def figure_si_4_low_connectivity():
