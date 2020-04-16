@@ -24,7 +24,6 @@ DERIVATIVE = 1
 CELLS_DISTANCE_RANGE = [4, 10]
 REAL_CELLS = True
 STATIC = False
-BAND = True
 MINIMUM_CORRELATION_TIME_POINTS = {
     'SN16': 15,
     'SN18': 15,
@@ -33,13 +32,12 @@ MINIMUM_CORRELATION_TIME_POINTS = {
 }
 
 
-def main(_high_time_resolution=False):
+def main(_band=False, _high_time_resolution=False):
     _experiments = load.experiments_groups_as_tuples(EXPERIMENTS[_high_time_resolution])
     _experiments = filtering.by_distance_range(_experiments, CELLS_DISTANCE_RANGE)
     _experiments = filtering.by_real_cells(_experiments, _real_cells=REAL_CELLS)
     _experiments = filtering.by_static_cells(_experiments, _static=STATIC)
-    if BAND:
-        _experiments = filtering.by_band(_experiments)
+    _experiments = filtering.by_band(_experiments, _band=_band)
     print('Total experiments:', len(_experiments))
 
     _arguments = []
@@ -254,7 +252,7 @@ def main(_high_time_resolution=False):
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        _filename='plot_high_time_res_' + str(_high_time_resolution)
+        _filename='plot_band_' + str(_band) + '_high_time_res_' + str(_high_time_resolution)
     )
 
 
