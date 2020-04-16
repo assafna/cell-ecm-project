@@ -11,7 +11,11 @@ from libs.experiments import load, filtering, compute, paths
 from libs.experiments.config import ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT
 from plotting import save
 
-EXPERIMENTS = ['SN16']
+# based on time resolution
+EXPERIMENTS = {
+    False: ['SN16'],
+    True: ['SN41']
+}
 OFFSET_X = 0
 # TODO: set the offset in y according to the angle in the original Z slices of the cells
 OFFSET_Y = 0.5
@@ -29,8 +33,8 @@ MINIMUM_CORRELATION_TIME_POINTS = {
 }
 
 
-def main():
-    _experiments = load.experiments_groups_as_tuples(EXPERIMENTS)
+def main(_high_time_resolution=False):
+    _experiments = load.experiments_groups_as_tuples(EXPERIMENTS[_high_time_resolution])
     _experiments = filtering.by_distance_range(_experiments, CELLS_DISTANCE_RANGE)
     _experiments = filtering.by_real_cells(_experiments, _real_cells=REAL_CELLS)
     _experiments = filtering.by_static_cells(_experiments, _static=STATIC)
@@ -250,7 +254,7 @@ def main():
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        _filename='plot'
+        _filename='plot_high_time_res_' + str(_high_time_resolution)
     )
 
 

@@ -3,16 +3,16 @@ import fibers_density
 
 def figure_1():
     print('Panel C-ii')
-    fibers_density.fibers_vs_distance_single_cells.main()
+    fibers_density.fibers_vs_distance_single_cells.main(_low_connectivity=False)
 
     print('Panel D-ii')
-    fibers_density.fibers_vs_distance_pairs.main()
+    fibers_density.fibers_vs_distance_pairs.main(_low_connectivity=False)
 
     print('Panel D-iii')
-    fibers_density.fibers_vs_distance_differences.main()
+    fibers_density.fibers_vs_distance_differences.main(_low_connectivity=False)
 
     print('Panel E-i')
-    fibers_density.simulations.fibers_vs_distance_multiple_cell_distances.main()
+    fibers_density.simulations.fibers_vs_distance_multiple_cell_distances.main(_low_connectivity=False)
 
     print('Panel E-ii')
     fibers_density.experiments.fibers_vs_distance_multiple_cell_distances.main()
@@ -37,7 +37,7 @@ def figure_2():
     fibers_density.simulations.fibers_vs_change.main()
 
     print('Panel C-ii')
-    fibers_density.experiments.fibers_vs_change.main()
+    fibers_density.experiments.fibers_vs_change.main(_early_time_points=True)
 
 
 def figure_si_2_density_vs_change_in_density_in_late_time_points():
@@ -81,16 +81,19 @@ def figure_si_3_insides_vs_outsides_offsets():
 
 def figure_4():
     print('Panel B-i')
-    fibers_density.simulations.same_vs_different.main()
+    fibers_density.simulations.same_vs_different.main(_low_connectivity=False)
 
     print('Panel B-ii')
-    fibers_density.simulations.same_vs_different_distances.main()
+    fibers_density.simulations.same_vs_different_distances.main(_low_connectivity=False)
 
     print('Panel C')
-    fibers_density.experiments.same_vs_different.main()
+    fibers_density.experiments.same_vs_different.main(_high_time_resolution=False)
 
-    print('Panel D')
+    print('Panel D-ii')
     fibers_density.experiments.same_vs_different_triplets.main()
+
+    print('Panel E')
+    fibers_density.experiments.same_vs_different.main(_high_time_resolution=True)
 
 
 def figure_si_4_low_connectivity():
