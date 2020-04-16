@@ -32,7 +32,7 @@ MINIMUM_CORRELATION_TIME_POINTS = {
 }
 
 
-def main(_band=False, _high_time_resolution=False):
+def main(_band=True, _high_time_resolution=False):
     _experiments = load.experiments_groups_as_tuples(EXPERIMENTS[_high_time_resolution])
     _experiments = filtering.by_distance_range(_experiments, CELLS_DISTANCE_RANGE)
     _experiments = filtering.by_real_cells(_experiments, _real_cells=REAL_CELLS)
