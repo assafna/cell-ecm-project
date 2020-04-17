@@ -137,7 +137,7 @@ def main(_low_connectivity=False):
             },
             'yaxis': {
                 'title': 'Distance from y = x',
-                'range': [-1, 1],
+                'range': [-1, 1.1],
                 'zeroline': False,
                 'tickmode': 'array',
                 'tickvals': [-1, -0.5, 0, 0.5, 1]
