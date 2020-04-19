@@ -12,8 +12,15 @@ from libs.experiments.config import ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT
 from plotting import save
 
 # based on time resolution
-EXPERIMENTS = ['SN41']
-TIME_POINTS_STEPS = range(1, 18)
+EXPERIMENT = 'SN41'
+TIME_POINTS_STEPS = {
+    'SN16': range(1, 6),
+    'SN41': range(1, 18)
+}
+TIME_RESOLUTION = {
+    'SN16': 15,
+    'SN41': 5
+}
 OFFSET_X = 0
 # TODO: set the offset in y according to the angle in the original Z slices of the cells
 OFFSET_Y = 0.5
@@ -28,11 +35,14 @@ MINIMUM_CORRELATION_TIME_POINTS = {
     'SN41': 50,
     'SN44': 50
 }
-GENERAL_MINIMUM_CORRELATION_TIME_POINTS = 15
+GENERAL_MINIMUM_CORRELATION_TIME_POINTS = {
+    'SN16': 5,
+    'SN41': 15
+}
 
 
 def main():
-    _experiments = load.experiments_groups_as_tuples(EXPERIMENTS)
+    _experiments = load.experiment_groups_as_tuples(EXPERIMENT)
     _experiments = filtering.by_distance_range(_experiments, CELLS_DISTANCE_RANGE)
     _experiments = filtering.by_real_cells(_experiments, _real_cells=REAL_CELLS)
     _experiments = filtering.by_static_cells(_experiments, _static=STATIC)
@@ -77,9 +87,10 @@ def main():
         for _key in _rois_dictionary
     }
 
-    _y_arrays = [[] for _i in TIME_POINTS_STEPS]
+    _y_arrays = [[] for _i in TIME_POINTS_STEPS[EXPERIMENT]]
     _x_array = []
-    for _time_point_index, _time_point_every in tqdm(enumerate(TIME_POINTS_STEPS), desc='Main loop'):
+    for _time_point_index, _time_point_every in enumerate(TIME_POINTS_STEPS[EXPERIMENT]):
+        print('Time resolution (minutes):', _time_point_every * TIME_RESOLUTION[EXPERIMENT])
         _higher_same_counter = 0
         for _time_point_begin in range(_time_point_every):
             for _same_index in range(len(_experiments)):
@@ -126,7 +137,7 @@ def main():
                     _same_right_cell_fibers_densities_filtered[_time_point_begin::_time_point_every]
 
                 # secondary ignore
-                if len(_same_left_cell_fibers_densities_filtered) < GENERAL_MINIMUM_CORRELATION_TIME_POINTS:
+                if len(_same_left_cell_fibers_densities_filtered) < GENERAL_MINIMUM_CORRELATION_TIME_POINTS[EXPERIMENT]:
                     continue
 
                 _same_correlation = compute_lib.correlation(
@@ -185,7 +196,7 @@ def main():
                                 _different_fibers_densities_filtered[_time_point_begin::_time_point_every]
 
                             # secondary ignore
-                            if len(_same_fibers_densities_filtered) < GENERAL_MINIMUM_CORRELATION_TIME_POINTS:
+                            if len(_same_fibers_densities_filtered) < GENERAL_MINIMUM_CORRELATION_TIME_POINTS[EXPERIMENT]:
                                 continue
 
                             _different_correlation = compute_lib.correlation(
@@ -203,12 +214,11 @@ def main():
                             else:
                                 _y_arrays[_time_point_index].append(-_point_distance)
 
-        print('Time resolution (minutes):', _time_point_every * 5)
         print('Total points:', len(_y_arrays[_time_point_index]))
         print('Wilcoxon around the zero:')
         print(wilcoxon(_y_arrays[_time_point_index]))
         print('Higher same amount:', _higher_same_counter / len(_y_arrays[_time_point_index]))
-        _x_array.append(_time_point_every * 5)
+        _x_array.append(_time_point_every * TIME_RESOLUTION[EXPERIMENT])
 
     # plot
     # _colors_array = ['#844b00', '#ea8500', '#edbc80']
@@ -247,7 +257,7 @@ def main():
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        _filename='plot'
+        _filename='plot_' + EXPERIMENT
     )
 
 
