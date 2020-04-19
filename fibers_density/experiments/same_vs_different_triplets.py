@@ -70,9 +70,9 @@ def main():
         for _key in _rois_dictionary
     }
 
-    _same_correlations_array = []
-    _different_correlations_array = []
-    for _triplet in _triplets:
+    _same_correlations_arrays = [[] for _i in _triplets]
+    _different_correlations_arrays = [[] for _i in _triplets]
+    for _triplet_index, _triplet in enumerate(_triplets):
         for _same_index in tqdm(range(len(_triplet)), desc='Main loop'):
             _same_tuple = _triplet[_same_index]
             _same_experiment, _same_series, _same_group = _same_tuple
@@ -156,36 +156,37 @@ def main():
                             compute_lib.derivative(_different_fibers_densities_filtered, _n=DERIVATIVE)
                         )
 
-                        _same_correlations_array.append(_same_correlation)
-                        _different_correlations_array.append(_different_correlation)
+                        _same_correlations_arrays[_triplet_index].append(_same_correlation)
+                        _different_correlations_arrays[_triplet_index].append(_different_correlation)
 
-                        # if _same_properties['cells_ids'][_same_cell_id] == \
-                        #         _different_properties['cells_ids'][_different_cell_id]:
-                        #     _same_cell_array.append(True)
-                        # else:
-                        #     _same_cell_array.append(False)
-
-    print('Total points:', len(_same_correlations_array))
+    print('Total points:', len(np.array(_same_correlations_arrays).flatten()))
     _same_minus_different = \
-        np.array(_same_correlations_array) - np.array(_different_correlations_array)
+        np.array(_same_correlations_arrays).flatten() - np.array(_different_correlations_arrays).flatten()
     print('Wilcoxon of same minus different around the zero:')
     print(wilcoxon(_same_minus_different))
     print('Higher same amount:', (_same_minus_different > 0).sum() /
           len(_same_minus_different))
 
     # plot
-    # _colors_array = ['black' if _same_cell else '#ea8500' for _same_cell in _same_cell_array]
+    _colors_array = ['green', 'blue', 'red']
     _fig = go.Figure(
-        data=go.Scatter(
-            x=_same_correlations_array,
-            y=_different_correlations_array,
-            mode='markers',
-            marker={
-                'size': 5,
-                'color': '#ea8500'
-            },
-            showlegend=False
-        ),
+        data=[
+            go.Scatter(
+                x=_same_correlations_array,
+                y=_different_correlations_array,
+                mode='markers',
+                marker={
+                    'size': 15,
+                    'color': _color,
+                    'line': {
+                        'width': 0.5,
+                        'color': '#ea8500'
+                    }
+                },
+                showlegend=False,
+                opacity=0.7
+            ) for _same_correlations_array, _different_correlations_array, _color in zip(_same_correlations_arrays, _different_correlations_arrays, _colors_array)
+        ],
         layout={
             'xaxis': {
                 'title': 'Same network correlation',
