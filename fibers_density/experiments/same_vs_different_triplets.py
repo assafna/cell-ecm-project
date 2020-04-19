@@ -185,7 +185,8 @@ def main():
                 },
                 showlegend=False,
                 opacity=0.7
-            ) for _same_correlations_array, _different_correlations_array, _color in zip(_same_correlations_arrays, _different_correlations_arrays, _colors_array)
+            ) for _same_correlations_array, _different_correlations_array, _color in
+            zip(_same_correlations_arrays, _different_correlations_arrays, _colors_array)
         ],
         layout={
             'xaxis': {
