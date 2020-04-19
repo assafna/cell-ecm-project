@@ -114,6 +114,11 @@ def figure_si_4_single_cell_detrending():
     fibers_density.experiments.correlations_by_derivatives_single_cells.main()
 
 
+def figure_si_4_temporal_assessment():
+    print('?')
+    fibers_density.experiments.same_vs_different_temporal_reduction.main()
+
+
 if __name__ == '__main__':
     print('Figure 1')
     figure_1()
