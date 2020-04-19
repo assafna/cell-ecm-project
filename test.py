@@ -1,5 +1,5 @@
 from libs.compute_lib import distance_from_a_point_to_a_line
-from libs.experiments import load, filtering, compute
+from libs.simulations import load, filtering, compute
 
 
 if __name__ == '__main__':
@@ -17,6 +17,16 @@ if __name__ == '__main__':
     #     _distance_end = compute.cells_distance_in_cell_size_time_point(_experiment, _series_id, _group, _time_point=17)
     #     print(_index, _distance_start, _distance_end, _distance_start - _distance_end, sep='\t')
     #     _index += 1
-    _a = distance_from_a_point_to_a_line([-1, -1, 1, 1], [1, 4])
-    print(_a)
+    # _a = distance_from_a_point_to_a_line([-1, -1, 1, 1], [1, 4])
+    # print(_a)
+    _simulations = load.structured()
+    _simulations = filtering.by_categories(
+        _simulations,
+        _is_single_cell=False,
+        _is_heterogeneity=True,
+        _is_low_connectivity=False,
+        _is_causality=False,
+        _is_dominant_passive=True
+    )
+    print(_simulations)
 
