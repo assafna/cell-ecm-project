@@ -98,9 +98,6 @@ def figure_4():
     print('Panel D-iii')
     fibers_density.experiments.same_vs_different_triplet.main()
 
-    print('Panel E')
-    fibers_density.experiments.same_vs_different.main(_band=True, _high_time_resolution=True)
-
     print('Panel F')
     fibers_density.experiments.same_vs_different.main(_band=False, _high_time_resolution=False)
 
