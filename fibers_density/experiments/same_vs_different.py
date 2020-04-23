@@ -32,7 +32,7 @@ MINIMUM_CORRELATION_TIME_POINTS = {
 }
 
 
-def main(_band=True, _high_time_resolution=False):
+def compute_fibers_densities(_band=True, _high_time_resolution=False):
     _experiments = load.experiments_groups_as_tuples(EXPERIMENTS[_high_time_resolution])
     _experiments = filtering.by_distance_range(_experiments, CELLS_DISTANCE_RANGE)
     _experiments = filtering.by_real_cells(_experiments, _real_cells=REAL_CELLS)
@@ -183,6 +183,12 @@ def main(_band=True, _high_time_resolution=False):
     print(wilcoxon(_same_minus_different))
     print('Higher same amount:', (_same_minus_different > 0).sum() /
           len(_same_minus_different))
+
+    return _same_correlations_array, _different_correlations_array
+
+
+def main(_band=True, _high_time_resolution=False):
+    _same_correlations_array, _different_correlations_array = compute_fibers_densities(_band, _high_time_resolution)
 
     # plot
     _fig = go.Figure(
