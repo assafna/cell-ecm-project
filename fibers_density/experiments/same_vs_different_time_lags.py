@@ -34,7 +34,10 @@ MINIMUM_CORRELATION_TIME_POINTS = {
     'SN41': 40,
     'SN44': 40
 }
-TIME_LAGS = [-2, -1, 0, 1, 2]
+TIME_LAGS = {
+    False: [-2, -1, 0, 1, 2],
+    True: [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]
+}
 
 
 def compute_fibers_densities(_band=True, _high_time_resolution=False):
@@ -84,10 +87,10 @@ def compute_fibers_densities(_band=True, _high_time_resolution=False):
         for _key in _rois_dictionary
     }
 
-    _same_time_lags_arrays = [[] for _i in TIME_LAGS]
-    _different_time_lags_arrays = [[] for _i in TIME_LAGS]
-    _same_time_lags_highest = [0 for _i in TIME_LAGS]
-    _different_time_lags_highest = [0 for _i in TIME_LAGS]
+    _same_time_lags_arrays = [[] for _i in TIME_LAGS[_high_time_resolution]]
+    _different_time_lags_arrays = [[] for _i in TIME_LAGS[_high_time_resolution]]
+    _same_time_lags_highest = [0 for _i in TIME_LAGS[_high_time_resolution]]
+    _different_time_lags_highest = [0 for _i in TIME_LAGS[_high_time_resolution]]
     for _same_index in tqdm(range(len(_experiments)), desc='Main loop'):
         _same_tuple = _experiments[_same_index]
         _same_experiment, _same_series, _same_group = _same_tuple
@@ -192,7 +195,7 @@ def compute_fibers_densities(_band=True, _high_time_resolution=False):
                     # time lag
                     _different_highest_correlation = -1.1
                     _different_highest_correlation_time_lag_index = 0
-                    for _time_lag_index, _time_lag in enumerate(TIME_LAGS):
+                    for _time_lag_index, _time_lag in enumerate(TIME_LAGS[_high_time_resolution]):
                         if _time_lag > 0:
                             _same_fibers_densities_time_lag = _same_fibers_densities[:-_time_lag]
                             _different_fibers_densities_time_lag = _different_fibers_densities[_time_lag:]
@@ -249,14 +252,14 @@ def main(_band=True, _high_time_resolution=False):
                         'color': '#ea8500'
                     },
                     showlegend=False
-                ) for _y, _time_lag in zip(_arrays, TIME_LAGS)
+                ) for _y, _time_lag in zip(_arrays, TIME_LAGS[_high_time_resolution])
             ],
             layout={
                 'xaxis': {
                     'title': 'Time lag (minutes)',
                     'zeroline': False,
                     'tickmode': 'array',
-                    'tickvals': np.array(TIME_LAGS) * TIME_RESOLUTION[_high_time_resolution]
+                    'tickvals': np.array(TIME_LAGS[_high_time_resolution]) * TIME_RESOLUTION[_high_time_resolution]
                 },
                 'yaxis': {
                     'title': _name.capitalize() + ' network correlations',
@@ -278,7 +281,7 @@ def main(_band=True, _high_time_resolution=False):
     for _name, _sums in zip(['same', 'different'], [_same_time_lags_highest, _different_time_lags_highest]):
         _fig = go.Figure(
             data=go.Bar(
-                x=np.array(TIME_LAGS) * TIME_RESOLUTION[_high_time_resolution],
+                x=np.array(TIME_LAGS[_high_time_resolution]) * TIME_RESOLUTION[_high_time_resolution],
                 y=np.array(_sums) / sum(_sums),
                 marker={
                     'color': '#ea8500'
@@ -289,7 +292,7 @@ def main(_band=True, _high_time_resolution=False):
                     'title': 'Time lag (minutes)',
                     'zeroline': False,
                     'tickmode': 'array',
-                    'tickvals': np.array(TIME_LAGS) * TIME_RESOLUTION[_high_time_resolution]
+                    'tickvals': np.array(TIME_LAGS[_high_time_resolution]) * TIME_RESOLUTION[_high_time_resolution]
                 },
                 'yaxis': {
                     'title': 'Highest correlations fraction',
