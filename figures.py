@@ -101,6 +101,9 @@ def figure_4():
     print('Panel F')
     fibers_density.experiments.same_vs_different.main(_band=False, _high_time_resolution=False)
 
+    print('?')
+    fibers_density.experiments.same_vs_different_compare.main(_high_time_resolution=False)
+
 
 def figure_si_4_low_connectivity():
     print('?')
