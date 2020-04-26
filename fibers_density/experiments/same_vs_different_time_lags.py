@@ -30,10 +30,10 @@ REAL_CELLS = True
 STATIC = False
 DIRECTION = 'inside'
 MINIMUM_CORRELATION_TIME_POINTS = {
-    'SN16': 15,
-    'SN18': 15,
-    'SN41': 50,
-    'SN44': 50
+    'SN16': 10,
+    'SN18': 10,
+    'SN41': 40,
+    'SN44': 40
 }
 TIME_LAGS = [-2, -1, 0, 1, 2]
 
@@ -87,6 +87,8 @@ def compute_fibers_densities(_band=True, _high_time_resolution=False):
 
     _same_time_lags_arrays = [[] for _i in TIME_LAGS]
     _different_time_lags_arrays = [[] for _i in TIME_LAGS]
+    _same_time_lags_highest = [0 for _i in TIME_LAGS]
+    _different_time_lags_highest = [0 for _i in TIME_LAGS]
     for _same_index in tqdm(range(len(_experiments)), desc='Main loop'):
         _same_tuple = _experiments[_same_index]
         _same_experiment, _same_series, _same_group = _same_tuple
@@ -115,7 +117,9 @@ def compute_fibers_densities(_band=True, _high_time_resolution=False):
             _same_right_cell_fibers_densities
         )
 
-        # shift according to time lag
+        # time lag
+        _same_highest_correlation = -1.1
+        _same_highest_correlation_time_lag_index = 0
         for _time_lag_index, _time_lag in enumerate(TIME_LAGS):
             if _time_lag > 0:
                 _same_left_cell_fibers_densities_time_lag = _same_left_cell_fibers_densities[:-_time_lag]
@@ -144,43 +148,52 @@ def compute_fibers_densities(_band=True, _high_time_resolution=False):
 
             _same_time_lags_arrays[_time_lag_index].append(_same_correlation)
 
-            for _different_index in range(len(_experiments)):
-                if _same_index != _different_index:
-                    _different_tuple = _experiments[_different_index]
-                    _different_experiment, _different_series, _different_group = \
-                        _different_tuple
-                    for _same_cell_id, _different_cell_id in product(['left_cell', 'right_cell'],
-                                                                     ['left_cell', 'right_cell']):
-                        _same_fibers_densities = _experiments_fibers_densities[(
-                            _same_experiment,
-                            _same_series,
-                            _same_group,
-                            _same_cell_id
-                        )]
-                        _different_fibers_densities = _experiments_fibers_densities[(
-                            _different_experiment,
-                            _different_series,
-                            _different_group,
-                            _different_cell_id
-                        )]
+            if _same_correlation > _same_highest_correlation:
+                _same_highest_correlation = _same_correlation
+                _same_highest_correlation_time_lag_index = _time_lag_index
 
-                        _different_properties = load.group_properties(
-                            _different_experiment, _different_series, _different_group
-                        )
-                        _same_fibers_densities = compute.remove_blacklist(
-                            _same_experiment,
-                            _same_series,
-                            _same_properties['cells_ids'][_same_cell_id],
-                            _same_fibers_densities
-                        )
-                        _different_fibers_densities = compute.remove_blacklist(
-                            _different_experiment,
-                            _different_series,
-                            _different_properties['cells_ids'][_different_cell_id],
-                            _different_fibers_densities
-                        )
+        _same_time_lags_highest[_same_highest_correlation_time_lag_index] += 1
 
-                        # time lag
+        for _different_index in range(len(_experiments)):
+            if _same_index != _different_index:
+                _different_tuple = _experiments[_different_index]
+                _different_experiment, _different_series, _different_group = \
+                    _different_tuple
+                for _same_cell_id, _different_cell_id in product(['left_cell', 'right_cell'],
+                                                                 ['left_cell', 'right_cell']):
+                    _same_fibers_densities = _experiments_fibers_densities[(
+                        _same_experiment,
+                        _same_series,
+                        _same_group,
+                        _same_cell_id
+                    )]
+                    _different_fibers_densities = _experiments_fibers_densities[(
+                        _different_experiment,
+                        _different_series,
+                        _different_group,
+                        _different_cell_id
+                    )]
+
+                    _different_properties = load.group_properties(
+                        _different_experiment, _different_series, _different_group
+                    )
+                    _same_fibers_densities = compute.remove_blacklist(
+                        _same_experiment,
+                        _same_series,
+                        _same_properties['cells_ids'][_same_cell_id],
+                        _same_fibers_densities
+                    )
+                    _different_fibers_densities = compute.remove_blacklist(
+                        _different_experiment,
+                        _different_series,
+                        _different_properties['cells_ids'][_different_cell_id],
+                        _different_fibers_densities
+                    )
+
+                    # time lag
+                    _different_highest_correlation = -1.1
+                    _different_highest_correlation_time_lag_index = 0
+                    for _time_lag_index, _time_lag in enumerate(TIME_LAGS):
                         if _time_lag > 0:
                             _same_fibers_densities_time_lag = _same_fibers_densities[:-_time_lag]
                             _different_fibers_densities_time_lag = _different_fibers_densities[_time_lag:]
@@ -208,14 +221,22 @@ def compute_fibers_densities(_band=True, _high_time_resolution=False):
 
                         _different_time_lags_arrays[_time_lag_index].append(_different_correlation)
 
-    return _same_time_lags_arrays, _different_time_lags_arrays
+                        if _different_correlation > _different_highest_correlation:
+                            _different_highest_correlation = _different_correlation
+                            _different_highest_correlation_time_lag_index = _time_lag_index
+
+                    _different_time_lags_highest[_different_highest_correlation_time_lag_index] += 1
+
+    return _same_time_lags_arrays, _different_time_lags_arrays, _same_time_lags_highest, _different_time_lags_highest
 
 
 def main(_band=True, _high_time_resolution=False):
-    _same_time_lags_arrays, _different_time_lags_arrays = compute_fibers_densities(_band, _high_time_resolution)
+    _same_time_lags_arrays, _different_time_lags_arrays, _same_time_lags_highest, _different_time_lags_highest = \
+        compute_fibers_densities(_band, _high_time_resolution)
 
-    # plots
     _colors_array = ['#844b00', '#ea8500', '#edbc80', '#ea8500', '#844b00']
+
+    # box plots
     for _name, _arrays in zip(['same', 'different'], [_same_time_lags_arrays, _different_time_lags_arrays]):
         _fig = go.Figure(
             data=[
@@ -251,7 +272,38 @@ def main(_band=True, _high_time_resolution=False):
         save.to_html(
             _fig=_fig,
             _path=os.path.join(paths.PLOTS, save.get_module_name()),
-            _filename='plot_high_time_res_' + str(_high_time_resolution) + '_' + _name
+            _filename='plot_box_high_time_res_' + str(_high_time_resolution) + '_' + _name
+        )
+
+    # bar plot
+    for _name, _sums in zip(['same', 'different'], [_same_time_lags_highest, _different_time_lags_highest]):
+        _fig = go.Figure(
+            data=go.Bar(
+                x=np.array(TIME_LAGS) * TIME_RESOLUTION[_high_time_resolution],
+                y=np.array(_sums) / sum(_sums),
+                marker={
+                    'color': _colors_array
+                }
+            ),
+            layout={
+                'xaxis': {
+                    'title': 'Time lag (minutes)',
+                    'zeroline': False
+                },
+                'yaxis': {
+                    'title': 'Highest correlations fraction',
+                    'range': [0, 1.1],
+                    'zeroline': False,
+                    'tickmode': 'array',
+                    'tickvals': [0, 0.5, 1]
+                }
+            }
+        )
+
+        save.to_html(
+            _fig=_fig,
+            _path=os.path.join(paths.PLOTS, save.get_module_name()),
+            _filename='plot_bar_high_time_res_' + str(_high_time_resolution) + '_' + _name
         )
 
 
