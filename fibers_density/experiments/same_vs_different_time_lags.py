@@ -246,7 +246,7 @@ def main(_band=True, _high_time_resolution=False):
                     },
                     marker={
                         'size': 10,
-                        'color': '#844b00'
+                        'color': '#ea8500'
                     },
                     showlegend=False
                 ) for _y, _time_lag in zip(_arrays, TIME_LAGS)
@@ -281,7 +281,7 @@ def main(_band=True, _high_time_resolution=False):
                 x=np.array(TIME_LAGS) * TIME_RESOLUTION[_high_time_resolution],
                 y=np.array(_sums) / sum(_sums),
                 marker={
-                    'color': '#844b00'
+                    'color': '#ea8500'
                 }
             ),
             layout={
