@@ -122,7 +122,7 @@ def compute_fibers_densities(_band=True, _high_time_resolution=False):
         # time lag
         _same_highest_correlation = -1.1
         _same_highest_correlation_time_lag_index = 0
-        for _time_lag_index, _time_lag in enumerate(TIME_LAGS):
+        for _time_lag_index, _time_lag in enumerate(TIME_LAGS[_high_time_resolution]):
             if _time_lag > 0:
                 _same_left_cell_fibers_densities_time_lag = _same_left_cell_fibers_densities[:-_time_lag]
                 _same_right_cell_fibers_densities_time_lag = _same_right_cell_fibers_densities[_time_lag:]
