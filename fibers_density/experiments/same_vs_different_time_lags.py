@@ -87,6 +87,7 @@ def compute_fibers_densities(_band=True, _high_time_resolution=False):
         for _key in _rois_dictionary
     }
 
+    _same_correlation_vs_time_lag = {}
     _same_time_lags_arrays = [[] for _i in TIME_LAGS[_high_time_resolution]]
     _different_time_lags_arrays = [[] for _i in TIME_LAGS[_high_time_resolution]]
     _same_time_lags_highest = [0 for _i in TIME_LAGS[_high_time_resolution]]
@@ -122,6 +123,7 @@ def compute_fibers_densities(_band=True, _high_time_resolution=False):
         # time lag
         _same_highest_correlation = -1.1
         _same_highest_correlation_time_lag_index = 0
+        _same_correlation_vs_time_lag[_same_tuple] = []
         for _time_lag_index, _time_lag in enumerate(TIME_LAGS[_high_time_resolution]):
             if _time_lag > 0:
                 _same_left_cell_fibers_densities_time_lag = _same_left_cell_fibers_densities[:-_time_lag]
@@ -141,6 +143,7 @@ def compute_fibers_densities(_band=True, _high_time_resolution=False):
             # ignore small arrays
             if len(_same_left_cell_fibers_densities_filtered) < \
                     MINIMUM_CORRELATION_TIME_POINTS[_same_experiment]:
+                _same_correlation_vs_time_lag[_same_tuple].append(None)
                 continue
 
             _same_correlation = compute_lib.correlation(
@@ -149,6 +152,7 @@ def compute_fibers_densities(_band=True, _high_time_resolution=False):
             )
 
             _same_time_lags_arrays[_time_lag_index].append(_same_correlation)
+            _same_correlation_vs_time_lag[_same_tuple].append(_same_correlation)
 
             if _same_correlation > _same_highest_correlation:
                 _same_highest_correlation = _same_correlation
@@ -229,12 +233,49 @@ def compute_fibers_densities(_band=True, _high_time_resolution=False):
 
                     _different_time_lags_highest[_different_highest_correlation_time_lag_index] += 1
 
-    return _same_time_lags_arrays, _different_time_lags_arrays, _same_time_lags_highest, _different_time_lags_highest
+    return _same_correlation_vs_time_lag, _same_time_lags_arrays, _different_time_lags_arrays, \
+        _same_time_lags_highest, _different_time_lags_highest
 
 
 def main(_band=True, _high_time_resolution=False):
-    _same_time_lags_arrays, _different_time_lags_arrays, _same_time_lags_highest, _different_time_lags_highest = \
-        compute_fibers_densities(_band, _high_time_resolution)
+    _same_correlation_vs_time_lag, _same_time_lags_arrays, _different_time_lags_arrays, _same_time_lags_highest, \
+        _different_time_lags_highest = compute_fibers_densities(_band, _high_time_resolution)
+
+    # individual plots
+    for _same_tuple in _same_correlation_vs_time_lag:
+        _experiment, _series_id, _group = _same_tuple
+        _fig = go.Figure(
+            data=go.Scatter(
+                x=np.array(TIME_LAGS[_high_time_resolution]) * TIME_RESOLUTION[_high_time_resolution],
+                y=_same_correlation_vs_time_lag[_same_tuple],
+                mode='markers',
+                marker={
+                    'size': 25,
+                    'color': '#ea8500'
+                }
+            ),
+            layout={
+                'xaxis': {
+                    'title': 'Time lag (minutes)',
+                    'zeroline': False,
+                    'tickmode': 'array',
+                    'tickvals': np.array(TIME_LAGS[_high_time_resolution]) * TIME_RESOLUTION[_high_time_resolution]
+                },
+                'yaxis': {
+                    'title': 'Correlation',
+                    'range': [-1, 1.1],
+                    'zeroline': False,
+                    'tickmode': 'array',
+                    'tickvals': [-1, -0.5, 0, 0.5, 1]
+                }
+            }
+        )
+
+        save.to_html(
+            _fig=_fig,
+            _path=os.path.join(paths.PLOTS, save.get_module_name()),
+            _filename='plot_' + _experiment + '_' + str(_series_id) + '_' + _group
+        )
 
     # box plots
     for _name, _arrays in zip(['same', 'different'], [_same_time_lags_arrays, _different_time_lags_arrays]):
