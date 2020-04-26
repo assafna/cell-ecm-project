@@ -3,7 +3,6 @@ from itertools import product
 
 import numpy as np
 import plotly.graph_objs as go
-from scipy.stats import wilcoxon
 from tqdm import tqdm
 
 from libs import compute_lib
@@ -234,8 +233,6 @@ def main(_band=True, _high_time_resolution=False):
     _same_time_lags_arrays, _different_time_lags_arrays, _same_time_lags_highest, _different_time_lags_highest = \
         compute_fibers_densities(_band, _high_time_resolution)
 
-    _colors_array = ['#844b00', '#ea8500', '#edbc80', '#ea8500', '#844b00']
-
     # box plots
     for _name, _arrays in zip(['same', 'different'], [_same_time_lags_arrays, _different_time_lags_arrays]):
         _fig = go.Figure(
@@ -249,15 +246,17 @@ def main(_band=True, _high_time_resolution=False):
                     },
                     marker={
                         'size': 10,
-                        'color': _color
+                        'color': '#844b00'
                     },
                     showlegend=False
-                ) for _y, _time_lag, _color in zip(_arrays, TIME_LAGS, _colors_array)
+                ) for _y, _time_lag in zip(_arrays, TIME_LAGS)
             ],
             layout={
                 'xaxis': {
                     'title': 'Time lag (minutes)',
-                    'zeroline': False
+                    'zeroline': False,
+                    'tickmode': 'array',
+                    'tickvals': np.array(TIME_LAGS) * TIME_RESOLUTION[_high_time_resolution]
                 },
                 'yaxis': {
                     'title': _name.capitalize() + ' network correlations',
@@ -282,13 +281,15 @@ def main(_band=True, _high_time_resolution=False):
                 x=np.array(TIME_LAGS) * TIME_RESOLUTION[_high_time_resolution],
                 y=np.array(_sums) / sum(_sums),
                 marker={
-                    'color': _colors_array
+                    'color': '#844b00'
                 }
             ),
             layout={
                 'xaxis': {
                     'title': 'Time lag (minutes)',
-                    'zeroline': False
+                    'zeroline': False,
+                    'tickmode': 'array',
+                    'tickvals': np.array(TIME_LAGS) * TIME_RESOLUTION[_high_time_resolution]
                 },
                 'yaxis': {
                     'title': 'Highest correlations fraction',
