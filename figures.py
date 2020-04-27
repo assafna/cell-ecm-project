@@ -102,6 +102,9 @@ def figure_4():
     fibers_density.experiments.same_vs_different.main(_band=False, _high_time_resolution=False)
 
     print('?')
+    fibers_density.experiments.fibers_vs_time.compute_tuples([('SN16', 3, 'cells_0_1')])
+
+    print('?')
     fibers_density.experiments.same_vs_different_compare.main(_high_time_resolution=False)
 
 
@@ -120,6 +123,11 @@ def figure_si_4_single_cell_detrending():
 def figure_si_4_temporal_assessment():
     print('?')
     fibers_density.experiments.same_vs_different_temporal_reduction.main()
+
+
+def figure_5():
+    print('Panel B-i')
+    fibers_density.experiments.fibers_vs_offsets_in_axes.main()
 
 
 if __name__ == '__main__':
