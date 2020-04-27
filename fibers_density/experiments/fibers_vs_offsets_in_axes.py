@@ -111,8 +111,7 @@ def main():
     _arguments = []
     for (_offset_y_index, _offset_y), (_offset_z_index, _offset_z) in \
             product(enumerate(_offsets_y), enumerate(_offsets_z)):
-        _arguments.append(
-            (_offset_y_index, _offset_y, _offset_z_index, _offset_z))
+        _arguments.append((_offset_y_index, _offset_y, _offset_z_index, _offset_z))
 
     _z_array = np.zeros(shape=(len(_offsets_y), len(_offsets_z)))
     with Pool(CPUS_TO_USE) as _p:
@@ -123,6 +122,7 @@ def main():
         _p.close()
         _p.join()
 
+    # plot
     _fig = go.Figure(
         data=go.Heatmap(
             x=_offsets_z,
