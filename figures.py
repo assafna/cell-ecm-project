@@ -105,7 +105,7 @@ def figure_4():
     fibers_density.experiments.fibers_vs_time.compute_tuples([('SN16', 3, 'cells_0_1')])
 
     print('?')
-    fibers_density.experiments.same_vs_different_compare.main(_high_time_resolution=False)
+    fibers_density.experiments.same_vs_different_band_vs_no_band.main(_high_time_resolution=False)
 
 
 def figure_si_4_low_connectivity():
