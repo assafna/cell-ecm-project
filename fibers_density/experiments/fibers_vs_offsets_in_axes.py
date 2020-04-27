@@ -20,8 +20,8 @@ REAL_CELLS = True
 STATIC = False
 BAND = True
 OFFSET_X = 0
-OFFSET_Y_START = -2.3
-OFFSET_Y_END = 3.9
+OFFSET_Y_START = -1.1
+OFFSET_Y_END = 2.6
 OFFSET_Y_STEP = 0.1
 OFFSET_Z_START = -5
 OFFSET_Z_END = 5
@@ -123,12 +123,19 @@ def main():
         _p.join()
 
     # plot
+    _colors_array = ['white', '#ea8500']
     _fig = go.Figure(
         data=go.Heatmap(
             x=_offsets_z,
             y=_offsets_y,
             z=_z_array,
-            colorscale=sns.light_palette('orange').as_hex(),
+            colorscale=sns.color_palette(_colors_array).as_hex(),
+            colorbar={
+                'tickmode': 'array',
+                'tickvals': [-3, 2.5, 8],
+                'ticktext': ['-3', 'Z-score', '8'],
+                'tickangle': -90
+            },
             showscale=True,
             zmin=-3,
             zmax=8
@@ -136,11 +143,15 @@ def main():
         layout={
             'xaxis': {
                 'title': 'Offset in XY axis (cell diameter)',
-                'zeroline': False
+                'zeroline': False,
+                'tickmode': 'array',
+                'tickvals': [-4, -2, 0, 2, 4]
             },
             'yaxis': {
                 'title': 'Offset in Z axis (cell diameter)',
-                'zeroline': False
+                'zeroline': False,
+                'tickmode': 'array',
+                'tickvals': [-1, 0, 1, 2]
             }
         }
     )
