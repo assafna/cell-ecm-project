@@ -176,8 +176,19 @@ def compute_tuples(_tuples):
                 },
                 'yaxis': {
                     'title': 'Fibers density z-score',
-                    'zeroline': False
-                }
+                    'zeroline': False,
+                    'range': [-3, 8],
+                    'tickmode': 'array',
+                    'tickvals': [-3, 0, 3, 6]
+                },
+                'legend': {
+                    'xanchor': 'left',
+                    'x': 0.1,
+                    'yanchor': 'top',
+                    'bordercolor': 'black',
+                    'borderwidth': 2,
+                    'bgcolor': 'white'
+                },
             }
         )
 
