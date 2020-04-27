@@ -1,7 +1,7 @@
 import os
 
 import numpy as np
-from matplotlib import pyplot as plt
+import plotly.graph_objs as go
 from tqdm import tqdm
 
 from libs import compute_lib
@@ -79,6 +79,7 @@ def compute_tuples(_tuples):
         for _key in _rois_dictionary
     }
 
+    _tuples_data = []
     for _tuple in tqdm(_tuples, desc='Main loop'):
         _experiment, _series_id, _group = _tuple
 
@@ -137,26 +138,57 @@ def compute_tuples(_tuples):
                 compute_lib.derivative(_right_cell_fibers_densities_normalized, _n=1)
             )
 
-        _plot_dir_path = os.path.join(paths.PLOTS, save.get_module_name())
-        os.makedirs(_plot_dir_path, exist_ok=True)
-        _plot_filename = \
-            'plot_' + _experiment + '_' + str(_series_id) + '_' + _group + '_offset_y_' + str(OFFSET_Y) + '.png'
-        _plot_path = os.path.join(_plot_dir_path, _plot_filename)
+        _tuples_data.append([
+            _tuple,
+            _start_time_point,
+            (
+                _left_cell_fibers_densities_normalized,
+                _right_cell_fibers_densities_normalized,
+                _middle_fibers_densities_normalized
+            ),
+            _correlation
+        ])
 
-        _x = np.arange(
-            start=_start_time_point,
-            stop=_start_time_point + len(_left_cell_fibers_densities_filtered) - DERIVATIVE,
-            step=1) * TIME_RESOLUTION
-        plt.clf()
-        plt.plot(_x, _left_cell_fibers_densities_normalized)
-        plt.plot(_x, _right_cell_fibers_densities_normalized)
-        plt.plot(_x, _middle_fibers_densities_normalized)
-        plt.legend(['Left cell', 'Right cell', 'Middle'])
-        plt.xlabel('Time (minutes)')
-        plt.ylabel('Z-score')
-        plt.title(_experiment + ' - ' + str(_series_id) + ' - ' + _group + ' - Z: ' + str(OFFSET_Y) + ', Cor: ' +
-                  str(round(_correlation, 2)))
-        plt.savefig(_plot_path)
+    # plots
+    _names_array = ['Left cell', 'Right cell', 'Middle']
+    _colors_array = ['#844b00', '#ea8500', '#edbc80']
+    for _tuple_data in _tuples_data:
+        _tuple, _start_time_point, _y_arrays, _correlation = _tuple_data
+        _fig = go.Figure(
+            data=[
+                go.Scatter(
+                    x=np.arange(
+                        start=_start_time_point,
+                        stop=_start_time_point + len(_y_arrays[0]) - DERIVATIVE,
+                        step=1) * TIME_RESOLUTION,
+                    y=_y,
+                    name=_name,
+                    mode='lines',
+                    line={
+                        'color': _color
+                    }
+                ) for _y, _name, _color in zip(_y_arrays, _names_array, _colors_array)
+            ],
+            layout={
+                'xaxis': {
+                    'title': 'Time (minutes)',
+                    'zeroline': False
+                },
+                'yaxis': {
+                    'title': 'Fibers density z-score',
+                    'zeroline': False
+                }
+            }
+        )
+
+        _experiment, _series_id, _group = _tuple
+        save.to_html(
+            _fig=_fig,
+            _path=os.path.join(paths.PLOTS, save.get_module_name()),
+            _filename='plot_' + _experiment + '_' + str(_series_id) + '_' + _group
+        )
+
+        print('Tuple:', _tuple, 'Correlation:', _correlation)
 
 
 def main():
