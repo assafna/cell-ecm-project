@@ -48,3 +48,20 @@ def by_single_cell_id(_experiments_tuples):
             _tuples_by_single_cell_id[_new_tuple] = [_tuple]
 
     return _tuples_by_single_cell_id
+
+
+def by_matched_real_and_fake(_experiments_tuples):
+    _experiments_matched = []
+    for _tuple in _experiments_tuples:
+        _experiment, _series_id, _group = _tuple
+        _type, _cell_1_id, _cell_2_id = _group.split('_')
+
+        if _type != 'cells':
+            continue
+
+        _fake_group = 'fake_' + _cell_1_id + '_' + _cell_2_id
+        _fake_tuple = (_experiment, _series_id, _fake_group)
+        if _fake_tuple in _experiments_tuples:
+            _experiments_matched.append((_tuple, _fake_tuple))
+
+    return _experiments_matched
