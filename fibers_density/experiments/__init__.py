@@ -4,7 +4,7 @@ from fibers_density.experiments import fibers_vs_distance_multiple_cell_distance
     correlations_by_derivatives_pairs, stationary_vs_fibers_derivatives_single_cells, \
     correlations_by_derivatives_single_cells, same_vs_different_triplets, same_vs_different_distances, \
     same_vs_different_temporal_reduction, same_vs_different_triplet, same_vs_different_compare, fibers_vs_time, \
-    fibers_vs_offsets_in_axes
+    fibers_vs_offsets_in_axes, fibers_vs_same_vs_different_offsets_in_axes
 
 __all__ = [
     fibers_vs_distance_multiple_cell_distances,
@@ -23,5 +23,6 @@ __all__ = [
     same_vs_different_temporal_reduction,
     same_vs_different_compare,
     fibers_vs_time,
-    fibers_vs_offsets_in_axes
+    fibers_vs_offsets_in_axes,
+    fibers_vs_same_vs_different_offsets_in_axes
 ]

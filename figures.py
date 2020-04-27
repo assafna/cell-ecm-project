@@ -130,6 +130,11 @@ def figure_5():
     fibers_density.experiments.fibers_vs_offsets_in_axes.main()
 
 
+def figure_si_5():
+    print('?')
+    fibers_density.experiments.fibers_vs_same_vs_different_offsets_in_axes.main()
+
+
 if __name__ == '__main__':
     print('Figure 1')
     figure_1()
@@ -166,3 +171,9 @@ if __name__ == '__main__':
 
     print('Figure SI 4 - Single Cell Detrending')
     figure_si_4_single_cell_detrending()
+
+    print('Figure 5')
+    figure_5()
+
+    print('Figure SI 5 - ?')
+    figure_si_5()
