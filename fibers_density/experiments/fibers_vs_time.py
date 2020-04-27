@@ -18,12 +18,9 @@ OFFSET_Z = 0
 DERIVATIVE = 0
 
 
-def main():
-    _experiments = load.experiments_groups_as_tuples(EXPERIMENTS)
-    print('Total experiments:', len(_experiments))
-
+def compute_tuples(_tuples):
     _arguments = []
-    for _tuple in _experiments:
+    for _tuple in _tuples:
         _experiment, _series_id, _group = _tuple
 
         # stop when windows are overlapping
@@ -82,7 +79,7 @@ def main():
         for _key in _rois_dictionary
     }
 
-    for _tuple in tqdm(_experiments, desc='Main loop'):
+    for _tuple in tqdm(_tuples, desc='Main loop'):
         _experiment, _series_id, _group = _tuple
 
         _left_cell_fibers_densities = \
@@ -160,6 +157,13 @@ def main():
         plt.title(_experiment + ' - ' + str(_series_id) + ' - ' + _group + ' - Z: ' + str(OFFSET_Y) + ', Cor: ' +
                   str(round(_correlation, 2)))
         plt.savefig(_plot_path)
+
+
+def main():
+    _experiments = load.experiments_groups_as_tuples(EXPERIMENTS)
+    print('Total experiments:', len(_experiments))
+
+    compute_tuples(_experiments)
 
 
 if __name__ == '__main__':
