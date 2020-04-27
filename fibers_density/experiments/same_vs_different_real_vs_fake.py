@@ -1,13 +1,17 @@
+import os
 from itertools import product
 
+import plotly.graph_objs as go
 from scipy.stats import wilcoxon
 from tqdm import tqdm
 
 from libs import compute_lib
-from libs.experiments import load, filtering, compute, organize
+from libs.experiments import load, filtering, compute, organize, paths
 from libs.experiments.config import ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT
 
 # based on time resolution
+from plotting import save
+
 EXPERIMENTS = {
     False: ['SN16'],
     True: ['SN41']
@@ -216,6 +220,38 @@ def main(_offset_y=0.5, _high_time_resolution=False):
     print('Total points:', len(_distances_from_y_equal_x[0]))
     print('Wilcoxon between real points and fake points distances from y = x:')
     print(wilcoxon(_distances_from_y_equal_x[0], _distances_from_y_equal_x[1]))
+
+    # plot
+    _colors_array = ['#844b00', '#edbc80']
+    _fig = go.Figure(
+        data=[
+            go.Box(
+                y=_y_array,
+                name=_real_pairs,
+                boxpoints=False,
+                line={
+                    'width': 1
+                },
+                showlegend=False
+            ) for _y_array, _real_pairs, _color in zip(_distances_from_y_equal_x, [True, False], _colors_array)
+        ],
+        layout={
+            'xaxis': {
+                'title': 'Real pairs',
+                'zeroline': False
+            },
+            'yaxis': {
+                'title': 'Distance from y = x',
+                'zeroline': False
+            }
+        }
+    )
+
+    save.to_html(
+        _fig=_fig,
+        _path=os.path.join(paths.PLOTS, save.get_module_name()),
+        _filename='plot_high_time_res_' + str(_high_time_resolution) + '_offset_y_' + str(_offset_y)
+    )
 
 
 if __name__ == '__main__':
