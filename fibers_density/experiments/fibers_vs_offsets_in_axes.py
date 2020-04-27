@@ -62,7 +62,7 @@ def compute_data(_arguments):
         return _offset_y_index, _offset_z_index, None
 
 
-def main():
+def compute_z_array():
     global _experiments, _experiments_fibers_densities, _z_array
 
     _experiments = load.experiments_groups_as_tuples(EXPERIMENTS)
@@ -95,7 +95,7 @@ def main():
                 'time_point': TIME_POINT - 1
             })
 
-    _rois_dictionary, _rois_to_compute =\
+    _rois_dictionary, _rois_to_compute = \
         compute.rois(_arguments, _keys=['experiment', 'series_id', 'group', 'offset_y', 'offset_z', 'cell_id'])
     _fibers_densities = compute.fibers_densities(_rois_to_compute)
 
@@ -122,7 +122,17 @@ def main():
         _p.close()
         _p.join()
 
+    return _z_array
+
+
+def main():
+    global _experiments, _experiments_fibers_densities, _z_array
+
+    compute_z_array()
+
     # plot
+    _offsets_y = np.arange(start=OFFSET_Y_START, stop=OFFSET_Y_END + OFFSET_Y_STEP, step=OFFSET_Y_STEP)
+    _offsets_z = np.arange(start=OFFSET_Z_START, stop=OFFSET_Z_END + OFFSET_Z_STEP, step=OFFSET_Z_STEP)
     _colors_array = ['white', '#ea8500']
     _fig = go.Figure(
         data=go.Heatmap(
