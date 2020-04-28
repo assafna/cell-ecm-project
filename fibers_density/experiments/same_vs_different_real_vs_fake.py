@@ -222,7 +222,7 @@ def main(_offset_y=0.5, _high_time_resolution=False):
     print(wilcoxon(_distances_from_y_equal_x[0], _distances_from_y_equal_x[1]))
 
     # plot
-    _colors_array = ['#844b00', '#edbc80']
+    _colors_array = ['#844b00', '#ea8500']
     _fig = go.Figure(
         data=[
             go.Box(
@@ -231,6 +231,9 @@ def main(_offset_y=0.5, _high_time_resolution=False):
                 boxpoints=False,
                 line={
                     'width': 1
+                },
+                marker={
+                    'color': _color
                 },
                 showlegend=False
             ) for _y_array, _real_pairs, _color in zip(_distances_from_y_equal_x, [True, False], _colors_array)
@@ -243,7 +246,7 @@ def main(_offset_y=0.5, _high_time_resolution=False):
             'yaxis': {
                 'title': 'Distance from y = x',
                 'zeroline': False,
-                'range': [-1, 1],
+                'range': [-1, 1.1],
                 'tickmode': 'array',
                 'tickvals': [-1, -0.5, 0, 0.5, 1]
             }
