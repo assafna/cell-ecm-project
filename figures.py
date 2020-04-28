@@ -135,6 +135,20 @@ def figure_si_5():
     fibers_density.experiments.fibers_vs_same_vs_different_offsets_in_axes.main()
 
 
+def figure_si_5_real_vs_fake():
+    print('?')
+    fibers_density.experiments.same_vs_different_real_vs_fake.main(_offset_y=0, _high_time_resolution=False)
+
+    print('?')
+    fibers_density.experiments.same_vs_different_real_vs_fake.main(_offset_y=0.5, _high_time_resolution=False)
+
+    print('?')
+    fibers_density.experiments.same_vs_different_real_vs_fake.main(_offset_y=0, _high_time_resolution=True)
+
+    print('?')
+    fibers_density.experiments.same_vs_different_real_vs_fake.main(_offset_y=0.5, _high_time_resolution=True)
+
+
 if __name__ == '__main__':
     print('Figure 1')
     figure_1()
