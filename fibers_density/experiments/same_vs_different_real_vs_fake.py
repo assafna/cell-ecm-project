@@ -242,7 +242,9 @@ def main(_offset_y=0.5, _high_time_resolution=False):
             },
             'yaxis': {
                 'title': 'Distance from y = x',
-                'zeroline': False
+                'zeroline': False,
+                'tickmode': 'array',
+                'tickvals': [-1, -0.5, 0, 0.5, 1]
             }
         }
     )
