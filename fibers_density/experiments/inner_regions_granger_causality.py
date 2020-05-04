@@ -1,5 +1,8 @@
+import warnings
+
+from statsmodels.tools.sm_exceptions import InterpolationWarning
 from statsmodels.tsa.api import VAR
-from statsmodels.tsa.stattools import grangercausalitytests, adfuller
+from statsmodels.tsa.stattools import grangercausalitytests, adfuller, kpss
 
 from libs import compute_lib
 from libs.experiments import load, filtering, compute
@@ -23,6 +26,10 @@ REAL_CELLS = True
 STATIC = False
 DIRECTION = 'inside'
 MINIMUM_TIME_POINTS = 30
+
+# stationary tests
+ADF_TEST = True
+KPSS_TEST = True
 
 
 def main(_band=True, _high_time_resolution=True):
@@ -94,22 +101,35 @@ def main(_band=True, _high_time_resolution=True):
             continue
 
         # stationary test
-        _left_cell_fibers_densities_derivative = None
-        _right_cell_fibers_densities_derivative = None
-        _derivative = None
-        for _derivative in range(10):
-            _left_cell_fibers_densities_derivative = \
-                compute_lib.derivative(_left_cell_fibers_densities_filtered, _n=_derivative)
-            _, _adf_p_value, _, _, _, _ = adfuller(_left_cell_fibers_densities_derivative)
-            if _adf_p_value > 0.05:
-                continue
-            _right_cell_fibers_densities_derivative = \
-                compute_lib.derivative(_right_cell_fibers_densities_filtered, _n=_derivative)
-            _, _adf_p_value, _, _, _, _ = adfuller(_right_cell_fibers_densities_derivative)
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', category=InterpolationWarning)
+            _left_cell_fibers_densities_derivative = None
+            _right_cell_fibers_densities_derivative = None
+            _derivative = None
+            _stationary = False
+            for _derivative in range(10):
+                _left_cell_fibers_densities_derivative = \
+                    compute_lib.derivative(_left_cell_fibers_densities_filtered, _n=_derivative)
+                if ADF_TEST:
+                    _, _adf_p_value, _, _, _, _ = adfuller(_left_cell_fibers_densities_derivative)
+                if KPSS_TEST:
+                    _, _kpss_p_value, _, _ = kpss(_left_cell_fibers_densities_derivative, nlags='legacy')
+                if (ADF_TEST and _adf_p_value > 0.05) or (KPSS_TEST and _kpss_p_value < 0.05):
+                    continue
+                _right_cell_fibers_densities_derivative = \
+                    compute_lib.derivative(_right_cell_fibers_densities_filtered, _n=_derivative)
+                if ADF_TEST:
+                    _, _adf_p_value, _, _, _, _ = adfuller(_right_cell_fibers_densities_derivative)
+                if KPSS_TEST:
+                    _, _kpss_p_value, _, _ = kpss(_right_cell_fibers_densities_derivative, nlags='legacy')
 
-            # both are stationary
-            if _adf_p_value < 0.05:
-                break
+                # both are stationary
+                if (ADF_TEST and _adf_p_value < 0.05) and (KPSS_TEST and _kpss_p_value > 0.05):
+                    _stationary = True
+                    break
+
+        if not _stationary:
+            continue
 
         # causality
         try:
@@ -141,7 +161,7 @@ def main(_band=True, _high_time_resolution=True):
 
                     if _f_test_p_value < 0.05:
                         print(_tuple, _causality[0].capitalize() + ' causality ' + _causality[1] + '!',
-                              'time-points:' + str(len(_left_cell_fibers_densities_derivative)),
+                              'time-points: ' + str(len(_left_cell_fibers_densities_derivative)),
                               'stationary derivative: ' + str(_derivative),
                               'p-value: ' + str(round(_f_test_p_value, 4)),
                               'lag: ' + str(_min_estimator_lag), sep='\t')
