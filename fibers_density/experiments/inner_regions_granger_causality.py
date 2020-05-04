@@ -8,7 +8,7 @@ from libs.experiments.config import ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT
 # based on time resolution
 EXPERIMENTS = {
     False: ['SN16'],
-    True: ['SN41']
+    True: ['SN41', 'SN44']
 }
 TIME_RESOLUTION = {
     False: 15,
@@ -141,6 +141,7 @@ def main(_band=True, _high_time_resolution=True):
 
                     if _f_test_p_value < 0.05:
                         print(_tuple, _causality[0].capitalize() + ' causality ' + _causality[1] + '!',
+                              'time-points:' + str(len(_left_cell_fibers_densities_derivative)),
                               'stationary derivative: ' + str(_derivative),
                               'p-value: ' + str(round(_f_test_p_value, 4)),
                               'lag: ' + str(_min_estimator_lag), sep='\t')
