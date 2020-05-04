@@ -11,11 +11,7 @@ from libs.experiments.config import ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT
 # based on time resolution
 EXPERIMENTS = {
     False: ['SN16'],
-    True: ['SN41', 'SN44']
-}
-TIME_RESOLUTION = {
-    False: 15,
-    True: 5
+    True: ['SN41', 'SN44', 'SN45']
 }
 OFFSET_X = 0
 # TODO: set the offset in y according to the angle in the original Z slices of the cells
