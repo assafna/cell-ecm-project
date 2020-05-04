@@ -40,24 +40,89 @@ def remove_from_blacklist(_experiment, _series_id, _cell_id, _time_point_start, 
 
 
 if __name__ == '__main__':
-    add_to_blacklist(_experiment='SN41',
-                     _series_id=6,
-                     _cell_id=2,
-                     _time_point_start=151,
-                     _time_point_end=245,
-                     _reason='Cell expands'
-                     )
-    add_to_blacklist(_experiment='SN41',
-                     _series_id=6,
-                     _cell_id=2,
-                     _time_point_start=151,
-                     _time_point_end=245,
-                     _reason='Cell attaches to another cell'
-                     )
-    add_to_blacklist(_experiment='SN41',
-                     _series_id=9,
-                     _cell_id=0,
-                     _time_point_start=151,
-                     _time_point_end=245,
-                     _reason='Cell expands'
-                     )
+    for _cell_id in [0, 1, 2, 3]:
+        add_to_blacklist(
+            _experiment='SN44',
+            _series_id=2,
+            _cell_id=_cell_id,
+            _time_point_start=1,
+            _time_point_end=40,
+            _reason='Light wave'
+        )
+
+    for _cell_id in [0, 1, 2, 3, 4]:
+        add_to_blacklist(
+            _experiment='SN44',
+            _series_id=3,
+            _cell_id=_cell_id,
+            _time_point_start=1,
+            _time_point_end=115,
+            _reason='Light wave'
+        )
+
+    for _cell_id in [0, 1, 2]:
+        add_to_blacklist(
+            _experiment='SN44',
+            _series_id=4,
+            _cell_id=_cell_id,
+            _time_point_start=9,
+            _time_point_end=11,
+            _reason='Light wave'
+        )
+
+    for _cell_id in [0, 1, 2, 3]:
+        add_to_blacklist(
+            _experiment='SN44',
+            _series_id=5,
+            _cell_id=_cell_id,
+            _time_point_start=8,
+            _time_point_end=10,
+            _reason='Light wave'
+        )
+
+    for _cell_id in [1, 3, 4, 6]:
+        add_to_blacklist(
+            _experiment='SN44',
+            _series_id=6,
+            _cell_id=_cell_id,
+            _time_point_start=24,
+            _time_point_end=27,
+            _reason='Light wave'
+        )
+        add_to_blacklist(
+            _experiment='SN44',
+            _series_id=6,
+            _cell_id=_cell_id,
+            _time_point_start=31,
+            _time_point_end=33,
+            _reason='Light wave'
+        )
+
+    for _cell_id in [0, 1, 2, 3]:
+        add_to_blacklist(
+            _experiment='SN44',
+            _series_id=7,
+            _cell_id=_cell_id,
+            _time_point_start=27,
+            _time_point_end=27,
+            _reason='Light wave'
+        )
+
+    add_to_blacklist(
+        _experiment='SN44',
+        _series_id=7,
+        _cell_id=3,
+        _time_point_start=111,
+        _time_point_end=247,
+        _reason='Cell expands'
+    )
+
+    for _cell_id in [0, 1, 2, 3]:
+        add_to_blacklist(
+            _experiment='SN44',
+            _series_id=8,
+            _cell_id=_cell_id,
+            _time_point_start=27,
+            _time_point_end=27,
+            _reason='Light wave'
+        )
