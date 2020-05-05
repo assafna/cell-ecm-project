@@ -13,7 +13,7 @@ from plotting import save
 # based on time resolution
 EXPERIMENTS = {
     False: ['SN16'],
-    True: ['SN41']
+    True: ['SN41', 'SN44', 'SN45']
 }
 TIME_RESOLUTION = {
     False: 15,
@@ -31,8 +31,9 @@ DIRECTION = 'inside'
 MINIMUM_CORRELATION_TIME_POINTS = {
     'SN16': 10,
     'SN18': 10,
-    'SN41': 40,
-    'SN44': 40
+    'SN41': 30,
+    'SN44': 30,
+    'SN45': 30
 }
 TIME_LAGS = {
     False: [-2, -1, 0, 1, 2],
