@@ -1,5 +1,6 @@
 import warnings
 
+from statsmodels.stats.stattools import durbin_watson
 from statsmodels.tools.sm_exceptions import InterpolationWarning
 from statsmodels.tsa.api import VAR
 from statsmodels.tsa.stattools import grangercausalitytests, adfuller, kpss
@@ -22,7 +23,7 @@ REAL_CELLS = True
 STATIC = False
 DIRECTION = 'inside'
 MINIMUM_TIME_POINTS = 30
-TIME_POINTS = 81
+TIME_POINTS = 80
 DERIVATIVE = 1
 MAXIMUM_LAG = 3
 
@@ -33,7 +34,7 @@ KPSS_TEST = True
 
 def main(_band=True, _high_time_resolution=True):
     _experiments = load.experiments_groups_as_tuples(EXPERIMENTS[_high_time_resolution])
-    _experiments = filtering.by_time_points_amount(_experiments, _time_points=TIME_POINTS)
+    # _experiments = filtering.by_time_points_amount(_experiments, _time_points=TIME_POINTS)
     _experiments = filtering.by_distance_range(_experiments, _distance_range=CELLS_DISTANCE_RANGE)
     _experiments = filtering.by_real_cells(_experiments, _real_cells=REAL_CELLS)
     _experiments = filtering.by_static_cells(_experiments, _static=STATIC)
@@ -145,6 +146,9 @@ def main(_band=True, _high_time_resolution=True):
                 # found a lag
                 if 0 < _min_estimator_lag <= MAXIMUM_LAG:
 
+                    _var_model_results = _var_model.fit()
+                    # print(durbin_watson(_var_model_results.resid))
+
                     # granger causality
                     _granger_causality_results = grangercausalitytests(x=_x, maxlag=_min_estimator_lag, verbose=False)
                     _f_test_p_value = _granger_causality_results[_min_estimator_lag][0]['ssr_ftest'][1]
@@ -154,6 +158,8 @@ def main(_band=True, _high_time_resolution=True):
                               'time-points: ' + str(len(_left_cell_fibers_densities_derivative)),
                               'p-value: ' + str(round(_f_test_p_value, 4)),
                               'lag: ' + str(_min_estimator_lag), sep='\t')
+                        print(_var_model_results.summary())
+                        print(_var_model_results.test_whiteness().summary())
 
         # not enough time points
         except ValueError:
