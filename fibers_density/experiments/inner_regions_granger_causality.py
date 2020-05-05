@@ -24,6 +24,7 @@ DIRECTION = 'inside'
 MINIMUM_TIME_POINTS = 30
 TIME_POINTS = 81
 DERIVATIVE = 1
+MAXIMUM_LAG = 3
 
 # stationary tests
 ADF_TEST = True
@@ -142,7 +143,7 @@ def main(_band=True, _high_time_resolution=True):
                 _min_estimator_lag = min(_estimators_lags)
 
                 # found a lag
-                if _min_estimator_lag > 0:
+                if 0 < _min_estimator_lag <= MAXIMUM_LAG:
 
                     # granger causality
                     _granger_causality_results = grangercausalitytests(x=_x, maxlag=_min_estimator_lag, verbose=False)
