@@ -22,6 +22,8 @@ REAL_CELLS = True
 STATIC = False
 DIRECTION = 'inside'
 MINIMUM_TIME_POINTS = 30
+TIME_POINTS = 81
+DERIVATIVE = 1
 
 # stationary tests
 ADF_TEST = True
@@ -30,8 +32,8 @@ KPSS_TEST = True
 
 def main(_band=True, _high_time_resolution=True):
     _experiments = load.experiments_groups_as_tuples(EXPERIMENTS[_high_time_resolution])
-    _experiments = filtering.by_time_points_amount(_experiments, MINIMUM_TIME_POINTS)
-    _experiments = filtering.by_distance_range(_experiments, CELLS_DISTANCE_RANGE)
+    _experiments = filtering.by_time_points_amount(_experiments, _time_points=TIME_POINTS)
+    _experiments = filtering.by_distance_range(_experiments, _distance_range=CELLS_DISTANCE_RANGE)
     _experiments = filtering.by_real_cells(_experiments, _real_cells=REAL_CELLS)
     _experiments = filtering.by_static_cells(_experiments, _static=STATIC)
     _experiments = filtering.by_band(_experiments, _band=_band)
@@ -79,8 +81,10 @@ def main(_band=True, _high_time_resolution=True):
     for _tuple in _experiments:
         _experiment, _series_id, _group = _tuple
 
-        _left_cell_fibers_densities = _experiments_fibers_densities[(_experiment, _series_id, _group, 'left_cell')]
-        _right_cell_fibers_densities = _experiments_fibers_densities[(_experiment, _series_id, _group, 'right_cell')]
+        _left_cell_fibers_densities = \
+            _experiments_fibers_densities[(_experiment, _series_id, _group, 'left_cell')][:TIME_POINTS]
+        _right_cell_fibers_densities = \
+            _experiments_fibers_densities[(_experiment, _series_id, _group, 'right_cell')][:TIME_POINTS]
 
         _properties = load.group_properties(_experiment, _series_id, _group)
         _left_cell_fibers_densities = compute.remove_blacklist(
@@ -99,33 +103,22 @@ def main(_band=True, _high_time_resolution=True):
         # stationary test
         with warnings.catch_warnings():
             warnings.simplefilter('ignore', category=InterpolationWarning)
-            _left_cell_fibers_densities_derivative = None
-            _right_cell_fibers_densities_derivative = None
-            _derivative = None
-            _stationary = False
-            for _derivative in range(10):
-                _left_cell_fibers_densities_derivative = \
-                    compute_lib.derivative(_left_cell_fibers_densities_filtered, _n=_derivative)
-                if ADF_TEST:
-                    _, _adf_p_value, _, _, _, _ = adfuller(_left_cell_fibers_densities_derivative)
-                if KPSS_TEST:
-                    _, _kpss_p_value, _, _ = kpss(_left_cell_fibers_densities_derivative, nlags='legacy')
-                if (ADF_TEST and _adf_p_value > 0.05) or (KPSS_TEST and _kpss_p_value < 0.05):
+            _left_cell_fibers_densities_derivative = \
+                compute_lib.derivative(_left_cell_fibers_densities_filtered, _n=DERIVATIVE)
+            _right_cell_fibers_densities_derivative = \
+                compute_lib.derivative(_right_cell_fibers_densities_filtered, _n=DERIVATIVE)
+
+            if ADF_TEST:
+                _, _left_cell_adf_p_value, _, _, _, _ = adfuller(_left_cell_fibers_densities_derivative)
+                _, _right_cell_adf_p_value, _, _, _, _ = adfuller(_right_cell_fibers_densities_derivative)
+                if _left_cell_adf_p_value > 0.05 or _right_cell_adf_p_value > 0.05:
                     continue
-                _right_cell_fibers_densities_derivative = \
-                    compute_lib.derivative(_right_cell_fibers_densities_filtered, _n=_derivative)
-                if ADF_TEST:
-                    _, _adf_p_value, _, _, _, _ = adfuller(_right_cell_fibers_densities_derivative)
-                if KPSS_TEST:
-                    _, _kpss_p_value, _, _ = kpss(_right_cell_fibers_densities_derivative, nlags='legacy')
 
-                # both are stationary
-                if (ADF_TEST and _adf_p_value < 0.05) and (KPSS_TEST and _kpss_p_value > 0.05):
-                    _stationary = True
-                    break
-
-        if not _stationary:
-            continue
+            if KPSS_TEST:
+                _, _left_cell_kpss_p_value, _, _ = kpss(_left_cell_fibers_densities_derivative, nlags='legacy')
+                _, _right_cell_kpss_p_value, _, _ = kpss(_right_cell_fibers_densities_derivative, nlags='legacy')
+                if _left_cell_kpss_p_value < 0.05 or _right_cell_kpss_p_value < 0.05:
+                    continue
 
         # causality
         try:
@@ -158,7 +151,6 @@ def main(_band=True, _high_time_resolution=True):
                     if _f_test_p_value < 0.05:
                         print(_tuple, _causality[0].capitalize() + ' causality ' + _causality[1] + '!',
                               'time-points: ' + str(len(_left_cell_fibers_densities_derivative)),
-                              'stationary derivative: ' + str(_derivative),
                               'p-value: ' + str(round(_f_test_p_value, 4)),
                               'lag: ' + str(_min_estimator_lag), sep='\t')
 
