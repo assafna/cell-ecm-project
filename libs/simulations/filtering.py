@@ -58,3 +58,53 @@ def by_categories(_simulations, _is_single_cell=None, _is_heterogeneity=None, _i
             (_is_causality is None or _is_causality == is_causality(_simulation)) and
             (_is_dominant_passive is None or _is_dominant_passive == is_dominant_passive(_simulation))
             ]
+
+
+def by_causality(_simulations, _alpha=None, _beta=None):
+    if _alpha is None and _beta is None:
+        return _simulations
+
+    _alpha_str = ''
+    if _alpha is not None:
+        if _alpha == 0:
+            _alpha_str = 'alpha_000'
+        elif _alpha == 0.25:
+            _alpha_str = 'alpha_025'
+        elif _alpha == 0.5:
+            _alpha_str = 'alpha_050'
+        elif _alpha == 0.75:
+            _alpha_str = 'alpha_075'
+        elif _alpha == 1:
+            _alpha_str = 'alpha_100'
+
+    _beta_str = ''
+    if _beta is not None:
+        if _beta == 1:
+            _beta_str = 'beta_100'
+        elif _beta == 1.05:
+            _beta_str = 'beta_105'
+        elif _beta == 1.1:
+            _beta_str = 'beta_110'
+        elif _beta == 1.2:
+            _beta_str = 'beta_120'
+
+    _simulations_filtered = []
+    for _simulation in _simulations:
+        if _alpha is not None:
+            if _alpha > 0:
+                if _beta is not None:
+                    if _alpha_str in _simulation and _beta_str in _simulation:
+                        _simulations_filtered.append(_simulation)
+                else:
+                    if _alpha_str in _simulation:
+                        _simulations_filtered.append(_simulation)
+            # alpha is 0, beta does not matter
+            else:
+                if _alpha_str in _simulation:
+                    _simulations_filtered.append(_simulation)
+        # alpha does not matter
+        else:
+            if _beta_str in _simulation:
+                _simulations_filtered.append(_simulation)
+
+    return _simulations_filtered
