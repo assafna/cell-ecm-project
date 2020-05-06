@@ -149,6 +149,11 @@ def figure_si_5_real_vs_fake():
     fibers_density.experiments.same_vs_different_real_vs_fake.main(_offset_y=0.5, _high_time_resolution=True)
 
 
+def figure_6():
+    print('Panel B')
+    fibers_density.simulations.same_vs_different_cross_correlation.main(_alpha=1, _beta=1, _low_connectivity=False)
+
+
 if __name__ == '__main__':
     print('Figure 1')
     figure_1()
@@ -191,3 +196,6 @@ if __name__ == '__main__':
 
     print('Figure SI 5 - ?')
     figure_si_5()
+
+    print('Figure 6')
+    figure_6()

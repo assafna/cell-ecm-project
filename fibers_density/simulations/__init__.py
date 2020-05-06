@@ -3,7 +3,8 @@ from fibers_density.simulations import fibers_vs_distance_multiple_cell_distance
     communicated_vs_non_communicated_cell_distances, fibers_vs_change, insides_vs_outsides_derivatives, \
     stationary_vs_fibers_derivatives_pairs, fibers_vs_time_derivatives, correlations_by_derivatives_pairs, \
     insides_vs_outsides_stds, stationary_vs_fibers_derivatives_single_cells, correlations_by_derivatives_single_cells, \
-    insides_vs_outsides_distances, insides_vs_outsides_offsets, same_vs_different_distances
+    insides_vs_outsides_distances, insides_vs_outsides_offsets, same_vs_different_distances, \
+    same_vs_different_cross_correlation
 
 __all__ = [
     fibers_vs_distance_multiple_cell_distances,
@@ -22,5 +23,6 @@ __all__ = [
     insides_vs_outsides_stds,
     insides_vs_outsides_distances,
     insides_vs_outsides_offsets,
-    same_vs_different_distances
+    same_vs_different_distances,
+    same_vs_different_cross_correlation
 ]
