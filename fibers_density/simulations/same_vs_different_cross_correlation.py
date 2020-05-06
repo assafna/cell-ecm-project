@@ -4,7 +4,6 @@ from multiprocessing.pool import Pool
 
 import numpy as np
 import plotly.graph_objs as go
-from scipy.stats import wilcoxon
 from tqdm import tqdm
 
 from libs import compute_lib
@@ -22,12 +21,10 @@ OFFSET_X = 0
 OFFSET_Y = 0
 DERIVATIVE = 2
 CELLS_DISTANCE = 7
-ALPHA = 1
-BETA = 1
 TIME_LAGS = [-2, -1, 0, 1, 2]
 
 
-def compute_fibers_densities(_low_connectivity=False):
+def compute_fibers_densities(_alpha=1, _beta=1, _low_connectivity=False):
     _simulations = load.structured()
     _simulations = filtering.by_time_points_amount(_simulations, TIME_POINT[_low_connectivity])
     _simulations = filtering.by_categories(
@@ -38,7 +35,7 @@ def compute_fibers_densities(_low_connectivity=False):
         _is_causality=True,
         _is_dominant_passive=False
     )
-    _simulations = filtering.by_causality(_simulations, _alpha=ALPHA, _beta=BETA)
+    _simulations = filtering.by_causality(_simulations, _alpha=_alpha, _beta=_beta)
     _simulations = filtering.by_distance(_simulations, _distance=CELLS_DISTANCE)
     print('Total simulations:', len(_simulations))
 
@@ -146,7 +143,7 @@ def compute_fibers_densities(_low_connectivity=False):
         _same_time_lags_highest, _different_time_lags_highest
 
 
-def main(_low_connectivity=False):
+def main(_alpha=1, _beta=1, _low_connectivity=False):
     _same_correlation_vs_time_lag, _same_time_lags_arrays, _different_time_lags_arrays, _same_time_lags_highest, \
         _different_time_lags_highest = compute_fibers_densities(_low_connectivity)
 
@@ -223,7 +220,8 @@ def main(_low_connectivity=False):
         save.to_html(
             _fig=_fig,
             _path=os.path.join(paths.PLOTS, save.get_module_name()),
-            _filename='plot_box_low_con_' + str(_low_connectivity) + '_' + _name
+            _filename='plot_box_alpha_' + str(_alpha) + '_beta_' + str(_beta) + '_low_con_' + str(_low_connectivity) +
+                      '_' + _name
         )
 
     # bar plot
@@ -256,7 +254,8 @@ def main(_low_connectivity=False):
         save.to_html(
             _fig=_fig,
             _path=os.path.join(paths.PLOTS, save.get_module_name()),
-            _filename='plot_bar_low_con_' + str(_low_connectivity) + '_' + _name
+            _filename='plot_bar_alpha_' + str(_alpha) + '_beta_' + str(_beta) + '_low_con_' + str(_low_connectivity) +
+                      '_' + _name
         )
 
 
