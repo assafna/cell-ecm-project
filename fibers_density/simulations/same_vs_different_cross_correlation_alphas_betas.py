@@ -75,7 +75,8 @@ def main(_type='alpha', _low_connectivity=False):
                     'title': _type.capitalize(),
                     'zeroline': False,
                     'tickmode': 'array',
-                    'tickvals': _names
+                    'tickvals': _names,
+                    'type': 'category'
                 },
                 'yaxis': {
                     'title': _name.capitalize() + ' network correlations',
@@ -108,10 +109,11 @@ def main(_type='alpha', _low_connectivity=False):
                     'title': _type.capitalize(),
                     'zeroline': False,
                     'tickmode': 'array',
-                    'tickvals': _names
+                    'tickvals': _names,
+                    'type': 'category'
                 },
                 'yaxis': {
-                    'title': 'Highest correlations fraction',
+                    'title': 'Lag ' + str(TIME_LAG) + ' highest correlations fraction',
                     'range': [0, 1.1],
                     'zeroline': False,
                     'tickmode': 'array',
