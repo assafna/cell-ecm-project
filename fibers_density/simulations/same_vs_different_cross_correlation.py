@@ -145,7 +145,7 @@ def compute_fibers_densities(_alpha=1, _beta=1, _low_connectivity=False):
 
 def main(_alpha=1, _beta=1, _low_connectivity=False):
     _same_correlation_vs_time_lag, _same_time_lags_arrays, _different_time_lags_arrays, _same_time_lags_highest, \
-        _different_time_lags_highest = compute_fibers_densities(_low_connectivity)
+        _different_time_lags_highest = compute_fibers_densities(_alpha, _beta, _low_connectivity)
 
     # individual plots
     for _same_simulation in _same_correlation_vs_time_lag:
