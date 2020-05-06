@@ -19,33 +19,46 @@ CELLS_DISTANCE = 7
 TIME_LAG = 1
 TIME_LAG_INDEX = np.where(np.array(same_vs_different_cross_correlation.TIME_LAGS) == TIME_LAG)[0][0]
 ALPHAS = [0, 0.25, 0.5, 0.75, 1]
+ALPHA = 1
+BETAS = [1, 1.05, 1.1, 1.2]
 BETA = 1
 
 
-def main(_low_connectivity=False):
-    _same_alphas_arrays = []
-    _different_alphas_arrays = []
-    _same_alphas_highest = []
-    _different_alphas_highest = []
+def main(_type='alpha', _low_connectivity=False):
+    _same_arrays = []
+    _different_arrays = []
+    _same_highest = []
+    _different_highest = []
 
-    for _alpha in ALPHAS:
-        print('Alpha:', _alpha)
+    if _type == 'alpha':
+        _alphas = ALPHAS
+        _betas = [BETA] * len(ALPHAS)
+        _names = _alphas
+    elif _type == 'beta':
+        _alphas = [ALPHA] * len(BETAS)
+        _betas = BETAS
+        _names = _betas
+    else:
+        raise Exception('No such type. Only \'alpha\' or \'beta\' are acceptable.')
+
+    for _alpha, _beta in zip(_alphas, _betas):
+        print('Alpha:', _alpha, 'beta:', _beta)
         _, _same_time_lags_arrays, _different_time_lags_arrays, _same_time_lags_highest, \
             _different_time_lags_highest = same_vs_different_cross_correlation.compute_fibers_densities(
-                _alpha=_alpha, _beta=BETA, _low_connectivity=_low_connectivity)
+                _alpha=_alpha, _beta=_beta, _low_connectivity=_low_connectivity)
 
-        _same_alphas_arrays.append(_same_time_lags_arrays[TIME_LAG_INDEX])
-        _different_alphas_arrays.append(_different_time_lags_arrays[TIME_LAG_INDEX])
-        _same_alphas_highest.append(_same_time_lags_highest)
-        _different_alphas_highest.append(_different_time_lags_highest)
+        _same_arrays.append(_same_time_lags_arrays[TIME_LAG_INDEX])
+        _different_arrays.append(_different_time_lags_arrays[TIME_LAG_INDEX])
+        _same_highest.append(_same_time_lags_highest)
+        _different_highest.append(_different_time_lags_highest)
 
     # box plots
-    for _name, _arrays in zip(['same', 'different'], [_same_alphas_arrays, _different_alphas_arrays]):
+    for _name, _arrays in zip(['same', 'different'], [_same_arrays, _different_arrays]):
         _fig = go.Figure(
             data=[
                 go.Box(
                     y=_y,
-                    name=_alpha,
+                    name=_name,
                     boxpoints=False,
                     line={
                         'width': 1
@@ -55,14 +68,14 @@ def main(_low_connectivity=False):
                         'color': '#2e82bf'
                     },
                     showlegend=False
-                ) for _y, _alpha in zip(_arrays, ALPHAS)
+                ) for _y, _name in zip(_arrays, _names)
             ],
             layout={
                 'xaxis': {
-                    'title': 'Alpha',
+                    'title': _type.capitalize(),
                     'zeroline': False,
                     'tickmode': 'array',
-                    'tickvals': ALPHAS
+                    'tickvals': _names
                 },
                 'yaxis': {
                     'title': _name.capitalize() + ' network correlations',
@@ -77,25 +90,25 @@ def main(_low_connectivity=False):
         save.to_html(
             _fig=_fig,
             _path=os.path.join(paths.PLOTS, save.get_module_name()),
-            _filename='plot_box_low_con_' + str(_low_connectivity) + '_' + _name
+            _filename='plot_box_' + _type + '_low_con_' + str(_low_connectivity) + '_' + _name
         )
 
     # bar plot
-    for _name, _sums in zip(['same', 'different'], [_same_alphas_highest, _different_alphas_highest]):
+    for _name, _sums in zip(['same', 'different'], [_same_highest, _different_highest]):
         _fig = go.Figure(
             data=go.Bar(
-                x=ALPHAS,
-                y=[_alpha_sums[TIME_LAG_INDEX] / sum(_alpha_sums) for _alpha_sums in _sums],
+                x=_names,
+                y=[_type_sums[TIME_LAG_INDEX] / sum(_type_sums) for _type_sums in _sums],
                 marker={
                     'color': '#2e82bf'
                 }
             ),
             layout={
                 'xaxis': {
-                    'title': 'Alpha',
+                    'title': _type.capitalize(),
                     'zeroline': False,
                     'tickmode': 'array',
-                    'tickvals': ALPHAS
+                    'tickvals': _names
                 },
                 'yaxis': {
                     'title': 'Highest correlations fraction',
@@ -110,7 +123,7 @@ def main(_low_connectivity=False):
         save.to_html(
             _fig=_fig,
             _path=os.path.join(paths.PLOTS, save.get_module_name()),
-            _filename='plot_bar_low_con_' + str(_low_connectivity) + '_' + _name
+            _filename='plot_bar_' + _type + '_low_con_' + str(_low_connectivity) + '_' + _name
         )
 
 
