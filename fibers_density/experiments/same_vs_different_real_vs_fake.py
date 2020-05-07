@@ -14,7 +14,7 @@ from plotting import save
 
 EXPERIMENTS = {
     False: ['SN16'],
-    True: ['SN41']
+    True: ['SN41', 'SN44', 'SN45']
 }
 OFFSET_X = 0
 OFFSET_Z = 0
@@ -24,7 +24,8 @@ MINIMUM_CORRELATION_TIME_POINTS = {
     'SN16': 15,
     'SN18': 15,
     'SN41': 50,
-    'SN44': 50
+    'SN44': 50,
+    'SN45': 50
 }
 
 
@@ -75,14 +76,7 @@ def compute_fibers_densities(_offset_y=0.5, _high_time_resolution=False):
     }
 
     # same (real, fake), different (real, fake)
-    _correlations = [
-        [
-            [], []
-        ],
-        [
-            [], []
-        ]
-    ]
+    _correlations = [[[], []], [[], []]]
     for _same_index in tqdm(range(len(_experiments_matched)), desc='Main loop'):
         for _group_type_index in [0, 1]:
             _same_tuple = _experiments_matched[_same_index][_group_type_index]
@@ -221,7 +215,7 @@ def main(_offset_y=0.5, _high_time_resolution=False):
     print('Wilcoxon between real points and fake points distances from y = x:')
     print(wilcoxon(_distances_from_y_equal_x[0], _distances_from_y_equal_x[1]))
 
-    # plot
+    # box plot
     _colors_array = ['#844b00', '#ea8500']
     _fig = go.Figure(
         data=[
@@ -250,6 +244,77 @@ def main(_offset_y=0.5, _high_time_resolution=False):
                 'tickmode': 'array',
                 'tickvals': [-1, -0.5, 0, 0.5, 1]
             }
+        }
+    )
+
+    save.to_html(
+        _fig=_fig,
+        _path=os.path.join(paths.PLOTS, save.get_module_name()),
+        _filename='plot_box_high_time_res_' + str(_high_time_resolution) + '_offset_y_' + str(_offset_y)
+    )
+
+    # scatter plot
+    _fig = go.Figure(
+        data=go.Scatter(
+            x=_distances_from_y_equal_x[0],
+            y=_distances_from_y_equal_x[1],
+            mode='markers',
+            marker={
+                'size': 5,
+                'color': '#ea8500'
+            },
+            showlegend=False
+        ),
+        layout={
+            'xaxis': {
+                'title': 'Real pair',
+                'zeroline': False,
+                'range': [-1.1, 1.2],
+                'tickmode': 'array',
+                'tickvals': [-1, -0.5, 0, 0.5, 1]
+            },
+            'yaxis': {
+                'title': 'Fake pair',
+                'zeroline': False,
+                'range': [-1.1, 1.2],
+                'tickmode': 'array',
+                'tickvals': [-1, -0.5, 0, 0.5, 1]
+            },
+            'shapes': [
+                {
+                    'type': 'line',
+                    'x0': -1,
+                    'y0': -1,
+                    'x1': -1,
+                    'y1': 1,
+                    'line': {
+                        'color': 'black',
+                        'width': 2
+                    }
+                },
+                {
+                    'type': 'line',
+                    'x0': -1,
+                    'y0': -1,
+                    'x1': 1,
+                    'y1': -1,
+                    'line': {
+                        'color': 'black',
+                        'width': 2
+                    }
+                },
+                {
+                    'type': 'line',
+                    'x0': -1,
+                    'y0': -1,
+                    'x1': 1,
+                    'y1': 1,
+                    'line': {
+                        'color': 'red',
+                        'width': 2
+                    }
+                }
+            ]
         }
     )
 
