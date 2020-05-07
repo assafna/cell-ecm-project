@@ -154,6 +154,18 @@ def figure_6():
     fibers_density.simulations.same_vs_different_cross_correlation.main(_alpha=1, _beta=1, _low_connectivity=False)
 
 
+def figure_si_6_alphas():
+    print('?')
+    fibers_density.simulations.same_vs_different_cross_correlation_alphas_betas.main(
+        _type='alpha', _low_connectivity=False)
+
+
+def figure_si_6_betas():
+    print('?')
+    fibers_density.simulations.same_vs_different_cross_correlation_alphas_betas.main(
+        _type='beta', _low_connectivity=False)
+
+
 if __name__ == '__main__':
     print('Figure 1')
     figure_1()
@@ -199,3 +211,9 @@ if __name__ == '__main__':
 
     print('Figure 6')
     figure_6()
+
+    print('Figure SI 6 - Alphas')
+    figure_si_6_alphas()
+
+    print('Figure SI 6 - Betas')
+    figure_si_6_betas()
