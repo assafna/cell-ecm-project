@@ -209,6 +209,9 @@ if __name__ == '__main__':
     print('Figure SI 5 - ?')
     figure_si_5()
 
+    print('Figure SI 5 - Real vs. Fake')
+    figure_si_5_real_vs_fake()
+
     print('Figure 6')
     figure_6()
 
