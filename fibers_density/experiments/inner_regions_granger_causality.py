@@ -1,5 +1,6 @@
 import warnings
 
+import pandas as pd
 from statsmodels.stats.diagnostic import acorr_ljungbox
 from statsmodels.stats.stattools import durbin_watson
 from statsmodels.tools.sm_exceptions import InterpolationWarning
@@ -17,22 +18,21 @@ EXPERIMENTS = {
 }
 OFFSET_X = 0
 # TODO: set the offset in y according to the angle in the original Z slices of the cells
-OFFSET_Y = 0.5
+OFFSET_Y = 0
 OFFSET_Z = 0
 CELLS_DISTANCE_RANGE = [4, 10]
 REAL_CELLS = True
 STATIC = False
 DIRECTION = 'inside'
 MINIMUM_TIME_POINTS = 30
-DERIVATIVE = 1
-MAXIMUM_LAG = 3
+MAXIMUM_LAG = 10
 
 # stationary tests
 ADF_TEST = True
 KPSS_TEST = True
 
 
-def main(_band=True, _high_time_resolution=True):
+def main(_band=None, _high_time_resolution=True):
     _experiments = load.experiments_groups_as_tuples(EXPERIMENTS[_high_time_resolution])
     _experiments = filtering.by_time_points_amount(_experiments, _time_points=MINIMUM_TIME_POINTS)
     _experiments = filtering.by_distance_range(_experiments, _distance_range=CELLS_DISTANCE_RANGE)
@@ -105,68 +105,78 @@ def main(_band=True, _high_time_resolution=True):
         # stationary test
         with warnings.catch_warnings():
             warnings.simplefilter('ignore', category=InterpolationWarning)
-            _left_cell_fibers_densities_derivative = \
-                compute_lib.derivative(_left_cell_fibers_densities_filtered, _n=DERIVATIVE)
-            _right_cell_fibers_densities_derivative = \
-                compute_lib.derivative(_right_cell_fibers_densities_filtered, _n=DERIVATIVE)
 
-            if ADF_TEST:
-                _, _left_cell_adf_p_value, _, _, _, _ = adfuller(_left_cell_fibers_densities_derivative)
-                _, _right_cell_adf_p_value, _, _, _, _ = adfuller(_right_cell_fibers_densities_derivative)
-                if _left_cell_adf_p_value > 0.05 or _right_cell_adf_p_value > 0.05:
-                    continue
+            # find derivative for stationary
+            for _derivative in range(10):
+                _left_cell_fibers_densities_derivative = \
+                    compute_lib.derivative(_left_cell_fibers_densities_filtered, _n=_derivative)
+                _right_cell_fibers_densities_derivative = \
+                    compute_lib.derivative(_right_cell_fibers_densities_filtered, _n=_derivative)
 
-            if KPSS_TEST:
-                _, _left_cell_kpss_p_value, _, _ = kpss(_left_cell_fibers_densities_derivative, nlags='legacy')
-                _, _right_cell_kpss_p_value, _, _ = kpss(_right_cell_fibers_densities_derivative, nlags='legacy')
-                if _left_cell_kpss_p_value < 0.05 or _right_cell_kpss_p_value < 0.05:
-                    continue
+                if ADF_TEST:
+                    _, _left_cell_adf_p_value, _, _, _, _ = adfuller(_left_cell_fibers_densities_derivative)
+                    _, _right_cell_adf_p_value, _, _, _, _ = adfuller(_right_cell_fibers_densities_derivative)
+                    if _left_cell_adf_p_value > 0.05 or _right_cell_adf_p_value > 0.05:
+                        continue
+
+                if KPSS_TEST:
+                    _, _left_cell_kpss_p_value, _, _ = kpss(_left_cell_fibers_densities_derivative, nlags='legacy')
+                    _, _right_cell_kpss_p_value, _, _ = kpss(_right_cell_fibers_densities_derivative, nlags='legacy')
+                    if _left_cell_kpss_p_value < 0.05 or _right_cell_kpss_p_value < 0.05:
+                        continue
+
+                # stationary
+                break
 
         # causality
         try:
-            for _causality, _cell_1_array, _cell_2_array in zip(
-                    [['left', 'right'], ['right', 'left']],
-                    [_left_cell_fibers_densities_derivative, _right_cell_fibers_densities_derivative],
-                    [_right_cell_fibers_densities_derivative, _left_cell_fibers_densities_derivative]
-            ):
-                _x = [[_cell_1_value, _cell_2_value] for _cell_1_value, _cell_2_value in
-                      zip(_cell_1_array, _cell_2_array)]
+            _x = pd.DataFrame(
+                data=[[_left_value, _right_value] for _left_value, _right_value in
+                      zip(_left_cell_fibers_densities_derivative, _right_cell_fibers_densities_derivative)],
+                columns=['left', 'right'])
 
-                # var model to retrieve lag and whiteness
-                _var_model = VAR(_x)
-                _lag_order_results = _var_model.select_order()
-                _estimators_lags = [
-                    _lag_order_results.aic,
-                    _lag_order_results.bic,
-                    _lag_order_results.fpe,
-                    _lag_order_results.hqic
-                ]
-                _min_estimator_lag = min(_estimators_lags)
+            # var model to retrieve lag
+            _var_model = VAR(_x)
+            _lag_order_results = _var_model.select_order()
+            _estimators_lags = [
+                _lag_order_results.aic,
+                _lag_order_results.bic,
+                _lag_order_results.fpe,
+                _lag_order_results.hqic
+            ]
+            _min_estimator_lag = min(_estimators_lags)
 
-                # found a lag
-                if 0 < _min_estimator_lag <= MAXIMUM_LAG:
-                    _var_model_results = _var_model.fit(maxlags=_min_estimator_lag, ic=None)
+            # found a lag
+            if 0 < _min_estimator_lag <= MAXIMUM_LAG:
+                _var_model_results = _var_model.fit(maxlags=_min_estimator_lag, ic=None)
 
-                    _residuals_autocorrelation = True
-                    _acf_result_1 = \
-                        acf(x=_var_model_results.resid[:, 0], fft=True, nlags=_min_estimator_lag, qstat=True)
-                    _acf_result_2 = \
-                        acf(x=_var_model_results.resid[:, 1], fft=True, nlags=_min_estimator_lag, qstat=True)
-                    if _acf_result_1[2][0] > 0.05 and _acf_result_2[2][0] > 0.05:
-                        _residuals_autocorrelation = False
+                # _acf_result_1 = \
+                #     acf(x=_var_model_results.resid[:, 0], fft=True, nlags=_min_estimator_lag, qstat=True)
+                # _acf_result_2 = \
+                #     acf(x=_var_model_results.resid[:, 1], fft=True, nlags=_min_estimator_lag, qstat=True)
+                # if _acf_result_1[2][0] > 0.05 and _acf_result_2[2][0] > 0.05:
+                #     _residuals_autocorrelation = False
+                _whiteness = _var_model_results.test_whiteness(nlags=max(2, _min_estimator_lag))
 
-                    # no autocorrelation in the residuals
-                    if not _residuals_autocorrelation:
+                # no autocorrelation in the residuals
+                if _whiteness.pvalue > 0.05:
 
-                        # granger causality
-                        _granger_causality_results = grangercausalitytests(x=_x, maxlag=_min_estimator_lag, verbose=False)
-                        _f_test_p_value = _granger_causality_results[_min_estimator_lag][0]['ssr_ftest'][1]
+                    # granger causality
+                    for _caused, _causing in zip(['left', 'right'], ['right', 'left']):
+                        _granger = _var_model_results.test_causality(caused=_caused, causing=_causing)
 
-                        if _f_test_p_value < 0.05:
-                            print(_tuple, _causality[1].capitalize() + ' causes ' + _causality[0] + '!',
+                        if _granger.pvalue < 0.05:
+                            _normality = _var_model_results.test_normality()
+                            _inst_granger = _var_model_results.test_inst_causality (causing=_causing)
+
+                            print(_tuple, _causing.capitalize() + ' causes ' + _caused + '!',
                                   'time-points: ' + str(len(_left_cell_fibers_densities_derivative)),
-                                  'p-value: ' + str(round(_f_test_p_value, 4)),
-                                  'lag: ' + str(_min_estimator_lag), sep='\t')
+                                  'stationary derivative: ' + str(_derivative),
+                                  'p-value: ' + str(round(_granger.pvalue, 4)),
+                                  'lag: ' + str(_min_estimator_lag),
+                                  'normality p-value: ' + str(round(_normality.pvalue, 4)),
+                                  'inst p-value: ' + str(round(_inst_granger.pvalue, 4)),
+                                  sep='\t')
 
         # not enough time points
         except ValueError:
