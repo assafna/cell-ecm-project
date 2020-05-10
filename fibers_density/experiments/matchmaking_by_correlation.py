@@ -1,13 +1,13 @@
 from tqdm import tqdm
 
 from libs import compute_lib
-from libs.experiments import load, filtering, compute
+from libs.experiments import load, filtering, compute, organize
 from libs.experiments.config import ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT
 
 # based on time resolution
 EXPERIMENTS = {
     False: ['SN16'],
-    True: ['SN41']
+    True: ['SN41', 'SN44', 'SN45']
 }
 OFFSET_X = 0
 # TODO: set the offset in y according to the angle in the original Z slices of the cells
@@ -72,73 +72,79 @@ def main(_band=True, _high_time_resolution=False):
         for _key in _rois_dictionary
     }
 
+    _tuples_by_experiment = organize.by_experiment(_experiments)
+
     _correct_matches = 0
     _incorrect_matches = 0
     _n_total = 0
-    for _tuple_1 in tqdm(_experiments, desc='Main loop'):
-        _experiment_1, _series_id_1, _group_1 = _tuple_1
-        _experiment_1_properties = load.group_properties(_experiment_1, _series_id_1, _group_1)
+    for _experiment in _tuples_by_experiment:
+        print('Experiment:', _experiment)
+        _experiment_tuples = _tuples_by_experiment[_experiment]
 
-        for _cell_1_id, _real_matched_cell_id in zip(['left_cell', 'right_cell'], ['right_cell', 'left_cell']):
-            _cell_1_fibers_densities = \
-                _experiments_fibers_densities[(_experiment_1, _series_id_1, _group_1, _cell_1_id)]
-            _cell_1_fibers_densities = compute.remove_blacklist(
-                _experiment_1,
-                _series_id_1,
-                _experiment_1_properties['cells_ids'][_cell_1_id],
-                _cell_1_fibers_densities
-            )
+        for _tuple_1 in tqdm(_experiment_tuples, desc='Main loop'):
+            _experiment_1, _series_id_1, _group_1 = _tuple_1
+            _experiment_1_properties = load.group_properties(_experiment_1, _series_id_1, _group_1)
 
-            _best_match = None
-            _highest_correlation = -1
-            _n = 0
-            for _tuple_2 in _experiments:
-                _experiment_2, _series_id_2, _group_2 = _tuple_2
-                _experiment_2_properties = load.group_properties(_experiment_2, _series_id_2, _group_2)
+            for _cell_1_id, _real_matched_cell_id in zip(['left_cell', 'right_cell'], ['right_cell', 'left_cell']):
+                _cell_1_fibers_densities = \
+                    _experiments_fibers_densities[(_experiment_1, _series_id_1, _group_1, _cell_1_id)]
+                _cell_1_fibers_densities = compute.remove_blacklist(
+                    _experiment_1,
+                    _series_id_1,
+                    _experiment_1_properties['cells_ids'][_cell_1_id],
+                    _cell_1_fibers_densities
+                )
 
-                for _cell_2_id in ['left_cell', 'right_cell']:
+                _best_match = None
+                _highest_correlation = -1
+                _n = 0
+                for _tuple_2 in _experiment_tuples:
+                    _experiment_2, _series_id_2, _group_2 = _tuple_2
+                    _experiment_2_properties = load.group_properties(_experiment_2, _series_id_2, _group_2)
 
-                    # same cell
-                    if _tuple_1 == _tuple_2 and _cell_1_id == _cell_2_id:
-                        continue
+                    for _cell_2_id in ['left_cell', 'right_cell']:
 
-                    _cell_2_fibers_densities = \
-                        _experiments_fibers_densities[(_experiment_2, _series_id_2, _group_2, _cell_2_id)]
-                    _cell_2_fibers_densities = compute.remove_blacklist(
-                        _experiment_2,
-                        _series_id_2,
-                        _experiment_2_properties['cells_ids'][_cell_2_id],
-                        _cell_2_fibers_densities
-                    )
+                        # same cell
+                        if _tuple_1 == _tuple_2 and _cell_1_id == _cell_2_id:
+                            continue
 
-                    _cell_1_fibers_densities_filtered, _cell_2_fibers_densities_filtered = \
-                        compute.longest_same_indices_shared_in_borders_sub_array(
-                            _cell_1_fibers_densities, _cell_2_fibers_densities
+                        _cell_2_fibers_densities = \
+                            _experiments_fibers_densities[(_experiment_2, _series_id_2, _group_2, _cell_2_id)]
+                        _cell_2_fibers_densities = compute.remove_blacklist(
+                            _experiment_2,
+                            _series_id_2,
+                            _experiment_2_properties['cells_ids'][_cell_2_id],
+                            _cell_2_fibers_densities
                         )
 
-                    # ignore small arrays
-                    if len(_cell_1_fibers_densities_filtered) < \
-                            MINIMUM_CORRELATION_TIME_POINTS[_experiment_1]:
-                        continue
+                        _cell_1_fibers_densities_filtered, _cell_2_fibers_densities_filtered = \
+                            compute.longest_same_indices_shared_in_borders_sub_array(
+                                _cell_1_fibers_densities, _cell_2_fibers_densities
+                            )
 
-                    _correlation = compute_lib.correlation(
-                        compute_lib.derivative(_cell_1_fibers_densities_filtered, _n=DERIVATIVE),
-                        compute_lib.derivative(_cell_2_fibers_densities_filtered, _n=DERIVATIVE)
-                    )
+                        # ignore small arrays
+                        if len(_cell_1_fibers_densities_filtered) < \
+                                MINIMUM_CORRELATION_TIME_POINTS[_experiment_1]:
+                            continue
 
-                    if _correlation > _highest_correlation:
-                        _highest_correlation = _correlation
-                        _best_match = (_tuple_2, _cell_2_id)
+                        _correlation = compute_lib.correlation(
+                            compute_lib.derivative(_cell_1_fibers_densities_filtered, _n=DERIVATIVE),
+                            compute_lib.derivative(_cell_2_fibers_densities_filtered, _n=DERIVATIVE)
+                        )
 
-                    _n += 1
+                        if _correlation > _highest_correlation:
+                            _highest_correlation = _correlation
+                            _best_match = (_tuple_2, _cell_2_id)
 
-            # check matchmaking
-            if _best_match is not None:
-                if _best_match == (_tuple_1, _real_matched_cell_id):
-                    _correct_matches += 1
-                else:
-                    _incorrect_matches += 1
-                _n_total += _n
+                        _n += 1
+
+                # check matchmaking
+                if _best_match is not None:
+                    if _best_match == (_tuple_1, _real_matched_cell_id):
+                        _correct_matches += 1
+                    else:
+                        _incorrect_matches += 1
+                    _n_total += _n
 
     _total_cells = _correct_matches + _incorrect_matches
     print('Matchmaking results:')
