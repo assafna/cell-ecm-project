@@ -20,13 +20,15 @@ if __name__ == '__main__':
     # _a = distance_from_a_point_to_a_line([-1, -1, 1, 1], [1, 4])
     # print(_a)
     _simulations = load.structured()
-    _simulations = filtering.by_categories(
-        _simulations,
-        _is_single_cell=False,
-        _is_heterogeneity=True,
-        _is_low_connectivity=False,
-        _is_causality=False,
-        _is_dominant_passive=True
-    )
-    print(_simulations)
+    # _simulations = filtering.by_categories(
+    #     _simulations,
+    #     _is_single_cell=False,
+    #     _is_heterogeneity=True,
+    #     _is_low_connectivity=False,
+    #     _is_causality=False,
+    #     _is_dominant_passive=True
+    # )
+    _properties = load.properties(_simulation='7D_8_heterogeneity')
+    print(_properties)
+    # print(_simulations)
 
