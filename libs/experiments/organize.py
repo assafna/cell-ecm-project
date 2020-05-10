@@ -65,3 +65,16 @@ def by_matched_real_and_fake(_experiments_tuples):
             _experiments_matched.append((_tuple, _fake_tuple))
 
     return _experiments_matched
+
+
+def by_experiment(_experiments_tuples):
+    _tuples_by_experiments = {}
+    for _tuple in _experiments_tuples:
+        _experiment, _, _ = _tuple
+
+        if _experiment in _tuples_by_experiments:
+            _tuples_by_experiments[_experiment].append(_tuple)
+        else:
+            _tuples_by_experiments[_experiment] = [_tuple]
+
+    return _tuples_by_experiments
