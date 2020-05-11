@@ -125,6 +125,11 @@ def figure_si_4_temporal_assessment():
     fibers_density.experiments.same_vs_different_temporal_reduction.main()
 
 
+def figure_si_4_matchmaking():
+    print('?')
+    fibers_density.experiments.matchmaking_by_correlation.main()
+
+
 def figure_5():
     print('Panel B-i')
     fibers_density.experiments.fibers_vs_offsets_in_axes.main()
@@ -202,6 +207,9 @@ if __name__ == '__main__':
 
     print('Figure SI 4 - Single Cell Detrending')
     figure_si_4_single_cell_detrending()
+
+    print('Figure SI 4 - Matchmaking')
+    figure_si_4_matchmaking()
 
     print('Figure 5')
     figure_5()
