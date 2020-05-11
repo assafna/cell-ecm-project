@@ -129,8 +129,11 @@ def figure_si_4_single_cell_detrending():
 
 
 def figure_si_4_temporal_assessment():
-    print('?')
-    fibers_density.experiments.same_vs_different_temporal_assessment.main()
+    print('Panel A')
+    fibers_density.experiments.same_vs_different_temporal_assessment.main(_high_time_resolution=False)
+
+    print('Panel B')
+    fibers_density.experiments.same_vs_different_temporal_assessment.main(_high_time_resolution=True)
 
 
 def figure_si_4_matchmaking():
