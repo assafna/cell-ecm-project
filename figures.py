@@ -150,16 +150,16 @@ def figure_si_5_communication_vs_density():
 
 
 def figure_si_5_real_vs_fake():
-    print('?')
+    print('Panel A')
     fibers_density.experiments.same_vs_different_real_vs_fake.main(_offset_y=0, _high_time_resolution=False)
 
-    print('?')
+    print('Panel B')
     fibers_density.experiments.same_vs_different_real_vs_fake.main(_offset_y=0.5, _high_time_resolution=False)
 
-    print('?')
+    print('Panel C')
     fibers_density.experiments.same_vs_different_real_vs_fake.main(_offset_y=0, _high_time_resolution=True)
 
-    print('?')
+    print('Panel D')
     fibers_density.experiments.same_vs_different_real_vs_fake.main(_offset_y=0.5, _high_time_resolution=True)
 
 
