@@ -12,8 +12,10 @@ from libs.experiments.config import ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT
 from plotting import save
 
 # based on time resolution
-EXPERIMENTS = ['SN41', 'SN44', 'SN45']
-EXPERIMENTS_STR = '_'.join(EXPERIMENTS)
+EXPERIMENTS = {
+    False: ['SN16'],
+    True: ['SN41', 'SN44', 'SN45']
+}
 TIME_POINTS_STEPS = {
     'SN16': range(1, 6),
     'SN41': range(1, 18),
@@ -49,7 +51,7 @@ GENERAL_MINIMUM_CORRELATION_TIME_POINTS = {
 }
 
 
-def main():
+def main(_high_time_resolution=True):
     _experiments = load.experiments_groups_as_tuples(EXPERIMENTS)
     _experiments = filtering.by_distance_range(_experiments, CELLS_DISTANCE_RANGE)
     _experiments = filtering.by_real_cells(_experiments, _real_cells=REAL_CELLS)
@@ -272,7 +274,7 @@ def main():
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        _filename='plot_' + EXPERIMENTS_STR
+        _filename='plot_high_time_res_' + str(_high_time_resolution)
     )
 
 
