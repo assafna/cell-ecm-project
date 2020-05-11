@@ -52,7 +52,7 @@ GENERAL_MINIMUM_CORRELATION_TIME_POINTS = {
 
 
 def main(_high_time_resolution=True):
-    _experiments = load.experiments_groups_as_tuples(EXPERIMENTS)
+    _experiments = load.experiments_groups_as_tuples(EXPERIMENTS[_high_time_resolution])
     _experiments = filtering.by_distance_range(_experiments, CELLS_DISTANCE_RANGE)
     _experiments = filtering.by_real_cells(_experiments, _real_cells=REAL_CELLS)
     _experiments = filtering.by_static_cells(_experiments, _static=STATIC)
@@ -99,10 +99,10 @@ def main(_high_time_resolution=True):
 
     _tuples_by_experiment = organize.by_experiment(_experiments)
 
-    _y_arrays = [[] for _i in TIME_POINTS_STEPS[EXPERIMENTS[0]]]
+    _y_arrays = [[] for _i in TIME_POINTS_STEPS[EXPERIMENTS[_high_time_resolution][0]]]
     _x_array = []
-    for _time_point_index, _time_point_every in enumerate(TIME_POINTS_STEPS[EXPERIMENTS[0]]):
-        print('Time resolution (minutes):', _time_point_every * TIME_RESOLUTION[EXPERIMENTS[0]])
+    for _time_point_index, _time_point_every in enumerate(TIME_POINTS_STEPS[EXPERIMENTS[_high_time_resolution][0]]):
+        print('Time resolution (minutes):', _time_point_every * TIME_RESOLUTION[EXPERIMENTS[_high_time_resolution][0]])
         _higher_same_counter = 0
         for _time_point_begin in range(_time_point_every):
             for _experiment in _tuples_by_experiment:
@@ -235,7 +235,7 @@ def main(_high_time_resolution=True):
         print('Wilcoxon around the zero:')
         print(wilcoxon(_y_arrays[_time_point_index]))
         print('Higher same amount:', _higher_same_counter / len(_y_arrays[_time_point_index]))
-        _x_array.append(_time_point_every * TIME_RESOLUTION[EXPERIMENTS[0]])
+        _x_array.append(_time_point_every * TIME_RESOLUTION[EXPERIMENTS[_high_time_resolution][0]])
 
     # plot
     # _colors_array = ['#844b00', '#ea8500', '#edbc80']
