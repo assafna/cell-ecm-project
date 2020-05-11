@@ -108,6 +108,14 @@ def figure_4():
     fibers_density.experiments.same_vs_different_band_vs_no_band.main(_high_time_resolution=False)
 
 
+def figure_si_4_same_vs_diff_high_time_res():
+    print('Panel A')
+    fibers_density.experiments.same_vs_different.main(_band=True, _high_time_resolution=True)
+
+    print('Panel B')
+    fibers_density.experiments.same_vs_different.main(_band=False, _high_time_resolution=True)
+
+
 def figure_si_4_low_connectivity():
     print('?')
 
@@ -201,6 +209,9 @@ if __name__ == '__main__':
 
     print('Figure 4')
     figure_4()
+
+    print('Figure SI 4 - Same vs. Different - High Temporal Resolution')
+    figure_si_4_same_vs_diff_high_time_res()
 
     print('Figure SI 4 - Low Connectivity')
     figure_si_4_low_connectivity()
