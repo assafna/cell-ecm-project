@@ -130,7 +130,7 @@ def figure_si_4_single_cell_detrending():
 
 def figure_si_4_temporal_assessment():
     print('?')
-    fibers_density.experiments.same_vs_different_temporal_reduction.main()
+    fibers_density.experiments.same_vs_different_temporal_assessment.main()
 
 
 def figure_si_4_matchmaking():
