@@ -43,7 +43,7 @@ def process_group(_experiment, _series_id, _group, _overwrite=False):
             _group=_group_real,
             _time_point=_time_point,
             _roi=[int(round(_value)) for _value in _roi]
-        )
+        )[:2]
         _fibers_densities.append(_fibers_density)
 
     if _fibers_densities[0] < _fibers_densities[1] < _fibers_densities[2]:

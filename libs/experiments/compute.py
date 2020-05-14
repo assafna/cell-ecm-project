@@ -124,7 +124,10 @@ def roi_fibers_density(_experiment, _series_id, _group, _time_point, _roi, _time
             (np.size(_roi_pixels) == 0 or np.count_nonzero(_roi_pixels == 0) / np.size(_roi_pixels) > 0.01):
         _out_of_boundaries = True
 
-    return np.mean(_roi_pixels[_non_zero_mask]), _out_of_boundaries
+    # saturation
+    _saturation_fraction = np.count_nonzero(_roi_pixels == 255) / np.size(_roi_pixels)
+
+    return np.mean(_roi_pixels[_non_zero_mask]), _out_of_boundaries, _saturation_fraction
 
 
 def roi_fibers_density_time_point(_arguments):
@@ -176,7 +179,7 @@ def roi_fibers_density_time_point(_arguments):
                   _arguments['cell_id'], 'roi', _time_point_roi, 'direction', _arguments['direction'], 'tp',
                   _arguments['time_point'], sep='\t')
         _roi_fibers_density = roi_fibers_density(_arguments['experiment'], _arguments['series_id'], _arguments['group'],
-                                                 _arguments['time_point'], _time_point_roi)
+                                                 _arguments['time_point'], _time_point_roi)[:2]
         if 'save' in _arguments and _arguments['save']:
             _time_point_fibers_densities[_time_point_roi] = _roi_fibers_density
             save.fibers_densities(_arguments['experiment'], _arguments['series_id'], _arguments['group'],
@@ -369,7 +372,7 @@ def rois_fibers_densities(_tuple):
     }
 
 
-def fibers_densities(_tuples):
+def fibers_densities(_tuples, _saturation=False):
     _organized_tuples = {}
     for _tuple in _tuples:
         _experiment, _series_id, _group, _time_point, _roi = _tuple
@@ -387,7 +390,10 @@ def fibers_densities(_tuples):
     with Pool(CPUS_TO_USE) as _p:
         for _rois in tqdm(_p.imap_unordered(rois_fibers_densities, _arguments), total=len(_arguments),
                           desc='Computing Fibers Densities'):
-            _fibers_densities.update(_rois)
+            if _saturation:
+                _fibers_densities.update(_rois)
+            else:
+                _fibers_densities.update(_rois[:2])
         _p.close()
         _p.join()
 
@@ -480,3 +486,5 @@ def group_mean_z_position_from_substrate(_experiment, _series_id, _group, _time_
     _right_cell_z_position = cell_z_position_from_substrate(_experiment, _series_id, _right_cell_id, _time_point)
 
     return (_left_cell_z_position + _right_cell_z_position) / 2
+
+
