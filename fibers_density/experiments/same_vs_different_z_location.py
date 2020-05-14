@@ -206,10 +206,14 @@ def compute_fibers_densities(_band=True, _high_time_resolution=False):
 def main(_band=True, _high_time_resolution=False):
     _distances_from_y_equal_x, _z_positions_array = compute_fibers_densities(_band, _high_time_resolution)
 
+    _min_z_position, _max_z_position = min(_z_positions_array), max(_z_positions_array)
+    _z_positions_array_normalized = [(_z_position_value - _min_z_position) / (_max_z_position - _min_z_position)
+                                     for _z_position_value in _z_positions_array]
+
     # plot
     _fig = go.Figure(
         data=go.Scatter(
-            x=_z_positions_array,
+            x=_z_positions_array_normalized,
             y=_distances_from_y_equal_x,
             mode='markers',
             marker={
@@ -220,11 +224,11 @@ def main(_band=True, _high_time_resolution=False):
         ),
         layout={
             'xaxis': {
-                'title': 'Z axis distance (micrometer)',
+                'title': 'Normalized mean Z distance',
                 'zeroline': False,
-                # 'range': [-1.1, 1.2],
-                # 'tickmode': 'array',
-                # 'tickvals': [-1, -0.5, 0, 0.5, 1]
+                'range': [-0.1, 1.2],
+                'tickmode': 'array',
+                'tickvals': [0, 0.5, 1]
             },
             'yaxis': {
                 'title': 'Distance from y = x',
