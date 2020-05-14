@@ -362,12 +362,13 @@ def smooth_coordinates_in_time(_coordinates, _n=5):
 
 
 def rois_fibers_densities(_tuple):
-    _key, _rois = _tuple
+    _key, _rois, _saturation = _tuple
     _experiment, _series_id, _group, _time_point = _key
     _time_point_image = load.structured_image(_experiment, _series_id, _group, _time_point)
     return {
         (_experiment, _series_id, _group, _time_point, _roi):
-            roi_fibers_density(_experiment, _series_id, _group, _time_point, _roi, _time_point_image)
+            roi_fibers_density(_experiment, _series_id, _group, _time_point, _roi, _time_point_image) if _saturation
+            else roi_fibers_density(_experiment, _series_id, _group, _time_point, _roi, _time_point_image)[:2]
         for _roi in _rois
     }
 
@@ -384,16 +385,13 @@ def fibers_densities(_tuples, _saturation=False):
 
     _arguments = []
     for _key in _organized_tuples:
-        _arguments.append((_key, _organized_tuples[_key]))
+        _arguments.append((_key, _organized_tuples[_key], _saturation))
 
     _fibers_densities = {}
     with Pool(CPUS_TO_USE) as _p:
         for _rois in tqdm(_p.imap_unordered(rois_fibers_densities, _arguments), total=len(_arguments),
                           desc='Computing Fibers Densities'):
-            if _saturation:
-                _fibers_densities.update(_rois)
-            else:
-                _fibers_densities.update(_rois[:2])
+            _fibers_densities.update(_rois)
         _p.close()
         _p.join()
 
