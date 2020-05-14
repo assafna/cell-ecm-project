@@ -462,3 +462,21 @@ def rois(_arguments, _keys):
         _p.join()
 
     return _rois_dictionary, _rois_to_compute
+
+
+def cell_z_position_from_substrate(_experiment, _series_id, _cell_id, _time_point=0):
+    _properties = load.image_properties(_experiment, _series_id)
+    _series_z_position = _properties['position']['z']
+    _cells_coordinates_tracked = \
+        load.cell_coordinates_tracked_series_file_data(_experiment, 'series_' + str(_series_id) + '.txt')
+    _cell_z_position = _cells_coordinates_tracked[int(_cell_id)][_time_point][2] * _properties['resolutions']['z']
+
+    return _series_z_position + _cell_z_position
+
+
+def group_mean_z_position_from_substrate(_experiment, _series_id, _group, _time_point=0):
+    _, _left_cell_id, _right_cell_id = _group.split('_')
+    _left_cell_z_position = cell_z_position_from_substrate(_experiment, _series_id, _left_cell_id, _time_point)
+    _right_cell_z_position = cell_z_position_from_substrate(_experiment, _series_id, _right_cell_id, _time_point)
+
+    return (_left_cell_z_position + _right_cell_z_position) / 2
