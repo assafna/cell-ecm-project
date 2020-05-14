@@ -129,8 +129,8 @@ def compute_fibers_densities(_band=True, _high_time_resolution=False):
                 compute_lib.derivative(_same_right_cell_fibers_densities_filtered, _n=DERIVATIVE)
             )
 
-            _same_series_properties = load.image_properties(_same_experiment, _same_series)
-            _same_series_z_position = _same_series_properties['position']['z']
+            _same_group_mean_z_position = \
+                compute.group_mean_z_position_from_substrate(_same_experiment, _same_series, _same_group)
 
             for _different_index in range(len(_experiment_tuples)):
                 if _same_index != _different_index:
@@ -192,7 +192,7 @@ def compute_fibers_densities(_band=True, _high_time_resolution=False):
                         else:
                             _distances_from_y_equal_x.append(-_point_distance)
 
-                        _z_positions_array.append(_same_series_z_position)
+                        _z_positions_array.append(_same_group_mean_z_position)
 
     print('Total points:', len(_distances_from_y_equal_x))
     print('Wilcoxon of distances from y = x around the zero:')
