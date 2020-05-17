@@ -18,7 +18,7 @@ EXPERIMENTS = {
 }
 OFFSET_X = 0
 # TODO: set the offset in y according to the angle in the original Z slices of the cells
-OFFSET_Y = 0
+OFFSET_Y = 0.5
 OFFSET_Z = 0
 CELLS_DISTANCE_RANGE = [4, 10]
 REAL_CELLS = True
@@ -156,7 +156,7 @@ def main(_band=None, _high_time_resolution=True):
                 #     acf(x=_var_model_results.resid[:, 1], fft=True, nlags=_min_estimator_lag, qstat=True)
                 # if _acf_result_1[2][0] > 0.05 and _acf_result_2[2][0] > 0.05:
                 #     _residuals_autocorrelation = False
-                _whiteness = _var_model_results.test_whiteness(nlags=max(2, _min_estimator_lag))
+                _whiteness = _var_model_results.test_whiteness(nlags=_min_estimator_lag + 1)
 
                 # no autocorrelation in the residuals
                 if _whiteness.pvalue > 0.05:
