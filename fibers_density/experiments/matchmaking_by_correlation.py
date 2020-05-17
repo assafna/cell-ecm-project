@@ -1,11 +1,16 @@
+import os
+
 import numpy as np
 from tqdm import tqdm
+import plotly.graph_objs as go
 
 from libs import compute_lib
-from libs.experiments import load, filtering, compute, organize
+from libs.experiments import load, filtering, compute, organize, paths
 from libs.experiments.config import ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT
 
 # based on time resolution
+from plotting import save
+
 EXPERIMENTS = {
     False: ['SN16'],
     True: ['SN41', 'SN44', 'SN45']
@@ -159,6 +164,7 @@ def main(_band=True, _high_time_resolution=False):
                     _cells_potential_matches.append(_cell_1_total_potential_matches)
                     _cells_ranks.append(_cell_1_correct_match_rank)
 
+    # results
     _mean_cells_potential_matches = float(np.mean(_cells_potential_matches))
     _mean_correct_match_probability = 1 / _mean_cells_potential_matches
     _first_place_correct_matches = sum([1 for _rank in _cells_ranks if _rank == 1])
@@ -169,6 +175,45 @@ def main(_band=True, _high_time_resolution=False):
     print('Average potential matches per cell:', round(_mean_cells_potential_matches, 2))
     print('Average correct match probability:', round(_mean_correct_match_probability, 2))
     print('Fraction of first place correct matches:', round(_first_place_fraction, 2))
+
+    # plot
+    _max_rank = max(_cells_ranks)
+    _x = list(range(1, _max_rank + 1))
+    _ranks_sums = [0 for _rank in _x]
+    for _rank in _cells_ranks:
+        _ranks_sums[_rank - 1] += 1
+    _y = np.array(_ranks_sums) / _n
+
+    _fig = go.Figure(
+        data=go.Bar(
+            x=_x,
+            y=_y,
+            marker={
+                'color': '#ea8500'
+            }
+        ),
+        layout={
+            'xaxis': {
+                'title': 'Correct match correlation rank',
+                'zeroline': False,
+                'tickmode': 'array',
+                'tickvals': _x
+            },
+            'yaxis': {
+                'title': 'Fraction',
+                'range': [0, 1.1],
+                'zeroline': False,
+                'tickmode': 'array',
+                'tickvals': [0, 0.5, 1]
+            }
+        }
+    )
+
+    save.to_html(
+        _fig=_fig,
+        _path=os.path.join(paths.PLOTS, save.get_module_name()),
+        _filename='plot'
+    )
 
 
 if __name__ == '__main__':
