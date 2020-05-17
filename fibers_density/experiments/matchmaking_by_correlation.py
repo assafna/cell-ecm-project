@@ -250,7 +250,7 @@ def main(_real_cells=True, _offset_y=0.5, _high_time_resolution=False):
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        _filename='plot_real_' + str(_real_cells) + '_offset_z_' + str(OFFSET_Z) + '_high_time_' +
+        _filename='plot_real_' + str(_real_cells) + '_offset_z_' + str(_offset_y) + '_high_time_' +
                   str(_high_time_resolution) + '_correct_match_prob'
     )
 
