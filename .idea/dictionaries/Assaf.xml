@@ -15,6 +15,7 @@
       <w>showgrid</w>
       <w>stds</w>
       <w>tickmode</w>
+      <w>ticktext</w>
       <w>tickvals</w>
       <w>titlefont</w>
       <w>wilcoxon</w>
