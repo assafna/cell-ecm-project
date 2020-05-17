@@ -30,6 +30,7 @@ MINIMUM_CORRELATION_TIME_POINTS = {
     'SN44': 50,
     'SN45': 50
 }
+MAX_RANK = 7
 
 
 def main(_band=True, _high_time_resolution=False):
@@ -177,11 +178,15 @@ def main(_band=True, _high_time_resolution=False):
     print('Fraction of first place correct matches:', round(_first_place_fraction, 2))
 
     # plot
-    _max_rank = max(_cells_ranks)
-    _x = list(range(1, _max_rank + 1))
+    _max_rank = min(MAX_RANK, max(_cells_ranks))
+    _x = list(range(_max_rank))
+    _x_text = [str(_rank + 1) for _rank in _x[:-1]] + [str(_max_rank) + '+']
     _ranks_sums = [0 for _rank in _x]
     for _rank in _cells_ranks:
-        _ranks_sums[_rank - 1] += 1
+        if _rank < _max_rank:
+            _ranks_sums[_rank - 1] += 1
+        else:
+            _ranks_sums[-1] += 1
     _y = np.array(_ranks_sums) / _n
 
     _fig = go.Figure(
@@ -197,7 +202,8 @@ def main(_band=True, _high_time_resolution=False):
                 'title': 'Correct match correlation rank',
                 'zeroline': False,
                 'tickmode': 'array',
-                'tickvals': _x
+                'tickvals': _x,
+                'ticktext': _x_text
             },
             'yaxis': {
                 'title': 'Fraction',
