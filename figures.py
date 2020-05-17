@@ -137,7 +137,21 @@ def figure_si_4_temporal_assessment():
 
 
 def figure_si_4_matchmaking():
-    fibers_density.experiments.matchmaking_by_correlation.main()
+    print('?')
+    fibers_density.experiments.matchmaking_by_correlation.main(
+        _real_cells=True, _offset_y=0.5, _high_time_resolution=False)
+
+    print('?')
+    fibers_density.experiments.matchmaking_by_correlation.main(
+        _real_cells=True, _offset_y=0, _high_time_resolution=False)
+
+    print('?')
+    fibers_density.experiments.matchmaking_by_correlation.main(
+        _real_cells=True, _offset_y=0.5, _high_time_resolution=True)
+
+    print('?')
+    fibers_density.experiments.matchmaking_by_correlation.main(
+        _real_cells=False, _offset_y=0.5, _high_time_resolution=False)
 
 
 def figure_5():
