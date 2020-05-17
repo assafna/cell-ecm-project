@@ -16,12 +16,10 @@ EXPERIMENTS = {
     True: ['SN41', 'SN44', 'SN45']
 }
 OFFSET_X = 0
-# TODO: set the offset in y according to the angle in the original Z slices of the cells
-OFFSET_Y = 0.5
 OFFSET_Z = 0
 DERIVATIVE = 1
 CELLS_DISTANCE_RANGE = [4, 10]
-REAL_CELLS = True
+BAND = True
 STATIC = False
 MINIMUM_CORRELATION_TIME_POINTS = {
     'SN16': 15,
@@ -33,12 +31,12 @@ MINIMUM_CORRELATION_TIME_POINTS = {
 MAX_RANK = 7
 
 
-def main(_band=True, _high_time_resolution=False):
+def main(_real_cells=True, _offset_y=0.5, _high_time_resolution=False):
     _experiments = load.experiments_groups_as_tuples(EXPERIMENTS[_high_time_resolution])
     _experiments = filtering.by_distance_range(_experiments, CELLS_DISTANCE_RANGE)
-    _experiments = filtering.by_real_cells(_experiments, _real_cells=REAL_CELLS)
+    _experiments = filtering.by_real_cells(_experiments, _real_cells=_real_cells)
     _experiments = filtering.by_static_cells(_experiments, _static=STATIC)
-    _experiments = filtering.by_band(_experiments, _band=_band)
+    _experiments = filtering.by_band(_experiments, _band=BAND)
     print('Total experiments:', len(_experiments))
 
     _arguments = []
@@ -64,7 +62,7 @@ def main(_band=True, _high_time_resolution=False):
                 'length_y': ROI_HEIGHT,
                 'length_z': ROI_WIDTH,
                 'offset_x': OFFSET_X,
-                'offset_y': OFFSET_Y,
+                'offset_y': _offset_y,
                 'offset_z': OFFSET_Z,
                 'cell_id': _cell_id,
                 'direction': 'inside',
@@ -217,7 +215,43 @@ def main(_band=True, _high_time_resolution=False):
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        _filename='plot'
+        _filename='plot_real_' + str(_real_cells) + '_offset_z_' + str(OFFSET_Z) + '_high_time_' +
+                  str(_high_time_resolution)
+    )
+
+    # correct match probability plot
+    _y = [_mean_correct_match_probability] * (MAX_RANK - 1) + [_mean_correct_match_probability * MAX_RANK]
+    _fig = go.Figure(
+        data=go.Bar(
+            x=_x,
+            y=_y,
+            marker={
+                'color': '#ea8500'
+            }
+        ),
+        layout={
+            'xaxis': {
+                'title': 'Correct match correlation rank',
+                'zeroline': False,
+                'tickmode': 'array',
+                'tickvals': _x,
+                'ticktext': _x_text
+            },
+            'yaxis': {
+                'title': 'Fraction',
+                'range': [0, 1.1],
+                'zeroline': False,
+                'tickmode': 'array',
+                'tickvals': [0, 0.5, 1]
+            }
+        }
+    )
+
+    save.to_html(
+        _fig=_fig,
+        _path=os.path.join(paths.PLOTS, save.get_module_name()),
+        _filename='plot_real_' + str(_real_cells) + '_offset_z_' + str(OFFSET_Z) + '_high_time_' +
+                  str(_high_time_resolution) + '_correct_match_prob'
     )
 
 
