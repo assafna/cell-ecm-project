@@ -8,9 +8,9 @@ from libs import compute_lib
 from libs.experiments import load, filtering, compute, organize, paths
 from libs.experiments.config import ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT
 
-# based on time resolution
 from plotting import save
 
+# based on time resolution
 EXPERIMENTS = {
     False: ['SN16'],
     True: ['SN41', 'SN44', 'SN45']
@@ -178,12 +178,11 @@ def main(_band=True, _high_time_resolution=False):
     print('Fraction of first place correct matches:', round(_first_place_fraction, 2))
 
     # plot
-    _max_rank = min(MAX_RANK, max(_cells_ranks))
-    _x = list(range(_max_rank))
-    _x_text = [str(_rank + 1) for _rank in _x[:-1]] + [str(_max_rank) + '+']
+    _x = list(range(MAX_RANK))
+    _x_text = [str(_rank + 1) for _rank in _x[:-1]] + [str(MAX_RANK) + '+']
     _ranks_sums = [0 for _rank in _x]
     for _rank in _cells_ranks:
-        if _rank < _max_rank:
+        if _rank < MAX_RANK:
             _ranks_sums[_rank - 1] += 1
         else:
             _ranks_sums[-1] += 1
