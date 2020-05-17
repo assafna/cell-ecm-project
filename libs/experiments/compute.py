@@ -119,9 +119,9 @@ def roi_fibers_density(_experiment, _series_id, _group, _time_point, _roi, _time
     _roi_pixels = _time_point_image[_z1:_z2, _y1:_y2, _x1:_x2]
     _non_zero_mask = np.nonzero(_roi_pixels)
 
-    # check if more than 1% is black
+    # check if more than 5% is black
     if not _out_of_boundaries and \
-            (np.size(_roi_pixels) == 0 or np.count_nonzero(_roi_pixels == 0) / np.size(_roi_pixels) > 0.01):
+            (np.size(_roi_pixels) == 0 or np.count_nonzero(_roi_pixels == 0) / np.size(_roi_pixels) > 0.05):
         _out_of_boundaries = True
 
     # saturation
