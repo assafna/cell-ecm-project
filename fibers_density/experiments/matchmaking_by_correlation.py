@@ -1,3 +1,4 @@
+import numpy as np
 from tqdm import tqdm
 
 from libs import compute_lib
@@ -74,9 +75,9 @@ def main(_band=True, _high_time_resolution=False):
 
     _tuples_by_experiment = organize.by_experiment(_experiments)
 
-    _correct_matches = 0
-    _incorrect_matches = 0
-    _n_total = 0
+    _n = 0
+    _cells_potential_matches = []
+    _cells_ranks = []
     for _experiment in _tuples_by_experiment:
         print('Experiment:', _experiment)
         _experiment_tuples = _tuples_by_experiment[_experiment]
@@ -85,7 +86,10 @@ def main(_band=True, _high_time_resolution=False):
             _experiment_1, _series_id_1, _group_1 = _tuple_1
             _experiment_1_properties = load.group_properties(_experiment_1, _series_id_1, _group_1)
 
-            for _cell_1_id, _real_matched_cell_id in zip(['left_cell', 'right_cell'], ['right_cell', 'left_cell']):
+            for _cell_1_id, _cell_1_correct_match_cell_id in \
+                    zip(['left_cell', 'right_cell'], ['right_cell', 'left_cell']):
+                _cell_1 = (_experiment_1, _series_id_1, _group_1, _cell_1_id)
+                _cell_1_correct_match = (_experiment_1, _series_id_1, _group_1, _cell_1_correct_match_cell_id)
                 _cell_1_fibers_densities = \
                     _experiments_fibers_densities[(_experiment_1, _series_id_1, _group_1, _cell_1_id)]
                 _cell_1_fibers_densities = compute.remove_blacklist(
@@ -95,17 +99,17 @@ def main(_band=True, _high_time_resolution=False):
                     _cell_1_fibers_densities
                 )
 
-                _best_match = None
-                _highest_correlation = -1
-                _n = 0
+                _cell_1_correlations = []
+                _cell_1_correct_match_correlation = None
                 for _tuple_2 in _experiment_tuples:
                     _experiment_2, _series_id_2, _group_2 = _tuple_2
                     _experiment_2_properties = load.group_properties(_experiment_2, _series_id_2, _group_2)
 
                     for _cell_2_id in ['left_cell', 'right_cell']:
+                        _cell_2 = (_experiment_2, _series_id_2, _group_2, _cell_2_id)
 
                         # same cell
-                        if _tuple_1 == _tuple_2 and _cell_1_id == _cell_2_id:
+                        if _cell_1 == _cell_2:
                             continue
 
                         _cell_2_fibers_densities = \
@@ -132,26 +136,39 @@ def main(_band=True, _high_time_resolution=False):
                             compute_lib.derivative(_cell_2_fibers_densities_filtered, _n=DERIVATIVE)
                         )
 
-                        if _correlation > _highest_correlation:
-                            _highest_correlation = _correlation
-                            _best_match = (_tuple_2, _cell_2_id)
+                        _cell_1_correlations.append(_correlation)
 
-                        _n += 1
+                        # correct match
+                        if _cell_2 == _cell_1_correct_match:
+                            _cell_1_correct_match_correlation = _correlation
+
+                # correct match does not exist
+                if _cell_1_correct_match_correlation is None:
+                    continue
 
                 # check matchmaking
-                if _best_match is not None:
-                    if _best_match == (_tuple_1, _real_matched_cell_id):
-                        _correct_matches += 1
-                    else:
-                        _incorrect_matches += 1
-                    _n_total += _n
+                _cell_1_total_potential_matches = len(_cell_1_correlations)
+                if _cell_1_total_potential_matches > 1:
+                    _cell_1_correct_match_rank = 1
+                    for _potential_match_correlation in sorted(_cell_1_correlations, reverse=True):
+                        if _cell_1_correct_match_correlation == _potential_match_correlation:
+                            break
+                        _cell_1_correct_match_rank += 1
 
-    _total_cells = _correct_matches + _incorrect_matches
+                    _n += 1
+                    _cells_potential_matches.append(_cell_1_total_potential_matches)
+                    _cells_ranks.append(_cell_1_correct_match_rank)
+
+    _mean_cells_potential_matches = float(np.mean(_cells_potential_matches))
+    _mean_correct_match_probability = 1 / _mean_cells_potential_matches
+    _first_place_correct_matches = sum([1 for _rank in _cells_ranks if _rank == 1])
+    _first_place_fraction = _first_place_correct_matches / _n
+
     print('Matchmaking results:')
-    print('Total cells:', _total_cells)
-    print('Average potential matches per cell:', round(_n_total / _total_cells, 2))
-    print('Correct match probability:', round(1 / (_n_total / _total_cells), 2))
-    print('Fraction of correct matches:', round(_correct_matches / _total_cells, 2))
+    print('Total cells:', _n)
+    print('Average potential matches per cell:', round(_mean_cells_potential_matches, 2))
+    print('Average correct match probability:', round(_mean_correct_match_probability, 2))
+    print('Fraction of first place correct matches:', round(_first_place_fraction, 2))
 
 
 if __name__ == '__main__':
