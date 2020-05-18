@@ -10,7 +10,7 @@ from tqdm import tqdm
 
 from libs import compute_lib
 from libs.config_lib import CPUS_TO_USE
-from libs.experiments import load, filtering, compute, paths
+from libs.experiments import load, filtering, compute, paths, organize
 from libs.experiments.config import ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT
 from plotting import save
 
@@ -38,6 +38,7 @@ MINIMUM_CORRELATION_TIME_POINTS = {
 
 # globals
 _experiments = []
+_tuples_by_experiment = {}
 _experiments_fibers_densities = {}
 _z_array = None
 _annotations_array = None
@@ -47,108 +48,111 @@ def compute_data(_arguments):
     _offset_y_index, _offset_y, _offset_z_index, _offset_z = _arguments
     _same_correlations_array = []
     _different_correlations_array = []
-    for _same_index in range(len(_experiments)):
-        _same_tuple = _experiments[_same_index]
-        _same_experiment, _same_series, _same_group = _same_tuple
+    for _experiment in _tuples_by_experiment:
+        _experiment_tuples = _tuples_by_experiment[_experiment]
 
-        _same_left_cell_fibers_densities = _experiments_fibers_densities[(
-            _same_experiment,
-            _same_series,
-            _same_group,
-            _offset_y,
-            _offset_z,
-            'left_cell'
-        )]
-        _same_right_cell_fibers_densities = _experiments_fibers_densities[(
-            _same_experiment,
-            _same_series,
-            _same_group,
-            _offset_y,
-            _offset_z,
-            'right_cell'
-        )]
+        for _same_index in range(len(_experiment_tuples)):
+            _same_tuple = _experiment_tuples[_same_index]
+            _same_experiment, _same_series, _same_group = _same_tuple
 
-        _same_properties = \
-            load.group_properties(_same_experiment, _same_series, _same_group)
-        _same_left_cell_fibers_densities = compute.remove_blacklist(
-            _same_experiment, _same_series, _same_properties['cells_ids']['left_cell'],
-            _same_left_cell_fibers_densities)
-        _same_right_cell_fibers_densities = compute.remove_blacklist(
-            _same_experiment, _same_series, _same_properties['cells_ids']['right_cell'],
-            _same_right_cell_fibers_densities)
+            _same_left_cell_fibers_densities = _experiments_fibers_densities[(
+                _same_experiment,
+                _same_series,
+                _same_group,
+                _offset_y,
+                _offset_z,
+                'left_cell'
+            )]
+            _same_right_cell_fibers_densities = _experiments_fibers_densities[(
+                _same_experiment,
+                _same_series,
+                _same_group,
+                _offset_y,
+                _offset_z,
+                'right_cell'
+            )]
 
-        _same_left_cell_fibers_densities_filtered, _same_right_cell_fibers_densities_filtered = \
-            compute.longest_same_indices_shared_in_borders_sub_array(
-                _same_left_cell_fibers_densities, _same_right_cell_fibers_densities
+            _same_properties = \
+                load.group_properties(_same_experiment, _same_series, _same_group)
+            _same_left_cell_fibers_densities = compute.remove_blacklist(
+                _same_experiment, _same_series, _same_properties['cells_ids']['left_cell'],
+                _same_left_cell_fibers_densities)
+            _same_right_cell_fibers_densities = compute.remove_blacklist(
+                _same_experiment, _same_series, _same_properties['cells_ids']['right_cell'],
+                _same_right_cell_fibers_densities)
+
+            _same_left_cell_fibers_densities_filtered, _same_right_cell_fibers_densities_filtered = \
+                compute.longest_same_indices_shared_in_borders_sub_array(
+                    _same_left_cell_fibers_densities, _same_right_cell_fibers_densities
+                )
+
+            # ignore small arrays
+            if len(_same_left_cell_fibers_densities_filtered) < \
+                    MINIMUM_CORRELATION_TIME_POINTS[_same_experiment]:
+                continue
+
+            _same_correlation = compute_lib.correlation(
+                compute_lib.derivative(_same_left_cell_fibers_densities_filtered, _n=DERIVATIVE),
+                compute_lib.derivative(_same_right_cell_fibers_densities_filtered, _n=DERIVATIVE)
             )
+            for _different_index in range(len(_experiment_tuples)):
+                if _same_index != _different_index:
+                    _different_tuple = _experiment_tuples[_different_index]
+                    _different_experiment, _different_series, _different_group = _different_tuple
 
-        # ignore small arrays
-        if len(_same_left_cell_fibers_densities_filtered) < \
-                MINIMUM_CORRELATION_TIME_POINTS[_same_experiment]:
-            continue
+                    for _same_cell_id, _different_cell_id in product(['left_cell', 'right_cell'],
+                                                                     ['left_cell', 'right_cell']):
+                        _same_fibers_densities = _experiments_fibers_densities[(
+                            _same_experiment,
+                            _same_series,
+                            _same_group,
+                            _offset_y,
+                            _offset_z,
+                            _same_cell_id
+                        )]
+                        _different_fibers_densities = _experiments_fibers_densities[(
+                            _different_experiment,
+                            _different_series,
+                            _different_group,
+                            _offset_y,
+                            _offset_z,
+                            _different_cell_id
+                        )]
 
-        _same_correlation = compute_lib.correlation(
-            compute_lib.derivative(_same_left_cell_fibers_densities_filtered, _n=DERIVATIVE),
-            compute_lib.derivative(_same_right_cell_fibers_densities_filtered, _n=DERIVATIVE)
-        )
-        for _different_index in range(len(_experiments)):
-            if _same_index != _different_index:
-                _different_tuple = _experiments[_different_index]
-                _different_experiment, _different_series, _different_group = _different_tuple
-
-                for _same_cell_id, _different_cell_id in product(['left_cell', 'right_cell'],
-                                                                 ['left_cell', 'right_cell']):
-                    _same_fibers_densities = _experiments_fibers_densities[(
-                        _same_experiment,
-                        _same_series,
-                        _same_group,
-                        _offset_y,
-                        _offset_z,
-                        _same_cell_id
-                    )]
-                    _different_fibers_densities = _experiments_fibers_densities[(
-                        _different_experiment,
-                        _different_series,
-                        _different_group,
-                        _offset_y,
-                        _offset_z,
-                        _different_cell_id
-                    )]
-
-                    _different_properties = load.group_properties(
-                        _different_experiment,
-                        _different_series,
-                        _different_group
-                    )
-                    _same_fibers_densities = compute.remove_blacklist(
-                        _same_experiment,
-                        _same_series,
-                        _same_properties['cells_ids'][_same_cell_id],
-                        _same_fibers_densities
-                    )
-                    _different_fibers_densities = compute.remove_blacklist(
-                        _different_experiment,
-                        _different_series,
-                        _different_properties['cells_ids'][_different_cell_id],
-                        _different_fibers_densities
-                    )
-
-                    _same_fibers_densities_filtered, _different_fibers_densities_filtered = \
-                        compute.longest_same_indices_shared_in_borders_sub_array(
-                            _same_fibers_densities, _different_fibers_densities
+                        _different_properties = load.group_properties(
+                            _different_experiment,
+                            _different_series,
+                            _different_group
+                        )
+                        _same_fibers_densities = compute.remove_blacklist(
+                            _same_experiment,
+                            _same_series,
+                            _same_properties['cells_ids'][_same_cell_id],
+                            _same_fibers_densities
+                        )
+                        _different_fibers_densities = compute.remove_blacklist(
+                            _different_experiment,
+                            _different_series,
+                            _different_properties['cells_ids'][_different_cell_id],
+                            _different_fibers_densities
                         )
 
-                    # ignore small arrays
-                    if len(_same_fibers_densities_filtered) < \
-                            MINIMUM_CORRELATION_TIME_POINTS[_different_experiment]:
-                        continue
+                        _same_fibers_densities_filtered, _different_fibers_densities_filtered = \
+                            compute.longest_same_indices_shared_in_borders_sub_array(
+                                _same_fibers_densities, _different_fibers_densities
+                            )
 
-                    _different_correlation = compute_lib.correlation(
-                        compute_lib.derivative(_same_fibers_densities_filtered, _n=DERIVATIVE),
-                        compute_lib.derivative(_different_fibers_densities_filtered, _n=DERIVATIVE)
-                    )
-                    _same_correlations_array.append(_same_correlation)
-                    _different_correlations_array.append(_different_correlation)
+                        # ignore small arrays
+                        if len(_same_fibers_densities_filtered) < \
+                                MINIMUM_CORRELATION_TIME_POINTS[_different_experiment]:
+                            continue
+
+                        _different_correlation = compute_lib.correlation(
+                            compute_lib.derivative(_same_fibers_densities_filtered, _n=DERIVATIVE),
+                            compute_lib.derivative(_different_fibers_densities_filtered, _n=DERIVATIVE)
+                        )
+                        _same_correlations_array.append(_same_correlation)
+                        _different_correlations_array.append(_different_correlation)
 
     # compute fraction
     _annotation = None
@@ -176,14 +180,13 @@ def compute_data(_arguments):
 
 
 def compute_z_array():
-    global _experiments, _experiments_fibers_densities, _z_array, _annotations_array
+    global _experiments, _tuples_by_experiment, _experiments_fibers_densities, _z_array, _annotations_array
 
     _experiments = load.experiments_groups_as_tuples(EXPERIMENTS)
     _experiments = filtering.by_distance_range(_experiments, CELLS_DISTANCE_RANGE)
     _experiments = filtering.by_real_cells(_experiments, _real_cells=REAL_CELLS)
     _experiments = filtering.by_static_cells(_experiments, _static=STATIC)
-    if BAND:
-        _experiments = filtering.by_band(_experiments)
+    _experiments = filtering.by_band(_experiments, _band=BAND)
     print('Total experiments:', len(_experiments))
 
     _offsets_y = np.arange(start=OFFSET_Y_START, stop=OFFSET_Y_END + OFFSET_Y_STEP, step=OFFSET_Y_STEP)
@@ -226,6 +229,8 @@ def compute_z_array():
     for _key in tqdm(_rois_dictionary, desc='Organizing Fibers Densities'):
         _experiments_fibers_densities[_key] = [_fibers_densities[_tuple] for _tuple in _rois_dictionary[_key]]
 
+    _tuples_by_experiment = organize.by_experiment(_experiments)
+
     # clean
     _fibers_densities = None
     _rois_dictionary = None
@@ -253,7 +258,7 @@ def compute_z_array():
 
 
 def main():
-    global _experiments, _experiments_fibers_densities, _z_array, _annotations_array
+    global _experiments, _tuples_by_experiment, _experiments_fibers_densities, _z_array, _annotations_array
 
     compute_z_array()
 
