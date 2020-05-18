@@ -163,8 +163,8 @@ def figure_5():
 
 
 def figure_si_5_high_time_res():
-    print('Panel A')
-    fibers_density.experiments.fibers_vs_offsets_in_axes.main(_high_time_resolution=True)
+    # print('Panel A')
+    # fibers_density.experiments.fibers_vs_offsets_in_axes.main(_high_time_resolution=True)
 
     print('Panel B')
     fibers_density.experiments.same_vs_different_offsets_in_axes.main(_high_time_resolution=True)
@@ -203,6 +203,14 @@ def figure_si_6_betas():
     print('?')
     fibers_density.simulations.same_vs_different_cross_correlation_alphas_betas.main(
         _type='beta', _low_connectivity=False)
+
+
+def figure_si_discussion_saturation():
+    print('Panel A')
+    fibers_density.experiments.inner_regions_saturation.main(_offset_y=0)
+
+    print('Panel B')
+    fibers_density.experiments.inner_regions_saturation.main(_offset_y=0.5)
 
 
 if __name__ == '__main__':
@@ -268,3 +276,6 @@ if __name__ == '__main__':
 
     print('Figure SI 6 - Betas')
     figure_si_6_betas()
+
+    print('Figure SI Discussion - Saturation')
+    figure_si_discussion_saturation()

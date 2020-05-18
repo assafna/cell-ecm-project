@@ -5,7 +5,7 @@ from fibers_density.experiments import fibers_vs_distance_multiple_cell_distance
     correlations_by_derivatives_single_cells, same_vs_different_triplets, same_vs_different_distances, \
     same_vs_different_temporal_assessment, same_vs_different_triplet, same_vs_different_band_vs_no_band, fibers_vs_time, \
     fibers_vs_offsets_in_axes, fibers_vs_same_vs_different_offsets_in_axes, same_vs_different_real_vs_fake, \
-    matchmaking_by_correlation, same_vs_different_offsets_in_axes
+    matchmaking_by_correlation, same_vs_different_offsets_in_axes, inner_regions_saturation
 
 __all__ = [
     fibers_vs_distance_multiple_cell_distances,
@@ -28,5 +28,6 @@ __all__ = [
     fibers_vs_same_vs_different_offsets_in_axes,
     same_vs_different_real_vs_fake,
     matchmaking_by_correlation,
-    same_vs_different_offsets_in_axes
+    same_vs_different_offsets_in_axes,
+    inner_regions_saturation
 ]
