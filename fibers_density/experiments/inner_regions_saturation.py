@@ -10,16 +10,12 @@ from libs.experiments.config import ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT
 from plotting import save
 
 # based on time resolution
-EXPERIMENTS = {
-    False: ['SN16'],
-    True: ['SN41', 'SN44', 'SN45']
-}
+EXPERIMENTS = ['SN16']
 OFFSET_X = 0
-# TODO: set the offset in y according to the angle in the original Z slices of the cells
-OFFSET_Y = 0.5
 OFFSET_Z = 0
 DERIVATIVE = 1
 CELLS_DISTANCE_RANGE = [4, 10]
+BAND = True
 REAL_CELLS = True
 STATIC = False
 MINIMUM_CORRELATION_TIME_POINTS = {
@@ -31,12 +27,12 @@ MINIMUM_CORRELATION_TIME_POINTS = {
 }
 
 
-def compute_fibers_densities(_band=True, _high_time_resolution=False):
-    _experiments = load.experiments_groups_as_tuples(EXPERIMENTS[_high_time_resolution])
+def compute_fibers_densities(_offset_y):
+    _experiments = load.experiments_groups_as_tuples(EXPERIMENTS)
     _experiments = filtering.by_distance_range(_experiments, CELLS_DISTANCE_RANGE)
     _experiments = filtering.by_real_cells(_experiments, _real_cells=REAL_CELLS)
     _experiments = filtering.by_static_cells(_experiments, _static=STATIC)
-    _experiments = filtering.by_band(_experiments, _band=_band)
+    _experiments = filtering.by_band(_experiments, _band=BAND)
     print('Total experiments:', len(_experiments))
 
     _arguments = []
@@ -62,7 +58,7 @@ def compute_fibers_densities(_band=True, _high_time_resolution=False):
                 'length_y': ROI_HEIGHT,
                 'length_z': ROI_WIDTH,
                 'offset_x': OFFSET_X,
-                'offset_y': OFFSET_Y,
+                'offset_y': _offset_y,
                 'offset_z': OFFSET_Z,
                 'cell_id': _cell_id,
                 'direction': 'inside',
@@ -164,8 +160,8 @@ def compute_fibers_densities(_band=True, _high_time_resolution=False):
     return _correlations_array, _saturation_array
 
 
-def main(_band=True, _high_time_resolution=False):
-    _correlations_array, _saturation_array = compute_fibers_densities(_band, _high_time_resolution)
+def main(_offset_y=0.5):
+    _correlations_array, _saturation_array = compute_fibers_densities(_offset_y)
 
     # plot
     _fig = go.Figure(
@@ -197,7 +193,7 @@ def main(_band=True, _high_time_resolution=False):
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        _filename='plot_band_' + str(_band) + '_high_time_res_' + str(_high_time_resolution)
+        _filename='plot_offset_y_' + str(_offset_y)
     )
 
 
