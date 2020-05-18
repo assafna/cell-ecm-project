@@ -170,7 +170,7 @@ def main(_offset_y=0.5):
             y=_correlations_array,
             mode='markers',
             marker={
-                'size': 5,
+                'size': 10,
                 'color': '#ea8500'
             },
             showlegend=False
@@ -178,7 +178,10 @@ def main(_offset_y=0.5):
         layout={
             'xaxis': {
                 'title': 'End mean saturation fraction',
-                'zeroline': False
+                'zeroline': False,
+                'range': [-0.01, 0.1],
+                'tickmode': 'array',
+                'tickvals': [0, 0.05, 0.1]
             },
             'yaxis': {
                 'title': 'Inner regions correlation',
