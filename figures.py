@@ -156,7 +156,18 @@ def figure_si_4_matchmaking():
 
 def figure_5():
     print('Panel B-i')
-    fibers_density.experiments.fibers_vs_offsets_in_axes.main()
+    fibers_density.experiments.fibers_vs_offsets_in_axes.main(_high_time_resolution=False)
+
+    print('Panel B-ii')
+    fibers_density.experiments.same_vs_different_offsets_in_axes.main(_high_time_resolution=False)
+
+
+def figure_si_5_high_time_res():
+    print('Panel A')
+    fibers_density.experiments.fibers_vs_offsets_in_axes.main(_high_time_resolution=True)
+
+    print('Panel B')
+    fibers_density.experiments.same_vs_different_offsets_in_axes.main(_high_time_resolution=True)
 
 
 def figure_si_5_communication_vs_density():
