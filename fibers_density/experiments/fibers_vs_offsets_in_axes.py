@@ -13,9 +13,12 @@ from libs.experiments import load, filtering, compute, paths
 from libs.experiments.config import ROI_LENGTH, ROI_HEIGHT, ROI_WIDTH
 from plotting import save
 
-EXPERIMENTS = ['SN16']
+# based on time resolution
+EXPERIMENTS = {
+    False: ['SN16'],
+    True: ['SN41', 'SN44', 'SN45']
+}
 TIME_POINT = 18
-EXPERIMENTS_STR = '_'.join(EXPERIMENTS)
 REAL_CELLS = True
 STATIC = False
 BAND = True
@@ -62,10 +65,10 @@ def compute_data(_arguments):
         return _offset_y_index, _offset_z_index, None
 
 
-def compute_z_array():
+def compute_z_array(_high_time_resolution):
     global _experiments, _experiments_fibers_densities, _z_array
 
-    _experiments = load.experiments_groups_as_tuples(EXPERIMENTS)
+    _experiments = load.experiments_groups_as_tuples(EXPERIMENTS[_high_time_resolution])
     _experiments = filtering.by_time_points_amount(_experiments, TIME_POINT)
     _experiments = filtering.by_distance_range(_experiments, CELLS_DISTANCE_RANGE)
     _experiments = filtering.by_real_cells(_experiments, _real_cells=REAL_CELLS)
@@ -125,10 +128,10 @@ def compute_z_array():
     return _z_array
 
 
-def main():
+def main(_high_time_resolution=False):
     global _experiments, _experiments_fibers_densities, _z_array
 
-    compute_z_array()
+    compute_z_array(_high_time_resolution)
 
     # plot
     _offsets_y = np.arange(start=OFFSET_Y_START, stop=OFFSET_Y_END + OFFSET_Y_STEP, step=OFFSET_Y_STEP)
@@ -169,7 +172,7 @@ def main():
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        _filename='plot_' + EXPERIMENTS_STR + '_real_' + str(REAL_CELLS) + '_static_' + str(STATIC) + '_band_' +
+        _filename='plot_high_time_' + str(_high_time_resolution) + '_real_' + str(REAL_CELLS) + '_static_' + str(STATIC) + '_band_' +
                   str(BAND)
     )
 
