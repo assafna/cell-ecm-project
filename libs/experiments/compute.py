@@ -125,7 +125,10 @@ def roi_fibers_density(_experiment, _series_id, _group, _time_point, _roi, _time
         _out_of_boundaries = True
 
     # saturation
-    _saturation_fraction = np.count_nonzero(_roi_pixels == 255) / np.size(_roi_pixels)
+    if np.size(_roi_pixels) != 0:
+        _saturation_fraction = np.count_nonzero(_roi_pixels == 255) / np.size(_roi_pixels)
+    else:
+        _saturation_fraction = None
 
     return np.mean(_roi_pixels[_non_zero_mask]), _out_of_boundaries, _saturation_fraction
 
