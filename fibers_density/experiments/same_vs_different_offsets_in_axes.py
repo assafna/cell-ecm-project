@@ -36,7 +36,8 @@ MINIMUM_CORRELATION_TIME_POINTS = {
     'SN16': 15,
     'SN18': 15,
     'SN41': 50,
-    'SN44': 50
+    'SN44': 50,
+    'SN45': 50
 }
 
 # globals
