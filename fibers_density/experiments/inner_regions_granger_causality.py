@@ -150,12 +150,6 @@ def main(_band=None, _high_time_resolution=True):
             if 0 < _min_estimator_lag <= MAXIMUM_LAG:
                 _var_model_results = _var_model.fit(maxlags=_min_estimator_lag, ic=None)
 
-                # _acf_result_1 = \
-                #     acf(x=_var_model_results.resid[:, 0], fft=True, nlags=_min_estimator_lag, qstat=True)
-                # _acf_result_2 = \
-                #     acf(x=_var_model_results.resid[:, 1], fft=True, nlags=_min_estimator_lag, qstat=True)
-                # if _acf_result_1[2][0] > 0.05 and _acf_result_2[2][0] > 0.05:
-                #     _residuals_autocorrelation = False
                 _whiteness = _var_model_results.test_whiteness(nlags=_min_estimator_lag + 1)
 
                 # no autocorrelation in the residuals
@@ -167,7 +161,7 @@ def main(_band=None, _high_time_resolution=True):
 
                         if _granger.pvalue < 0.05:
                             _normality = _var_model_results.test_normality()
-                            _inst_granger = _var_model_results.test_inst_causality (causing=_causing)
+                            _inst_granger = _var_model_results.test_inst_causality(causing=_causing)
 
                             print(_tuple, _causing.capitalize() + ' causes ' + _caused + '!',
                                   'time-points: ' + str(len(_left_cell_fibers_densities_derivative)),
