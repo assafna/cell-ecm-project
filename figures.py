@@ -251,6 +251,9 @@ if __name__ == '__main__':
     print('Figure 5')
     figure_5()
 
+    print('Figure SI 5 - High Temporal Resolution')
+    figure_si_5_high_time_res()
+
     print('Figure SI 5 - Communication vs. Density')
     figure_si_5_communication_vs_density()
 
