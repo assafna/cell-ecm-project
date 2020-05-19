@@ -33,9 +33,12 @@ MINIMUM_CORRELATION_TIME_POINTS = {
 }
 
 
-def compute_fibers_densities(_band=True, _high_time_resolution=False):
+def compute_fibers_densities(_band=True, _high_time_resolution=False, _cells_distance_range=None):
+    if _cells_distance_range is None:
+        _cells_distance_range = CELLS_DISTANCE_RANGE
+
     _experiments = load.experiments_groups_as_tuples(EXPERIMENTS[_high_time_resolution])
-    _experiments = filtering.by_distance_range(_experiments, CELLS_DISTANCE_RANGE)
+    _experiments = filtering.by_distance_range(_experiments, _cells_distance_range)
     _experiments = filtering.by_real_cells(_experiments, _real_cells=REAL_CELLS)
     _experiments = filtering.by_static_cells(_experiments, _static=STATIC)
     _experiments = filtering.by_band(_experiments, _band=_band)
@@ -194,8 +197,9 @@ def compute_fibers_densities(_band=True, _high_time_resolution=False):
     return _same_correlations_array, _different_correlations_array
 
 
-def main(_band=True, _high_time_resolution=False):
-    _same_correlations_array, _different_correlations_array = compute_fibers_densities(_band, _high_time_resolution)
+def main(_band=True, _high_time_resolution=False, _cells_distance_range=None):
+    _same_correlations_array, _different_correlations_array =\
+        compute_fibers_densities(_band, _high_time_resolution, _cells_distance_range)
 
     # plot
     _fig = go.Figure(
@@ -265,7 +269,8 @@ def main(_band=True, _high_time_resolution=False):
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        _filename='plot_band_' + str(_band) + '_high_time_res_' + str(_high_time_resolution)
+        _filename='plot_band_' + str(_band) + '_high_time_res_' + str(_high_time_resolution) + '_range_' +
+                  '_'.join([str(_distance) for _distance in _cells_distance_range])
     )
 
 
