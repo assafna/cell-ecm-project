@@ -186,6 +186,14 @@ def figure_5():
     fibers_density.experiments.same_vs_different_offsets_in_axes.main(_high_time_resolution=False)
 
 
+def figure_si_5_no_band():
+    print('Panel A')
+    fibers_density.experiments.fibers_vs_offsets_in_axes.main(_band=False, _high_time_resolution=False)
+
+    print('Panel B')
+    fibers_density.experiments.same_vs_different_offsets_in_axes.main(_band=False, _high_time_resolution=False)
+
+
 def figure_si_5_high_time_res():
     print('Panel A')
     fibers_density.experiments.fibers_vs_offsets_in_axes.main(_high_time_resolution=True)
@@ -297,6 +305,9 @@ if __name__ == '__main__':
 
     print('Figure 5')
     figure_5()
+
+    print('Figure SI 5 - No Band')
+    figure_si_5_no_band()
 
     print('Figure SI 5 - High Temporal Resolution')
     figure_si_5_high_time_res()
