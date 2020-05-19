@@ -208,7 +208,7 @@ def figure_si_6_betas():
 def figure_si_6_granger_causality():
     print('?')
     fibers_density.experiments.inner_regions_granger_causality.main(
-        _band=None, _high_time_resolution=True, _tuple_to_plot=('SN45', 2, 'cells_2_3'))
+        _band=None, _high_time_resolution=True, _tuples_to_plot=[('SN45', 2, 'cells_2_3')])
 
 
 def figure_si_discussion_saturation():

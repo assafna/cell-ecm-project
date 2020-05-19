@@ -35,7 +35,7 @@ ADF_TEST = True
 KPSS_TEST = True
 
 
-def main(_band=None, _high_time_resolution=True, _tuple_to_plot=None):
+def main(_band=None, _high_time_resolution=True, _tuples_to_plot=None):
     _experiments = load.experiments_groups_as_tuples(EXPERIMENTS[_high_time_resolution])
     _experiments = filtering.by_time_points_amount(_experiments, _time_points=MINIMUM_TIME_POINTS)
     _experiments = filtering.by_distance_range(_experiments, _distance_range=CELLS_DISTANCE_RANGE)
@@ -182,7 +182,7 @@ def main(_band=None, _high_time_resolution=True, _tuple_to_plot=None):
                                   sep='\t')
 
                             # plots
-                            if _tuple_to_plot is not None and _tuple_to_plot == _tuple:
+                            if _tuples_to_plot is not None and _tuple in _tuples_to_plot:
                                 _y_arrays = [_left_cell_fibers_densities_derivative,
                                              _right_cell_fibers_densities_derivative]
                                 _names_array = ['Left cell', 'Right cell']
