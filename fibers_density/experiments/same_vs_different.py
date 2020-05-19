@@ -22,8 +22,6 @@ OFFSET_Y = 0.5
 OFFSET_Z = 0
 DERIVATIVE = 1
 CELLS_DISTANCE_RANGE = [4, 10]
-REAL_CELLS = True
-STATIC = False
 MINIMUM_CORRELATION_TIME_POINTS = {
     'SN16': 15,
     'SN18': 15,
@@ -33,14 +31,15 @@ MINIMUM_CORRELATION_TIME_POINTS = {
 }
 
 
-def compute_fibers_densities(_band=True, _high_time_resolution=False, _cells_distance_range=None):
+def compute_fibers_densities(_real_cells=True, _static=False, _band=True, _high_time_resolution=False,
+                             _cells_distance_range=None):
     if _cells_distance_range is None:
         _cells_distance_range = CELLS_DISTANCE_RANGE
 
     _experiments = load.experiments_groups_as_tuples(EXPERIMENTS[_high_time_resolution])
     _experiments = filtering.by_distance_range(_experiments, _cells_distance_range)
-    _experiments = filtering.by_real_cells(_experiments, _real_cells=REAL_CELLS)
-    _experiments = filtering.by_static_cells(_experiments, _static=STATIC)
+    _experiments = filtering.by_real_cells(_experiments, _real_cells=_real_cells)
+    _experiments = filtering.by_static_cells(_experiments, _static=_static)
     _experiments = filtering.by_band(_experiments, _band=_band)
     print('Total experiments:', len(_experiments))
 
@@ -197,9 +196,9 @@ def compute_fibers_densities(_band=True, _high_time_resolution=False, _cells_dis
     return _same_correlations_array, _different_correlations_array
 
 
-def main(_band=True, _high_time_resolution=False, _cells_distance_range=None):
+def main(_real_cells=True, _static=False, _band=True, _high_time_resolution=False, _cells_distance_range=None):
     _same_correlations_array, _different_correlations_array =\
-        compute_fibers_densities(_band, _high_time_resolution, _cells_distance_range)
+        compute_fibers_densities(_real_cells, _static, _band, _high_time_resolution, _cells_distance_range)
 
     # plot
     _fig = go.Figure(
@@ -269,8 +268,8 @@ def main(_band=True, _high_time_resolution=False, _cells_distance_range=None):
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        _filename='plot_band_' + str(_band) + '_high_time_res_' + str(_high_time_resolution) + '_range_' +
-                  '_'.join([str(_distance) for _distance in _cells_distance_range])
+        _filename='plot_real_' + str(_real_cells) + '_static_' + str(_static) + '_band_' + str(_band) +
+                  '_high_time_' + str(_high_time_resolution) + '_range_' + '_'.join([str(_distance) for _distance in _cells_distance_range])
     )
 
 
