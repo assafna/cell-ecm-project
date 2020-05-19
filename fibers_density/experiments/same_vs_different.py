@@ -33,9 +33,6 @@ MINIMUM_CORRELATION_TIME_POINTS = {
 
 def compute_fibers_densities(_real_cells=True, _static=False, _band=True, _high_time_resolution=False,
                              _cells_distance_range=None):
-    if _cells_distance_range is None:
-        _cells_distance_range = CELLS_DISTANCE_RANGE
-
     _experiments = load.experiments_groups_as_tuples(EXPERIMENTS[_high_time_resolution])
     _experiments = filtering.by_distance_range(_experiments, _cells_distance_range)
     _experiments = filtering.by_real_cells(_experiments, _real_cells=_real_cells)
@@ -197,6 +194,9 @@ def compute_fibers_densities(_real_cells=True, _static=False, _band=True, _high_
 
 
 def main(_real_cells=True, _static=False, _band=True, _high_time_resolution=False, _cells_distance_range=None):
+    if _cells_distance_range is None:
+        _cells_distance_range = CELLS_DISTANCE_RANGE
+
     _same_correlations_array, _different_correlations_array =\
         compute_fibers_densities(_real_cells, _static, _band, _high_time_resolution, _cells_distance_range)
 
@@ -269,7 +269,8 @@ def main(_real_cells=True, _static=False, _band=True, _high_time_resolution=Fals
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
         _filename='plot_real_' + str(_real_cells) + '_static_' + str(_static) + '_band_' + str(_band) +
-                  '_high_time_' + str(_high_time_resolution) + '_range_' + '_'.join([str(_distance) for _distance in _cells_distance_range])
+                  '_high_time_' + str(_high_time_resolution) + '_range_' +
+                  '_'.join([str(_distance) for _distance in _cells_distance_range])
     )
 
 
