@@ -128,6 +128,20 @@ def figure_si_4_single_cell_detrending():
     fibers_density.experiments.correlations_by_derivatives_single_cells.main()
 
 
+def figure_si_4_same_vs_diff_distances():
+    print('Panel A')
+    fibers_density.experiments.same_vs_different.main(
+        _band=True, _high_time_resolution=False, _cells_distance_range=[4, 6])
+
+    print('Panel B')
+    fibers_density.experiments.same_vs_different.main(
+        _band=True, _high_time_resolution=False, _cells_distance_range=[6, 8])
+
+    print('Panel C')
+    fibers_density.experiments.same_vs_different.main(
+        _band=True, _high_time_resolution=False, _cells_distance_range=[8, 10])
+
+
 def figure_si_4_temporal_assessment():
     print('Panel A')
     fibers_density.experiments.same_vs_different_temporal_assessment.main(_high_time_resolution=False)
@@ -258,6 +272,12 @@ if __name__ == '__main__':
 
     print('Figure SI 4 - Single Cell Detrending')
     figure_si_4_single_cell_detrending()
+
+    print('Figure SI 4 - Same vs. Different - Distances')
+    figure_si_4_same_vs_diff_distances()
+
+    print('Figure SI 4 - Temporal Assessment')
+    figure_si_4_temporal_assessment()
 
     print('Figure SI 4 - Matchmaking')
     figure_si_4_matchmaking()
