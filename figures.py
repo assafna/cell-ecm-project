@@ -142,6 +142,16 @@ def figure_si_4_same_vs_diff_distances():
         _band=True, _high_time_resolution=False, _cells_distance_range=[8, 10])
 
 
+def figure_si_4_same_vs_diff_controls():
+    print('Panel C')
+    fibers_density.experiments.same_vs_different.main(
+        _real_cells=False, _static=False, _band=True, _high_time_resolution=False)
+
+    print('Panel D')
+    fibers_density.experiments.same_vs_different.main(
+        _real_cells=False, _static=True, _band=False, _high_time_resolution=False)
+
+
 def figure_si_4_temporal_assessment():
     print('Panel A')
     fibers_density.experiments.same_vs_different_temporal_assessment.main(_high_time_resolution=False)
@@ -275,6 +285,9 @@ if __name__ == '__main__':
 
     print('Figure SI 4 - Same vs. Different - Distances')
     figure_si_4_same_vs_diff_distances()
+
+    print('Figure SI 4 - Same vs. Different - Controls')
+    figure_si_4_same_vs_diff_controls()
 
     print('Figure SI 4 - Temporal Assessment')
     figure_si_4_temporal_assessment()
