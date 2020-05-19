@@ -1,17 +1,19 @@
+import os
 import warnings
 
+import numpy as np
 import pandas as pd
-from statsmodels.stats.diagnostic import acorr_ljungbox
-from statsmodels.stats.stattools import durbin_watson
+import plotly.graph_objs as go
 from statsmodels.tools.sm_exceptions import InterpolationWarning
 from statsmodels.tsa.api import VAR
-from statsmodels.tsa.stattools import grangercausalitytests, adfuller, kpss, acf
+from statsmodels.tsa.stattools import adfuller, kpss
 
 from libs import compute_lib
-from libs.experiments import load, filtering, compute
+from libs.experiments import load, filtering, compute, paths
 from libs.experiments.config import ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT
-
 # based on time resolution
+from plotting import save
+
 EXPERIMENTS = {
     False: ['SN16'],
     True: ['SN41', 'SN44', 'SN45']
@@ -20,6 +22,7 @@ OFFSET_X = 0
 # TODO: set the offset in y according to the angle in the original Z slices of the cells
 OFFSET_Y = 0.5
 OFFSET_Z = 0
+TIME_RESOLUTION = 5
 CELLS_DISTANCE_RANGE = [4, 10]
 REAL_CELLS = True
 STATIC = False
@@ -32,7 +35,7 @@ ADF_TEST = True
 KPSS_TEST = True
 
 
-def main(_band=None, _high_time_resolution=True):
+def main(_band=None, _high_time_resolution=True, _tuple_to_plot=None):
     _experiments = load.experiments_groups_as_tuples(EXPERIMENTS[_high_time_resolution])
     _experiments = filtering.by_time_points_amount(_experiments, _time_points=MINIMUM_TIME_POINTS)
     _experiments = filtering.by_distance_range(_experiments, _distance_range=CELLS_DISTANCE_RANGE)
@@ -101,6 +104,12 @@ def main(_band=None, _high_time_resolution=True):
         # ignore small arrays
         if len(_left_cell_fibers_densities_filtered) < MINIMUM_TIME_POINTS:
             continue
+
+        _start_time_point = 0
+        for _left in _left_cell_fibers_densities:
+            if _left[0] == _left_cell_fibers_densities_filtered[0]:
+                break
+            _start_time_point += 1
 
         # stationary test
         with warnings.catch_warnings():
@@ -175,6 +184,53 @@ def main(_band=None, _high_time_resolution=True):
         # not enough time points
         except ValueError:
             continue
+
+        # plot
+        if _tuple_to_plot is not None and _tuple_to_plot == _tuple:
+            _y_arrays = [_left_cell_fibers_densities_derivative, _right_cell_fibers_densities_derivative]
+            _names_array = ['Left cell', 'Right cell']
+            _colors_array = ['#844b00', '#ea8500']
+            _fig = go.Figure(
+                data=[
+                    go.Scatter(
+                        x=np.arange(
+                            start=_start_time_point,
+                            stop=_start_time_point + len(_left_cell_fibers_densities_derivative),
+                            step=1) * TIME_RESOLUTION,
+                        y=_y,
+                        name=_name,
+                        mode='lines',
+                        line={
+                            'color': _color
+                        }
+                    ) for _y, _name, _color in zip(_y_arrays, _names_array, _colors_array)
+                ],
+                layout={
+                    'xaxis': {
+                        'title': 'Time (minutes)',
+                        'zeroline': False
+                    },
+                    'yaxis': {
+                        'title': 'Fibers density z-score' + '\'' * _derivative,
+                        'zeroline': False
+                    },
+                    'legend': {
+                        'xanchor': 'left',
+                        'x': 0.1,
+                        'yanchor': 'top',
+                        'bordercolor': 'black',
+                        'borderwidth': 2,
+                        'bgcolor': 'white'
+                    },
+                }
+            )
+
+            _experiment, _series_id, _group = _tuple
+            save.to_html(
+                _fig=_fig,
+                _path=os.path.join(paths.PLOTS, save.get_module_name()),
+                _filename='plot_' + _experiment + '_' + str(_series_id) + '_' + _group
+            )
 
 
 if __name__ == '__main__':
