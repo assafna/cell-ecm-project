@@ -181,56 +181,104 @@ def main(_band=None, _high_time_resolution=True, _tuple_to_plot=None):
                                   'inst p-value: ' + str(round(_inst_granger.pvalue, 4)),
                                   sep='\t')
 
+                            # plots
+                            if _tuple_to_plot is not None and _tuple_to_plot == _tuple:
+                                _y_arrays = [_left_cell_fibers_densities_derivative,
+                                             _right_cell_fibers_densities_derivative]
+                                _names_array = ['Left cell', 'Right cell']
+                                _colors_array = ['#844b00', '#ea8500']
+                                _fig = go.Figure(
+                                    data=[
+                                        go.Scatter(
+                                            x=np.arange(
+                                                start=_start_time_point,
+                                                stop=_start_time_point + len(_left_cell_fibers_densities_derivative),
+                                                step=1) * TIME_RESOLUTION,
+                                            y=_y,
+                                            name=_name,
+                                            mode='lines',
+                                            line={
+                                                'color': _color,
+                                                'width': 1
+                                            }
+                                        ) for _y, _name, _color in zip(_y_arrays, _names_array, _colors_array)
+                                    ],
+                                    layout={
+                                        'xaxis': {
+                                            'title': 'Time (minutes)',
+                                            'zeroline': False
+                                        },
+                                        'yaxis': {
+                                            'title': 'Fibers density z-score' + '\'' * _derivative,
+                                            'zeroline': False
+                                        },
+                                        'legend': {
+                                            'xanchor': 'left',
+                                            'x': 0.1,
+                                            'yanchor': 'top',
+                                            'bordercolor': 'black',
+                                            'borderwidth': 2,
+                                            'bgcolor': 'white'
+                                        },
+                                    }
+                                )
+
+                                _experiment, _series_id, _group = _tuple
+                                save.to_html(
+                                    _fig=_fig,
+                                    _path=os.path.join(paths.PLOTS, save.get_module_name()),
+                                    _filename='plot_' + _experiment + '_' + str(_series_id) + '_' + _group
+                                )
+
+                                # residuals
+                                _y_arrays = \
+                                    [_var_model_results.resid.values[:, 0], _var_model_results.resid.values[:, 1]]
+                                _fig = go.Figure(
+                                    data=[
+                                        go.Scatter(
+                                            x=np.arange(
+                                                start=_start_time_point,
+                                                stop=_start_time_point + len(_y),
+                                                step=1) * TIME_RESOLUTION,
+                                            y=_y,
+                                            name=_name,
+                                            mode='lines',
+                                            line={
+                                                'color': _color,
+                                                'width': 1
+                                            }
+                                        ) for _y, _name, _color in zip(_y_arrays, _names_array, _colors_array)
+                                    ],
+                                    layout={
+                                        'xaxis': {
+                                            'title': 'Time (minutes)',
+                                            'zeroline': False
+                                        },
+                                        'yaxis': {
+                                            'title': 'Residual',
+                                            'zeroline': False
+                                        },
+                                        'legend': {
+                                            'xanchor': 'left',
+                                            'x': 0.1,
+                                            'yanchor': 'top',
+                                            'bordercolor': 'black',
+                                            'borderwidth': 2,
+                                            'bgcolor': 'white'
+                                        },
+                                    }
+                                )
+
+                                _experiment, _series_id, _group = _tuple
+                                save.to_html(
+                                    _fig=_fig,
+                                    _path=os.path.join(paths.PLOTS, save.get_module_name()),
+                                    _filename='plot_residuals_' + _experiment + '_' + str(_series_id) + '_' + _group
+                                )
+
         # not enough time points
         except ValueError:
             continue
-
-        # plot
-        if _tuple_to_plot is not None and _tuple_to_plot == _tuple:
-            _y_arrays = [_left_cell_fibers_densities_derivative, _right_cell_fibers_densities_derivative]
-            _names_array = ['Left cell', 'Right cell']
-            _colors_array = ['#844b00', '#ea8500']
-            _fig = go.Figure(
-                data=[
-                    go.Scatter(
-                        x=np.arange(
-                            start=_start_time_point,
-                            stop=_start_time_point + len(_left_cell_fibers_densities_derivative),
-                            step=1) * TIME_RESOLUTION,
-                        y=_y,
-                        name=_name,
-                        mode='lines',
-                        line={
-                            'color': _color
-                        }
-                    ) for _y, _name, _color in zip(_y_arrays, _names_array, _colors_array)
-                ],
-                layout={
-                    'xaxis': {
-                        'title': 'Time (minutes)',
-                        'zeroline': False
-                    },
-                    'yaxis': {
-                        'title': 'Fibers density z-score' + '\'' * _derivative,
-                        'zeroline': False
-                    },
-                    'legend': {
-                        'xanchor': 'left',
-                        'x': 0.1,
-                        'yanchor': 'top',
-                        'bordercolor': 'black',
-                        'borderwidth': 2,
-                        'bgcolor': 'white'
-                    },
-                }
-            )
-
-            _experiment, _series_id, _group = _tuple
-            save.to_html(
-                _fig=_fig,
-                _path=os.path.join(paths.PLOTS, save.get_module_name()),
-                _filename='plot_' + _experiment + '_' + str(_series_id) + '_' + _group
-            )
 
 
 if __name__ == '__main__':
