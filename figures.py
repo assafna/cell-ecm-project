@@ -143,11 +143,11 @@ def figure_si_4_same_vs_diff_distances():
 
 
 def figure_si_4_same_vs_diff_controls():
-    print('Panel C')
+    print('Panel A-ii')
     fibers_density.experiments.same_vs_different.main(
         _real_cells=False, _static=False, _band=True, _high_time_resolution=False)
 
-    print('Panel D')
+    print('Panel B-ii')
     fibers_density.experiments.same_vs_different.main(
         _real_cells=False, _static=True, _band=False, _high_time_resolution=False)
 
