@@ -202,6 +202,14 @@ def figure_si_5_high_time_res():
     fibers_density.experiments.same_vs_different_offsets_in_axes.main(_high_time_resolution=True)
 
 
+def figure_si_5_simulations():
+    print('Panel A')
+    fibers_density.simulations.fibers_vs_offsets_in_axes.main(_low_connectivity=False)
+
+    print('Panel B')
+    fibers_density.simulations.same_vs_different_offsets_in_axes.main(_low_connectivity=False)
+
+
 def figure_si_5_communication_vs_density():
     fibers_density.experiments.fibers_vs_same_vs_different_offsets_in_axes.main()
 
@@ -311,6 +319,9 @@ if __name__ == '__main__':
 
     print('Figure SI 5 - High Temporal Resolution')
     figure_si_5_high_time_res()
+
+    print('Figure SI 5 - Simulations')
+    figure_si_5_simulations()
 
     print('Figure SI 5 - Communication vs. Density')
     figure_si_5_communication_vs_density()
