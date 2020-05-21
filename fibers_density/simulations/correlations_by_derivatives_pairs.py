@@ -81,6 +81,7 @@ def main():
             print('Derivative:', _derivative, wilcoxon(_y_array))
 
         # plot
+        _y_title = 'Inner correlation' if _direction == 'inside' else 'Outer correlation'
         _colors_array = ['#011f4b', '#005b96', '#74c2e8']
         _fig = go.Figure(
             data=[
@@ -108,7 +109,7 @@ def main():
                     'zeroline': False
                 },
                 'yaxis': {
-                    'title': 'Correlation',
+                    'title': _y_title,
                     'range': [-1, 1],
                     'zeroline': False,
                     'tickmode': 'array',
