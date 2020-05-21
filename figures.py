@@ -230,19 +230,31 @@ def figure_si_5_real_vs_fake():
 
 def figure_6():
     print('Panel B')
-    fibers_density.simulations.same_vs_different_cross_correlation.main(_alpha=1, _beta=1, _low_connectivity=False)
+    fibers_density.simulations.same_vs_different_cross_correlation.main(
+        _alpha=1, _beta=1, _low_connectivity=False, _plots=['same'])
 
-
-def figure_si_6_alphas():
-    print('?')
+    print('Panel C')
     fibers_density.simulations.same_vs_different_cross_correlation_alphas_betas.main(
-        _type='alpha', _low_connectivity=False)
+        _type='alpha', _low_connectivity=False, _plots=['same'])
 
 
 def figure_si_6_betas():
-    print('?')
     fibers_density.simulations.same_vs_different_cross_correlation_alphas_betas.main(
-        _type='beta', _low_connectivity=False)
+        _type='beta', _low_connectivity=False, _plots=['same'])
+
+
+def figure_si_6_different_network():
+    print('Panel A')
+    fibers_density.simulations.same_vs_different_cross_correlation.main(
+        _alpha=1, _beta=1, _low_connectivity=False, _plots=['different'])
+
+    print('Panel B')
+    fibers_density.simulations.same_vs_different_cross_correlation_alphas_betas.main(
+        _type='alpha', _low_connectivity=False, _plots=['different'])
+
+    print('Panel C')
+    fibers_density.simulations.same_vs_different_cross_correlation_alphas_betas.main(
+        _type='beta', _low_connectivity=False, _plots=['different'])
 
 
 def figure_si_6_granger_causality():
@@ -332,11 +344,11 @@ if __name__ == '__main__':
     print('Figure 6')
     figure_6()
 
-    print('Figure SI 6 - Alphas')
-    figure_si_6_alphas()
-
     print('Figure SI 6 - Betas')
     figure_si_6_betas()
+
+    print('Figure SI 6 - Different Network')
+    figure_si_6_different_network()
 
     print('Figure SI 6 - Granger Causality')
     figure_si_6_granger_causality()
