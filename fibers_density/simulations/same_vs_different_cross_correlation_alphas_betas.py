@@ -24,7 +24,7 @@ BETAS = [1, 1.05, 1.1, 1.2]
 BETA = 1
 
 
-def main(_type='alpha', _low_connectivity=False):
+def main(_type='alpha', _low_connectivity=False, _plots=None):
     _same_arrays = []
     _different_arrays = []
     _same_highest = []
@@ -52,81 +52,85 @@ def main(_type='alpha', _low_connectivity=False):
         _same_highest.append(_same_time_lags_highest)
         _different_highest.append(_different_time_lags_highest)
 
-    # box plots
-    for _name, _arrays in zip(['same', 'different'], [_same_arrays, _different_arrays]):
-        _fig = go.Figure(
-            data=[
-                go.Box(
-                    y=_y,
-                    name=_name,
-                    boxpoints=False,
-                    line={
-                        'width': 1
-                    },
-                    marker={
-                        'size': 10,
-                        'color': '#2e82bf'
-                    },
-                    showlegend=False
-                ) for _y, _name in zip(_arrays, _names)
-            ],
-            layout={
-                'xaxis': {
-                    'title': _type.capitalize(),
-                    'zeroline': False,
-                    'tickmode': 'array',
-                    'tickvals': _names,
-                    'type': 'category'
-                },
-                'yaxis': {
-                    'title': _name.capitalize() + ' network correlations',
-                    'range': [-1, 1.1],
-                    'zeroline': False,
-                    'tickmode': 'array',
-                    'tickvals': [-1, -0.5, 0, 0.5, 1]
-                }
-            }
-        )
+    if _plots is not None:
 
-        save.to_html(
-            _fig=_fig,
-            _path=os.path.join(paths.PLOTS, save.get_module_name()),
-            _filename='plot_box_' + _type + '_low_con_' + str(_low_connectivity) + '_' + _name
-        )
+        # box plot
+        for _name, _arrays in zip(['same', 'different'], [_same_arrays, _different_arrays]):
+            if _name in _plots:
+                _fig = go.Figure(
+                    data=[
+                        go.Box(
+                            y=_y,
+                            name=_name,
+                            boxpoints=False,
+                            line={
+                                'width': 1
+                            },
+                            marker={
+                                'size': 10,
+                                'color': '#2e82bf'
+                            },
+                            showlegend=False
+                        ) for _y, _name in zip(_arrays, _names)
+                    ],
+                    layout={
+                        'xaxis': {
+                            'title': _type.capitalize(),
+                            'zeroline': False,
+                            'tickmode': 'array',
+                            'tickvals': _names,
+                            'type': 'category'
+                        },
+                        'yaxis': {
+                            'title': _name.capitalize() + ' network correlations',
+                            'range': [-1, 1.1],
+                            'zeroline': False,
+                            'tickmode': 'array',
+                            'tickvals': [-1, -0.5, 0, 0.5, 1]
+                        }
+                    }
+                )
 
-    # bar plot
-    for _name, _sums in zip(['same', 'different'], [_same_highest, _different_highest]):
-        _fig = go.Figure(
-            data=go.Bar(
-                x=_names,
-                y=[_type_sums[TIME_LAG_INDEX] / sum(_type_sums) for _type_sums in _sums],
-                marker={
-                    'color': '#2e82bf'
-                }
-            ),
-            layout={
-                'xaxis': {
-                    'title': _type.capitalize(),
-                    'zeroline': False,
-                    'tickmode': 'array',
-                    'tickvals': _names,
-                    'type': 'category'
-                },
-                'yaxis': {
-                    'title': 'Lag ' + str(TIME_LAG) + ' highest correlations fraction',
-                    'range': [0, 1.1],
-                    'zeroline': False,
-                    'tickmode': 'array',
-                    'tickvals': [0, 0.5, 1]
-                }
-            }
-        )
+                save.to_html(
+                    _fig=_fig,
+                    _path=os.path.join(paths.PLOTS, save.get_module_name()),
+                    _filename='plot_box_' + _type + '_low_con_' + str(_low_connectivity) + '_' + _name
+                )
 
-        save.to_html(
-            _fig=_fig,
-            _path=os.path.join(paths.PLOTS, save.get_module_name()),
-            _filename='plot_bar_' + _type + '_low_con_' + str(_low_connectivity) + '_' + _name
-        )
+        # bar plot
+        for _name, _sums in zip(['same', 'different'], [_same_highest, _different_highest]):
+            if _name in _plots:
+                _fig = go.Figure(
+                    data=go.Bar(
+                        x=_names,
+                        y=[_type_sums[TIME_LAG_INDEX] / sum(_type_sums) for _type_sums in _sums],
+                        marker={
+                            'color': '#2e82bf'
+                        }
+                    ),
+                    layout={
+                        'xaxis': {
+                            'title': _type.capitalize(),
+                            'zeroline': False,
+                            'tickmode': 'array',
+                            'tickvals': _names,
+                            'type': 'category'
+                        },
+                        'yaxis': {
+                            'title': 'Lag ' + str(TIME_LAG) + ' highest correlations fraction',
+                            'range': [0, 1.1],
+                            'zeroline': False,
+                            'tickmode': 'array',
+                            'tickvals': [0, 0.5, 1]
+                        }
+                    }
+                )
+
+                save.to_html(
+                    _fig=_fig,
+                    _path=os.path.join(paths.PLOTS, save.get_module_name()),
+                    _filename='plot_bar_' + _type + '_low_con_' + str(_low_connectivity) + '_' + _name
+                )
 
 
 if __name__ == '__main__':
