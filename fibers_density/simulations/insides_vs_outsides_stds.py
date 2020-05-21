@@ -108,14 +108,14 @@ def main():
         ],
         layout={
             'xaxis': {
-                'title': 'Insides correlation',
+                'title': 'Inner correlation',
                 'zeroline': False,
                 'range': [-1.1, 1.2],
                 'tickmode': 'array',
                 'tickvals': [-1, -0.5, 0, 0.5, 1]
             },
             'yaxis': {
-                'title': 'Outsides correlation',
+                'title': 'Outer correlation',
                 'zeroline': False,
                 'range': [-1.1, 1.2],
                 'tickmode': 'array',
@@ -190,14 +190,14 @@ def main():
             ),
             layout={
                 'xaxis': {
-                    'title': 'Insides correlation',
+                    'title': 'Inner correlation',
                     'zeroline': False,
                     'range': [-1.1, 1.2],
                     'tickmode': 'array',
                     'tickvals': [-1, -0.5, 0, 0.5, 1]
                 },
                 'yaxis': {
-                    'title': 'Outsides correlation',
+                    'title': 'Outer correlation',
                     'zeroline': False,
                     'range': [-1.1, 1.2],
                     'tickmode': 'array',
@@ -290,7 +290,7 @@ def main():
                 'zeroline': False
             },
             'yaxis': {
-                'title': 'Distance from y = x',
+                'title': 'Inner minus outer correlation',
                 'zeroline': False,
                 'range': [-0.5, 0.5],
                 'tickmode': 'array',
