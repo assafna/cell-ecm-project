@@ -82,7 +82,7 @@ def main():
               str(_stationary_count / len(_kpss_y_arrays[_derivative_index]) * 100) + '%')
     print('ADF:')
     for _derivative_index, _derivative in enumerate(DERIVATIVES):
-        _stationary_count = len([_value for _value in _adf_y_arrays[_derivative_index] if _value < 0.95])
+        _stationary_count = len([_value for _value in _adf_y_arrays[_derivative_index] if _value < 0.05])
         print('Derivative:', _derivative, 'Stationary:',
               str(_stationary_count / len(_adf_y_arrays[_derivative_index]) * 100) + '%')
 
@@ -92,8 +92,8 @@ def main():
             zip(
                 ['kpss', 'adf'],
                 ['KPSS test p-value', 'ADF test p-value'],
-                [[0.05, 0.1], [0, 0.5, 0.95]],
-                [0.05, 0.95],
+                [[0.05, 0.1], [0.05, 1]],
+                [0.05, 0.05],
                 [_kpss_y_arrays, _adf_y_arrays]
             ):
         _fig = go.Figure(
@@ -110,11 +110,7 @@ def main():
                     fillcolor='white',
                     marker={
                         'size': 10,
-                        'color': _color,
-                        # 'line': {
-                        #     'width': 1,
-                        #     'color': 'white'
-                        # }
+                        'color': _color
                     },
                     opacity=0.7,
                     showlegend=False
