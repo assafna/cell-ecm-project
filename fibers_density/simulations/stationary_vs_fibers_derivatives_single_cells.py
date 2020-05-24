@@ -1,8 +1,10 @@
 import os
+import warnings
 
 import numpy as np
 import plotly.graph_objs as go
 from multiprocess.pool import Pool
+from statsmodels.tools.sm_exceptions import InterpolationWarning
 from statsmodels.tsa.stattools import kpss, adfuller
 from tqdm import tqdm
 
@@ -70,10 +72,12 @@ def main():
         _cell_fibers_densities = np.mean(_cell_fibers_densities, axis=0)
         for _derivative_index, _derivative in enumerate(DERIVATIVES):
             _cell_fibers_densities_derivative = compute_lib.derivative(_cell_fibers_densities, _n=_derivative)
-            _, _kpss_p_value, _, _ = kpss(_cell_fibers_densities_derivative)
-            _kpss_y_arrays[_derivative_index].append(_kpss_p_value)
-            _, _adf_p_value, _, _, _, _ = adfuller(_cell_fibers_densities_derivative)
-            _adf_y_arrays[_derivative_index].append(_adf_p_value)
+            with warnings.catch_warnings():
+                warnings.simplefilter('ignore', category=InterpolationWarning)
+                _, _kpss_p_value, _, _ = kpss(_cell_fibers_densities_derivative, nlags='legacy')
+                _kpss_y_arrays[_derivative_index].append(_kpss_p_value)
+                _, _adf_p_value, _, _, _, _ = adfuller(_cell_fibers_densities_derivative)
+                _adf_y_arrays[_derivative_index].append(_adf_p_value)
 
     print('Total cells:', len(_kpss_y_arrays[0]))
 

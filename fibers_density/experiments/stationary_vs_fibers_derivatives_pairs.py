@@ -72,7 +72,7 @@ def main():
 
             for _derivative_index, _derivative in enumerate(DERIVATIVES):
                 _cell_fibers_densities_derivative = compute_lib.derivative(_cell_fibers_densities, _n=_derivative)
-                _, _kpss_p_value, _, _ = kpss(_cell_fibers_densities_derivative)
+                _, _kpss_p_value, _, _ = kpss(_cell_fibers_densities_derivative, nlags='legacy')
                 _kpss_y_arrays[_derivative_index].append(_kpss_p_value)
                 _, _adf_p_value, _, _, _, _ = adfuller(_cell_fibers_densities_derivative)
                 _adf_y_arrays[_derivative_index].append(_adf_p_value)
