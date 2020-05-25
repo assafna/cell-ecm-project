@@ -180,11 +180,7 @@ def main():
                 mode='markers',
                 marker={
                     'size': 15,
-                    'color': _color,
-                    'line': {
-                        'width': 0.5,
-                        'color': '#ea8500'
-                    }
+                    'color': _color
                 },
                 opacity=0.7
             ) for _same_correlations_array, _different_correlations_array, _name, _color in
