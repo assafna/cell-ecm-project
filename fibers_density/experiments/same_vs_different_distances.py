@@ -85,6 +85,7 @@ def main(_band=True, _high_time_resolution=False):
         _tuples_by_experiment = organize.by_experiment(_experiments)
 
         _higher_same_counter = 0
+        _valid_tuples = []
         for _experiment in _tuples_by_experiment:
             print('Experiment:', _experiment)
             _experiment_tuples = _tuples_by_experiment[_experiment]
@@ -192,6 +193,10 @@ def main(_band=True, _high_time_resolution=False):
                             else:
                                 _y_arrays[_distances_index].append(-_point_distance)
 
+                            if _same_tuple not in _valid_tuples:
+                                _valid_tuples.append(_same_tuple)
+
+        print('Total tuples:', len(_valid_tuples))
         print('Total points:', len(_y_arrays[_distances_index]))
         print('Wilcoxon around the zero:')
         print(wilcoxon(_y_arrays[_distances_index]))
