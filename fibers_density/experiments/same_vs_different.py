@@ -82,6 +82,7 @@ def compute_fibers_densities(_real_cells=True, _static=False, _band=True, _high_
 
     _same_correlations_array = []
     _different_correlations_array = []
+    _valid_tuples = []
     for _experiment in _tuples_by_experiment:
         print('Experiment:', _experiment)
         _experiment_tuples = _tuples_by_experiment[_experiment]
@@ -182,6 +183,10 @@ def compute_fibers_densities(_real_cells=True, _static=False, _band=True, _high_
                         _same_correlations_array.append(_same_correlation)
                         _different_correlations_array.append(_different_correlation)
 
+                        if _same_tuple not in _valid_tuples:
+                            _valid_tuples.append(_same_tuple)
+
+    print('Total tuples:', len(_valid_tuples))
     print('Total points:', len(_same_correlations_array))
     _same_minus_different = \
         np.array(_same_correlations_array) - np.array(_different_correlations_array)
