@@ -72,6 +72,7 @@ def main():
 
     _same_correlations_arrays = [[] for _i in _triplets]
     _different_correlations_arrays = [[] for _i in _triplets]
+    _names_array = []
     for _triplet_index, _triplet in enumerate(_triplets):
         for _same_index in tqdm(range(len(_triplet)), desc='Main loop'):
             _same_tuple = _triplet[_same_index]
@@ -159,6 +160,8 @@ def main():
                         _same_correlations_arrays[_triplet_index].append(_same_correlation)
                         _different_correlations_arrays[_triplet_index].append(_different_correlation)
 
+        _names_array.append('Triplet #' + str(_triplet_index + 1))
+
     print('Total points:', len(np.array(_same_correlations_arrays).flatten()))
     _same_minus_different = \
         np.array(_same_correlations_arrays).flatten() - np.array(_different_correlations_arrays).flatten()
@@ -174,19 +177,15 @@ def main():
             go.Scatter(
                 x=_same_correlations_array,
                 y=_different_correlations_array,
+                name=_name,
                 mode='markers',
                 marker={
                     'size': 15,
-                    'color': _color,
-                    'line': {
-                        'width': 0.5,
-                        'color': '#ea8500'
-                    }
+                    'color': _color
                 },
-                showlegend=False,
                 opacity=0.7
-            ) for _same_correlations_array, _different_correlations_array, _color in
-            zip(_same_correlations_arrays, _different_correlations_arrays, _colors_array)
+            ) for _same_correlations_array, _different_correlations_array, _name, _color in
+            zip(_same_correlations_arrays, _different_correlations_arrays, _names_array, _colors_array)
         ],
         layout={
             'xaxis': {
@@ -202,6 +201,14 @@ def main():
                 'range': [-1.1, 1.2],
                 'tickmode': 'array',
                 'tickvals': [-1, -0.5, 0, 0.5, 1]
+            },
+            'legend': {
+                'xanchor': 'left',
+                'x': 0.1,
+                'yanchor': 'top',
+                'bordercolor': 'black',
+                'borderwidth': 2,
+                'bgcolor': 'white'
             },
             'shapes': [
                 {
