@@ -38,6 +38,9 @@ def main():
                 _latest_time_point = _time_point - 1
                 break
 
+        _cells_distance = compute.cells_distance_in_cell_size_time_point(_experiment, _series_id, _group, _time_point=0)
+        print(_tuple, 'cells distance:', round(_cells_distance, 2))
+
         for _cell_id in ['left_cell', 'right_cell']:
             _arguments.append({
                 'experiment': _experiment,
