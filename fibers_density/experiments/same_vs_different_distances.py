@@ -223,7 +223,7 @@ def main(_band=True, _high_time_resolution=False):
                 'type': 'category'
             },
             'yaxis': {
-                'title': 'Distance from y = x',
+                'title': 'Same minus different correlation',
                 'range': [-1, 1.1],
                 'zeroline': False,
                 'tickmode': 'array',
