@@ -220,7 +220,8 @@ def main(_real_cells=True, _offset_y=0.5, _high_time_resolution=False):
     )
 
     # correct match probability plot
-    _y = [_mean_correct_match_probability] * (MAX_RANK - 1) + [_mean_correct_match_probability * MAX_RANK]
+    _y = [_mean_correct_match_probability] * (MAX_RANK - 1) + [_mean_correct_match_probability *
+                                                               (_mean_cells_potential_matches - MAX_RANK + 1)]
     _fig = go.Figure(
         data=go.Bar(
             x=_x,
