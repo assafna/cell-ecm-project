@@ -25,26 +25,27 @@ def main(_high_time_resolution=False):
                 _y_arrays[_band_index].append(-_point_distance)
 
     # plot
-    _colors_array = ['#844b00', '#edbc80']
+    _colors_array = ['#ea8500', '#844b00']
+    _names_array = ['Band', 'No Band']
     _fig = go.Figure(
         data=[
             go.Box(
                 y=_y_array,
-                name=_band,
+                name=_name,
                 boxpoints=False,
                 line={
-                    'width': 1
+                    'width': 1,
+                    'color': _color
                 },
                 showlegend=False
-            ) for _y_array, _band, _color in zip(_y_arrays, [True, False], _colors_array)
+            ) for _y_array, _name, _color in zip(_y_arrays, _names_array, _colors_array)
         ],
         layout={
             'xaxis': {
-                'title': 'Pairs with band',
                 'zeroline': False
             },
             'yaxis': {
-                'title': 'Distance from y = x',
+                'title': 'Same minus different correlation',
                 'zeroline': False
             }
         }
