@@ -4,7 +4,6 @@ from itertools import product
 import numpy as np
 import plotly.graph_objs as go
 from scipy.stats import wilcoxon
-from tqdm import tqdm
 
 from libs import compute_lib
 from libs.experiments import load, filtering, compute, paths, organize
@@ -104,6 +103,7 @@ def main(_high_time_resolution=True):
     for _time_point_index, _time_point_every in enumerate(TIME_POINTS_STEPS[EXPERIMENTS[_high_time_resolution][0]]):
         print('Time resolution (minutes):', _time_point_every * TIME_RESOLUTION[EXPERIMENTS[_high_time_resolution][0]])
         _higher_same_counter = 0
+        _valid_tuples = []
         for _time_point_begin in range(_time_point_every):
             for _experiment in _tuples_by_experiment:
                 _experiment_tuples = _tuples_by_experiment[_experiment]
@@ -231,6 +231,10 @@ def main(_high_time_resolution=True):
                                 else:
                                     _y_arrays[_time_point_index].append(-_point_distance)
 
+                                if _same_tuple not in _valid_tuples:
+                                    _valid_tuples.append(_same_tuple)
+
+        print('Total tuples:', len(_valid_tuples))
         print('Total points:', len(_y_arrays[_time_point_index]))
         print('Wilcoxon around the zero:')
         print(wilcoxon(_y_arrays[_time_point_index]))
@@ -238,7 +242,6 @@ def main(_high_time_resolution=True):
         _x_array.append(_time_point_every * TIME_RESOLUTION[EXPERIMENTS[_high_time_resolution][0]])
 
     # plot
-    # _colors_array = ['#844b00', '#ea8500', '#edbc80']
     _fig = go.Figure(
         data=go.Scatter(
             x=_x_array,
@@ -262,7 +265,7 @@ def main(_high_time_resolution=True):
                 'zeroline': False
             },
             'yaxis': {
-                'title': 'Distance from y = x',
+                'title': 'Same minus different correlation',
                 'range': [-1, 1.1],
                 'zeroline': False,
                 'tickmode': 'array',
