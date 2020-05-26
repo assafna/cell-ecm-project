@@ -2,6 +2,7 @@ import os
 
 import numpy as np
 import plotly.graph_objs as go
+from scipy.stats import pearsonr
 from tqdm import tqdm
 
 from libs import compute_lib
@@ -133,7 +134,7 @@ def compute_tuples(_tuples):
             compute_lib.derivative(_middle_fibers_densities_normalized, _n=DERIVATIVE)
 
         _correlation = \
-            compute_lib.correlation(
+            pearsonr(
                 compute_lib.derivative(_left_cell_fibers_densities_normalized, _n=1),
                 compute_lib.derivative(_right_cell_fibers_densities_normalized, _n=1)
             )
