@@ -33,6 +33,9 @@ MINIMUM_CORRELATION_TIME_POINTS = {
 
 def compute_fibers_densities(_real_cells=True, _static=False, _band=True, _high_time_resolution=False,
                              _cells_distance_range=None):
+    if _cells_distance_range is None:
+        _cells_distance_range = CELLS_DISTANCE_RANGE
+
     _experiments = load.experiments_groups_as_tuples(EXPERIMENTS[_high_time_resolution])
     _experiments = filtering.by_distance_range(_experiments, _cells_distance_range)
     _experiments = filtering.by_real_cells(_experiments, _real_cells=_real_cells)
