@@ -225,11 +225,12 @@ def main(_offset_y=0.5, _high_time_resolution=False):
 
     # box plot
     _colors_array = ['#844b00', '#ea8500']
+    _names_array = ['Real', 'Fake']
     _fig = go.Figure(
         data=[
             go.Box(
                 y=_y_array,
-                name=_real_pairs,
+                name=_name,
                 boxpoints=False,
                 line={
                     'width': 1
@@ -238,15 +239,14 @@ def main(_offset_y=0.5, _high_time_resolution=False):
                     'color': _color
                 },
                 showlegend=False
-            ) for _y_array, _real_pairs, _color in zip(_distances_from_y_equal_x, [True, False], _colors_array)
+            ) for _y_array, _name, _color in zip(_distances_from_y_equal_x, _names_array, _colors_array)
         ],
         layout={
             'xaxis': {
-                'title': 'Real pairs',
                 'zeroline': False
             },
             'yaxis': {
-                'title': 'Distance from y = x',
+                'title': 'Same minus different correlation',
                 'zeroline': False,
                 'range': [-1, 1.1],
                 'tickmode': 'array',
@@ -275,14 +275,14 @@ def main(_offset_y=0.5, _high_time_resolution=False):
         ),
         layout={
             'xaxis': {
-                'title': 'Real pair',
+                'title': 'Real',
                 'zeroline': False,
                 'range': [-1.1, 1.2],
                 'tickmode': 'array',
                 'tickvals': [-1, -0.5, 0, 0.5, 1]
             },
             'yaxis': {
-                'title': 'Fake pair',
+                'title': 'Fake',
                 'zeroline': False,
                 'range': [-1.1, 1.2],
                 'tickmode': 'array',
