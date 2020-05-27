@@ -79,6 +79,7 @@ def compute_fibers_densities(_offset_y=0.5, _high_time_resolution=False):
 
     # same (real, fake), different (real, fake)
     _correlations = [[[], []], [[], []]]
+    _valid_real_tuples = []
     for _experiment in _tuples_by_experiment:
         print('Experiment:', _experiment)
         _experiment_tuples = _tuples_by_experiment[_experiment]
@@ -189,6 +190,10 @@ def compute_fibers_densities(_offset_y=0.5, _high_time_resolution=False):
                             _correlations[0][_group_type_index].append(_same_correlation)
                             _correlations[1][_group_type_index].append(_different_correlation)
 
+                            if _group_type_index == 0 and _same_tuple not in _valid_real_tuples:
+                                _valid_real_tuples.append(_same_tuple)
+
+    print('Total real tuples:', len(_valid_real_tuples))
     _distances_from_y_equal_x = [[], []]
     _same_correlations, _different_correlations = _correlations
     _same_real_correlations, _same_fake_correlations = _same_correlations
