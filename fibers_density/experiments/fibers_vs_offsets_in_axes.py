@@ -18,7 +18,10 @@ EXPERIMENTS = {
     False: ['SN16'],
     True: ['SN41', 'SN44', 'SN45']
 }
-TIME_POINT = 18
+TIME_POINT = {
+    False: 18,
+    True: 52
+}
 REAL_CELLS = True
 STATIC = False
 OFFSET_X = 0
@@ -68,7 +71,7 @@ def compute_z_array(_band, _high_time_resolution):
     global _experiments, _experiments_fibers_densities, _z_array
 
     _experiments = load.experiments_groups_as_tuples(EXPERIMENTS[_high_time_resolution])
-    _experiments = filtering.by_time_points_amount(_experiments, TIME_POINT)
+    _experiments = filtering.by_time_points_amount(_experiments, TIME_POINT[_high_time_resolution])
     _experiments = filtering.by_distance_range(_experiments, CELLS_DISTANCE_RANGE)
     _experiments = filtering.by_real_cells(_experiments, _real_cells=REAL_CELLS)
     _experiments = filtering.by_static_cells(_experiments, _static=STATIC)
@@ -93,7 +96,7 @@ def compute_z_array(_band, _high_time_resolution):
                 'offset_z': _offset_z,
                 'cell_id': _cell_id,
                 'direction': DIRECTION,
-                'time_point': TIME_POINT - 1
+                'time_point': TIME_POINT[_high_time_resolution] - 1
             })
 
     _rois_dictionary, _rois_to_compute = \
