@@ -8,12 +8,13 @@ from libs.experiments import paths
 from plotting import save
 
 
-def main():
+def main(_band=True, _high_time_resolution=False):
     print('Computing fibers vs. offsets in axes:')
-    _fibers_z_array = fibers_vs_offsets_in_axes.compute_z_array().flatten()
+    _fibers_z_array = fibers_vs_offsets_in_axes.compute_z_array(_band, _high_time_resolution).flatten()
 
     print('Computing "same vs. different" vs. offset in axes:')
-    _same_vs_different_z_array = same_vs_different_offsets_in_axes.compute_z_array().flatten()
+    _same_vs_different_z_array = \
+        same_vs_different_offsets_in_axes.compute_z_array(_band, _high_time_resolution).flatten()
 
     print('Correlation:', pearsonr(_fibers_z_array, _same_vs_different_z_array))
 
