@@ -2,230 +2,227 @@ import fibers_density
 
 
 def figure_1():
-    print('Panel C-ii')
+    print('\nPanel D')
     fibers_density.fibers_vs_distance_single_cells.main(_low_connectivity=False)
 
-    print('Panel D-ii')
+    print('\nPanel F')
     fibers_density.fibers_vs_distance_pairs.main(_low_connectivity=False)
 
-    print('Panel D-iii')
+    print('\nPanel G')
     fibers_density.fibers_vs_distance_differences.main(_low_connectivity=False)
 
-    print('Panel E-i')
+    print('\nPanel H')
     fibers_density.simulations.fibers_vs_distance_multiple_cell_distances.main(_low_connectivity=False)
 
-    print('Panel E-ii')
+    print('\nPanel I')
     fibers_density.experiments.fibers_vs_distance_multiple_cell_distances.main()
 
 
 def figure_si_1_correlation_distance_density_offset():
-    print('Panel B')
+    print('\nPanels B (main panel) & C')
     fibers_density.experiments.fibers_and_pairs_cells_distance_correlations_vs_distance.main()
 
-    print('Panel D')
+    print('\nPanel B (secondary panels)')
     fibers_density.experiments.fibers_vs_pairs_cells_distance_in_offset.main()
 
 
 def figure_2():
-    print('Panel A-ii')
+    print('\nPanel B')
     fibers_density.fibers_in_time_single_cells.main()
 
-    print('Panel B-ii')
+    print('\nPanel D')
     fibers_density.fibers_in_time_pairs.main()
 
-    print('Panel C-i')
+    print('\nPanel E')
     fibers_density.simulations.fibers_vs_change.main()
 
-    print('Panel C-ii')
+    print('\nPanel F')
     fibers_density.experiments.fibers_vs_change.main(_early_time_points=True)
 
 
 def figure_si_2_density_vs_change_in_density_in_late_time_points():
-    print('Main panel')
     fibers_density.experiments.fibers_vs_change.main(_early_time_points=False)
 
 
 def figure_3():
-    print('Panel B')
+    print('\nPanels B & C')
     fibers_density.simulations.correlations_by_derivatives_pairs.main()
 
-    print('Panels C & D')
+    print('\nPanels D & E')
     fibers_density.simulations.insides_vs_outsides_stds.main()
 
 
 def figure_si_3_stationary_and_detrending():
-    print('Panel A')
+    print('\nPanels A, B & C')
     fibers_density.simulations.fibers_vs_time_derivatives.main()
 
-    print('Panel B')
+    print('\nPanels D & E')
     fibers_density.simulations.stationary_vs_fibers_derivatives_pairs.main()
 
 
 def figure_si_3_single_cell_detrending():
-    print('Panel A & B')
+    print('\nPanel A & B')
     fibers_density.simulations.stationary_vs_fibers_derivatives_single_cells.main()
 
-    print('Panel C')
+    print('\nPanel C')
     fibers_density.simulations.correlations_by_derivatives_single_cells.main()
 
 
 def figure_si_3_insides_vs_outsides_distances():
-    print('Panels A & B')
+    print('\nPanels A & B')
     fibers_density.simulations.insides_vs_outsides_distances.main()
 
 
 def figure_si_3_insides_vs_outsides_offsets():
-    print('Panels A & B')
+    print('\nPanels A & B')
     fibers_density.simulations.insides_vs_outsides_offsets.main()
 
 
 def figure_4():
-    print('Panel B-i')
+    print('\nPanel B')
     fibers_density.simulations.same_vs_different.main(_low_connectivity=False)
 
-    print('Panel B-ii')
+    print('\nPanel C')
     fibers_density.simulations.same_vs_different_distances.main(_low_connectivity=False)
 
-    print('Panel C-i')
+    print('\nPanel D')
     fibers_density.experiments.same_vs_different.main(_band=True, _high_time_resolution=False)
 
-    print('Panel C-ii')
+    print('\nPanel E')
     fibers_density.experiments.same_vs_different_distances.main(_band=True, _high_time_resolution=False)
 
-    print('Panel D-ii')
+    print('\nPanel G')
     fibers_density.experiments.same_vs_different_triplets.main()
 
-    print('Panel D-iii')
+    print('\nPanel H')
     fibers_density.experiments.same_vs_different_triplet.main()
 
-    print('Panel F')
-    fibers_density.experiments.same_vs_different.main(_band=False, _high_time_resolution=False)
 
-    print('?')
+def figure_si_4_no_band():
+    print('\nPanel B')
     fibers_density.experiments.fibers_vs_time.compute_tuples([('SN16', 3, 'cells_0_1')])
 
-    print('?')
+    print('\nPanel C')
+    fibers_density.experiments.same_vs_different.main(_band=False, _high_time_resolution=False)
+
+    print('\nPanel D')
     fibers_density.experiments.same_vs_different_band_vs_no_band.main(_high_time_resolution=False)
 
 
-def figure_si_4_same_vs_diff_high_time_res():
-    print('Panel A')
-    fibers_density.experiments.same_vs_different.main(_band=True, _high_time_resolution=True)
-
-    print('Panel B')
-    fibers_density.experiments.same_vs_different.main(_band=False, _high_time_resolution=True)
-
-
-def figure_si_4_low_connectivity():
-    print('?')
-
-
 def figure_si_4_single_cell_detrending():
-    print('Panel A & B')
+    print('\nPanels A & B')
     fibers_density.experiments.stationary_vs_fibers_derivatives_single_cells.main()
 
-    print('Panel C')
+    print('\nPanel C')
     fibers_density.experiments.correlations_by_derivatives_single_cells.main()
 
 
 def figure_si_4_same_vs_diff_distances():
-    print('Panel A')
+    print('\nPanel A')
     fibers_density.experiments.same_vs_different.main(
         _band=True, _high_time_resolution=False, _cells_distance_range=[4, 6])
 
-    print('Panel B')
+    print('\nPanel B')
     fibers_density.experiments.same_vs_different.main(
         _band=True, _high_time_resolution=False, _cells_distance_range=[6, 8])
 
-    print('Panel C')
+    print('\nPanel C')
     fibers_density.experiments.same_vs_different.main(
         _band=True, _high_time_resolution=False, _cells_distance_range=[8, 10])
 
 
 def figure_si_4_same_vs_diff_controls():
-    print('Panel A-ii')
+    print('\nPanel B')
     fibers_density.experiments.same_vs_different.main(
         _real_cells=False, _static=False, _band=True, _high_time_resolution=False)
 
-    print('Panel B-ii')
+    print('\nPanel D')
     fibers_density.experiments.same_vs_different.main(
         _real_cells=False, _static=True, _band=False, _high_time_resolution=False)
 
 
-def figure_si_4_temporal_assessment():
-    print('Panel A')
-    fibers_density.experiments.same_vs_different_temporal_assessment.main(_high_time_resolution=False)
-
-    print('Panel B')
-    fibers_density.experiments.same_vs_different_temporal_assessment.main(_high_time_resolution=True)
-
-
 def figure_si_4_matchmaking():
-    print('Panel B & F')
+    print('\nPanels B & F')
     fibers_density.experiments.matchmaking_by_correlation.main(
         _real_cells=True, _offset_y=0.5, _high_time_resolution=False)
 
-    print('Panel C')
+    print('\nPanel C')
     fibers_density.experiments.matchmaking_by_correlation.main(
         _real_cells=True, _offset_y=0, _high_time_resolution=False)
 
-    print('Panel D')
+    print('\nPanel D')
     fibers_density.experiments.matchmaking_by_correlation.main(
         _real_cells=True, _offset_y=0.5, _high_time_resolution=True)
 
-    print('Panel E')
+    print('\nPanel E')
     fibers_density.experiments.matchmaking_by_correlation.main(
         _real_cells=False, _offset_y=0.5, _high_time_resolution=False)
 
 
+def figure_si_4_same_vs_diff_high_time_res():
+    print('\nPanel A')
+    fibers_density.experiments.same_vs_different.main(_band=True, _high_time_resolution=True)
+
+    print('\nPanel B')
+    fibers_density.experiments.same_vs_different.main(_band=False, _high_time_resolution=True)
+
+
+def figure_si_4_temporal_assessment():
+    print('\nPanel A')
+    fibers_density.experiments.same_vs_different_temporal_assessment.main(_high_time_resolution=False)
+
+    print('\nPanel B')
+    fibers_density.experiments.same_vs_different_temporal_assessment.main(_high_time_resolution=True)
+
+
 def figure_5():
-    print('Panel B-i')
+    print('\nPanel B')
     fibers_density.experiments.fibers_vs_offsets_in_axes.main(_high_time_resolution=False)
 
-    print('Panel B-ii')
+    print('\nPanel C')
     fibers_density.experiments.same_vs_different_offsets_in_axes.main(_high_time_resolution=False)
 
 
-def figure_si_5_no_band():
-    print('Panel A')
-    fibers_density.experiments.fibers_vs_offsets_in_axes.main(_band=False, _high_time_resolution=False)
-
-    print('Panel B')
-    fibers_density.experiments.same_vs_different_offsets_in_axes.main(_band=False, _high_time_resolution=False)
-
-
 def figure_si_5_high_time_res():
-    print('Panel A')
+    print('\nPanel A')
     fibers_density.experiments.fibers_vs_offsets_in_axes.main(_high_time_resolution=True)
 
-    print('Panel B')
+    print('\nPanel B')
     fibers_density.experiments.same_vs_different_offsets_in_axes.main(_high_time_resolution=True)
 
 
 def figure_si_5_simulations():
-    print('Panel A')
+    print('\nPanel A')
     fibers_density.simulations.fibers_vs_offsets_in_axes.main(_low_connectivity=False)
 
-    print('Panel B')
+    print('\nPanel B')
     fibers_density.simulations.same_vs_different_offsets_in_axes.main(_low_connectivity=False)
 
 
-def figure_si_5_communication_vs_density():
-    fibers_density.experiments.fibers_vs_same_vs_different_offsets_in_axes.main()
+def figure_si_5_no_band():
+    print('\nPanel A')
+    fibers_density.experiments.fibers_vs_offsets_in_axes.main(_band=False, _high_time_resolution=False)
+
+    print('\nPanel B')
+    fibers_density.experiments.same_vs_different_offsets_in_axes.main(_band=False, _high_time_resolution=False)
 
 
 def figure_si_5_real_vs_fake():
-    print('Panel A')
+    print('\nPanels A & B')
     fibers_density.experiments.same_vs_different_real_vs_fake.main(_offset_y=0, _high_time_resolution=False)
 
-    print('Panel B')
+    print('\nPanels C & D')
     fibers_density.experiments.same_vs_different_real_vs_fake.main(_offset_y=0.5, _high_time_resolution=False)
 
-    print('Panel C')
+    print('\nPanels E & F')
     fibers_density.experiments.same_vs_different_real_vs_fake.main(_offset_y=0, _high_time_resolution=True)
 
-    print('Panel D')
+    print('\nPanels G & H')
     fibers_density.experiments.same_vs_different_real_vs_fake.main(_offset_y=0.5, _high_time_resolution=True)
+
+
+def figure_si_5_communication_vs_density():
+    fibers_density.experiments.fibers_vs_same_vs_different_offsets_in_axes.main(_band=True, _high_time_resolution=False)
 
 
 def figure_6():
@@ -272,74 +269,74 @@ def figure_si_discussion_saturation():
 
 
 if __name__ == '__main__':
-    print('Figure 1')
+    print('\nFigure 1')
     figure_1()
 
-    print('Figure SI 1 - Correlation Distance Density Offset')
+    print('\nFigure SI 1 - Correlation Distance Density Offset')
     figure_si_1_correlation_distance_density_offset()
 
-    print('Figure 2')
+    print('\nFigure 2')
     figure_2()
 
-    print('Figure SI 2 - Density vs. Change in Density in Late Time-points')
+    print('\nFigure SI 2 - Density vs. Change in Density in Late Time-points')
     figure_si_2_density_vs_change_in_density_in_late_time_points()
 
-    print('Figure 3')
+    print('\nFigure 3')
     figure_3()
 
-    print('Figure SI 3 - Stationary & Detrending')
+    print('\nFigure SI 3 - Stationary & Detrending')
     figure_si_3_stationary_and_detrending()
 
-    print('Figure SI 3 - Single Cell Detrending')
+    print('\nFigure SI 3 - Single Cell Detrending')
     figure_si_3_single_cell_detrending()
 
-    print('Figure SI 3 - Insides vs. Outsides Distances')
+    print('\nFigure SI 3 - Insides vs. Outsides Distances')
     figure_si_3_insides_vs_outsides_distances()
 
-    print('Figure SI 3 - Insides vs. Outsides Offsets')
+    print('\nFigure SI 3 - Insides vs. Outsides Offsets')
     figure_si_3_insides_vs_outsides_offsets()
 
-    print('Figure 4')
+    print('\nFigure 4')
     figure_4()
 
-    print('Figure SI 4 - Same vs. Different - High Temporal Resolution')
-    figure_si_4_same_vs_diff_high_time_res()
+    print('\nFigure SI 4 - No Band')
+    figure_si_4_no_band()
 
-    print('Figure SI 4 - Low Connectivity')
-    figure_si_4_low_connectivity()
-
-    print('Figure SI 4 - Single Cell Detrending')
+    print('\nFigure SI 4 - Single Cell Detrending')
     figure_si_4_single_cell_detrending()
 
-    print('Figure SI 4 - Same vs. Different - Distances')
+    print('\nFigure SI 4 - Same vs. Different - Distances')
     figure_si_4_same_vs_diff_distances()
 
-    print('Figure SI 4 - Same vs. Different - Controls')
+    print('\nFigure SI 4 - Same vs. Different - Controls')
     figure_si_4_same_vs_diff_controls()
 
-    print('Figure SI 4 - Temporal Assessment')
-    figure_si_4_temporal_assessment()
-
-    print('Figure SI 4 - Matchmaking')
+    print('\nFigure SI 4 - Matchmaking')
     figure_si_4_matchmaking()
 
-    print('Figure 5')
+    print('\nFigure SI 4 - Same vs. Different - High Temporal Resolution')
+    figure_si_4_same_vs_diff_high_time_res()
+
+    print('\nFigure SI 4 - Temporal Assessment')
+    figure_si_4_temporal_assessment()
+
+    print('\nFigure 5')
     figure_5()
 
-    print('Figure SI 5 - No Band')
-    figure_si_5_no_band()
-
-    print('Figure SI 5 - High Temporal Resolution')
+    print('\nFigure SI 5 - High Temporal Resolution')
     figure_si_5_high_time_res()
 
-    print('Figure SI 5 - Simulations')
+    print('\nFigure SI 5 - Simulations')
     figure_si_5_simulations()
 
-    print('Figure SI 5 - Communication vs. Density')
-    figure_si_5_communication_vs_density()
+    print('\nFigure SI 5 - No Band')
+    figure_si_5_no_band()
 
-    print('Figure SI 5 - Real vs. Fake')
+    print('\nFigure SI 5 - Real vs. Fake')
     figure_si_5_real_vs_fake()
+
+    print('\nFigure SI 5 - Communication vs. Density')
+    figure_si_5_communication_vs_density()
 
     print('Figure 6')
     figure_6()
