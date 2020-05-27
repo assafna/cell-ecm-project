@@ -280,14 +280,14 @@ def main(_offset_y=0.5, _high_time_resolution=False):
         ),
         layout={
             'xaxis': {
-                'title': 'Real',
+                'title': 'Real pair',
                 'zeroline': False,
                 'range': [-1.1, 1.2],
                 'tickmode': 'array',
                 'tickvals': [-1, -0.5, 0, 0.5, 1]
             },
             'yaxis': {
-                'title': 'Fake',
+                'title': 'Fake pair',
                 'zeroline': False,
                 'range': [-1.1, 1.2],
                 'tickmode': 'array',
