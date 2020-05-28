@@ -226,11 +226,11 @@ def figure_si_5_communication_vs_density():
 
 
 def figure_6():
-    print('Panel B')
+    print('\nPanels B & C')
     fibers_density.simulations.same_vs_different_cross_correlation.main(
         _alpha=1, _beta=1, _low_connectivity=False, _plots=['same'])
 
-    print('Panel C')
+    print('\nPanels D & E')
     fibers_density.simulations.same_vs_different_cross_correlation_alphas_betas.main(
         _type='alpha', _low_connectivity=False, _plots=['same'])
 
@@ -241,30 +241,30 @@ def figure_si_6_betas():
 
 
 def figure_si_6_different_network():
-    print('Panel A')
+    print('\nPanels A & B')
     fibers_density.simulations.same_vs_different_cross_correlation.main(
         _alpha=1, _beta=1, _low_connectivity=False, _plots=['different'])
 
-    print('Panel B')
+    print('\nPanels C & D')
     fibers_density.simulations.same_vs_different_cross_correlation_alphas_betas.main(
         _type='alpha', _low_connectivity=False, _plots=['different'])
 
-    print('Panel C')
+    print('\nPanels E & F')
     fibers_density.simulations.same_vs_different_cross_correlation_alphas_betas.main(
         _type='beta', _low_connectivity=False, _plots=['different'])
 
 
 def figure_si_6_granger_causality():
-    print('?')
+    print('\nPanels A & B')
     fibers_density.experiments.inner_regions_granger_causality.main(
         _band=None, _high_time_resolution=True, _tuples_to_plot=[('SN45', 2, 'cells_2_3')])
 
 
 def figure_si_discussion_saturation():
-    print('Panel A')
+    print('\nPanel A')
     fibers_density.experiments.inner_regions_saturation.main(_offset_y=0)
 
-    print('Panel B')
+    print('\nPanel B')
     fibers_density.experiments.inner_regions_saturation.main(_offset_y=0.5)
 
 
@@ -338,17 +338,17 @@ if __name__ == '__main__':
     print('\nFigure SI 5 - Communication vs. Density')
     figure_si_5_communication_vs_density()
 
-    print('Figure 6')
+    print('\nFigure 6')
     figure_6()
 
-    print('Figure SI 6 - Betas')
+    print('\nFigure SI 6 - Betas')
     figure_si_6_betas()
 
-    print('Figure SI 6 - Different Network')
+    print('\nFigure SI 6 - Different Network')
     figure_si_6_different_network()
 
-    print('Figure SI 6 - Granger Causality')
+    print('\nFigure SI 6 - Granger Causality')
     figure_si_6_granger_causality()
 
-    print('Figure SI Discussion - Saturation')
+    print('\nFigure SI Discussion - Saturation')
     figure_si_discussion_saturation()
