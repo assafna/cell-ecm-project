@@ -211,7 +211,7 @@ def main(_alpha=1, _beta=1, _low_connectivity=False, _plots=None):
                             'tickvals': TIME_LAGS
                         },
                         'yaxis': {
-                            'title': _name.capitalize() + ' network correlations',
+                            'title': _name.capitalize() + ' network correlation',
                             'range': [-1, 1.1],
                             'zeroline': False,
                             'tickmode': 'array',
@@ -223,8 +223,8 @@ def main(_alpha=1, _beta=1, _low_connectivity=False, _plots=None):
                 save.to_html(
                     _fig=_fig,
                     _path=os.path.join(paths.PLOTS, save.get_module_name()),
-                    _filename='plot_box_alpha_' + str(_alpha) + '_beta_' + str(_beta) + '_low_con_' + str(_low_connectivity) +
-                              '_' + _name
+                    _filename='plot_box_alpha_' + str(_alpha) + '_beta_' + str(_beta) + '_low_con_' +
+                              str(_low_connectivity) + '_' + _name
                 )
 
         # bar plot
@@ -246,7 +246,7 @@ def main(_alpha=1, _beta=1, _low_connectivity=False, _plots=None):
                             'tickvals': TIME_LAGS
                         },
                         'yaxis': {
-                            'title': 'Highest correlations fraction',
+                            'title': 'Highest correlation fraction',
                             'range': [0, 1.1],
                             'zeroline': False,
                             'tickmode': 'array',
@@ -258,8 +258,8 @@ def main(_alpha=1, _beta=1, _low_connectivity=False, _plots=None):
                 save.to_html(
                     _fig=_fig,
                     _path=os.path.join(paths.PLOTS, save.get_module_name()),
-                    _filename='plot_bar_alpha_' + str(_alpha) + '_beta_' + str(_beta) + '_low_con_' + str(_low_connectivity) +
-                              '_' + _name
+                    _filename='plot_bar_alpha_' + str(_alpha) + '_beta_' + str(_beta) + '_low_con_' +
+                              str(_low_connectivity) + '_' + _name
                 )
 
 
