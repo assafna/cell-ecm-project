@@ -82,7 +82,7 @@ def main(_type='alpha', _low_connectivity=False, _plots=None):
                             'type': 'category'
                         },
                         'yaxis': {
-                            'title': _name.capitalize() + ' network correlations',
+                            'title': _name.capitalize() + ' network correlation',
                             'range': [-1, 1.1],
                             'zeroline': False,
                             'tickmode': 'array',
@@ -117,7 +117,7 @@ def main(_type='alpha', _low_connectivity=False, _plots=None):
                             'type': 'category'
                         },
                         'yaxis': {
-                            'title': 'Lag ' + str(TIME_LAG) + ' highest correlations fraction',
+                            'title': 'Lag ' + str(TIME_LAG) + ' highest correlation fraction',
                             'range': [0, 1.1],
                             'zeroline': False,
                             'tickmode': 'array',
