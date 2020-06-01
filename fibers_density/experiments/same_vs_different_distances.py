@@ -36,7 +36,7 @@ def main(_band=True, _high_time_resolution=False):
     _y_arrays = [[] for _i in CELLS_DISTANCES_RANGES]
     _names_array = []
     for _distances_index, _distances_range in enumerate(CELLS_DISTANCES_RANGES):
-        print('Cells distance range:', str(_distances_range))
+        print('Pair distance range:', str(_distances_range))
         _experiments = load.experiments_groups_as_tuples(EXPERIMENTS[_high_time_resolution])
         _experiments = filtering.by_distance_range(_experiments, _distances_range)
         _experiments = filtering.by_real_cells(_experiments, _real_cells=REAL_CELLS)
@@ -223,7 +223,7 @@ def main(_band=True, _high_time_resolution=False):
         ],
         layout={
             'xaxis': {
-                'title': 'Cells distance (cell diameter)',
+                'title': 'Pair distance (cell diameter)',
                 'zeroline': False,
                 'type': 'category'
             },

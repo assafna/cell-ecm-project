@@ -123,7 +123,7 @@ def main():
         _offset_index = 0
         _normalization = load.normalization_series_file_data(_experiment, 'Series ' + str(_series_id))
 
-        # take offsets based on cells distance
+        # take offsets based on pair distance
         _properties = load.group_properties(_experiment, _series_id, _group)
         _left_cell_coordinates = [list(_properties['time_points'][0]['left_cell']['coordinates'].values())]
         _right_cell_coordinates = [list(_properties['time_points'][0]['right_cell']['coordinates'].values())]

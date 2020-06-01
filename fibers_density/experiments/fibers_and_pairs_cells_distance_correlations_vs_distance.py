@@ -124,11 +124,11 @@ def main():
         ],
         layout={
             'xaxis': {
-                'title': 'Distance from cell (cell diameter)',
+                'title': 'Cell distance (cell diameter)',
                 'zeroline': False
             },
             'yaxis': {
-                'title': 'Correlation:<br>pairs cells distance vs. fiber density',
+                'title': 'Correlation:<br>pair distance vs. fibers density',
                 'zeroline': False,
                 'range': [-0.82, 0.3],
                 'tickmode': 'array',
@@ -168,7 +168,7 @@ def main():
     )
 
     # table
-    print('Distance from cell (cell diameter)', 'Correlation: pairs cells distance vs. fiber density', 'N', 'P-value',
+    print('Cell distance (cell diameter)', 'Correlation: pair distance vs. fibers density', 'N', 'P-value',
           sep='\t')
     for _x, _y, _n, _p_value in zip(_x_array, _y_array, _n_array, _p_value_array):
         print(_x, _y, _n, _p_value, sep='\t')

@@ -23,7 +23,7 @@ def main():
     _y_array = []
     _names_array = []
     for _distances_range in CELLS_DISTANCE_RANGES:
-        print('Cells distance range:', str(_distances_range))
+        print('Pair distance range:', str(_distances_range))
         _experiments = load.experiments_groups_as_tuples(EXPERIMENTS)
         _experiments = filtering.by_time_points_amount(_experiments, TIME_POINT)
         _experiments = filtering.by_real_cells(_experiments)
@@ -112,7 +112,7 @@ def main():
         ],
         layout={
             'xaxis': {
-                'title': 'Distance from cell (cell diameter)',
+                'title': 'Cell distance (cell diameter)',
                 'zeroline': False
             },
             'yaxis': {

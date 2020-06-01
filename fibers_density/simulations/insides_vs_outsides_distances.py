@@ -283,7 +283,7 @@ def main():
         ],
         layout={
             'xaxis': {
-                'title': 'Cells distance (cell diameter)',
+                'title': 'Pair distance (cell diameter)',
                 'zeroline': False,
                 'tickmode': 'array',
                 'tickvals': CELLS_DISTANCES,
