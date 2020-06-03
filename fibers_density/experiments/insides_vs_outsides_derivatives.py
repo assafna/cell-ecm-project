@@ -13,15 +13,17 @@ from plotting import save
 
 EXPERIMENTS = ['SN16']
 OFFSET_X = 0
-OFFSET_Y = 0
+OFFSET_Y = 0.5
 OFFSET_Z = 0
 BAND = True
 OUT_OF_BOUNDARIES = False
+CELLS_DISTANCE_RANGE = [4, 10]
 MINIMUM_CORRELATION_TIME_POINTS = {
     'SN16': 15,
     'SN18': 15,
     'SN41': 50,
-    'SN44': 50
+    'SN44': 50,
+    'SN45': 50
 }
 DERIVATIVES = [0, 1, 2]
 DERIVATIVES_TEXT = ['D', 'D\'', 'D\'\'']
@@ -30,6 +32,7 @@ DERIVATIVES_TEXT = ['D', 'D\'', 'D\'\'']
 def main():
     _experiments = load.experiments_groups_as_tuples(EXPERIMENTS)
     _experiments = filtering.by_real_cells(_experiments)
+    _experiments = filtering.by_distance_range(_experiments, CELLS_DISTANCE_RANGE)
     if BAND:
         _experiments = filtering.by_band(_experiments)
     print('Total experiments:', len(_experiments))
