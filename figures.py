@@ -134,6 +134,23 @@ def figure_4_main():
     fibers_density.experiments.same_vs_different_triplet.main()
 
 
+def figure_si_4_same_vs_diff_offsets():
+    print('\nPanel A')
+    fibers_density.experiments.same_vs_different.main(_offset_y=0, _offset_z=0)
+
+    print('\nPanel B')
+    fibers_density.experiments.same_vs_different.main(_offset_y=-0.5, _offset_z=0)
+
+    print('\nPanel C')
+    fibers_density.experiments.same_vs_different.main(_offset_y=0.5, _offset_z=0)
+
+    print('\nPanel D')
+    fibers_density.experiments.same_vs_different.main(_offset_y=0, _offset_z=-0.5)
+
+    print('\nPanel E')
+    fibers_density.experiments.same_vs_different.main(_offset_y=0, _offset_z=0.5)
+
+
 def figure_si_4_no_band():
     print('\nPanel B')
     fibers_density.experiments.fibers_vs_time.compute_tuples([('SN16', 3, 'cells_0_1')])
@@ -216,11 +233,8 @@ def figure_4_all():
     figure_4_main()
 
     print('\nFigure SI 4')
-    print('\nFigure SI 4 - No Band')
-    figure_si_4_no_band()
-
-    print('\nFigure SI 4 - Single Cell Detrending')
-    figure_si_4_single_cell_detrending()
+    print('\nFigure SI 4 - Same vs. Different - Offsets')
+    figure_si_4_same_vs_diff_offsets()
 
     print('\nFigure SI 4 - Same vs. Different - Distances')
     figure_si_4_same_vs_diff_distances()
