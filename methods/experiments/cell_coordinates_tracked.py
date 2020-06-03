@@ -24,14 +24,14 @@ def process_series(_experiment, _series_id, _overwrite=False):
                 # fix path for SN18 experiment, where at time point 11 the Z is different, so ignore it
                 if _experiment == 'SN18' and _time_point == 11:
                     _distances = [math.sqrt(
-                        math.pow(_previous_cell_x - _optional_cell_x, 2) +
-                        math.pow(_previous_cell_y - _optional_cell_y, 2)
+                        (_previous_cell_x - _optional_cell_x) ** 2 +
+                        (_previous_cell_y - _optional_cell_y) ** 2
                     ) for _optional_cell_x, _optional_cell_y, _optional_cell_z in _tp]
                 else:
                     _distances = [math.sqrt(
-                        math.pow(_previous_cell_x - _optional_cell_x, 2) +
-                        math.pow(_previous_cell_y - _optional_cell_y, 2) +
-                        math.pow(_previous_cell_z - _optional_cell_z, 2)
+                        (_previous_cell_x - _optional_cell_x) ** 2 +
+                        (_previous_cell_y - _optional_cell_y) ** 2 +
+                        (_previous_cell_z - _optional_cell_z) ** 2
                     ) for _optional_cell_x, _optional_cell_y, _optional_cell_z in _tp]
 
                 _min_distance_index = int(np.argmin(_distances)) if len(_distances) > 0 else None
