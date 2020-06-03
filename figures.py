@@ -146,11 +146,11 @@ def figure_si_4_no_band():
 
 
 def figure_si_4_single_cell_detrending():
-    print('\nPanels A & B')
-    fibers_density.experiments.stationary_vs_fibers_derivatives_single_cells.main()
-
-    print('\nPanel C')
+    print('\nPanel A')
     fibers_density.experiments.correlations_by_derivatives_single_cells.main()
+
+    print('\nPanels B & C')
+    fibers_density.experiments.stationary_vs_fibers_derivatives_single_cells.main()
 
 
 def figure_si_4_same_vs_diff_distances():
