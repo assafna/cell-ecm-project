@@ -17,9 +17,6 @@ EXPERIMENTS = {
     True: ['SN41', 'SN44', 'SN45']
 }
 OFFSET_X = 0
-# TODO: set the offset in y according to the angle in the original Z slices of the cells
-OFFSET_Y = 0.5
-OFFSET_Z = 0
 DERIVATIVE = 1
 CELLS_DISTANCE_RANGE = [4, 10]
 MINIMUM_CORRELATION_TIME_POINTS = {
@@ -32,7 +29,7 @@ MINIMUM_CORRELATION_TIME_POINTS = {
 
 
 def compute_fibers_densities(_real_cells=True, _static=False, _band=True, _high_time_resolution=False,
-                             _cells_distance_range=None):
+                             _cells_distance_range=None, _offset_y=0.5, _offset_z=0):
     if _cells_distance_range is None:
         _cells_distance_range = CELLS_DISTANCE_RANGE
 
@@ -66,8 +63,8 @@ def compute_fibers_densities(_real_cells=True, _static=False, _band=True, _high_
                 'length_y': ROI_HEIGHT,
                 'length_z': ROI_WIDTH,
                 'offset_x': OFFSET_X,
-                'offset_y': OFFSET_Y,
-                'offset_z': OFFSET_Z,
+                'offset_y': _offset_y,
+                'offset_z': _offset_z,
                 'cell_id': _cell_id,
                 'direction': 'inside',
                 'time_points': _latest_time_point
@@ -189,6 +186,7 @@ def compute_fibers_densities(_real_cells=True, _static=False, _band=True, _high_
                         if _same_tuple not in _valid_tuples:
                             _valid_tuples.append(_same_tuple)
 
+    print('Offset Y:', _offset_y, 'Offset Z:', _offset_z)
     print('Total tuples:', len(_valid_tuples))
     print('Total points:', len(_same_correlations_array))
     _same_minus_different = \
@@ -201,12 +199,14 @@ def compute_fibers_densities(_real_cells=True, _static=False, _band=True, _high_
     return _same_correlations_array, _different_correlations_array
 
 
-def main(_real_cells=True, _static=False, _band=True, _high_time_resolution=False, _cells_distance_range=None):
+def main(_real_cells=True, _static=False, _band=True, _high_time_resolution=False, _cells_distance_range=None,
+         _offset_y=0.5, _offset_z=0):
     if _cells_distance_range is None:
         _cells_distance_range = CELLS_DISTANCE_RANGE
 
     _same_correlations_array, _different_correlations_array =\
-        compute_fibers_densities(_real_cells, _static, _band, _high_time_resolution, _cells_distance_range)
+        compute_fibers_densities(
+            _real_cells, _static, _band, _high_time_resolution, _cells_distance_range, _offset_y, _offset_z)
 
     # plot
     _fig = go.Figure(
@@ -278,7 +278,8 @@ def main(_real_cells=True, _static=False, _band=True, _high_time_resolution=Fals
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
         _filename='plot_real_' + str(_real_cells) + '_static_' + str(_static) + '_band_' + str(_band) +
                   '_high_time_' + str(_high_time_resolution) + '_range_' +
-                  '_'.join([str(_distance) for _distance in _cells_distance_range])
+                  '_'.join([str(_distance) for _distance in _cells_distance_range]) + '_y_' + str(_offset_y) + '_z_'
+                  + str(_offset_z)
     )
 
 
