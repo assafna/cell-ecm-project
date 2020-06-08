@@ -79,6 +79,9 @@ def figure_si_3_detrending_simulations():
     print('\nPanels A, B & C')
     fibers_density.simulations.fibers_vs_time_derivatives.main()
 
+    print('\nPanel D')
+    fibers_density.simulations.correlations_by_derivatives_pairs.main(_directions=['inside'])
+
     print('\nPanels E & F')
     fibers_density.simulations.stationary_vs_fibers_derivatives_pairs.main()
 
