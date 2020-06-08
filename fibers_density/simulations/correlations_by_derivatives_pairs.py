@@ -47,7 +47,10 @@ def compute_fibers_densities(_simulations):
     return _fibers_densities
 
 
-def main():
+def main(_directions=None):
+    if _directions is None:
+        _directions = ['inside', 'outside']
+
     _simulations = load.structured()
     _simulations = filtering.by_time_points_amount(_simulations, _time_points=SIMULATIONS_TIME_POINTS)
     _simulations = filtering.by_categories(
@@ -63,7 +66,7 @@ def main():
 
     _fibers_densities = compute_fibers_densities(_simulations)
 
-    for _direction in ['inside', 'outside']:
+    for _direction in _directions:
         _y_arrays = [[] for _i in DERIVATIVES]
         for _simulation in tqdm(_simulations, desc='Simulations loop'):
             _left_cell_fibers_densities = _fibers_densities[(_simulation, 'left_cell', _direction)]
