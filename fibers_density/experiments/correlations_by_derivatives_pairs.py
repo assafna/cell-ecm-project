@@ -1,4 +1,5 @@
 import os
+from itertools import product
 
 import plotly.graph_objs as go
 from scipy.stats import wilcoxon
@@ -15,6 +16,7 @@ OFFSET_Y = 0
 OFFSET_Z = 0
 BAND = True
 OUT_OF_BOUNDARIES = False
+CELLS_DISTANCE_RANGE = [4, 10]
 MINIMUM_CORRELATION_TIME_POINTS = {
     'SN16': 15,
     'SN18': 15,
@@ -25,31 +27,45 @@ DERIVATIVES = [0, 1, 2]
 DERIVATIVES_TEXT = ['D', 'D\'', 'D\'\'']
 
 
-def main():
+def main(_directions=None):
+    if _directions is None:
+        _directions = ['inside', 'outside']
+
     _experiments = load.experiments_groups_as_tuples(EXPERIMENTS)
     _experiments = filtering.by_real_cells(_experiments)
-    if BAND:
-        _experiments = filtering.by_band(_experiments)
+    _experiments = filtering.by_band(_experiments)
+    _experiments = filtering.by_distance_range(_experiments, CELLS_DISTANCE_RANGE)
     print('Total experiments:', len(_experiments))
 
     _arguments = []
     for _tuple in _experiments:
         _experiment, _series_id, _group = _tuple
-        for _cell_id in ['left_cell', 'right_cell']:
-            for _direction in ['inside', 'outside']:
-                _arguments.append({
-                    'experiment': _experiment,
-                    'series_id': _series_id,
-                    'group': _group,
-                    'length_x': ROI_LENGTH,
-                    'length_y': ROI_HEIGHT,
-                    'length_z': ROI_WIDTH,
-                    'offset_x': OFFSET_X,
-                    'offset_y': OFFSET_Y,
-                    'offset_z': OFFSET_Z,
-                    'cell_id': _cell_id,
-                    'direction': _direction
-                })
+
+        # stop when windows are overlapping
+        _properties = load.group_properties(_experiment, _series_id, _group)
+        _latest_time_point = len(_properties['time_points'])
+        for _time_point in range(len(_properties['time_points'])):
+            _cells_distance = \
+                compute.cells_distance_in_cell_size_time_point(_experiment, _series_id, _group, _time_point)
+            if _cells_distance - 1 - OFFSET_X * 2 < ROI_LENGTH * 2:
+                _latest_time_point = _time_point - 1
+                break
+
+        for _cell_id, _direction in product(['left_cell', 'right_cell'], _directions):
+            _arguments.append({
+                'experiment': _experiment,
+                'series_id': _series_id,
+                'group': _group,
+                'length_x': ROI_LENGTH,
+                'length_y': ROI_HEIGHT,
+                'length_z': ROI_WIDTH,
+                'offset_x': OFFSET_X,
+                'offset_y': OFFSET_Y,
+                'offset_z': OFFSET_Z,
+                'cell_id': _cell_id,
+                'direction': _direction,
+                'time_points': _latest_time_point
+            })
 
     _rois_dictionary, _rois_to_compute = \
         compute.rois(_arguments, _keys=['experiment', 'series_id', 'group', 'cell_id', 'direction'])
@@ -60,7 +76,7 @@ def main():
         for _key in _rois_dictionary
     }
 
-    for _direction in ['inside', 'outside']:
+    for _direction in _directions:
         _y_arrays = [[] for _i in DERIVATIVES]
         for _tuple in tqdm(_experiments, desc='Experiments loop'):
             _experiment, _series_id, _group = _tuple
@@ -108,6 +124,7 @@ def main():
             print('Derivative:', _derivative, wilcoxon(_y_array))
 
         # plot
+        _y_title = 'Inner correlation' if _direction == 'inside' else 'Outer correlation'
         _colors_array = ['#844b00', '#ea8500', '#edbc80']
         _fig = go.Figure(
             data=[
@@ -135,7 +152,7 @@ def main():
                     'zeroline': False
                 },
                 'yaxis': {
-                    'title': 'Correlation',
+                    'title': _y_title,
                     'range': [-1, 1],
                     'zeroline': False,
                     'tickmode': 'array',
@@ -147,7 +164,7 @@ def main():
         save.to_html(
             _fig=_fig,
             _path=os.path.join(paths.PLOTS, save.get_module_name()),
-            _filename='plot_' + _direction
+            _filename='plot_direction_' + _direction
         )
 
 
