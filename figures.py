@@ -75,19 +75,17 @@ def figure_3_main():
     fibers_density.simulations.insides_vs_outsides_stds.main()
 
 
-def figure_si_3_stationary_and_detrending():
+def figure_si_3_detrending_simulations():
     print('\nPanels A, B & C')
     fibers_density.simulations.fibers_vs_time_derivatives.main()
 
-    print('\nPanels D & E')
+    print('\nPanels E & F')
     fibers_density.simulations.stationary_vs_fibers_derivatives_pairs.main()
 
-
-def figure_si_3_single_cell_detrending():
-    print('\nPanel A')
+    print('\nPanel G')
     fibers_density.simulations.correlations_by_derivatives_single_cells.main()
 
-    print('\nPanels B & C')
+    print('\nPanels H & I')
     fibers_density.simulations.stationary_vs_fibers_derivatives_single_cells.main()
 
 
@@ -106,11 +104,8 @@ def figure_3_all():
     figure_3_main()
 
     print('\nFigure SI 3')
-    print('\nFigure SI 3 - Stationary & Detrending')
-    figure_si_3_stationary_and_detrending()
-
-    print('\nFigure SI 3 - Single Cell Detrending')
-    figure_si_3_single_cell_detrending()
+    print('\nFigure SI 3 - Detrending Simulations')
+    figure_si_3_detrending_simulations()
 
     print('\nFigure SI 3 - Insides vs. Outsides Distances')
     figure_si_3_insides_vs_outsides_distances()
