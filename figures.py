@@ -165,11 +165,17 @@ def figure_si_4_no_band():
     fibers_density.experiments.same_vs_different_band_vs_no_band.main(_high_time_resolution=False)
 
 
-def figure_si_4_single_cell_detrending():
+def figure_si_4_detrending_experiments():
     print('\nPanel A')
-    fibers_density.experiments.correlations_by_derivatives_single_cells.main()
+    fibers_density.experiments.correlations_by_derivatives_pairs.main(_directions=['inside'])
 
     print('\nPanels B & C')
+    fibers_density.experiments.stationary_vs_fibers_derivatives_pairs.main()
+
+    print('\nPanel D')
+    fibers_density.experiments.correlations_by_derivatives_single_cells.main()
+
+    print('\nPanels E & F')
     fibers_density.experiments.stationary_vs_fibers_derivatives_single_cells.main()
 
 
@@ -238,6 +244,12 @@ def figure_4_all():
     print('\nFigure SI 4')
     print('\nFigure SI 4 - Same vs. Different - Offsets')
     figure_si_4_same_vs_diff_offsets()
+
+    print('\nFigure SI 4 - No Band')
+    figure_si_4_no_band()
+
+    print('\nFigure SI 4 - Detrending Experiments')
+    figure_si_4_detrending_experiments()
 
     print('\nFigure SI 4 - Same vs. Different - Distances')
     figure_si_4_same_vs_diff_distances()
