@@ -19,11 +19,11 @@ DERIVATIVES = [0, 1, 2]
 DERIVATIVES_TEXT = ['D', 'D\'', 'D\'\'']
 
 
-def compute_fibers_densities(_simulations):
+def compute_fibers_densities(_simulations, _directions):
     _arguments = []
     for _simulation in _simulations:
         for _cell_id in ['left_cell', 'right_cell']:
-            for _direction in ['inside', 'outside']:
+            for _direction in _directions:
                 _arguments.append({
                     'simulation': _simulation,
                     'length_x': ROI_WIDTH,
@@ -64,7 +64,7 @@ def main(_directions=None):
     _simulations = filtering.by_distance(_simulations, _distance=CELLS_DISTANCE)
     print('Total simulations:', len(_simulations))
 
-    _fibers_densities = compute_fibers_densities(_simulations)
+    _fibers_densities = compute_fibers_densities(_simulations, _directions)
 
     for _direction in _directions:
         _y_arrays = [[] for _i in DERIVATIVES]
