@@ -8,14 +8,16 @@ def figure_1_main():
     print('\nPanel F')
     fibers_density.fibers_vs_distance_pairs.main(_low_connectivity=False)
 
-    print('\nPanel G')
+    print('\nPanel H')
+    fibers_density.experiments.fibers_vs_distance_multiple_cell_distances.main()
+
+
+def figure_si_1_distances():
+    print('\nPanel A')
     fibers_density.fibers_vs_distance_differences.main(_low_connectivity=False)
 
-    print('\nPanel H')
+    print('\nPanel B')
     fibers_density.simulations.fibers_vs_distance_multiple_cell_distances.main(_low_connectivity=False)
-
-    print('\nPanel I')
-    fibers_density.experiments.fibers_vs_distance_multiple_cell_distances.main()
 
 
 def figure_si_1_correlation_distance_density_offset():
@@ -31,6 +33,9 @@ def figure_1_all():
     figure_1_main()
 
     print('\nFigure SI 1')
+    print('\nFigure SI 1 - Distances')
+    figure_si_1_distances()
+
     print('\nFigure SI 1 - Correlation Distance Density Offset')
     figure_si_1_correlation_distance_density_offset()
 
