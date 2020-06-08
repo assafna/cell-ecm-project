@@ -10,27 +10,40 @@ from libs.experiments.config import ROI_LENGTH, ROI_HEIGHT, ROI_WIDTH
 from plotting import save
 
 EXPERIMENTS = ['SN16']
-CELLS_DISTANCE_RANGE = (6, 8)
 OFFSET_X = 0
 OFFSET_Y = 0
 OFFSET_Z = 0
 BAND = True
 OUT_OF_BOUNDARIES = False
+CELLS_DISTANCE_RANGE = [4, 10]
+TIME_POINTS = 18
+MINIMUM_TIME_POINTS = 15
 DERIVATIVES = [0, 1, 2]
 DERIVATIVES_TEXT = ['D', 'D\'', 'D\'\'']
 
 
 def main():
     _experiments = load.experiments_groups_as_tuples(EXPERIMENTS)
-    _experiments = filtering.by_distance_range(_experiments, CELLS_DISTANCE_RANGE)
+    _experiments = filtering.by_time_points_amount(_experiments, TIME_POINTS)
     _experiments = filtering.by_real_cells(_experiments)
-    if BAND:
-        _experiments = filtering.by_band(_experiments)
+    _experiments = filtering.by_band(_experiments)
+    _experiments = filtering.by_distance_range(_experiments, CELLS_DISTANCE_RANGE)
     print('Total experiments:', len(_experiments))
 
     _arguments = []
     for _tuple in _experiments:
         _experiment, _series_id, _group = _tuple
+
+        # stop when windows are overlapping
+        _properties = load.group_properties(_experiment, _series_id, _group)
+        _latest_time_point = len(_properties['time_points'])
+        for _time_point in range(len(_properties['time_points'])):
+            _cells_distance = \
+                compute.cells_distance_in_cell_size_time_point(_experiment, _series_id, _group, _time_point)
+            if _cells_distance - 1 - OFFSET_X * 2 < ROI_LENGTH * 2:
+                _latest_time_point = _time_point - 1
+                break
+
         for _cell_id in ['left_cell', 'right_cell']:
             _arguments.append({
                 'experiment': _experiment,
@@ -43,7 +56,8 @@ def main():
                 'offset_y': OFFSET_Y,
                 'offset_z': OFFSET_Z,
                 'cell_id': _cell_id,
-                'direction': 'inside'
+                'direction': 'inside',
+                'time_points': _latest_time_point
             })
 
     _rois_dictionary, _rois_to_compute = \
@@ -60,24 +74,37 @@ def main():
     for _tuple in tqdm(_experiments, desc='Experiments loop'):
         _experiment, _series_id, _group = _tuple
         _properties = load.group_properties(_experiment, _series_id, _group)
-        for _cell_id in ['left_cell', 'right_cell']:
-            _cell_fibers_densities = _experiments_fibers_densities[(_experiment, _series_id, _group, _cell_id)]
-            _cell_fibers_densities = compute.remove_blacklist(
-                _experiment, _series_id, _properties['cells_ids'][_cell_id], _cell_fibers_densities)
 
-            if not OUT_OF_BOUNDARIES:
-                _cell_fibers_densities = compute.longest_fibers_densities_ascending_sequence(_cell_fibers_densities)
-            else:
-                _cell_fibers_densities = [_fibers_density[0] for _fibers_density in _cell_fibers_densities]
+        _left_cell_fibers_densities = _experiments_fibers_densities[(_experiment, _series_id, _group, 'left_cell')]
+        _left_cell_fibers_densities = compute.remove_blacklist(
+            _experiment, _series_id, _properties['cells_ids']['left_cell'], _left_cell_fibers_densities)
+        _right_cell_fibers_densities = _experiments_fibers_densities[(_experiment, _series_id, _group, 'right_cell')]
+        _right_cell_fibers_densities = compute.remove_blacklist(
+            _experiment, _series_id, _properties['cells_ids']['right_cell'], _right_cell_fibers_densities)
 
-            for _derivative_index, _derivative in enumerate(DERIVATIVES):
+        if not OUT_OF_BOUNDARIES:
+            _left_cell_fibers_densities = \
+                compute.longest_fibers_densities_ascending_sequence(_left_cell_fibers_densities)
+            _right_cell_fibers_densities = \
+                compute.longest_fibers_densities_ascending_sequence(_right_cell_fibers_densities)
+        else:
+            _left_cell_fibers_densities = [_fibers_density[0] for _fibers_density in _left_cell_fibers_densities]
+            _right_cell_fibers_densities = [_fibers_density[0] for _fibers_density in _right_cell_fibers_densities]
+
+        # ignore small arrays
+        if len(_left_cell_fibers_densities) < MINIMUM_TIME_POINTS or len(_right_cell_fibers_densities) < \
+                MINIMUM_TIME_POINTS:
+            continue
+
+        for _derivative_index, _derivative in enumerate(DERIVATIVES):
+            for _cell_fibers_densities in [_left_cell_fibers_densities, _right_cell_fibers_densities]:
                 _cell_fibers_densities_derivative = compute_lib.derivative(_cell_fibers_densities, _n=_derivative)
                 _, _kpss_p_value, _, _ = kpss(_cell_fibers_densities_derivative, nlags='legacy')
                 _kpss_y_arrays[_derivative_index].append(_kpss_p_value)
                 _, _adf_p_value, _, _, _, _ = adfuller(_cell_fibers_densities_derivative)
                 _adf_y_arrays[_derivative_index].append(_adf_p_value)
 
-    print('Total cells:', len(_kpss_y_arrays[0]))
+    print('Total pairs:', len(_kpss_y_arrays[0]) / 2)
 
     # print results
     print('KPSS:')
@@ -87,7 +114,7 @@ def main():
               str(_stationary_count / len(_kpss_y_arrays[_derivative_index]) * 100) + '%')
     print('ADF:')
     for _derivative_index, _derivative in enumerate(DERIVATIVES):
-        _stationary_count = len([_value for _value in _adf_y_arrays[_derivative_index] if _value < 0.95])
+        _stationary_count = len([_value for _value in _adf_y_arrays[_derivative_index] if _value < 0.05])
         print('Derivative:', _derivative, 'Stationary:',
               str(_stationary_count / len(_adf_y_arrays[_derivative_index]) * 100) + '%')
 
@@ -97,8 +124,8 @@ def main():
             zip(
                 ['kpss', 'adf'],
                 ['KPSS test p-value', 'ADF test p-value'],
-                [[0.05, 0.1], [0, 0.5, 0.95]],
-                [0.05, 0.95],
+                [[0.05, 0.1], [0.05, 1]],
+                [0.05, 0.05],
                 [_kpss_y_arrays, _adf_y_arrays]
             ):
         _fig = go.Figure(
@@ -115,11 +142,7 @@ def main():
                     fillcolor='white',
                     marker={
                         'size': 10,
-                        'color': _color,
-                        # 'line': {
-                        #     'width': 1,
-                        #     'color': 'white'
-                        # }
+                        'color': _color
                     },
                     opacity=0.7,
                     showlegend=False
