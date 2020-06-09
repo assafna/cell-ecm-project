@@ -154,17 +154,6 @@ def figure_si_4_same_vs_diff_offsets():
     fibers_density.experiments.same_vs_different.main(_offset_y=0, _offset_z=0.5)
 
 
-def figure_si_4_no_band():
-    print('\nPanel B')
-    fibers_density.experiments.fibers_vs_time.compute_tuples([('SN16', 3, 'cells_0_1')])
-
-    print('\nPanel C')
-    fibers_density.experiments.same_vs_different.main(_band=False, _high_time_resolution=False)
-
-    print('\nPanel D')
-    fibers_density.experiments.same_vs_different_band_vs_no_band.main(_high_time_resolution=False)
-
-
 def figure_si_4_detrending_experiments():
     print('\nPanel A')
     fibers_density.experiments.correlations_by_derivatives_pairs.main(_directions=['inside'])
@@ -245,9 +234,6 @@ def figure_4_all():
     print('\nFigure SI 4 - Same vs. Different - Offsets')
     figure_si_4_same_vs_diff_offsets()
 
-    print('\nFigure SI 4 - No Band')
-    figure_si_4_no_band()
-
     print('\nFigure SI 4 - Detrending Experiments')
     figure_si_4_detrending_experiments()
 
@@ -268,11 +254,20 @@ def figure_4_all():
 
 
 def figure_5_main():
-    print('\nPanel B')
+    print('\nPanel A')
     fibers_density.experiments.fibers_vs_offsets_in_axes.main(_high_time_resolution=False)
 
-    print('\nPanel C')
+    print('\nPanel B')
     fibers_density.experiments.same_vs_different_offsets_in_axes.main(_high_time_resolution=False)
+
+    print('\nPanel F')
+    fibers_density.experiments.fibers_vs_time.compute_tuples([('SN16', 3, 'cells_0_1')])
+
+    print('\nPanel G')
+    fibers_density.experiments.same_vs_different.main(_band=False, _high_time_resolution=False)
+
+    print('\nPanel H')
+    fibers_density.experiments.same_vs_different_band_vs_no_band.main(_high_time_resolution=False)
 
 
 def figure_si_5_high_time_res():
