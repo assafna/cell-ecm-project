@@ -243,6 +243,9 @@ def figure_4_all():
     print('\nFigure SI 4 - Same vs. Different - Controls')
     figure_si_4_same_vs_diff_controls()
 
+    print('\nFigure SI 4 - Real vs. Fake')
+    figure_si_4_real_vs_fake()
+
     print('\nFigure SI 4 - Matchmaking')
     figure_si_4_matchmaking()
 
@@ -294,7 +297,7 @@ def figure_si_5_no_band():
     fibers_density.experiments.same_vs_different_offsets_in_axes.main(_band=False, _high_time_resolution=False)
 
 
-def figure_si_5_real_vs_fake():
+def figure_si_4_real_vs_fake():
     print('\nPanels A & B')
     fibers_density.experiments.same_vs_different_real_vs_fake.main(_offset_y=0, _high_time_resolution=False)
 
@@ -325,9 +328,6 @@ def figure_5_all():
 
     print('\nFigure SI 5 - No Band')
     figure_si_5_no_band()
-
-    print('\nFigure SI 5 - Real vs. Fake')
-    figure_si_5_real_vs_fake()
 
     print('\nFigure SI 5 - Communication vs. Density')
     figure_si_5_communication_vs_density()
