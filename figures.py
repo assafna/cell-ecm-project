@@ -320,8 +320,8 @@ def figure_5_all():
     print('\nFigure SI 5 - High Temporal Resolution')
     figure_si_5_high_time_res()
 
-    print('\nFigure SI 5 - Simulations')
-    figure_si_5_simulations()
+    # print('\nFigure SI 5 - Simulations')
+    # figure_si_5_simulations()
 
     print('\nFigure SI 5 - No Band')
     figure_si_5_no_band()
