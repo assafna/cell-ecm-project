@@ -173,7 +173,7 @@ def main():
           len(_same_minus_different))
 
     # plot
-    _colors_array = ['green', 'blue', 'red']
+    _colors_array = ['#844b00', '#ea8500', '#edbc80']
     _fig = go.Figure(
         data=[
             go.Scatter(

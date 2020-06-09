@@ -131,10 +131,10 @@ def figure_4_main():
     fibers_density.experiments.same_vs_different_distances.main(_band=True, _high_time_resolution=False)
 
     print('\nPanel G')
-    fibers_density.experiments.same_vs_different_triplets.main()
+    fibers_density.experiments.same_vs_different_triplet.main()
 
     print('\nPanel H')
-    fibers_density.experiments.same_vs_different_triplet.main()
+    fibers_density.experiments.same_vs_different_triplets.main()
 
 
 def figure_si_4_same_vs_diff_offsets():
