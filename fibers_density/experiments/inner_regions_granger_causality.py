@@ -191,6 +191,25 @@ def main(_band=None, _high_time_resolution=True, _tuples_to_plot=None):
                                   'inst p-value: ' + str(round(_inst_granger.pvalue, 4)),
                                   sep='\t')
 
+                            # lag = 0
+                            _correlation = compute_lib.correlation(
+                                _left_cell_fibers_densities_derivative, _right_cell_fibers_densities_derivative)
+                            print('Time lag = 0 correlation:', _correlation)
+
+                            # rest of lags
+                            for _lag in range(1, _min_estimator_lag + 1):
+                                if _causing == 'left':
+                                    _left_fibers_densities_time_lag = _left_cell_fibers_densities_derivative[:-_lag]
+                                    _right_fibers_densities_time_lag = _right_cell_fibers_densities_derivative[_lag:]
+                                else:
+                                    _left_fibers_densities_time_lag = _left_cell_fibers_densities_derivative[-_lag:]
+                                    _right_fibers_densities_time_lag = _right_cell_fibers_densities_derivative[:_lag]
+
+                                _correlation = compute_lib.correlation(
+                                    _left_fibers_densities_time_lag, _right_fibers_densities_time_lag
+                                )
+                                print('Time lag = ' + str(_lag) + ' correlation:', _correlation)
+
                             # plots
                             if _tuples_to_plot is not None and _tuple in _tuples_to_plot:
                                 _y_arrays = [_left_cell_fibers_densities_derivative,
