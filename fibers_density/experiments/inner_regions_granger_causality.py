@@ -83,6 +83,9 @@ def main(_band=None, _high_time_resolution=True, _tuples_to_plot=None):
         for _key in _rois_dictionary
     }
 
+    _n_pairs = 0
+    _n_pairs_with_band = 0
+    _n_gc = 0
     for _tuple in _experiments:
         _experiment, _series_id, _group = _tuple
 
@@ -104,6 +107,10 @@ def main(_band=None, _high_time_resolution=True, _tuples_to_plot=None):
         # ignore small arrays
         if len(_left_cell_fibers_densities_filtered) < MINIMUM_TIME_POINTS:
             continue
+
+        _n_pairs += 1
+        if _properties['band']:
+            _n_pairs_with_band += 1
 
         _start_time_point = 0
         for _left in _left_cell_fibers_densities:
@@ -172,9 +179,12 @@ def main(_band=None, _high_time_resolution=True, _tuples_to_plot=None):
                             _normality = _var_model_results.test_normality()
                             _inst_granger = _var_model_results.test_inst_causality(causing=_causing)
 
+                            _n_gc += 1
+
                             print(_tuple, _causing.capitalize() + ' causes ' + _caused + '!',
                                   'time-points: ' + str(len(_left_cell_fibers_densities_derivative)),
                                   'stationary derivative: ' + str(_derivative),
+                                  'band:' + str(_properties['band']),
                                   'p-value: ' + str(round(_granger.pvalue, 4)),
                                   'lag: ' + str(_min_estimator_lag),
                                   'normality p-value: ' + str(round(_normality.pvalue, 4)),
@@ -279,6 +289,10 @@ def main(_band=None, _high_time_resolution=True, _tuples_to_plot=None):
         # not enough time points
         except ValueError:
             continue
+
+    print('Total pairs:', _n_pairs)
+    print('Total pairs with band:', _n_pairs_with_band)
+    print('Total granger causality:', _n_gc)
 
 
 if __name__ == '__main__':
