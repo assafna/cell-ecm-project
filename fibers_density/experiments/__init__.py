@@ -6,7 +6,7 @@ from fibers_density.experiments import fibers_vs_distance_multiple_cell_distance
     same_vs_different_temporal_assessment, same_vs_different_triplet, same_vs_different_band_vs_no_band, fibers_vs_time, \
     fibers_vs_offsets_in_axes, fibers_vs_same_vs_different_offsets_in_axes, same_vs_different_real_vs_fake, \
     matchmaking_by_correlation, same_vs_different_offsets_in_axes, inner_regions_saturation, \
-    inner_regions_granger_causality
+    inner_regions_granger_causality, same_vs_different_cross_correlation
 
 __all__ = [
     fibers_vs_distance_multiple_cell_distances,
@@ -31,5 +31,6 @@ __all__ = [
     matchmaking_by_correlation,
     same_vs_different_offsets_in_axes,
     inner_regions_saturation,
-    inner_regions_granger_causality
+    inner_regions_granger_causality,
+    same_vs_different_cross_correlation
 ]

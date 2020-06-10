@@ -41,7 +41,7 @@ TIME_LAGS = {
 }
 
 
-def compute_fibers_densities(_band=True, _high_time_resolution=False):
+def compute_fibers_densities(_band=True, _high_time_resolution=True):
     _experiments = load.experiments_groups_as_tuples(EXPERIMENTS[_high_time_resolution])
     _experiments = filtering.by_distance_range(_experiments, CELLS_DISTANCE_RANGE)
     _experiments = filtering.by_real_cells(_experiments, _real_cells=REAL_CELLS)
@@ -238,119 +238,132 @@ def compute_fibers_densities(_band=True, _high_time_resolution=False):
         _same_time_lags_highest, _different_time_lags_highest
 
 
-def main(_band=True, _high_time_resolution=False):
+def main(_band=True, _high_time_resolution=True, _plots=None, _plot_types=None):
+    if _plots is None:
+        _plots = ['same', 'different']
+    if _plot_types is None:
+        _plot_types = ['scatter', 'box', 'bar']
+
     _same_correlation_vs_time_lag, _same_time_lags_arrays, _different_time_lags_arrays, _same_time_lags_highest, \
         _different_time_lags_highest = compute_fibers_densities(_band, _high_time_resolution)
 
-    # individual plots
-    for _same_tuple in _same_correlation_vs_time_lag:
-        _experiment, _series_id, _group = _same_tuple
-        _fig = go.Figure(
-            data=go.Scatter(
-                x=np.array(TIME_LAGS[_high_time_resolution]) * TIME_RESOLUTION[_high_time_resolution],
-                y=_same_correlation_vs_time_lag[_same_tuple],
-                mode='markers',
-                marker={
-                    'size': 25,
-                    'color': '#ea8500'
-                }
-            ),
-            layout={
-                'xaxis': {
-                    'title': 'Time lag (minutes)',
-                    'zeroline': False,
-                    'tickmode': 'array',
-                    'tickvals': np.array(TIME_LAGS[_high_time_resolution]) * TIME_RESOLUTION[_high_time_resolution]
-                },
-                'yaxis': {
-                    'title': 'Correlation',
-                    'range': [-1, 1.1],
-                    'zeroline': False,
-                    'tickmode': 'array',
-                    'tickvals': [-1, -0.5, 0, 0.5, 1]
-                }
-            }
-        )
+    if _plots is not None:
 
-        save.to_html(
-            _fig=_fig,
-            _path=os.path.join(paths.PLOTS, save.get_module_name()),
-            _filename='plot_' + _experiment + '_' + str(_series_id) + '_' + _group
-        )
+        # individual plots
+        if 'scatter' in _plot_types:
+            for _same_tuple in _same_correlation_vs_time_lag:
+                _experiment, _series_id, _group = _same_tuple
+                _fig = go.Figure(
+                    data=go.Scatter(
+                        x=np.array(TIME_LAGS[_high_time_resolution]) * TIME_RESOLUTION[_high_time_resolution],
+                        y=_same_correlation_vs_time_lag[_same_tuple],
+                        mode='markers',
+                        marker={
+                            'size': 25,
+                            'color': '#ea8500'
+                        }
+                    ),
+                    layout={
+                        'xaxis': {
+                            'title': 'Time lag (minutes)',
+                            'zeroline': False,
+                            'tickmode': 'array',
+                            'tickvals': np.array(TIME_LAGS[_high_time_resolution]) *
+                                        TIME_RESOLUTION[_high_time_resolution]
+                        },
+                        'yaxis': {
+                            'title': 'Correlation',
+                            'range': [-1, 1.1],
+                            'zeroline': False,
+                            'tickmode': 'array',
+                            'tickvals': [-1, -0.5, 0, 0.5, 1]
+                        }
+                    }
+                )
 
-    # box plots
-    for _name, _arrays in zip(['same', 'different'], [_same_time_lags_arrays, _different_time_lags_arrays]):
-        _fig = go.Figure(
-            data=[
-                go.Box(
-                    y=_y,
-                    name=_time_lag * TIME_RESOLUTION[_high_time_resolution],
-                    boxpoints=False,
-                    line={
-                        'width': 1
-                    },
-                    marker={
-                        'size': 10,
-                        'color': '#ea8500'
-                    },
-                    showlegend=False
-                ) for _y, _time_lag in zip(_arrays, TIME_LAGS[_high_time_resolution])
-            ],
-            layout={
-                'xaxis': {
-                    'title': 'Time lag (minutes)',
-                    'zeroline': False,
-                    'tickmode': 'array',
-                    'tickvals': np.array(TIME_LAGS[_high_time_resolution]) * TIME_RESOLUTION[_high_time_resolution]
-                },
-                'yaxis': {
-                    'title': _name.capitalize() + ' network correlations',
-                    'range': [-1, 1.1],
-                    'zeroline': False,
-                    'tickmode': 'array',
-                    'tickvals': [-1, -0.5, 0, 0.5, 1]
-                }
-            }
-        )
+                save.to_html(
+                    _fig=_fig,
+                    _path=os.path.join(paths.PLOTS, save.get_module_name()),
+                    _filename='plot_' + _experiment + '_' + str(_series_id) + '_' + _group
+                )
 
-        save.to_html(
-            _fig=_fig,
-            _path=os.path.join(paths.PLOTS, save.get_module_name()),
-            _filename='plot_box_high_time_res_' + str(_high_time_resolution) + '_' + _name
-        )
+        # box plots
+        if 'box' in _plot_types:
+            for _name, _arrays in zip(['same', 'different'], [_same_time_lags_arrays, _different_time_lags_arrays]):
+                _fig = go.Figure(
+                    data=[
+                        go.Box(
+                            y=_y,
+                            name=_time_lag * TIME_RESOLUTION[_high_time_resolution],
+                            boxpoints=False,
+                            line={
+                                'width': 1
+                            },
+                            marker={
+                                'size': 10,
+                                'color': '#ea8500'
+                            },
+                            showlegend=False
+                        ) for _y, _time_lag in zip(_arrays, TIME_LAGS[_high_time_resolution])
+                    ],
+                    layout={
+                        'xaxis': {
+                            'title': 'Time lag (minutes)',
+                            'zeroline': False,
+                            'tickmode': 'array',
+                            'tickvals': np.array(TIME_LAGS[_high_time_resolution]) *
+                                        TIME_RESOLUTION[_high_time_resolution]
+                        },
+                        'yaxis': {
+                            'title': _name.capitalize() + ' network correlations',
+                            'range': [-1, 1.1],
+                            'zeroline': False,
+                            'tickmode': 'array',
+                            'tickvals': [-1, -0.5, 0, 0.5, 1]
+                        }
+                    }
+                )
 
-    # bar plot
-    for _name, _sums in zip(['same', 'different'], [_same_time_lags_highest, _different_time_lags_highest]):
-        _fig = go.Figure(
-            data=go.Bar(
-                x=np.array(TIME_LAGS[_high_time_resolution]) * TIME_RESOLUTION[_high_time_resolution],
-                y=np.array(_sums) / sum(_sums),
-                marker={
-                    'color': '#ea8500'
-                }
-            ),
-            layout={
-                'xaxis': {
-                    'title': 'Time lag (minutes)',
-                    'zeroline': False,
-                    'tickmode': 'array',
-                    'tickvals': np.array(TIME_LAGS[_high_time_resolution]) * TIME_RESOLUTION[_high_time_resolution]
-                },
-                'yaxis': {
-                    'title': 'Highest correlations fraction',
-                    'range': [0, 1.1],
-                    'zeroline': False,
-                    'tickmode': 'array',
-                    'tickvals': [0, 0.5, 1]
-                }
-            }
-        )
+                save.to_html(
+                    _fig=_fig,
+                    _path=os.path.join(paths.PLOTS, save.get_module_name()),
+                    _filename='plot_box_high_time_res_' + str(_high_time_resolution) + '_' + _name
+                )
 
-        save.to_html(
-            _fig=_fig,
-            _path=os.path.join(paths.PLOTS, save.get_module_name()),
-            _filename='plot_bar_high_time_res_' + str(_high_time_resolution) + '_' + _name
-        )
+        # bar plot
+        if 'bar' in _plot_types:
+            for _name, _sums in zip(['same', 'different'], [_same_time_lags_highest, _different_time_lags_highest]):
+                _fig = go.Figure(
+                    data=go.Bar(
+                        x=np.array(TIME_LAGS[_high_time_resolution]) * TIME_RESOLUTION[_high_time_resolution],
+                        y=np.array(_sums) / sum(_sums),
+                        marker={
+                            'color': '#ea8500'
+                        }
+                    ),
+                    layout={
+                        'xaxis': {
+                            'title': 'Time lag (minutes)',
+                            'zeroline': False,
+                            'tickmode': 'array',
+                            'tickvals': np.array(TIME_LAGS[_high_time_resolution]) *
+                                        TIME_RESOLUTION[_high_time_resolution]
+                        },
+                        'yaxis': {
+                            'title': 'Highest correlations fraction',
+                            'range': [0, 1.1],
+                            'zeroline': False,
+                            'tickmode': 'array',
+                            'tickvals': [0, 0.5, 1]
+                        }
+                    }
+                )
+
+                save.to_html(
+                    _fig=_fig,
+                    _path=os.path.join(paths.PLOTS, save.get_module_name()),
+                    _filename='plot_bar_high_time_res_' + str(_high_time_resolution) + '_' + _name
+                )
 
 
 if __name__ == '__main__':
