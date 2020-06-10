@@ -192,24 +192,6 @@ def figure_si_4_same_vs_diff_controls():
         _real_cells=False, _static=True, _band=False, _high_time_resolution=False)
 
 
-def figure_si_4_matchmaking():
-    print('\nPanels B & F')
-    fibers_density.experiments.matchmaking_by_correlation.main(
-        _real_cells=True, _offset_y=0.5, _high_time_resolution=False)
-
-    print('\nPanel C')
-    fibers_density.experiments.matchmaking_by_correlation.main(
-        _real_cells=True, _offset_y=0, _high_time_resolution=False)
-
-    print('\nPanel D')
-    fibers_density.experiments.matchmaking_by_correlation.main(
-        _real_cells=True, _offset_y=0.5, _high_time_resolution=True)
-
-    print('\nPanel E')
-    fibers_density.experiments.matchmaking_by_correlation.main(
-        _real_cells=False, _offset_y=0.5, _high_time_resolution=False)
-
-
 def figure_si_4_same_vs_diff_high_time_res():
     print('\nPanel A')
     fibers_density.experiments.same_vs_different.main(_band=True, _high_time_resolution=True)
@@ -245,9 +227,6 @@ def figure_4_all():
 
     print('\nFigure SI 4 - Real vs. Fake')
     figure_si_4_real_vs_fake()
-
-    print('\nFigure SI 4 - Matchmaking')
-    figure_si_4_matchmaking()
 
     print('\nFigure SI 4 - Same vs. Different - High Temporal Resolution')
     figure_si_4_same_vs_diff_high_time_res()
@@ -334,6 +313,29 @@ def figure_5_all():
 
 
 def figure_6_main():
+    print('\nPanels B & F')
+    fibers_density.experiments.matchmaking_by_correlation.main(
+        _real_cells=True, _offset_y=0.5, _high_time_resolution=False)
+
+    print('\nPanel C')
+    fibers_density.experiments.matchmaking_by_correlation.main(
+        _real_cells=True, _offset_y=0, _high_time_resolution=False)
+
+    print('\nPanel D')
+    fibers_density.experiments.matchmaking_by_correlation.main(
+        _real_cells=True, _offset_y=0.5, _high_time_resolution=True)
+
+    print('\nPanel E')
+    fibers_density.experiments.matchmaking_by_correlation.main(
+        _real_cells=False, _offset_y=0.5, _high_time_resolution=False)
+
+
+def figure_6_all():
+    print('\nFigure 6 - Main Figure')
+    figure_6_main()
+
+
+def figure_7_main():
     print('\nPanels B & C')
     fibers_density.simulations.same_vs_different_cross_correlation.main(
         _alpha=1, _beta=1, _low_connectivity=False, _plots=['same'])
@@ -343,12 +345,12 @@ def figure_6_main():
         _type='alpha', _low_connectivity=False, _plots=['same'])
 
 
-def figure_si_6_betas():
+def figure_si_7_betas():
     fibers_density.simulations.same_vs_different_cross_correlation_alphas_betas.main(
         _type='beta', _low_connectivity=False, _plots=['same'])
 
 
-def figure_si_6_different_network():
+def figure_si_7_different_network():
     print('\nPanels A & B')
     fibers_density.simulations.same_vs_different_cross_correlation.main(
         _alpha=1, _beta=1, _low_connectivity=False, _plots=['different'])
@@ -362,25 +364,25 @@ def figure_si_6_different_network():
         _type='beta', _low_connectivity=False, _plots=['different'])
 
 
-def figure_si_6_granger_causality():
+def figure_si_7_granger_causality():
     print('\nPanels A & B')
     fibers_density.experiments.inner_regions_granger_causality.main(
         _band=None, _high_time_resolution=True, _tuples_to_plot=[('SN45', 2, 'cells_2_3')])
 
 
-def figure_6_all():
-    print('\nFigure 6 - Main Figure')
-    figure_6_main()
+def figure_7_all():
+    print('\nFigure 7 - Main Figure')
+    figure_7_main()
 
-    print('\nFigure SI 6')
-    print('\nFigure SI 6 - Betas')
-    figure_si_6_betas()
+    print('\nFigure SI 7')
+    print('\nFigure SI 7 - Betas')
+    figure_si_7_betas()
 
-    print('\nFigure SI 6 - Different Network')
-    figure_si_6_different_network()
+    print('\nFigure SI 7 - Different Network')
+    figure_si_7_different_network()
 
-    print('\nFigure SI 6 - Granger Causality')
-    figure_si_6_granger_causality()
+    print('\nFigure SI 7 - Granger Causality')
+    figure_si_7_granger_causality()
 
 
 def figure_si_discussion_saturation():
@@ -404,4 +406,5 @@ if __name__ == '__main__':
     figure_4_all()
     figure_5_all()
     figure_6_all()
+    figure_7_all()
     figure_discussion_all()
