@@ -336,18 +336,36 @@ def figure_6_all():
 
 
 def figure_7_main():
-    print('\nPanels B & C')
+    print('\nPanel B')
     fibers_density.simulations.same_vs_different_cross_correlation.main(
-        _alpha=1, _beta=1, _low_connectivity=False, _plots=['same'])
+        _alpha=1, _beta=1, _low_connectivity=False, _plots=['same'], _plot_types=['box'])
 
-    print('\nPanels D & E')
+    print('\nPanel C')
     fibers_density.simulations.same_vs_different_cross_correlation_alphas_betas.main(
-        _type='alpha', _low_connectivity=False, _plots=['same'])
+        _type='alpha', _low_connectivity=False, _plots=['same'], _plot_types=['box'])
 
-
-def figure_si_7_betas():
+    print('\nPanel D')
     fibers_density.simulations.same_vs_different_cross_correlation_alphas_betas.main(
-        _type='beta', _low_connectivity=False, _plots=['same'])
+        _type='beta', _low_connectivity=False, _plots=['same'], _plot_types=['box'])
+
+
+def figure_si_7_simulate_time_lag_distribution():
+    print('\nPanel A')
+    fibers_density.simulations.same_vs_different_cross_correlation.main(
+        _alpha=1, _beta=1, _low_connectivity=False, _plots=['same'], _plot_types=['bar'])
+
+    print('\nPanel B')
+    fibers_density.simulations.same_vs_different_cross_correlation_alphas_betas.main(
+        _type='alpha', _low_connectivity=False, _plots=['same'], _plot_types=['bar'])
+
+    print('\nPanel C')
+    fibers_density.simulations.same_vs_different_cross_correlation_alphas_betas.main(
+        _type='beta', _low_connectivity=False, _plots=['same'], _plot_types=['bar'])
+
+
+def figure_si_7_leader_follower_cross_correlation_experiments():
+    print('\nPanels A & B')
+    fibers_density.experiments.same_vs_different_cross_correlation.main(_plots=['same'], _plot_types=['box', 'bar'])
 
 
 def figure_si_7_different_network():
@@ -375,8 +393,11 @@ def figure_7_all():
     figure_7_main()
 
     print('\nFigure SI 7')
-    print('\nFigure SI 7 - Betas')
-    figure_si_7_betas()
+    print('\nFigure SI 7 - Simulate Time Lag Distribution')
+    figure_si_7_simulate_time_lag_distribution()
+
+    print('\nFigure SI 7 - Leader Follower Cross Correlation Experiments')
+    figure_si_7_leader_follower_cross_correlation_experiments()
 
     print('\nFigure SI 7 - Different Network')
     figure_si_7_different_network()
