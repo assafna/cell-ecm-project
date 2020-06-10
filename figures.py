@@ -313,21 +313,21 @@ def figure_5_all():
 
 
 def figure_6_main():
-    print('\nPanels B & F')
+    print('\nPanels B & C')
     fibers_density.experiments.matchmaking_by_correlation.main(
         _real_cells=True, _offset_y=0.5, _high_time_resolution=False)
 
-    print('\nPanel C')
-    fibers_density.experiments.matchmaking_by_correlation.main(
-        _real_cells=True, _offset_y=0, _high_time_resolution=False)
-
     print('\nPanel D')
     fibers_density.experiments.matchmaking_by_correlation.main(
-        _real_cells=True, _offset_y=0.5, _high_time_resolution=True)
+        _real_cells=True, _offset_y=0, _high_time_resolution=False)
 
     print('\nPanel E')
     fibers_density.experiments.matchmaking_by_correlation.main(
         _real_cells=False, _offset_y=0.5, _high_time_resolution=False)
+
+    print('\nPanel F')
+    fibers_density.experiments.matchmaking_by_correlation.main(
+        _real_cells=True, _offset_y=0.5, _high_time_resolution=True)
 
 
 def figure_6_all():
