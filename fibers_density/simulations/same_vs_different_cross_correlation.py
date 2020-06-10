@@ -143,98 +143,27 @@ def compute_fibers_densities(_alpha=1, _beta=1, _low_connectivity=False):
         _same_time_lags_highest, _different_time_lags_highest
 
 
-def main(_alpha=1, _beta=1, _low_connectivity=False, _plots=None):
+def main(_alpha=1, _beta=1, _low_connectivity=False, _plots=None, _plot_types=None):
+    if _plots is None:
+        _plots = ['same', 'different']
+    if _plot_types is None:
+        _plot_types = ['scatter', 'box', 'bar']
+
     _same_correlation_vs_time_lag, _same_time_lags_arrays, _different_time_lags_arrays, _same_time_lags_highest, \
         _different_time_lags_highest = compute_fibers_densities(_alpha, _beta, _low_connectivity)
 
     if _plots is not None:
 
         # individual plots
-        for _same_simulation in _same_correlation_vs_time_lag:
-            _fig = go.Figure(
-                data=go.Scatter(
-                    x=TIME_LAGS,
-                    y=_same_correlation_vs_time_lag[_same_simulation],
-                    mode='markers',
-                    marker={
-                        'size': 25,
-                        'color': '#2e82bf'
-                    }
-                ),
-                layout={
-                    'xaxis': {
-                        'title': 'Time lag',
-                        'zeroline': False,
-                        'tickmode': 'array',
-                        'tickvals': TIME_LAGS
-                    },
-                    'yaxis': {
-                        'title': 'Correlation',
-                        'range': [-1, 1.1],
-                        'zeroline': False,
-                        'tickmode': 'array',
-                        'tickvals': [-1, -0.5, 0, 0.5, 1]
-                    }
-                }
-            )
-
-            save.to_html(
-                _fig=_fig,
-                _path=os.path.join(paths.PLOTS, save.get_module_name()),
-                _filename='plot_' + _same_simulation
-            )
-
-        # box plots
-        for _name, _arrays in zip(['same', 'different'], [_same_time_lags_arrays, _different_time_lags_arrays]):
-            if _name in _plots:
+        if 'scatter' in _plot_types:
+            for _same_simulation in _same_correlation_vs_time_lag:
                 _fig = go.Figure(
-                    data=[
-                        go.Box(
-                            y=_y,
-                            name=_time_lag,
-                            boxpoints=False,
-                            line={
-                                'width': 1
-                            },
-                            marker={
-                                'size': 10,
-                                'color': '#2e82bf'
-                            },
-                            showlegend=False
-                        ) for _y, _time_lag in zip(_arrays, TIME_LAGS)
-                    ],
-                    layout={
-                        'xaxis': {
-                            'title': 'Time lag',
-                            'zeroline': False,
-                            'tickmode': 'array',
-                            'tickvals': TIME_LAGS
-                        },
-                        'yaxis': {
-                            'title': _name.capitalize() + ' network correlation',
-                            'range': [-1, 1.1],
-                            'zeroline': False,
-                            'tickmode': 'array',
-                            'tickvals': [-1, -0.5, 0, 0.5, 1]
-                        }
-                    }
-                )
-
-                save.to_html(
-                    _fig=_fig,
-                    _path=os.path.join(paths.PLOTS, save.get_module_name()),
-                    _filename='plot_box_alpha_' + str(_alpha) + '_beta_' + str(_beta) + '_low_con_' +
-                              str(_low_connectivity) + '_' + _name
-                )
-
-        # bar plot
-        for _name, _sums in zip(['same', 'different'], [_same_time_lags_highest, _different_time_lags_highest]):
-            if _name in _plots:
-                _fig = go.Figure(
-                    data=go.Bar(
+                    data=go.Scatter(
                         x=TIME_LAGS,
-                        y=np.array(_sums) / sum(_sums),
+                        y=_same_correlation_vs_time_lag[_same_simulation],
+                        mode='markers',
                         marker={
+                            'size': 25,
                             'color': '#2e82bf'
                         }
                     ),
@@ -246,11 +175,11 @@ def main(_alpha=1, _beta=1, _low_connectivity=False, _plots=None):
                             'tickvals': TIME_LAGS
                         },
                         'yaxis': {
-                            'title': 'Highest correlation fraction',
-                            'range': [0, 1.1],
+                            'title': 'Correlation',
+                            'range': [-1, 1.1],
                             'zeroline': False,
                             'tickmode': 'array',
-                            'tickvals': [0, 0.5, 1]
+                            'tickvals': [-1, -0.5, 0, 0.5, 1]
                         }
                     }
                 )
@@ -258,9 +187,88 @@ def main(_alpha=1, _beta=1, _low_connectivity=False, _plots=None):
                 save.to_html(
                     _fig=_fig,
                     _path=os.path.join(paths.PLOTS, save.get_module_name()),
-                    _filename='plot_bar_alpha_' + str(_alpha) + '_beta_' + str(_beta) + '_low_con_' +
-                              str(_low_connectivity) + '_' + _name
+                    _filename='plot_' + _same_simulation
                 )
+
+        # box plots
+        if 'box' in _plot_types:
+            for _name, _arrays in zip(['same', 'different'], [_same_time_lags_arrays, _different_time_lags_arrays]):
+                if _name in _plots:
+                    _fig = go.Figure(
+                        data=[
+                            go.Box(
+                                y=_y,
+                                name=_time_lag,
+                                boxpoints=False,
+                                line={
+                                    'width': 1
+                                },
+                                marker={
+                                    'size': 10,
+                                    'color': '#2e82bf'
+                                },
+                                showlegend=False
+                            ) for _y, _time_lag in zip(_arrays, TIME_LAGS)
+                        ],
+                        layout={
+                            'xaxis': {
+                                'title': 'Time lag',
+                                'zeroline': False,
+                                'tickmode': 'array',
+                                'tickvals': TIME_LAGS
+                            },
+                            'yaxis': {
+                                'title': _name.capitalize() + ' network correlation',
+                                'range': [-1, 1.1],
+                                'zeroline': False,
+                                'tickmode': 'array',
+                                'tickvals': [-1, -0.5, 0, 0.5, 1]
+                            }
+                        }
+                    )
+
+                    save.to_html(
+                        _fig=_fig,
+                        _path=os.path.join(paths.PLOTS, save.get_module_name()),
+                        _filename='plot_box_alpha_' + str(_alpha) + '_beta_' + str(_beta) + '_low_con_' +
+                                  str(_low_connectivity) + '_' + _name
+                    )
+
+        # bar plot
+        if 'bar' in _plot_types:
+            for _name, _sums in zip(['same', 'different'], [_same_time_lags_highest, _different_time_lags_highest]):
+                if _name in _plots:
+                    _fig = go.Figure(
+                        data=go.Bar(
+                            x=TIME_LAGS,
+                            y=np.array(_sums) / sum(_sums),
+                            marker={
+                                'color': '#2e82bf'
+                            }
+                        ),
+                        layout={
+                            'xaxis': {
+                                'title': 'Time lag',
+                                'zeroline': False,
+                                'tickmode': 'array',
+                                'tickvals': TIME_LAGS
+                            },
+                            'yaxis': {
+                                'title': 'Highest correlation fraction',
+                                'range': [0, 1.1],
+                                'zeroline': False,
+                                'tickmode': 'array',
+                                'tickvals': [0, 0.5, 1]
+                            }
+                        }
+                    )
+
+                    save.to_html(
+                        _fig=_fig,
+                        _path=os.path.join(paths.PLOTS, save.get_module_name()),
+                        _filename='plot_bar_alpha_' + str(_alpha) + '_beta_' + str(_beta) + '_low_con_' +
+                                  str(_low_connectivity) + '_' + _name
+                    )
 
 
 if __name__ == '__main__':
