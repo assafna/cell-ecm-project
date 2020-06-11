@@ -291,7 +291,7 @@ def figure_si_4_real_vs_fake():
 
 
 def figure_si_5_communication_vs_density():
-    fibers_density.experiments.fibers_vs_same_vs_different_offsets_in_axes.main(_band=True, _high_time_resolution=False)
+    fibers_density.experiments.fibers_vs_same_vs_different_offsets_in_axes.main()
 
 
 def figure_5_all():
@@ -347,6 +347,10 @@ def figure_7_main():
     print('\nPanel D')
     fibers_density.simulations.same_vs_different_cross_correlation_alphas_betas.main(
         _type='beta', _low_connectivity=False, _plots=['same'], _plot_types=['box'])
+
+    print('\nPanel E')
+    fibers_density.experiments.inner_regions_granger_causality.main(
+        _band=None, _high_time_resolution=True, _plots=['granger'])
 
 
 def figure_si_7_simulate_time_lag_distribution():
