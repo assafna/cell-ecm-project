@@ -35,7 +35,10 @@ ADF_TEST = True
 KPSS_TEST = True
 
 
-def main(_band=None, _high_time_resolution=True, _tuples_to_plot=None):
+def main(_band=None, _high_time_resolution=True, _tuples_to_plot=None, _plots=None):
+    if _plots is None:
+        _plots = ['whiteness', 'granger']
+
     _experiments = load.experiments_groups_as_tuples(EXPERIMENTS[_high_time_resolution])
     _experiments = filtering.by_time_points_amount(_experiments, _time_points=MINIMUM_TIME_POINTS)
     _experiments = filtering.by_distance_range(_experiments, _distance_range=CELLS_DISTANCE_RANGE)
@@ -85,7 +88,10 @@ def main(_band=None, _high_time_resolution=True, _tuples_to_plot=None):
 
     _n_pairs = 0
     _n_pairs_with_band = 0
-    _n_gc = 0
+    _whiteness_p_values = []
+    _n_passed_whiteness_with_band = 0
+    _granger_causality_p_values = []
+    _n_passed_granger_causality_with_band = 0
     for _tuple in _experiments:
         _experiment, _series_id, _group = _tuple
 
@@ -167,6 +173,9 @@ def main(_band=None, _high_time_resolution=True, _tuples_to_plot=None):
                 _var_model_results = _var_model.fit(maxlags=_min_estimator_lag, ic=None)
 
                 _whiteness = _var_model_results.test_whiteness(nlags=_min_estimator_lag + 1)
+                _whiteness_p_values.append(_whiteness.pvalue)
+                if _properties['band']:
+                    _n_passed_whiteness_with_band += 1
 
                 # no autocorrelation in the residuals
                 if _whiteness.pvalue > 0.05:
@@ -174,12 +183,13 @@ def main(_band=None, _high_time_resolution=True, _tuples_to_plot=None):
                     # granger causality
                     for _caused, _causing in zip(['left', 'right'], ['right', 'left']):
                         _granger = _var_model_results.test_causality(caused=_caused, causing=_causing)
+                        _granger_causality_p_values.append(_granger.pvalue)
+                        if _properties['band']:
+                            _n_passed_granger_causality_with_band += 1
 
                         if _granger.pvalue < 0.05:
                             _normality = _var_model_results.test_normality()
                             _inst_granger = _var_model_results.test_inst_causality(causing=_causing)
-
-                            _n_gc += 1
 
                             print(_tuple, _causing.capitalize() + ' causes ' + _caused + '!',
                                   'time-points: ' + str(len(_left_cell_fibers_densities_derivative)),
@@ -311,7 +321,69 @@ def main(_band=None, _high_time_resolution=True, _tuples_to_plot=None):
 
     print('Total pairs:', _n_pairs)
     print('Total pairs with band:', _n_pairs_with_band)
-    print('Total granger causality:', _n_gc)
+    print('Total passed whiteness:', (np.array(_whiteness_p_values) > 0.05).sum())
+    print('Total passed whiteness with band:', _n_passed_whiteness_with_band)
+    print('Total passed granger causality:', (np.array(_granger_causality_p_values) < 0.05).sum())
+    print('Total passed granger causality with band:', _n_passed_granger_causality_with_band)
+
+    # plots
+    for _test_name, _y_title, _y_array in \
+            zip(
+                ['whiteness', 'granger'],
+                ['Whiteness p-value', 'Granger causality p-value'],
+                [_whiteness_p_values, _granger_causality_p_values]
+            ):
+        if _test_name in _plots:
+            _fig = go.Figure(
+                data=go.Box(
+                    y=_y_array,
+                    boxpoints='all',
+                    jitter=1,
+                    pointpos=0,
+                    line={
+                        'width': 1
+                    },
+                    fillcolor='white',
+                    marker={
+                        'size': 10,
+                        'color': '#ea8500'
+                    },
+                    opacity=0.7,
+                    showlegend=False
+                ),
+                layout={
+                    'xaxis': {
+                        'zeroline': False
+                    },
+                    'yaxis': {
+                        'title': _y_title,
+                        'zeroline': False,
+                        'range': [-0.1, 1.1],
+                        'tickmode': 'array',
+                        'tickvals': [0.05, 1]
+                    },
+                    'shapes': [
+                        {
+                            'type': 'line',
+                            'x0': -0.75,
+                            'y0': 0.05,
+                            'x1': 0.75,
+                            'y1': 0.05,
+                            'line': {
+                                'color': 'red',
+                                'width': 2,
+                                'dash': 'dash'
+                            }
+                        }
+                    ]
+                }
+            )
+
+            save.to_html(
+                _fig=_fig,
+                _path=os.path.join(paths.PLOTS, save.get_module_name()),
+                _filename='plot_' + _test_name
+            )
 
 
 if __name__ == '__main__':
