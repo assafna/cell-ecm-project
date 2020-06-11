@@ -7,14 +7,23 @@ from fibers_density.experiments import fibers_vs_offsets_in_axes, same_vs_differ
 from libs.experiments import paths
 from plotting import save
 
+OFFSET_Y_START = -1
+OFFSET_Y_END = 1
+OFFSET_Z_START = -1
+OFFSET_Z_END = 1
 
-def main(_band=True, _high_time_resolution=False):
+
+def main():
     print('Computing fibers vs. offsets in axes:')
-    _fibers_z_array = fibers_vs_offsets_in_axes.compute_z_array(_band, _high_time_resolution).flatten()
+    _fibers_z_array = fibers_vs_offsets_in_axes.compute_z_array(
+        _offset_y_start=OFFSET_Y_START, _offset_y_end=OFFSET_Y_END,
+        _offset_z_start=OFFSET_Z_START, _offset_z_end=OFFSET_Z_END).flatten()
 
     print('Computing "same vs. different" vs. offset in axes:')
     _same_vs_different_z_array = \
-        same_vs_different_offsets_in_axes.compute_z_array(_band, _high_time_resolution).flatten()
+        same_vs_different_offsets_in_axes.compute_z_array(
+            _offset_y_start=OFFSET_Y_START, _offset_y_end=OFFSET_Y_END,
+            _offset_z_start=OFFSET_Z_START, _offset_z_end=OFFSET_Z_END).flatten()
 
     print('Correlation:', pearsonr(_fibers_z_array, _same_vs_different_z_array))
 
