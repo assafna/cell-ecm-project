@@ -182,7 +182,9 @@ def compute_data(_arguments):
     return _offset_y_index, _offset_z_index, _same_fraction, _annotation
 
 
-def compute_z_array(_band, _high_time_resolution):
+def compute_z_array(_band=True, _high_time_resolution=False, _offset_x=OFFSET_X, _offset_y_start=OFFSET_Y_START,
+                    _offset_y_end=OFFSET_Y_END, _offset_y_step=OFFSET_Y_STEP, _offset_z_start=OFFSET_Z_START,
+                    _offset_z_end=OFFSET_Z_END, _offset_z_step=OFFSET_Z_STEP):
     global _experiments, _tuples_by_experiment, _experiments_fibers_densities, _z_array, _annotations_array
 
     _experiments = load.experiments_groups_as_tuples(EXPERIMENTS[_high_time_resolution])
@@ -192,8 +194,8 @@ def compute_z_array(_band, _high_time_resolution):
     _experiments = filtering.by_band(_experiments, _band=_band)
     print('Total experiments:', len(_experiments))
 
-    _offsets_y = np.arange(start=OFFSET_Y_START, stop=OFFSET_Y_END + OFFSET_Y_STEP, step=OFFSET_Y_STEP)
-    _offsets_z = np.arange(start=OFFSET_Z_START, stop=OFFSET_Z_END + OFFSET_Z_STEP, step=OFFSET_Z_STEP)
+    _offsets_y = np.arange(start=_offset_y_start, stop=_offset_y_end + _offset_y_step, step=_offset_y_step)
+    _offsets_z = np.arange(start=_offset_z_start, stop=_offset_z_end + _offset_z_step, step=_offset_z_step)
     _arguments = []
     for _tuple in _experiments:
         _experiment, _series_id, _group = _tuple
@@ -260,14 +262,18 @@ def compute_z_array(_band, _high_time_resolution):
     return _z_array
 
 
-def main(_band=True, _high_time_resolution=False):
+def main(_band=True, _high_time_resolution=False, _offset_x=OFFSET_X, _offset_y_start=OFFSET_Y_START,
+         _offset_y_end=OFFSET_Y_END, _offset_y_step=OFFSET_Y_STEP, _offset_z_start=OFFSET_Z_START,
+         _offset_z_end=OFFSET_Z_END, _offset_z_step=OFFSET_Z_STEP):
     global _experiments, _tuples_by_experiment, _experiments_fibers_densities, _z_array, _annotations_array
 
-    compute_z_array(_band, _high_time_resolution)
+    compute_z_array(_band=_band, _high_time_resolution=_high_time_resolution, _offset_x=OFFSET_X,
+                    _offset_y_start=OFFSET_Y_START, _offset_y_end=OFFSET_Y_END, _offset_y_step=OFFSET_Y_STEP,
+                    _offset_z_start=OFFSET_Z_START, _offset_z_end=OFFSET_Z_END, _offset_z_step=OFFSET_Z_STEP)
 
     # plot
-    _offsets_y = np.arange(start=OFFSET_Y_START, stop=OFFSET_Y_END + OFFSET_Y_STEP, step=OFFSET_Y_STEP)
-    _offsets_z = np.arange(start=OFFSET_Z_START, stop=OFFSET_Z_END + OFFSET_Z_STEP, step=OFFSET_Z_STEP)
+    _offsets_y = np.arange(start=_offset_y_start, stop=_offset_y_end + _offset_y_step, step=_offset_y_step)
+    _offsets_z = np.arange(start=_offset_z_start, stop=_offset_z_end + _offset_z_step, step=_offset_z_step)
     _colors_array = ['black', 'white', '#ea8500']
     _fig = go.Figure(
         data=go.Heatmap(
