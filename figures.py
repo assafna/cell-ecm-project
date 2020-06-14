@@ -392,6 +392,11 @@ def figure_si_7_granger_causality():
         _band=None, _high_time_resolution=True, _tuples_to_plot=[('SN45', 2, 'cells_2_3')])
 
 
+def figure_si_7_whiteness():
+    fibers_density.experiments.inner_regions_granger_causality.main(
+        _band=None, _high_time_resolution=True, _plots=['whiteness'])
+
+
 def figure_7_all():
     print('\nFigure 7 - Main Figure')
     figure_7_main()
@@ -408,6 +413,9 @@ def figure_7_all():
 
     print('\nFigure SI 7 - Granger Causality')
     figure_si_7_granger_causality()
+
+    print('\nFigure 7 SI - Whiteness')
+    figure_si_7_whiteness()
 
 
 def figure_si_discussion_saturation():
