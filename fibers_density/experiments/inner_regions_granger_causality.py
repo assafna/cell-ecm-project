@@ -174,20 +174,21 @@ def main(_band=None, _high_time_resolution=True, _tuples_to_plot=None, _plots=No
 
                 _whiteness = _var_model_results.test_whiteness(nlags=_min_estimator_lag + 1)
                 _whiteness_p_values.append(_whiteness.pvalue)
-                if _properties['band']:
-                    _n_passed_whiteness_with_band += 1
 
                 # no autocorrelation in the residuals
                 if _whiteness.pvalue > 0.05:
+                    if _properties['band']:
+                        _n_passed_whiteness_with_band += 1
 
                     # granger causality
                     for _caused, _causing in zip(['left', 'right'], ['right', 'left']):
                         _granger = _var_model_results.test_causality(caused=_caused, causing=_causing)
                         _granger_causality_p_values.append(_granger.pvalue)
-                        if _properties['band']:
-                            _n_passed_granger_causality_with_band += 1
 
                         if _granger.pvalue < 0.05:
+                            if _properties['band']:
+                                _n_passed_granger_causality_with_band += 1
+
                             _normality = _var_model_results.test_normality()
                             _inst_granger = _var_model_results.test_inst_causality(causing=_causing)
 
