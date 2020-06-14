@@ -368,8 +368,8 @@ def figure_si_7_simulate_time_lag_distribution():
 
 
 def figure_si_7_leader_follower_cross_correlation_experiments():
-    print('\nPanels A & B')
-    fibers_density.experiments.same_vs_different_cross_correlation.main(_plots=['same'], _plot_types=['box', 'bar'])
+    fibers_density.experiments.same_vs_different_cross_correlation.main(
+        _plots=['same', 'different'], _plot_types=['box', 'bar'])
 
 
 def figure_si_7_different_network():
