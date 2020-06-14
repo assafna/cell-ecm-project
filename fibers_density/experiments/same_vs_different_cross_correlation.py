@@ -29,11 +29,11 @@ REAL_CELLS = True
 STATIC = False
 DIRECTION = 'inside'
 MINIMUM_CORRELATION_TIME_POINTS = {
-    'SN16': 10,
-    'SN18': 10,
-    'SN41': 30,
-    'SN44': 30,
-    'SN45': 30
+    'SN16': 15,
+    'SN18': 15,
+    'SN41': 50,
+    'SN44': 50,
+    'SN45': 50
 }
 TIME_LAGS = {
     False: [-2, -1, 0, 1, 2],
@@ -93,6 +93,7 @@ def compute_fibers_densities(_band=True, _high_time_resolution=True):
     _different_time_lags_arrays = [[] for _i in TIME_LAGS[_high_time_resolution]]
     _same_time_lags_highest = [0 for _i in TIME_LAGS[_high_time_resolution]]
     _different_time_lags_highest = [0 for _i in TIME_LAGS[_high_time_resolution]]
+    _valid_tuples = []
     for _same_index in tqdm(range(len(_experiments)), desc='Main loop'):
         _same_tuple = _experiments[_same_index]
         _same_experiment, _same_series, _same_group = _same_tuple
@@ -232,7 +233,12 @@ def compute_fibers_densities(_band=True, _high_time_resolution=True):
                             _different_highest_correlation = _different_correlation
                             _different_highest_correlation_time_lag_index = _time_lag_index
 
+                        if _same_tuple not in _valid_tuples:
+                            _valid_tuples.append(_same_tuple)
+
                     _different_time_lags_highest[_different_highest_correlation_time_lag_index] += 1
+
+    print('Total tuples:', len(_valid_tuples))
 
     return _same_correlation_vs_time_lag, _same_time_lags_arrays, _different_time_lags_arrays, \
         _same_time_lags_highest, _different_time_lags_highest
