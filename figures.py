@@ -390,9 +390,13 @@ def figure_si_7_different_network():
 
 
 def figure_si_7_granger_causality():
-    print('\nPanels A & B')
+    print('\nPanels B & C')
     fibers_density.experiments.inner_regions_granger_causality.main(
         _band=None, _high_time_resolution=True, _tuples_to_plot=[('SN45', 2, 'cells_2_3')])
+
+    print('\nPanels E & F')
+    fibers_density.experiments.inner_regions_granger_causality.main(
+        _band=None, _high_time_resolution=True, _tuples_to_plot=[('SN45', 1, 'cells_1_3')])
 
 
 def figure_si_7_whiteness():
