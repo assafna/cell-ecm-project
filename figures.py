@@ -242,6 +242,9 @@ def figure_5_main():
     print('\nPanel B')
     fibers_density.experiments.same_vs_different_offsets_in_axes.main(_high_time_resolution=False)
 
+    print('\nPanel C')
+    fibers_density.experiments.density_vs_communication_vs_z_offset.main()
+
     print('\nPanel F')
     fibers_density.experiments.fibers_vs_time.compute_tuples([('SN16', 3, 'cells_0_1')])
 
