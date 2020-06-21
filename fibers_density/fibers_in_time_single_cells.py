@@ -22,7 +22,8 @@ OFFSET_X = 0
 OFFSET_Y = 0
 
 # experiments
-EXPERIMENTS_TIME_POINTS = 18
+EXPERIMENTS_TIME_POINTS = 12
+EXPERIMENTS_TIME_RESOLUTION = 21
 OFFSET_Z = 0
 OUT_OF_BOUNDARIES = False
 
@@ -180,7 +181,7 @@ def main():
                 opacity=0.7
             ),
             go.Scatter(
-                x=np.array(range(EXPERIMENTS_TIME_POINTS)) * 15,
+                x=np.array(range(EXPERIMENTS_TIME_POINTS)) * EXPERIMENTS_TIME_RESOLUTION,
                 xaxis='x2',
                 y=[np.mean(_array) for _array in _experiments_fibers_densities],
                 name='Experiments',
