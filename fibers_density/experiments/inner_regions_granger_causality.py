@@ -322,10 +322,10 @@ def main(_band=None, _high_time_resolution=True, _tuples_to_plot=None, _plots=No
 
     print('Total pairs:', _n_pairs)
     print('Total pairs with band:', _n_pairs_with_band)
-    print('Total passed whiteness:', (np.array(_whiteness_p_values) > 0.05).sum())
-    print('Total passed whiteness with band:', _n_passed_whiteness_with_band)
-    print('Total passed granger causality:', (np.array(_granger_causality_p_values) < 0.05).sum())
-    print('Total passed granger causality with band:', _n_passed_granger_causality_with_band)
+    print('Total pairs passed whiteness:', (np.array(_whiteness_p_values) > 0.05).sum())
+    print('Total pairs passed whiteness with band:', _n_passed_whiteness_with_band)
+    print('Total cells passed granger causality:', (np.array(_granger_causality_p_values) < 0.05).sum())
+    print('Total cells passed granger causality with band:', _n_passed_granger_causality_with_band)
 
     # plots
     for _test_name, _y_title, _y_array in \
