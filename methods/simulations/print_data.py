@@ -3,7 +3,7 @@ from itertools import product
 from libs.simulations import load, filtering
 
 DISTANCES = [5, 7, 9]
-STDS = [0, 0.25, 0.5, 0.75]
+STDS = [0.25, 0.5, 0.75]
 ALPHAS = [0, 0.25, 0.5, 0.75, 1]
 BETAS = [1, 1.05, 1.1, 1.2]
 
@@ -22,6 +22,17 @@ def main():
         _is_dominant_passive=False
     )
     print('\tTotal single cell simulations:', len(_single_cell_simulations))
+
+    # no heterogeneity
+    _no_heterogeneity_single_cell_simulations = filtering.by_categories(
+        _simulations,
+        _is_single_cell=True,
+        _is_heterogeneity=False,
+        _is_low_connectivity=False,
+        _is_causality=False,
+        _is_dominant_passive=False
+    )
+    print('\tTotal single cell no heterogeneity:', len(_no_heterogeneity_single_cell_simulations))
 
     # heterogeneity
     _heterogeneity_single_cell_simulations = filtering.by_categories(
@@ -79,7 +90,8 @@ def main():
 
         for _std in STDS:
             _std_simulations = filtering.by_heterogeneity(_filtered_simulations, _std=_std)
-            print('\t\tTotal with std. ' + str(_std) + ':', len(_std_simulations))
+            if len(_std_simulations) > 0:
+                print('\t\tTotal with std. ' + str(_std) + ':', len(_std_simulations))
 
         # heterogeneity with causality
         _filtered_simulations = filtering.by_categories(
@@ -90,11 +102,15 @@ def main():
             _is_causality=True,
             _is_dominant_passive=False
         )
-        print('\tTotal cell pairs heterogeneity (causality):', len(_filtered_simulations))
+        if len(_filtered_simulations) > 0:
+            print('\tTotal cell pairs heterogeneity (causality):', len(_filtered_simulations))
 
-        for _alpha, _beta in product(ALPHAS, BETAS):
-            _causality_simulations = filtering.by_causality(_filtered_simulations, _alpha=_alpha, _beta=_beta)
-            print('\t\tTotal with alpha = ' + str(_alpha) + ', beta = ' + str(_beta) + ':', len(_causality_simulations))
+            for _alpha, _beta in product(ALPHAS, BETAS):
+                if _alpha != 0 or (_alpha == 0 and _beta == 1):
+                    _causality_simulations = filtering.by_causality(_filtered_simulations, _alpha=_alpha, _beta=_beta)
+                    if len(_causality_simulations) > 0:
+                        print('\t\tTotal with alpha = ' + str(_alpha) + ', beta = ' + str(_beta) + ':',
+                              len(_causality_simulations))
 
 
 if __name__ == '__main__':
