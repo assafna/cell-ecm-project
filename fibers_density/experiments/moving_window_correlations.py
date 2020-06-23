@@ -90,23 +90,23 @@ def main(_high_time_resolution=True):
         for _key in _rois_dictionary
     }
 
-    _correlations_by_start_time_point = []
-    for _start_time_point in tqdm(range(0, END_TIME_POINT[_high_time_resolution],
-                                        TIME_POINT_STEP[_high_time_resolution]), desc='Time loop'):
+    for _tuple in _experiments:
         _correlations = []
-        for _tuple in _experiments:
-            _experiment, _series_id, _group = _tuple
+        _experiment, _series_id, _group = _tuple
 
-            _left_cell_fibers_densities = \
-                _experiments_fibers_densities[(_experiment, _series_id, _group, 'left_cell')]
-            _right_cell_fibers_densities = \
-                _experiments_fibers_densities[(_experiment, _series_id, _group, 'right_cell')]
+        _left_cell_fibers_densities = \
+            _experiments_fibers_densities[(_experiment, _series_id, _group, 'left_cell')]
+        _right_cell_fibers_densities = \
+            _experiments_fibers_densities[(_experiment, _series_id, _group, 'right_cell')]
 
-            _properties = load.group_properties(_experiment, _series_id, _group)
-            _left_cell_fibers_densities = compute.remove_blacklist(
-                _experiment, _series_id, _properties['cells_ids']['left_cell'], _left_cell_fibers_densities)
-            _right_cell_fibers_densities = compute.remove_blacklist(
-                _experiment, _series_id, _properties['cells_ids']['right_cell'], _right_cell_fibers_densities)
+        _properties = load.group_properties(_experiment, _series_id, _group)
+        _left_cell_fibers_densities = compute.remove_blacklist(
+            _experiment, _series_id, _properties['cells_ids']['left_cell'], _left_cell_fibers_densities)
+        _right_cell_fibers_densities = compute.remove_blacklist(
+            _experiment, _series_id, _properties['cells_ids']['right_cell'], _right_cell_fibers_densities)
+
+        for _start_time_point in \
+                range(0, END_TIME_POINT[_high_time_resolution], TIME_POINT_STEP[_high_time_resolution]):
 
             _left_cell_fibers_densities_window = _left_cell_fibers_densities[
                                                  _start_time_point:_start_time_point +
@@ -121,6 +121,7 @@ def main(_high_time_resolution=True):
 
             # ignore small arrays
             if len(_left_cell_fibers_densities_filtered) < MOVING_WINDOW_LENGTH[_high_time_resolution]:
+                _correlations.append(None)
                 continue
 
             _correlations.append(compute_lib.correlation(
@@ -128,41 +129,34 @@ def main(_high_time_resolution=True):
                 compute_lib.derivative(_right_cell_fibers_densities_filtered, _n=DERIVATIVE)
             ))
 
-        _correlations_by_start_time_point.append(_correlations)
-
-    # plot
-    _fig = go.Figure(
-        data=go.Scatter(
-            x=np.arange(
-                start=0,
-                stop=len(_correlations_by_start_time_point),
-                step=1) * TIME_RESOLUTION[_high_time_resolution] * TIME_POINT_STEP[_high_time_resolution],
-            y=[np.mean(_array) for _array in _correlations_by_start_time_point],
-            error_y={
-                'type': 'data',
-                'array': [np.std(_array) for _array in _correlations_by_start_time_point],
-                'thickness': 1
-            },
-            mode='lines+markers',
-            line={'dash': 'solid'}
-        ),
-        layout={
-            'xaxis': {
-                'title': 'Window start time (minutes)',
-                'zeroline': False
-            },
-            'yaxis': {
-                'title': 'Inner correlation',
-                'zeroline': False
+        # plot
+        _fig = go.Figure(
+            data=go.Scatter(
+                x=np.arange(
+                    start=0,
+                    stop=len(_correlations),
+                    step=1) * TIME_RESOLUTION[_high_time_resolution] * TIME_POINT_STEP[_high_time_resolution],
+                y=_correlations,
+                mode='lines+markers',
+                line={'dash': 'solid'}
+            ),
+            layout={
+                'xaxis': {
+                    'title': 'Window start time (minutes)',
+                    'zeroline': False
+                },
+                'yaxis': {
+                    'title': 'Inner correlation',
+                    'zeroline': False
+                }
             }
-        }
-    )
+        )
 
-    save.to_html(
-        _fig=_fig,
-        _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        _filename='plot'
-    )
+        save.to_html(
+            _fig=_fig,
+            _path=os.path.join(paths.PLOTS, save.get_module_name()),
+            _filename='plot_' + str(_experiment) + '_' + str(_series_id) + '_' + str(_group)
+        )
 
 
 if __name__ == '__main__':
