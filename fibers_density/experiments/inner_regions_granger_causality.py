@@ -35,7 +35,7 @@ ADF_TEST = True
 KPSS_TEST = True
 
 
-def main(_band=None, _high_time_resolution=True, _tuples_to_plot=None, _plots=None):
+def main(_band=None, _high_time_resolution=True, _tuples_to_mark=None, _tuples_to_plot=None, _plots=None):
     if _plots is None:
         _plots = ['whiteness', 'granger']
 
@@ -175,6 +175,9 @@ def main(_band=None, _high_time_resolution=True, _tuples_to_plot=None, _plots=No
                 _whiteness = _var_model_results.test_whiteness(nlags=_min_estimator_lag + 1)
                 _whiteness_p_values.append(_whiteness.pvalue)
 
+                if _tuples_to_mark is not None and _tuple in _tuples_to_mark and _whiteness.pvalue > 0.05:
+                    print(_tuple, 'marked whiteness p-value:', _whiteness.pvalue)
+
                 # no autocorrelation in the residuals
                 if _whiteness.pvalue > 0.05:
                     if _properties['band']:
@@ -184,6 +187,9 @@ def main(_band=None, _high_time_resolution=True, _tuples_to_plot=None, _plots=No
                     for _caused, _causing in zip(['left', 'right'], ['right', 'left']):
                         _granger = _var_model_results.test_causality(caused=_caused, causing=_causing)
                         _granger_causality_p_values.append(_granger.pvalue)
+
+                        if _tuples_to_mark is not None and _tuple in _tuples_to_mark and _granger.pvalue < 0.05:
+                            print(_tuple, 'causing:', _causing, 'marked granger p-value:', _granger.pvalue)
 
                         if _granger.pvalue < 0.05:
                             if _properties['band']:
