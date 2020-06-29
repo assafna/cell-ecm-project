@@ -41,7 +41,7 @@ def main():
         ),
         layout={
             'xaxis': {
-                'title': 'Fibers density z-score',
+                'title': 'Fiber density (z-score)',
                 'zeroline': False
             },
             'yaxis': {

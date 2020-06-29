@@ -100,7 +100,7 @@ def main():
                     'zeroline': False
                 },
                 'yaxis': {
-                    'title': 'Fibers density z-score',
+                    'title': 'Fiber density (z-score)',
                     'zeroline': False,
                     'range': [-2.2, 13],
                     'tickmode': 'array',

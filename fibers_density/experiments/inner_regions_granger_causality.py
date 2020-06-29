@@ -255,7 +255,7 @@ def main(_band=None, _high_time_resolution=True, _tuples_to_mark=None, _tuples_t
                                             'zeroline': False
                                         },
                                         'yaxis': {
-                                            'title': 'Fibers density z-score' + '\'' * _derivative,
+                                            'title': 'Fiber density (z-score)' + '\'' * _derivative,
                                             'zeroline': False
                                         },
                                         'legend': {

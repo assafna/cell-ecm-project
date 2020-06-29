@@ -70,7 +70,7 @@ def main(_low_connectivity=False):
                 'zeroline': False
             },
             'yaxis': {
-                'title': 'Fibers density z-score difference',
+                'title': 'Fiber density (z-score) difference',
                 'range': [-0.2, 6],
                 'zeroline': False,
                 'tickvals': [0, 2, 4]

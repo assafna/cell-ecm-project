@@ -176,7 +176,7 @@ def compute_tuples(_tuples):
                     'zeroline': False
                 },
                 'yaxis': {
-                    'title': 'Fibers density z-score',
+                    'title': 'Fiber density (z-score)',
                     'zeroline': False,
                     'range': [-3, 8],
                     'tickmode': 'array',

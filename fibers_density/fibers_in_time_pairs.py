@@ -228,7 +228,7 @@ def main():
                 'zeroline': False
             },
             'yaxis': {
-                'title': 'Fibers density z-score',
+                'title': 'Fiber density (z-score)',
                 # 'domain': [0.3, 1],
                 'range': [-1.7, 14],
                 'zeroline': False,

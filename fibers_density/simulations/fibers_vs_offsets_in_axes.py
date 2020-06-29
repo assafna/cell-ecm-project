@@ -143,7 +143,7 @@ def main(_low_connectivity=False):
                 'zeroline': False
             },
             'yaxis': {
-                'title': 'Fibers density z-score mean',
+                'title': 'Fiber density (z-score) mean',
                 'zeroline': False,
                 'range': [-1.1, 7],
                 'tickmode': 'array',

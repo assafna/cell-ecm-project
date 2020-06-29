@@ -179,8 +179,8 @@ def main():
             )
         ],
         layout={
-            'xaxis_title': 'Distance from Left Cell (cell size)',
-            'yaxis_title': 'Fibers Density Z-score'
+            'xaxis_title': 'Distance from left cell (cell size)',
+            'yaxis_title': 'Fiber density (z-score)'
         }
     )
 

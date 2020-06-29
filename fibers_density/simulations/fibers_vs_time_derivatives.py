@@ -94,7 +94,7 @@ def main():
             data=go.Scatter(
                 x=list(range(TIME_POINTS))[::TIME_POINTS_STEP],
                 y=np.mean(_y_array, axis=0)[::TIME_POINTS_STEP],
-                name='Fibers density z-score',
+                name='Fiber density (z-score)',
                 error_y={
                     'type': 'data',
                     'array': np.std(_y_array, axis=0)[::TIME_POINTS_STEP],
@@ -114,7 +114,7 @@ def main():
                     'zeroline': False
                 },
                 'yaxis': {
-                    'title': 'Fibers density z-score' + str('\'') * _derivative,
+                    'title': 'Fiber density (z-score)' + str('\'') * _derivative,
                     'zeroline': False,
                     'tickmode': 'array',
                     'tickvals': DERIVATIVES_Y_TICKVALS[_derivative]
