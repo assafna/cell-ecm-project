@@ -353,7 +353,8 @@ def figure_7_main():
 
     print('\nPanel E')
     fibers_density.experiments.inner_regions_granger_causality.main(
-        _band=None, _high_time_resolution=True, _plots=['granger'])
+        _band=None, _high_time_resolution=True, _tuples_to_mark=[('SN45', 2, 'cells_2_3'), ('SN45', 1, 'cells_1_3')],
+        _plots=['granger'])
 
 
 def figure_si_7_simulate_time_lag_distribution():
@@ -401,7 +402,8 @@ def figure_si_7_granger_causality():
 
 def figure_si_7_whiteness():
     fibers_density.experiments.inner_regions_granger_causality.main(
-        _band=None, _high_time_resolution=True, _plots=['whiteness'])
+        _band=None, _high_time_resolution=True, _tuples_to_mark=[('SN45', 2, 'cells_2_3'), ('SN45', 1, 'cells_1_3')],
+        _plots=['whiteness'])
 
 
 def figure_7_all():
