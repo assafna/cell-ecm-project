@@ -63,7 +63,7 @@ def main():
                 'zeroline': False
             },
             'yaxis': {
-                'title': 'Fiber density Z-score',
+                'title': 'Fiber density (z-score)',
                 'titlefont': {
                     'color': '#844b00'
                 },
@@ -73,7 +73,7 @@ def main():
                 'zeroline': False
             },
             'yaxis2': {
-                'title': 'Fraction',
+                'title': '"same" > "different" (%)',
                 'titlefont': {
                     'color': '#edbc80'
                 },

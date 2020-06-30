@@ -86,7 +86,7 @@ def main():
 
         _x_array.append(_max_offsets_x)
         _y_array.append(_cells_distance_fibers_densities)
-        _names_array.append('Distances ' + str(_distances_range[0]) + '-' + str(_distances_range[1]))
+        _names_array.append('Pair distance ' + str(_distances_range[0]) + '-' + str(_distances_range[1]))
 
     # plot
     _colors_array = ['#844b00', '#ea8500', '#edbc80']

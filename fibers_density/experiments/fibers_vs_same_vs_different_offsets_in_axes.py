@@ -45,7 +45,7 @@ def main():
                 'zeroline': False
             },
             'yaxis': {
-                'title': 'Same network fraction',
+                'title': '"same" > "different" (%)',
                 'zeroline': False
             }
         }

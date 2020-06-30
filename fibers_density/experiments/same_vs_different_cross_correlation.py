@@ -322,7 +322,7 @@ def main(_band=True, _high_time_resolution=True, _plots=None, _plot_types=None):
                                             TIME_RESOLUTION[_high_time_resolution]
                             },
                             'yaxis': {
-                                'title': _name.capitalize() + ' network correlations',
+                                'title': 'Inner correlation' if _name == 'same' else 'Different network correlation',
                                 'range': [-1, 1.1],
                                 'zeroline': False,
                                 'tickmode': 'array',

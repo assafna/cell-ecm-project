@@ -88,7 +88,7 @@ def main(_type='alpha', _low_connectivity=False, _plots=None, _plot_types=None):
                                 'type': 'category'
                             },
                             'yaxis': {
-                                'title': _name.capitalize() + ' network correlation',
+                                'title': 'Inner correlation' if _name == 'same' else 'Different network correlation',
                                 'range': [-1, 1.1],
                                 'zeroline': False,
                                 'tickmode': 'array',

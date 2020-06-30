@@ -125,7 +125,7 @@ def main():
                 'title': 'Distance from left cell (cell size)'
             },
             'yaxis': {
-                'title': 'Fiber density z-score'
+                'title': 'Fiber density (z-score)'
             }
         }
     )

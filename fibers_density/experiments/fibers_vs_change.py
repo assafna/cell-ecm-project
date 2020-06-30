@@ -166,7 +166,7 @@ def main(_early_time_points=True):
                     'zeroline': False
                 },
                 'yaxis': {
-                    'title': 'Change in fibers<br>densities z-score',
+                    'title': 'Change in fiber<br>density (z-score)',
                     'zeroline': False
                 },
                 'shapes': [

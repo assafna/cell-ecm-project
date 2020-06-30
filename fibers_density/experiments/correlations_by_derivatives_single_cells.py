@@ -127,7 +127,7 @@ def main():
         ],
         layout={
             'xaxis': {
-                'title': 'Density by derivatives',
+                'title': 'Fiber density derivative',
                 'zeroline': False
             },
             'yaxis': {

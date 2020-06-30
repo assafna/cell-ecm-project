@@ -114,7 +114,7 @@ def main():
                     'zeroline': False
                 },
                 'yaxis': {
-                    'title': 'Fiber density (z-score)' + str('\'') * _derivative,
+                    'title': 'Fiber density (z-score)',
                     'zeroline': False,
                     'tickmode': 'array',
                     'tickvals': DERIVATIVES_Y_TICKVALS[_derivative]

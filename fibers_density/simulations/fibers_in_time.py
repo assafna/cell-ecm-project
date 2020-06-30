@@ -127,7 +127,7 @@ def main():
                 'title': 'Time (cell contraction percentages)'
             },
             'yaxis': {
-                'title': 'Fiber density z-score'
+                'title': 'Fiber density (z-score)'
             }
         }
     )

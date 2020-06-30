@@ -92,7 +92,7 @@ def main(_low_connectivity=False):
 
         _x_array.append(_offsets_x)
         _y_array.append(_cells_distance_fibers_densities)
-        _names_array.append('Distance ' + str(_distance))
+        _names_array.append('Pair distance ' + str(_distance))
 
     # plot
     _colors_array = ['#011f4b', '#005b96', '#74c2e8']

@@ -286,7 +286,7 @@ def main():
         ],
         layout={
             'xaxis': {
-                'title': 'Heterogeneity (std.)',
+                'title': 'Contraction heterogeneity (std.)',
                 'zeroline': False
             },
             'yaxis': {
