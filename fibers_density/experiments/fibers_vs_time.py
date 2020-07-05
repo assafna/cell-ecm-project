@@ -31,6 +31,8 @@ def compute_tuples(_tuples):
         for _time_point in range(len(_properties['time_points'])):
             _cells_distance = \
                 compute.cells_distance_in_cell_size_time_point(_experiment, _series_id, _group, _time_point)
+            if _time_point == 0:
+                print(_tuple, 'Pair distance:', _cells_distance)
             _middle_offsets_x.append((_time_point, (_cells_distance - 1) / 2 - ROI_LENGTH / 2))
             if _cells_distance - 1 - OFFSET_X * 2 < ROI_LENGTH * 2:
                 _latest_time_point = _time_point - 1
