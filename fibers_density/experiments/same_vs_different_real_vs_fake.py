@@ -1,6 +1,7 @@
 import os
 from itertools import product
 
+import numpy as np
 import plotly.graph_objs as go
 from scipy.stats import wilcoxon
 from tqdm import tqdm
@@ -225,8 +226,16 @@ def main(_offset_y=0.5, _high_time_resolution=False):
     _distances_from_y_equal_x = compute_fibers_densities(_offset_y, _high_time_resolution)
 
     print('Total points:', len(_distances_from_y_equal_x[0]))
-    print('Wilcoxon between real points and fake points distances from y = x:')
-    print(wilcoxon(_distances_from_y_equal_x[0], _distances_from_y_equal_x[1]))
+    print('Higher real same amount:', (np.array(_distances_from_y_equal_x[0]) > 0).sum() /
+          len(_distances_from_y_equal_x[0]))
+    print('Wilcoxon of real points:', wilcoxon(_distances_from_y_equal_x[0]))
+    print('Higher fake same amount:', (np.array(_distances_from_y_equal_x[1]) > 0).sum() /
+          len(_distances_from_y_equal_x[1]))
+    print('Wilcoxon of fake points:', wilcoxon(_distances_from_y_equal_x[1]))
+    _real_minus_fake = np.array(_distances_from_y_equal_x[0]) - np.array(_distances_from_y_equal_x[1])
+    print('Real > fake amount:', (_real_minus_fake > 0).sum() /
+          len(_real_minus_fake))
+    print('Wilcoxon real & fake:', wilcoxon(_distances_from_y_equal_x[0], _distances_from_y_equal_x[1]))
 
     # box plot
     _colors_array = ['#844b00', '#ea8500']
