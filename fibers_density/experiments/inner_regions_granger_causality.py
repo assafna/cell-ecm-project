@@ -4,7 +4,7 @@ import warnings
 import numpy as np
 import pandas as pd
 import plotly.graph_objs as go
-from statsmodels.stats.multitest import fdrcorrection, multipletests
+from statsmodels.stats.multitest import multipletests
 from statsmodels.tools.sm_exceptions import InterpolationWarning
 from statsmodels.tsa.api import VAR
 from statsmodels.tsa.stattools import adfuller, kpss
@@ -12,9 +12,9 @@ from statsmodels.tsa.stattools import adfuller, kpss
 from libs import compute_lib
 from libs.experiments import load, filtering, compute, paths
 from libs.experiments.config import ROI_LENGTH, ROI_WIDTH, ROI_HEIGHT
-# based on time resolution
 from plotting import save
 
+# based on time resolution
 EXPERIMENTS = {
     False: ['SN16'],
     True: ['SN41', 'SN44', 'SN45']
@@ -336,7 +336,7 @@ def main(_band=None, _high_time_resolution=True, _tuples_to_mark=None, _tuples_t
 
     # p-value correction
     print('Corrections of GC p-value < 0.05:')
-    _granger_causality_p_values_corrected = multipletests(pvals=_granger_causality_p_values)
+    _granger_causality_p_values_corrected = multipletests(pvals=_granger_causality_p_values, method='fdr_bh')
     for _p_value, _p_value_corrected in zip(_granger_causality_p_values, _granger_causality_p_values_corrected[1]):
         if _p_value < 0.05:
             print('Original GC p-value:', _p_value, 'corrected:', _p_value_corrected)
