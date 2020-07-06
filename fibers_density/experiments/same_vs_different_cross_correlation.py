@@ -36,8 +36,8 @@ MINIMUM_CORRELATION_TIME_POINTS = {
     'SN45': 50
 }
 TIME_LAGS = {
-    False: [-2, -1, 0, 1, 2],
-    True: [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]
+    False: [0, 1, 2],
+    True: [0, 1, 2, 3, 4, 5]
 }
 
 
@@ -127,38 +127,48 @@ def compute_fibers_densities(_band=True, _high_time_resolution=True):
         _same_highest_correlation_time_lag_index = 0
         _same_correlation_vs_time_lag[_same_tuple] = []
         for _time_lag_index, _time_lag in enumerate(TIME_LAGS[_high_time_resolution]):
-            if _time_lag > 0:
-                _same_left_cell_fibers_densities_time_lag = _same_left_cell_fibers_densities[:-_time_lag]
-                _same_right_cell_fibers_densities_time_lag = _same_right_cell_fibers_densities[_time_lag:]
-            elif _time_lag < 0:
-                _same_left_cell_fibers_densities_time_lag = _same_left_cell_fibers_densities[-_time_lag:]
-                _same_right_cell_fibers_densities_time_lag = _same_right_cell_fibers_densities[:_time_lag]
-            else:
-                _same_left_cell_fibers_densities_time_lag = _same_left_cell_fibers_densities
-                _same_right_cell_fibers_densities_time_lag = _same_right_cell_fibers_densities
 
-            _same_left_cell_fibers_densities_filtered, _same_right_cell_fibers_densities_filtered = \
-                compute.longest_same_indices_shared_in_borders_sub_array(
-                    _same_left_cell_fibers_densities_time_lag, _same_right_cell_fibers_densities_time_lag
+            # choose either negative or positive lag
+            for _symbol in [-1, 1]:
+
+                # if no time lag consider it only once
+                if _time_lag == 0 and _symbol == -1:
+                    continue
+
+                _time_lag_symbol = _time_lag * _symbol
+
+                if _time_lag_symbol > 0:
+                    _same_left_cell_fibers_densities_time_lag = _same_left_cell_fibers_densities[:-_time_lag_symbol]
+                    _same_right_cell_fibers_densities_time_lag = _same_right_cell_fibers_densities[_time_lag_symbol:]
+                elif _time_lag_symbol < 0:
+                    _same_left_cell_fibers_densities_time_lag = _same_left_cell_fibers_densities[-_time_lag_symbol:]
+                    _same_right_cell_fibers_densities_time_lag = _same_right_cell_fibers_densities[:_time_lag_symbol]
+                else:
+                    _same_left_cell_fibers_densities_time_lag = _same_left_cell_fibers_densities
+                    _same_right_cell_fibers_densities_time_lag = _same_right_cell_fibers_densities
+
+                _same_left_cell_fibers_densities_filtered, _same_right_cell_fibers_densities_filtered = \
+                    compute.longest_same_indices_shared_in_borders_sub_array(
+                        _same_left_cell_fibers_densities_time_lag, _same_right_cell_fibers_densities_time_lag
+                    )
+
+                # ignore small arrays
+                if len(_same_left_cell_fibers_densities_filtered) < \
+                        MINIMUM_CORRELATION_TIME_POINTS[_same_experiment]:
+                    _same_correlation_vs_time_lag[_same_tuple].append(None)
+                    continue
+
+                _same_correlation = compute_lib.correlation(
+                    compute_lib.derivative(_same_left_cell_fibers_densities_filtered, _n=DERIVATIVE),
+                    compute_lib.derivative(_same_right_cell_fibers_densities_filtered, _n=DERIVATIVE)
                 )
 
-            # ignore small arrays
-            if len(_same_left_cell_fibers_densities_filtered) < \
-                    MINIMUM_CORRELATION_TIME_POINTS[_same_experiment]:
-                _same_correlation_vs_time_lag[_same_tuple].append(None)
-                continue
+                _same_time_lags_arrays[_time_lag_index].append(_same_correlation)
+                _same_correlation_vs_time_lag[_same_tuple].append(_same_correlation)
 
-            _same_correlation = compute_lib.correlation(
-                compute_lib.derivative(_same_left_cell_fibers_densities_filtered, _n=DERIVATIVE),
-                compute_lib.derivative(_same_right_cell_fibers_densities_filtered, _n=DERIVATIVE)
-            )
-
-            _same_time_lags_arrays[_time_lag_index].append(_same_correlation)
-            _same_correlation_vs_time_lag[_same_tuple].append(_same_correlation)
-
-            if _same_correlation > _same_highest_correlation:
-                _same_highest_correlation = _same_correlation
-                _same_highest_correlation_time_lag_index = _time_lag_index
+                if _same_correlation > _same_highest_correlation:
+                    _same_highest_correlation = _same_correlation
+                    _same_highest_correlation_time_lag_index = _time_lag_index
 
         _same_time_lags_highest[_same_highest_correlation_time_lag_index] += 1
 
@@ -202,39 +212,49 @@ def compute_fibers_densities(_band=True, _high_time_resolution=True):
                     _different_highest_correlation = -1.1
                     _different_highest_correlation_time_lag_index = 0
                     for _time_lag_index, _time_lag in enumerate(TIME_LAGS[_high_time_resolution]):
-                        if _time_lag > 0:
-                            _same_fibers_densities_time_lag = _same_fibers_densities[:-_time_lag]
-                            _different_fibers_densities_time_lag = _different_fibers_densities[_time_lag:]
-                        elif _time_lag < 0:
-                            _same_fibers_densities_time_lag = _same_fibers_densities[-_time_lag:]
-                            _different_fibers_densities_time_lag = _different_fibers_densities[:_time_lag]
-                        else:
-                            _same_fibers_densities_time_lag = _same_fibers_densities
-                            _different_fibers_densities_time_lag = _different_fibers_densities
 
-                        _same_fibers_densities_filtered, _different_fibers_densities_filtered = \
-                            compute.longest_same_indices_shared_in_borders_sub_array(
-                                _same_fibers_densities_time_lag, _different_fibers_densities_time_lag
+                        # choose either negative or positive lag
+                        for _symbol in [-1, 1]:
+
+                            # if no time lag consider it only once
+                            if _time_lag == 0 and _symbol == -1:
+                                continue
+
+                            _time_lag_symbol = _time_lag * _symbol
+
+                            if _time_lag_symbol > 0:
+                                _same_fibers_densities_time_lag = _same_fibers_densities[:-_time_lag_symbol]
+                                _different_fibers_densities_time_lag = _different_fibers_densities[_time_lag_symbol:]
+                            elif _time_lag_symbol < 0:
+                                _same_fibers_densities_time_lag = _same_fibers_densities[-_time_lag_symbol:]
+                                _different_fibers_densities_time_lag = _different_fibers_densities[:_time_lag_symbol]
+                            else:
+                                _same_fibers_densities_time_lag = _same_fibers_densities
+                                _different_fibers_densities_time_lag = _different_fibers_densities
+
+                            _same_fibers_densities_filtered, _different_fibers_densities_filtered = \
+                                compute.longest_same_indices_shared_in_borders_sub_array(
+                                    _same_fibers_densities_time_lag, _different_fibers_densities_time_lag
+                                )
+
+                            # ignore small arrays
+                            if len(_same_fibers_densities_filtered) < \
+                                    MINIMUM_CORRELATION_TIME_POINTS[_different_experiment]:
+                                continue
+
+                            _different_correlation = compute_lib.correlation(
+                                compute_lib.derivative(_same_fibers_densities_filtered, _n=DERIVATIVE),
+                                compute_lib.derivative(_different_fibers_densities_filtered, _n=DERIVATIVE)
                             )
 
-                        # ignore small arrays
-                        if len(_same_fibers_densities_filtered) < \
-                                MINIMUM_CORRELATION_TIME_POINTS[_different_experiment]:
-                            continue
+                            _different_time_lags_arrays[_time_lag_index].append(_different_correlation)
 
-                        _different_correlation = compute_lib.correlation(
-                            compute_lib.derivative(_same_fibers_densities_filtered, _n=DERIVATIVE),
-                            compute_lib.derivative(_different_fibers_densities_filtered, _n=DERIVATIVE)
-                        )
+                            if _different_correlation > _different_highest_correlation:
+                                _different_highest_correlation = _different_correlation
+                                _different_highest_correlation_time_lag_index = _time_lag_index
 
-                        _different_time_lags_arrays[_time_lag_index].append(_different_correlation)
-
-                        if _different_correlation > _different_highest_correlation:
-                            _different_highest_correlation = _different_correlation
-                            _different_highest_correlation_time_lag_index = _time_lag_index
-
-                        if _same_tuple not in _valid_tuples:
-                            _valid_tuples.append(_same_tuple)
+                            if _same_tuple not in _valid_tuples:
+                                _valid_tuples.append(_same_tuple)
 
                     _different_time_lags_highest[_different_highest_correlation_time_lag_index] += 1
 
