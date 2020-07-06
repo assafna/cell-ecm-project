@@ -4,6 +4,7 @@ import warnings
 import numpy as np
 import pandas as pd
 import plotly.graph_objs as go
+from statsmodels.stats.multitest import fdrcorrection, multipletests
 from statsmodels.tools.sm_exceptions import InterpolationWarning
 from statsmodels.tsa.api import VAR
 from statsmodels.tsa.stattools import adfuller, kpss
@@ -332,6 +333,13 @@ def main(_band=None, _high_time_resolution=True, _tuples_to_mark=None, _tuples_t
     print('Total pairs passed whiteness with band:', _n_passed_whiteness_with_band)
     print('Total cells passed granger causality:', (np.array(_granger_causality_p_values) < 0.05).sum())
     print('Total cells passed granger causality with band:', _n_passed_granger_causality_with_band)
+
+    # p-value correction
+    print('Corrections of GC p-value < 0.05:')
+    _granger_causality_p_values_corrected = multipletests(pvals=_granger_causality_p_values)
+    for _p_value, _p_value_corrected in zip(_granger_causality_p_values, _granger_causality_p_values_corrected[1]):
+        if _p_value < 0.05:
+            print('Original GC p-value:', _p_value, 'corrected:', _p_value_corrected)
 
     # plots
     for _test_name, _y_title, _y_array in \
