@@ -192,14 +192,19 @@ def main(_band=None, _high_time_resolution=True, _tuples_to_mark=None, _tuples_t
                     if _properties['band']:
                         _n_passed_whiteness_with_band += 1
 
+                    # time lag = 0
+                    _correlation = compute_lib.correlation(
+                        _left_cell_fibers_densities_derivative, _right_cell_fibers_densities_derivative)
+
+                    # if _correlation < 0.5:
+                    #     continue
+
                     # granger causality
                     for _caused, _causing in zip(['left', 'right'], ['right', 'left']):
                         _granger = _var_model_results.test_causality(caused=_caused, causing=_causing)
                         _granger_causality_p_values.append(_granger.pvalue)
 
                         # time lag = 0
-                        _correlation = compute_lib.correlation(
-                            _left_cell_fibers_densities_derivative, _right_cell_fibers_densities_derivative)
                         _correlations.append(_correlation)
 
                         # time lag = min estimator
@@ -227,7 +232,13 @@ def main(_band=None, _high_time_resolution=True, _tuples_to_mark=None, _tuples_t
                             _end_fiber_density = \
                                 (_left_cell_fibers_densities_filtered[-1] +
                                  _right_cell_fibers_densities_filtered[-1]) / 2
-                        _end_fiber_densities.append(_end_fiber_density)
+                        _normalization = load.normalization_series_file_data(_experiment, 'Series ' + str(_series_id))
+                        _normalized_fibers_density = compute_lib.z_score(
+                            _end_fiber_density,
+                            _normalization['average'],
+                            _normalization['std']
+                        )
+                        _end_fiber_densities.append(_normalized_fibers_density)
 
                         # marking
                         if _tuples_to_mark is not None and _tuple in _tuples_to_mark and _granger.pvalue < 0.05:
