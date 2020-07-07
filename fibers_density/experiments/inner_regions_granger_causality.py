@@ -20,6 +20,10 @@ EXPERIMENTS = {
     False: ['SN16'],
     True: ['SN41', 'SN44', 'SN45']
 }
+TIME_POINT = {
+    False: 18,
+    True: 52
+}
 OFFSET_X = 0
 # TODO: set the offset in y according to the angle in the original Z slices of the cells
 OFFSET_Y = 0.5
@@ -96,6 +100,7 @@ def main(_band=None, _high_time_resolution=True, _tuples_to_mark=None, _tuples_t
     _n_passed_granger_causality_with_band = 0
     _correlations = []
     _time_lag_correlations = []
+    _end_fiber_densities = []
     for _tuple in _experiments:
         _experiment, _series_id, _group = _tuple
 
@@ -212,6 +217,17 @@ def main(_band=None, _high_time_resolution=True, _tuples_to_mark=None, _tuples_t
                             _left_fibers_densities_time_lag, _right_fibers_densities_time_lag
                         )
                         _time_lag_correlations.append(_time_lag_correlation)
+
+                        # end fiber density
+                        if len(_left_cell_fibers_densities_filtered) > TIME_POINT[_high_time_resolution]:
+                            _end_fiber_density = \
+                                (_left_cell_fibers_densities_filtered[TIME_POINT[_high_time_resolution]] +
+                                 _right_cell_fibers_densities_filtered[TIME_POINT[_high_time_resolution]]) / 2
+                        else:
+                            _end_fiber_density = \
+                                (_left_cell_fibers_densities_filtered[-1] +
+                                 _right_cell_fibers_densities_filtered[-1]) / 2
+                        _end_fiber_densities.append(_end_fiber_density)
 
                         # marking
                         if _tuples_to_mark is not None and _tuple in _tuples_to_mark and _granger.pvalue < 0.05:
@@ -484,6 +500,37 @@ def main(_band=None, _high_time_resolution=True, _tuples_to_mark=None, _tuples_t
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
         _filename='plot_gc_vs_time_lag_correlation'
+    )
+
+    # granger versus end fiber density
+    print('GC vs. end fiber density pearson correlation:', pearsonr(_granger_causality_p_values, _end_fiber_densities))
+    _fig = go.Figure(
+        data=go.Scatter(
+            x=_granger_causality_p_values,
+            y=_end_fiber_densities,
+            mode='markers',
+            marker={
+                'size': 10,
+                'color': '#ea8500'
+            },
+            showlegend=False
+        ),
+        layout={
+            'xaxis': {
+                'title': 'Granger causality p-value',
+                'zeroline': False,
+            },
+            'yaxis': {
+                'title': 'End fiber density (z-score)',
+                'zeroline': False,
+            }
+        }
+    )
+
+    save.to_html(
+        _fig=_fig,
+        _path=os.path.join(paths.PLOTS, save.get_module_name()),
+        _filename='plot_gc_vs_end_density'
     )
 
 
