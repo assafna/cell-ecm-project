@@ -4,6 +4,7 @@ import warnings
 import numpy as np
 import pandas as pd
 import plotly.graph_objs as go
+from scipy.stats import pearsonr
 from statsmodels.stats.multitest import multipletests
 from statsmodels.tools.sm_exceptions import InterpolationWarning
 from statsmodels.tsa.api import VAR
@@ -93,6 +94,8 @@ def main(_band=None, _high_time_resolution=True, _tuples_to_mark=None, _tuples_t
     _n_passed_whiteness_with_band = 0
     _granger_causality_p_values = []
     _n_passed_granger_causality_with_band = 0
+    _correlations = []
+    _time_lag_correlations = []
     for _tuple in _experiments:
         _experiment, _series_id, _group = _tuple
 
@@ -189,6 +192,28 @@ def main(_band=None, _high_time_resolution=True, _tuples_to_mark=None, _tuples_t
                         _granger = _var_model_results.test_causality(caused=_caused, causing=_causing)
                         _granger_causality_p_values.append(_granger.pvalue)
 
+                        # time lag = 0
+                        _correlation = compute_lib.correlation(
+                            _left_cell_fibers_densities_derivative, _right_cell_fibers_densities_derivative)
+                        _correlations.append(_correlation)
+
+                        # time lag = min estimator
+                        if _causing == 'left':
+                            _left_fibers_densities_time_lag = \
+                                _left_cell_fibers_densities_derivative[:-_min_estimator_lag]
+                            _right_fibers_densities_time_lag = \
+                                _right_cell_fibers_densities_derivative[_min_estimator_lag:]
+                        else:
+                            _left_fibers_densities_time_lag = \
+                                _left_cell_fibers_densities_derivative[_min_estimator_lag:]
+                            _right_fibers_densities_time_lag = \
+                                _right_cell_fibers_densities_derivative[:-_min_estimator_lag]
+                        _time_lag_correlation = compute_lib.correlation(
+                            _left_fibers_densities_time_lag, _right_fibers_densities_time_lag
+                        )
+                        _time_lag_correlations.append(_time_lag_correlation)
+
+                        # marking
                         if _tuples_to_mark is not None and _tuple in _tuples_to_mark and _granger.pvalue < 0.05:
                             print(_tuple, 'causing:', _causing, 'marked granger p-value:', _granger.pvalue)
 
@@ -210,8 +235,6 @@ def main(_band=None, _high_time_resolution=True, _tuples_to_mark=None, _tuples_t
                                   sep='\t')
 
                             # lag = 0
-                            _correlation = compute_lib.correlation(
-                                _left_cell_fibers_densities_derivative, _right_cell_fibers_densities_derivative)
                             print('Time lag = 0 correlation:', _correlation)
 
                             # rest of lags
@@ -220,8 +243,8 @@ def main(_band=None, _high_time_resolution=True, _tuples_to_mark=None, _tuples_t
                                     _left_fibers_densities_time_lag = _left_cell_fibers_densities_derivative[:-_lag]
                                     _right_fibers_densities_time_lag = _right_cell_fibers_densities_derivative[_lag:]
                                 else:
-                                    _left_fibers_densities_time_lag = _left_cell_fibers_densities_derivative[-_lag:]
-                                    _right_fibers_densities_time_lag = _right_cell_fibers_densities_derivative[:_lag]
+                                    _left_fibers_densities_time_lag = _left_cell_fibers_densities_derivative[_lag:]
+                                    _right_fibers_densities_time_lag = _right_cell_fibers_densities_derivative[:-_lag]
 
                                 _correlation = compute_lib.correlation(
                                     _left_fibers_densities_time_lag, _right_fibers_densities_time_lag
@@ -399,6 +422,69 @@ def main(_band=None, _high_time_resolution=True, _tuples_to_mark=None, _tuples_t
                 _path=os.path.join(paths.PLOTS, save.get_module_name()),
                 _filename='plot_' + _test_name
             )
+
+    # granger versus correlation
+    print('GC vs. correlation pearson correlation:', pearsonr(_granger_causality_p_values, _correlations))
+    _fig = go.Figure(
+        data=go.Scatter(
+            x=_granger_causality_p_values,
+            y=_correlations,
+            mode='markers',
+            marker={
+                'size': 10,
+                'color': '#ea8500'
+            },
+            showlegend=False
+        ),
+        layout={
+            'xaxis': {
+                'title': 'Granger causality p-value',
+                'zeroline': False,
+            },
+            'yaxis': {
+                'title': 'Inner correlation',
+                'zeroline': False,
+            }
+        }
+    )
+
+    save.to_html(
+        _fig=_fig,
+        _path=os.path.join(paths.PLOTS, save.get_module_name()),
+        _filename='plot_gc_vs_correlation'
+    )
+
+    # granger versus time lag correlation
+    print('GC vs. time lag correlation pearson correlation:', pearsonr(_granger_causality_p_values,
+                                                                       _time_lag_correlations))
+    _fig = go.Figure(
+        data=go.Scatter(
+            x=_granger_causality_p_values,
+            y=_time_lag_correlations,
+            mode='markers',
+            marker={
+                'size': 10,
+                'color': '#ea8500'
+            },
+            showlegend=False
+        ),
+        layout={
+            'xaxis': {
+                'title': 'Granger causality p-value',
+                'zeroline': False,
+            },
+            'yaxis': {
+                'title': 'GC lag inner correlation',
+                'zeroline': False,
+            }
+        }
+    )
+
+    save.to_html(
+        _fig=_fig,
+        _path=os.path.join(paths.PLOTS, save.get_module_name()),
+        _filename='plot_gc_vs_time_lag_correlation'
+    )
 
 
 if __name__ == '__main__':
