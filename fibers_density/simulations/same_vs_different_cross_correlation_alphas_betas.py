@@ -28,7 +28,7 @@ def main(_type='alpha', _low_connectivity=False, _plots=None, _plot_types=None):
     if _plots is None:
         _plots = ['same', 'different']
     if _plot_types is None:
-        _plot_types = ['scatter', 'box', 'bar']
+        _plot_types = ['stacked_bar', 'box', 'bar']
 
     _same_arrays = []
     _different_arrays = []
@@ -59,8 +59,8 @@ def main(_type='alpha', _low_connectivity=False, _plots=None, _plot_types=None):
 
     if _plots is not None:
 
-        # scatter plot
-        if 'scatter' in _plot_types:
+        # stacked bar plot
+        if 'stacked_bar' in _plot_types:
             for _name, _sums in zip(['same', 'different'], [_same_highest, _different_highest]):
                 if _name in _plots:
 
@@ -79,7 +79,7 @@ def main(_type='alpha', _low_connectivity=False, _plots=None, _plot_types=None):
                         _y_arrays[1].append(_none_wins / _total)
                         _y_arrays[2].append(_right_wins / _total)
 
-                    _colors_array = ['#844b00', '#ea8500', '#edbc80']
+                    _colors_array = ['#011f4b', '#005b96', '#74c2e8']
                     _fig = go.Figure(
                         data=[
                             go.Bar(
@@ -107,14 +107,19 @@ def main(_type='alpha', _low_connectivity=False, _plots=None, _plot_types=None):
                                 'tickmode': 'array',
                                 'tickvals': [0, 0.5, 1]
                             },
-                            'barmode': 'stack'
+                            'barmode': 'stack',
+                            'legend': {
+                                'bordercolor': 'black',
+                                'borderwidth': 2,
+                                'bgcolor': 'white'
+                            },
                         }
                     )
 
                     save.to_html(
                         _fig=_fig,
                         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-                        _filename='plot_scatter_' + _type + '_low_con_' + str(_low_connectivity) + '_' + _name
+                        _filename='plot_stacked_bar_' + _type + '_low_con_' + str(_low_connectivity) + '_' + _name
                     )
 
         # box plot
