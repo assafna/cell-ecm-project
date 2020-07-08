@@ -68,9 +68,9 @@ def main(_type='alpha', _low_connectivity=False, _plots=None, _plot_types=None):
                     for _type_sums in _sums:
                         _left_wins, _none_wins, _right_wins = 0, 0, 0
                         for _time_lag, _type_sum in zip(same_vs_different_cross_correlation.TIME_LAGS, _type_sums):
-                            if _time_lag < 0:
+                            if _time_lag > 0:
                                 _left_wins += _type_sum
-                            elif _time_lag > 0:
+                            elif _time_lag < 0:
                                 _right_wins += _type_sum
                             else:
                                 _none_wins += _type_sum
@@ -79,18 +79,18 @@ def main(_type='alpha', _low_connectivity=False, _plots=None, _plot_types=None):
                         _y_arrays[1].append(_none_wins / _total)
                         _y_arrays[2].append(_right_wins / _total)
 
+                    _colors_array = ['#844b00', '#ea8500', '#edbc80']
                     _fig = go.Figure(
                         data=[
-                            go.Scatter(
+                            go.Bar(
                                 x=_names,
                                 y=_y_array,
                                 name=_name,
-                                mode='markers',
                                 marker={
-                                    'size': 25,
-                                    # 'color': '#2e82bf'
+                                    'color': _color
                                 }
-                            ) for _name, _y_array in zip(['Left cell', 'None', 'Right cell'], _y_arrays)
+                            ) for _name, _y_array, _color in
+                            zip(['Left cell', 'None', 'Right cell'], _y_arrays, _colors_array)
                         ],
                         layout={
                             'xaxis': {
@@ -106,14 +106,15 @@ def main(_type='alpha', _low_connectivity=False, _plots=None, _plot_types=None):
                                 'zeroline': False,
                                 'tickmode': 'array',
                                 'tickvals': [0, 0.5, 1]
-                            }
+                            },
+                            'barmode': 'stack'
                         }
                     )
 
                     save.to_html(
                         _fig=_fig,
                         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-                        _filename='plot_scatter_' + _type + '_low_con_' + str(_low_connectivity)
+                        _filename='plot_scatter_' + _type + '_low_con_' + str(_low_connectivity) + '_' + _name
                     )
 
         # box plot
