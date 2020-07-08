@@ -349,9 +349,14 @@ def figure_7_main():
 
     print('\nPanel D')
     fibers_density.simulations.same_vs_different_cross_correlation_alphas_betas.main(
-        _type='beta', _low_connectivity=False, _plots=['same'], _plot_types=['box'])
+        _type='alpha', _low_connectivity=False, _plots=['same'], _plot_types=['stacked_bar']
+    )
 
     print('\nPanel E')
+    fibers_density.simulations.same_vs_different_cross_correlation_alphas_betas.main(
+        _type='beta', _low_connectivity=False, _plots=['same'], _plot_types=['box'])
+
+    print('\nPanel F')
     fibers_density.experiments.inner_regions_granger_causality.main(
         _band=None, _high_time_resolution=True, _tuples_to_mark=[('SN45', 2, 'cells_2_3'), ('SN45', 1, 'cells_1_3')],
         _plots=['granger'])
