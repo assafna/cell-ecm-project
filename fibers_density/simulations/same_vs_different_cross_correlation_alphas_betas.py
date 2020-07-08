@@ -59,6 +59,63 @@ def main(_type='alpha', _low_connectivity=False, _plots=None, _plot_types=None):
 
     if _plots is not None:
 
+        # scatter plot
+        if 'scatter' in _plot_types:
+            for _name, _sums in zip(['same', 'different'], [_same_highest, _different_highest]):
+                if _name in _plots:
+
+                    _y_arrays = [[], [], []]
+                    for _type_sums in _sums:
+                        _left_wins, _none_wins, _right_wins = 0, 0, 0
+                        for _time_lag, _type_sum in zip(same_vs_different_cross_correlation.TIME_LAGS, _type_sums):
+                            if _time_lag < 0:
+                                _left_wins += _type_sum
+                            elif _time_lag > 0:
+                                _right_wins += _type_sum
+                            else:
+                                _none_wins += _type_sum
+                        _total = sum(_type_sums)
+                        _y_arrays[0].append(_left_wins / _total)
+                        _y_arrays[1].append(_none_wins / _total)
+                        _y_arrays[2].append(_right_wins / _total)
+
+                    _fig = go.Figure(
+                        data=[
+                            go.Scatter(
+                                x=_names,
+                                y=_y_array,
+                                name=_name,
+                                mode='markers',
+                                marker={
+                                    'size': 25,
+                                    # 'color': '#2e82bf'
+                                }
+                            ) for _name, _y_array in zip(['Left cell', 'None', 'Right cell'], _y_arrays)
+                        ],
+                        layout={
+                            'xaxis': {
+                                'title': _type.capitalize(),
+                                'zeroline': False,
+                                'tickmode': 'array',
+                                'tickvals': _names,
+                                'type': 'category'
+                            },
+                            'yaxis': {
+                                'title': 'Highest correlation fraction',
+                                'range': [0, 1.1],
+                                'zeroline': False,
+                                'tickmode': 'array',
+                                'tickvals': [0, 0.5, 1]
+                            }
+                        }
+                    )
+
+                    save.to_html(
+                        _fig=_fig,
+                        _path=os.path.join(paths.PLOTS, save.get_module_name()),
+                        _filename='plot_scatter_' + _type + '_low_con_' + str(_low_connectivity)
+                    )
+
         # box plot
         if 'box' in _plot_types:
             for _name, _arrays in zip(['same', 'different'], [_same_arrays, _different_arrays]):
