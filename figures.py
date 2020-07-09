@@ -293,10 +293,6 @@ def figure_si_4_real_vs_fake():
     fibers_density.experiments.same_vs_different_real_vs_fake.main(_offset_y=0.5, _high_time_resolution=True)
 
 
-def figure_si_5_communication_vs_density():
-    fibers_density.experiments.fibers_vs_same_vs_different_offsets_in_axes.main()
-
-
 def figure_5_all():
     print('\nFigure 5 - Main Figure')
     figure_5_main()
@@ -310,9 +306,6 @@ def figure_5_all():
 
     print('\nFigure SI 5 - No Band')
     figure_si_5_no_band()
-
-    print('\nFigure SI 5 - Communication vs. Density')
-    figure_si_5_communication_vs_density()
 
 
 def figure_6_main():
@@ -440,9 +433,16 @@ def figure_si_discussion_saturation():
     fibers_density.experiments.inner_regions_saturation.main(_offset_y=0.5)
 
 
+def figure_si_discussion_plasticity():
+    fibers_density.experiments.fibers_vs_same_vs_different_offsets_in_axes.main()
+
+
 def figure_discussion_all():
     print('\nFigure SI Discussion - Saturation')
     figure_si_discussion_saturation()
+
+    print('\nFigure SI Discussion - Plasticity')
+    figure_si_discussion_plasticity()
 
 
 if __name__ == '__main__':
