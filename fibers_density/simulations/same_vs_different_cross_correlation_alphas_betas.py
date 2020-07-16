@@ -90,7 +90,7 @@ def main(_type='alpha', _low_connectivity=False, _plots=None, _plot_types=None):
                                     'color': _color
                                 }
                             ) for _name, _y_array, _color in
-                            zip(['Left cell', 'None', 'Right cell'], _y_arrays, _colors_array)
+                            zip(['Leader', 'None', 'Follower'], _y_arrays, _colors_array)
                         ],
                         layout={
                             'xaxis': {
