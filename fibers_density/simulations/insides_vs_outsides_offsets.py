@@ -283,7 +283,7 @@ def main():
         ],
         layout={
             'xaxis': {
-                'title': 'Distance from cell (cell diameter)',
+                'title': 'Cell distance (cell diameter)',
                 'zeroline': False,
                 'tickmode': 'array',
                 'tickvals': OFFSETS_X,
