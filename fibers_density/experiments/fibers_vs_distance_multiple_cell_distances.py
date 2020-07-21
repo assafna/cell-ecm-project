@@ -112,7 +112,7 @@ def main():
         ],
         layout={
             'xaxis': {
-                'title': 'Cell distance (cell diameter)',
+                'title': 'Window distance (cell diameter)',
                 'zeroline': False
             },
             'yaxis': {

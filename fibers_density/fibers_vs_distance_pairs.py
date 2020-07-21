@@ -217,7 +217,7 @@ def main(_low_connectivity=False):
         ],
         layout={
             'xaxis': {
-                'title': 'Cell distance (cell diameter)',
+                'title': 'Window distance (cell diameter)',
                 'zeroline': False
             },
             'yaxis': {

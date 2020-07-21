@@ -90,7 +90,7 @@ def main():
         _names_array=CELLS_DISTANCES,
         _x_axis_title='Cells Distance',
         _y_axis_title='Communicated minus Non-communicated',
-        _title='Communicated minus Non-communicated Pair Correlations by Cell Distance'
+        _title='Communicated minus Non-communicated Pair Correlations by Window Distance'
     )
 
     save.to_html(

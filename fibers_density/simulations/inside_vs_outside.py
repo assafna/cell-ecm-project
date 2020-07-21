@@ -73,7 +73,7 @@ def main():
         _names_array=['Distance ' + str(_distance) for _distance in _correlations_by_distances.keys()],
         _x_axis_title='Cells Distances',
         _y_axis_title='Correlation',
-        _title='Inside vs. Outside Correlation by Cell Distance'
+        _title='Inside vs. Outside Correlation by Window Distance'
     )
 
     save.to_html(

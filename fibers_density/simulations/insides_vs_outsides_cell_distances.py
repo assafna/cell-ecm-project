@@ -95,7 +95,7 @@ def main():
         _names_array=['Insides', 'Outsides'],
         _x_axis_title='Cells Distances',
         _y_axis_title='Correlation',
-        _title='Insides & Outsides Correlation by Cell Distance'
+        _title='Insides & Outsides Correlation by Window Distance'
     )
 
     _fig = update.y_axis(
