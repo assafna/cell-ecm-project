@@ -26,7 +26,7 @@ STD = {
     False: 0.5,
     True: 0.25
 }
-CELLS_DISTANCE = 7
+CELLS_DISTANCES = [5, 7, 9]
 
 
 def compute_fibers_densities(_simulations, _low_connectivity):
@@ -69,7 +69,7 @@ def main(_low_connectivity=False):
         _is_dominant_passive=False
     )
     _simulations = filtering.by_heterogeneity(_simulations, _std=STD[_low_connectivity])
-    _simulations = filtering.by_distance(_simulations, _distance=CELLS_DISTANCE)
+    _simulations = filtering.by_distances(_simulations, _distances=CELLS_DISTANCES)
     print('Total simulations:', len(_simulations))
 
     _fibers_densities = compute_fibers_densities(_simulations, _low_connectivity)
