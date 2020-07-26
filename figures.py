@@ -269,6 +269,14 @@ def figure_5_main():
     fibers_density.experiments.same_vs_different_band_vs_no_band.main(_high_time_resolution=False)
 
 
+def figure_si_5_saturation():
+    print('\nPanel A')
+    fibers_density.experiments.inner_regions_saturation.main(_offset_y=0)
+
+    print('\nPanel B')
+    fibers_density.experiments.inner_regions_saturation.main(_offset_y=0.5)
+
+
 def figure_si_5_high_time_res():
     print('\nPanel A')
     fibers_density.experiments.fibers_vs_offsets_in_axes.main(_high_time_resolution=True)
@@ -298,6 +306,9 @@ def figure_5_all():
     figure_5_main()
 
     print('\nFigure SI 5')
+    print('\nFigure SI 5 - Saturation')
+    figure_si_5_saturation()
+
     print('\nFigure SI 5 - High Temporal Resolution')
     figure_si_5_high_time_res()
 
@@ -429,22 +440,11 @@ def figure_7_all():
     figure_si_7_whiteness()
 
 
-def figure_si_discussion_saturation():
-    print('\nPanel A')
-    fibers_density.experiments.inner_regions_saturation.main(_offset_y=0)
-
-    print('\nPanel B')
-    fibers_density.experiments.inner_regions_saturation.main(_offset_y=0.5)
-
-
 def figure_si_discussion_plasticity():
     fibers_density.experiments.fibers_vs_same_vs_different_offsets_in_axes.main()
 
 
 def figure_discussion_all():
-    print('\nFigure SI Discussion - Saturation')
-    figure_si_discussion_saturation()
-
     print('\nFigure SI Discussion - Plasticity')
     figure_si_discussion_plasticity()
 
