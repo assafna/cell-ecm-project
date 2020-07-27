@@ -96,7 +96,7 @@ def main():
             go.Scatter(
                 x=_x,
                 y=_y,
-                name='Std. ' + str(_std),
+                name='σ = ' + str(_std),
                 mode='markers',
                 marker={
                     'size': 10,
