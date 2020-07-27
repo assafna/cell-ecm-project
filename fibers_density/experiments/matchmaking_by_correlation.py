@@ -19,7 +19,6 @@ OFFSET_X = 0
 OFFSET_Z = 0
 DERIVATIVE = 1
 CELLS_DISTANCE_RANGE = [4, 10]
-BAND = True
 STATIC = False
 MINIMUM_CORRELATION_TIME_POINTS = {
     'SN16': 15,
@@ -31,12 +30,12 @@ MINIMUM_CORRELATION_TIME_POINTS = {
 MAX_RANK = 7
 
 
-def main(_real_cells=True, _offset_y=0.5, _high_time_resolution=False):
+def main(_real_cells=True, _offset_y=0.5, _high_time_resolution=False, _band=True):
     _experiments = load.experiments_groups_as_tuples(EXPERIMENTS[_high_time_resolution])
     _experiments = filtering.by_distance_range(_experiments, CELLS_DISTANCE_RANGE)
     _experiments = filtering.by_real_cells(_experiments, _real_cells=_real_cells)
     _experiments = filtering.by_static_cells(_experiments, _static=STATIC)
-    _experiments = filtering.by_band(_experiments, _band=BAND)
+    _experiments = filtering.by_band(_experiments, _band=_band)
     print('Total experiments:', len(_experiments))
 
     _arguments = []
@@ -216,7 +215,7 @@ def main(_real_cells=True, _offset_y=0.5, _high_time_resolution=False):
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
         _filename='plot_real_' + str(_real_cells) + '_offset_z_' + str(_offset_y) + '_high_time_' +
-                  str(_high_time_resolution)
+                  str(_high_time_resolution) + '_band_' + str(_band)
     )
 
     # correct match probability plot
@@ -252,7 +251,7 @@ def main(_real_cells=True, _offset_y=0.5, _high_time_resolution=False):
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
         _filename='plot_real_' + str(_real_cells) + '_offset_z_' + str(_offset_y) + '_high_time_' +
-                  str(_high_time_resolution) + '_correct_match_prob'
+                  str(_high_time_resolution) + '_band_' + str(_band) + '_correct_match_prob'
     )
 
 
