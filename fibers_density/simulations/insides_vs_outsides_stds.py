@@ -180,7 +180,7 @@ def main():
             data=go.Scatter(
                 x=_x,
                 y=_y,
-                name='Std. ' + str(_std),
+                name='σ = ' + str(_std),
                 mode='markers',
                 marker={
                     'size': 10,
@@ -286,7 +286,7 @@ def main():
         ],
         layout={
             'xaxis': {
-                'title': 'Contraction heterogeneity (std.)',
+                'title': 'Contraction heterogeneity (σ)',
                 'zeroline': False
             },
             'yaxis': {
