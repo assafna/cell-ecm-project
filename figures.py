@@ -33,10 +33,10 @@ def figure_1_all():
     figure_1_main()
 
     print('\nFigure SI 1')
-    print('\nFigure SI 1 - Distances')
+    print('\nFigure SI 1 - Distances (S2)')
     figure_si_1_distances()
 
-    print('\nFigure SI 1 - Correlation Distance Density Offset')
+    print('\nFigure SI 1 - Correlation Distance Density Offset (S3)')
     figure_si_1_correlation_distance_density_offset()
 
 
@@ -63,7 +63,7 @@ def figure_2_all():
     figure_2_main()
 
     print('\nFigure SI 2')
-    print('\nFigure SI 2 - Density vs. Change in Density in Late Time-points')
+    print('\nFigure SI 2 - Density vs. Change in Density in Late Time-points (S4)')
     figure_si_2_density_vs_change_in_density_in_late_time_points()
 
 
@@ -107,13 +107,13 @@ def figure_3_all():
     figure_3_main()
 
     print('\nFigure SI 3')
-    print('\nFigure SI 3 - Detrending Simulations')
+    print('\nFigure SI 3 - Detrending Simulations (S5)')
     figure_si_3_detrending_simulations()
 
-    print('\nFigure SI 3 - Insides vs. Outsides Distances')
+    print('\nFigure SI 3 - Insides vs. Outsides Distances (S6)')
     figure_si_3_insides_vs_outsides_distances()
 
-    print('\nFigure SI 3 - Insides vs. Outsides Offsets')
+    print('\nFigure SI 3 - Insides vs. Outsides Offsets (S7)')
     figure_si_3_insides_vs_outsides_offsets()
 
 
@@ -227,26 +227,26 @@ def figure_4_all():
     figure_4_main()
 
     print('\nFigure SI 4')
-    print('\nFigure SI 4 - Same vs. Different - Offsets')
-    figure_si_4_same_vs_diff_offsets()
-
-    print('\nFigure SI 4 - Detrending Experiments')
+    print('\nFigure SI 4 - Detrending Experiments (S8)')
     figure_si_4_detrending_experiments()
 
-    print('\nFigure SI 4 - Same vs. Different - Distances')
+    print('\nFigure SI 4 - Same vs. Different - Offsets (S9)')
+    figure_si_4_same_vs_diff_offsets()
+
+    print('\nFigure SI 4 - Same vs. Different - Distances (S10)')
     figure_si_4_same_vs_diff_distances()
 
-    print('\nFigure SI 4 - Same vs. Different - Controls')
-    figure_si_4_same_vs_diff_controls()
-
-    print('\nFigure SI 4 - Real vs. Fake')
-    figure_si_4_real_vs_fake()
-
-    print('\nFigure SI 4 - Same vs. Different - High Temporal Resolution')
+    print('\nFigure SI 4 - Same vs. Different - High Temporal Resolution (S11)')
     figure_si_4_same_vs_diff_high_time_res()
 
-    print('\nFigure SI 4 - Temporal Assessment')
+    print('\nFigure SI 4 - Temporal Assessment (S12)')
     figure_si_4_temporal_assessment()
+
+    print('\nFigure SI 4 - Same vs. Different - Controls (S13)')
+    figure_si_4_same_vs_diff_controls()
+
+    print('\nFigure SI 4 - Real vs. Fake (S14)')
+    figure_si_4_real_vs_fake()
 
 
 def figure_5_main():
@@ -306,16 +306,16 @@ def figure_5_all():
     figure_5_main()
 
     print('\nFigure SI 5')
-    print('\nFigure SI 5 - Saturation')
+    print('\nFigure SI 5 - Saturation (S16)')
     figure_si_5_saturation()
 
-    print('\nFigure SI 5 - High Temporal Resolution')
+    print('\nFigure SI 5 - High Temporal Resolution (S17)')
     figure_si_5_high_time_res()
 
     # print('\nFigure SI 5 - Simulations')
     # figure_si_5_simulations()
 
-    print('\nFigure SI 5 - No Band')
+    print('\nFigure SI 5 - No Band (S18)')
     figure_si_5_no_band()
 
 
@@ -424,19 +424,19 @@ def figure_7_all():
     figure_7_main()
 
     print('\nFigure SI 7')
-    print('\nFigure SI 7 - Simulate Time Lag Distribution')
+    print('\nFigure SI 7 - Simulate Time Lag Distribution (S19)')
     figure_si_7_simulate_time_lag_distribution()
 
-    print('\nFigure SI 7 - Leader Follower Cross Correlation Experiments')
-    figure_si_7_leader_follower_cross_correlation_experiments()
-
-    print('\nFigure SI 7 - Different Network')
+    print('\nFigure SI 7 - Different Network (S20)')
     figure_si_7_different_network()
 
-    print('\nFigure SI 7 - Granger Causality')
+    print('\nFigure SI 7 - Leader Follower Cross Correlation Experiments (S21)')
+    figure_si_7_leader_follower_cross_correlation_experiments()
+
+    print('\nFigure SI 7 - Granger Causality (S22)')
     figure_si_7_granger_causality()
 
-    print('\nFigure 7 SI - Whiteness')
+    print('\nFigure 7 SI - Whiteness (S23)')
     figure_si_7_whiteness()
 
 
@@ -445,7 +445,7 @@ def figure_si_discussion_plasticity():
 
 
 def figure_discussion_all():
-    print('\nFigure SI Discussion - Plasticity')
+    print('\nFigure SI Discussion - Plasticity (S24)')
     figure_si_discussion_plasticity()
 
 
