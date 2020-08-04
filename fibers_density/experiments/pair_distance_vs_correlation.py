@@ -26,7 +26,7 @@ MINIMUM_CORRELATION_TIME_POINTS = {
 }
 
 
-def main(_real_cells=True, _static=False, _band=True, _high_time_resolution=False, _offset_y=0.5):
+def main(_real_cells=True, _static=False, _band=None, _high_time_resolution=True, _offset_y=0.5):
     _experiments = load.experiments_groups_as_tuples(EXPERIMENTS[_high_time_resolution])
     _experiments = filtering.by_real_cells(_experiments, _real_cells=_real_cells)
     _experiments = filtering.by_static_cells(_experiments, _static=_static)
