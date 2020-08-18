@@ -7,7 +7,9 @@ PAIRS = [
     'SN18',
     'SN41',
     'SN44',
-    'SN45'
+    'SN45',
+    'SN20_Bleb_fromStart',
+    'SN26_BlebAdded'
 ]
 
 FIBERS_CHANNEL_INDEX = 0
