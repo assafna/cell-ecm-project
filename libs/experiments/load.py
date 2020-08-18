@@ -11,6 +11,8 @@ from libs import load_lib
 from libs.experiments import paths
 from libs.experiments.config import FIBERS_CHANNEL_INDEX
 
+from methods.experiments.update_blacklist import add_to_blacklist
+
 
 # TODO: change everywhere to use the save_lib and load_lib
 def time_point_file_name_to_number(_time_point_file_name):
@@ -95,6 +97,23 @@ def objects_time_point_file_data(_experiment, _series, _time_point):
         _cells = []
         with open(_file_path) as _f:
             _lines = _f.readlines()
+
+            # check for black image
+            if _lines[0] == 'BLACK':
+                _tp = int(str(_time_point.split('_')[1]).split('.')[0])
+                for _cell_id in ['left_cell', 'right_cell']:
+                    add_to_blacklist(
+                        _experiment=_experiment,
+                        _series_id=_series,
+                        _cell_id=_cell_id,
+                        _time_point_start=_tp,
+                        _time_point_end=_tp,
+                        _reason='Black image'
+                    )
+
+                # return previous time point data
+                return objects_time_point_file_data(_experiment, _series, 'tp_' + str(_tp - 1) + '.txt')
+
             _headers = _lines[0].split('\t')
             _x_index, _y_index, _z_index = _headers.index('X'), _headers.index('Y'), _headers.index('Z')
             for _line in _lines[1:]:
