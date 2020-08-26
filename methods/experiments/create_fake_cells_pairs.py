@@ -64,14 +64,89 @@ def process_follow(_experiment, _series_id, _cell_1_id, _cell_2_id, _x_change, _
 
 if __name__ == '__main__':
     _arguments = [
-        ('SN45', 1, 1, 5, -80, -15),
-        ('SN45', 1, 1, 6, 0, 160),
-        ('SN45', 1, 3, 4, -105, 0),
-        ('SN45', 1, 3, 5, -125, 0),
-        ('SN45', 1, 4, 5, 80, 0),
-        ('SN45', 2, 2, 3, 0, -120),
-        ('SN45', 3, 1, 2, -15, -130),
-        ('SN45', 4, 0, 2, 30, 105)
+        ('SN20_Bleb_fromStart', 1, 0, 1, 280, 100),
+        ('SN20_Bleb_fromStart', 1, 0, 2, 40, 150),
+        ('SN20_Bleb_fromStart', 1, 1, 2, -35, 240),
+
+        ('SN20_Bleb_fromStart', 2, 0, 1, -105, -140),
+
+        ('SN20_Bleb_fromStart', 3, 0, 1, 365, 95),
+        ('SN20_Bleb_fromStart', 3, 0, 2, 210, -245),
+        ('SN20_Bleb_fromStart', 3, 1, 2, 145, -140),
+        ('SN20_Bleb_fromStart', 3, 1, 3, 0, 225),
+
+        ('SN20_Bleb_fromStart', 4, 0, 1, 130, 195),
+
+        ('SN20_Bleb_fromStart', 5, 0, 1, 210, -160),
+        ('SN20_Bleb_fromStart', 5, 0, 2, 170, 70),
+        ('SN20_Bleb_fromStart', 5, 1, 2, 40, -150),
+        ('SN20_Bleb_fromStart', 5, 1, 3, -110, -140),
+        ('SN20_Bleb_fromStart', 5, 2, 3, 0, 160),
+
+        ('SN20_Bleb_fromStart', 6, 0, 1, 50, -200),
+        ('SN20_Bleb_fromStart', 6, 0, 2, -100, 100),
+        ('SN20_Bleb_fromStart', 6, 1, 2, -80, -160),
+
+        ('SN20_Bleb_fromStart', 7, 0, 1, -190, 60),
+        ('SN20_Bleb_fromStart', 7, 0, 2, 185, 170),
+        ('SN20_Bleb_fromStart', 7, 1, 2, -220, -50),
+
+        ('SN20_Bleb_fromStart', 8, 0, 1, -150, 130),
+
+        ('SN20_Bleb_fromStart', 9, 0, 1, -195, 140),
+
+        ('SN20_Bleb_fromStart', 10, 0, 1, -90, -115),
+        ('SN20_Bleb_fromStart', 10, 0, 2, 70, 320),
+        ('SN20_Bleb_fromStart', 10, 1, 2, -40, 160),
+
+        ('SN20_Bleb_fromStart', 11, 0, 2, -30, 305),
+        ('SN20_Bleb_fromStart', 11, 1, 2, -220, -145),
+
+        ('SN20_Bleb_fromStart', 12, 0, 1, -200, -130),
+        ('SN20_Bleb_fromStart', 12, 0, 2, 30, 195),
+        ('SN20_Bleb_fromStart', 12, 1, 2, -190, 40),
+        ('SN20_Bleb_fromStart', 12, 1, 3, -140, 110),
+        ('SN20_Bleb_fromStart', 12, 2, 3, 0, 120),
+
+        ('SN20_Bleb_fromStart', 13, 0, 1, 85, 335),
+        ('SN20_Bleb_fromStart', 13, 0, 2, -275, 265),
+        ('SN20_Bleb_fromStart', 13, 0, 3, -65, 130),
+        ('SN20_Bleb_fromStart', 13, 1, 2, -110, 260),
+        ('SN20_Bleb_fromStart', 13, 1, 3, -170, -100),
+        ('SN20_Bleb_fromStart', 13, 2, 3, 135, 20),
+
+        ('SN20_Bleb_fromStart', 14, 0, 1, -235, 30),
+        ('SN20_Bleb_fromStart', 14, 0, 2, 120, 230),
+        ('SN20_Bleb_fromStart', 14, 0, 3, -230, 105),
+        ('SN20_Bleb_fromStart', 14, 0, 4, 205, 35),
+        ('SN20_Bleb_fromStart', 14, 1, 2, 110, -180),
+        ('SN20_Bleb_fromStart', 14, 1, 3, -220, 25),
+        ('SN20_Bleb_fromStart', 14, 1, 4, -150, 0),
+        ('SN20_Bleb_fromStart', 14, 2, 3, 160, -130),
+        ('SN20_Bleb_fromStart', 14, 2, 4, -75, 210),
+        ('SN20_Bleb_fromStart', 14, 3, 4, 220, 105),
+
+        ('SN20_Bleb_fromStart', 15, 0, 1, 0, 235),
+
+        ('SN20_Bleb_fromStart', 16, 0, 1, 0, -225),
+        ('SN20_Bleb_fromStart', 16, 0, 2, -80, 130),
+        ('SN20_Bleb_fromStart', 16, 1, 2, -60, -120),
+
+        ('SN20_Bleb_fromStart', 17, 0, 2, -180, 0),
+        ('SN20_Bleb_fromStart', 17, 0, 3, 155, 0),
+        ('SN20_Bleb_fromStart', 17, 1, 2, -225, -115),
+        ('SN20_Bleb_fromStart', 17, 1, 3, -135, 20),
+
+        ('SN20_Bleb_fromStart', 18, 0, 1, -110, -175),
+
+        ('SN20_Bleb_fromStart', 19, 0, 1, 70, -150),
+        ('SN20_Bleb_fromStart', 19, 1, 2, -100, 115),
+        ('SN20_Bleb_fromStart', 19, 1, 3, 60, -170),
+        ('SN20_Bleb_fromStart', 19, 2, 3, 135, 185),
+
+        ('SN20_Bleb_fromStart', 20, 0, 1, 175, 20),
+        ('SN20_Bleb_fromStart', 20, 0, 2, 205, -60),
+        ('SN20_Bleb_fromStart', 20, 1, 2, -135, 80),
     ]
     _p = Pool(CPUS_TO_USE)
     _answers = _p.starmap(process_follow, _arguments)
