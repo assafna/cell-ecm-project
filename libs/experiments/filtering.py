@@ -90,7 +90,21 @@ def by_real_cells(_experiments_tuples, _real_cells=True):
     for _tuple in _experiments_tuples:
         _experiment, _series_id, _group = _tuple
         _group_properties = load.group_properties(_experiment, _series_id, _group)
-        if _group_properties['fake'] != _real_cells:
+        if _group_properties['fake'] != _real_cells and \
+                ('real_fake' not in _group_properties or _group_properties['real_fake'] != _real_cells):
+            _experiments_tuples_filtered.append(_tuple)
+
+    return _experiments_tuples_filtered
+
+
+def by_real_fake_cells(_experiments_tuples, _real_fake_cells=True):
+    _experiments_tuples_filtered = []
+    for _tuple in _experiments_tuples:
+        _experiment, _series_id, _group = _tuple
+        _group_properties = load.group_properties(_experiment, _series_id, _group)
+        if _real_fake_cells and 'real_fake' in _group_properties and _group_properties['real_fake']:
+            _experiments_tuples_filtered.append(_tuple)
+        elif 'real_fake' not in _group_properties or not _group_properties['real_fake']:
             _experiments_tuples_filtered.append(_tuple)
 
     return _experiments_tuples_filtered
