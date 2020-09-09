@@ -291,6 +291,10 @@ def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell
                 _best_distance = _shortest_distance
                 _best_point = _point
 
+        # in case no good point was found
+        if _best_point is None:
+            return
+
         # create fake pair
         process_real_fake(
             _experiment=_experiment,
