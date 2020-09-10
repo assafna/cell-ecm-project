@@ -22,6 +22,7 @@ CELLS_DISTANCE_RANGE = [4, 10]
 MINIMUM_CORRELATION_TIME_POINTS = {
     'SN16': 15,
     'SN18': 15,
+    'SN20_Bleb_fromStart': 15,
     'SN41': 50,
     'SN44': 50,
     'SN45': 50
