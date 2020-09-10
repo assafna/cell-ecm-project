@@ -4,7 +4,6 @@ SINGLE_CELL = [
 
 PAIRS = [
     'SN16',
-    'SN18',
     'SN41',
     'SN44',
     'SN45',
