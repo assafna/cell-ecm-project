@@ -32,7 +32,7 @@ def main(_offset_y=0.5, _high_time_resolution=False):
     _experiments = load.experiments_groups_as_tuples(EXPERIMENTS[_high_time_resolution])
     _experiments = filtering.by_distance_range(_experiments, CELLS_DISTANCE_RANGE)
     _experiments = filtering.by_band(_experiments)
-    _tuples_matched = organize.by_matched_real_and_fake(_experiments)
+    _tuples_matched = organize.by_matched_real_real_and_real_fake(_experiments)
     print('Total matched pairs:', len(_tuples_matched))
 
     _arguments = []
@@ -74,104 +74,93 @@ def main(_offset_y=0.5, _high_time_resolution=False):
         for _key in _rois_dictionary
     }
 
-    _tuples_by_experiment = organize.by_experiment(_experiments)
-
     _real_real_correlations_array = []
     _real_fake_correlations_array = []
     _valid_real_real_tuples = []
-    for _experiment in _tuples_by_experiment:
-        print('Experiment:', _experiment)
-        _experiment_tuples = _tuples_by_experiment[_experiment]
-        _tuples_matched = organize.by_matched_real_and_fake(_experiment_tuples)
-        print('Matched pairs:', len(_tuples_matched))
+    for _tuple_matched in tqdm(_tuples_matched, desc='Main loop'):
+        _real_real_tuple, _real_fake_tuple = _tuple_matched
 
-        for _tuple_matched in tqdm(_tuples_matched, desc='Main loop'):
-            _real_real_tuple, _real_fake_tuple = _tuple_matched
+        _real_real_experiment, _real_real_series, _real_real_group = _real_real_tuple
+        _, _, _real_fake_group = _real_fake_tuple
 
-            _real_real_experiment, _real_real_series, _real_real_group = _real_real_tuple
-            _, _, _real_fake_group = _real_fake_tuple
+        _real_real_left_cell_fibers_densities = \
+            _experiments_fibers_densities[
+                (_real_real_experiment, _real_real_series, _real_real_group, 'left_cell')
+            ]
+        _real_real_right_cell_fibers_densities = \
+            _experiments_fibers_densities[
+                (_real_real_experiment, _real_real_series, _real_real_group, 'right_cell')
+            ]
+        _real_fake_left_cell_fibers_densities = \
+            _experiments_fibers_densities[
+                (_real_real_experiment, _real_real_series, _real_fake_group, 'left_cell')
+            ]
+        _real_fake_right_cell_fibers_densities = \
+            _experiments_fibers_densities[
+                (_real_real_experiment, _real_real_series, _real_fake_group, 'right_cell')
+            ]
 
-            _real_left_cell_fibers_densities = \
-                _experiments_fibers_densities[
-                    (_real_real_experiment, _real_real_series, _real_real_group, 'left_cell')
-                ]
-            _real_right_cell_fibers_densities = \
-                _experiments_fibers_densities[
-                    (_real_real_experiment, _real_real_series, _real_real_group, 'right_cell')
-                ]
-            _fake_left_cell_fibers_densities = \
-                _experiments_fibers_densities[
-                    (_real_real_experiment, _real_real_series, _real_fake_group, 'left_cell')
-                ]
-            _fake_right_cell_fibers_densities = \
-                _experiments_fibers_densities[
-                    (_real_real_experiment, _real_real_series, _real_fake_group, 'right_cell')
-                ]
+        _properties = \
+            load.group_properties(_real_real_experiment, _real_real_series, _real_real_group)
 
-            _properties = \
-                load.group_properties(_real_real_experiment, _real_real_series, _real_real_group)
+        _real_real_left_cell_fibers_densities = compute.remove_blacklist(
+            _real_real_experiment,
+            _real_real_series,
+            _properties['cells_ids']['left_cell'],
+            _real_real_left_cell_fibers_densities
+        )
+        _real_real_right_cell_fibers_densities = compute.remove_blacklist(
+            _real_real_experiment,
+            _real_real_series,
+            _properties['cells_ids']['right_cell'],
+            _real_real_right_cell_fibers_densities
+        )
+        _real_fake_left_cell_fibers_densities = compute.remove_blacklist(
+            _real_real_experiment,
+            _real_real_series,
+            _properties['cells_ids']['left_cell'],
+            _real_fake_left_cell_fibers_densities
+        )
+        _real_fake_right_cell_fibers_densities = compute.remove_blacklist(
+            _real_real_experiment,
+            _real_real_series,
+            _properties['cells_ids']['right_cell'],
+            _real_fake_right_cell_fibers_densities
+        )
 
-            _real_left_cell_fibers_densities = compute.remove_blacklist(
-                _real_real_experiment,
-                _real_real_series,
-                _properties['cells_ids']['left_cell'],
-                _real_left_cell_fibers_densities
-            )
-            _real_right_cell_fibers_densities = compute.remove_blacklist(
-                _real_real_experiment,
-                _real_real_series,
-                _properties['cells_ids']['right_cell'],
-                _real_right_cell_fibers_densities
-            )
-            _fake_left_cell_fibers_densities = compute.remove_blacklist(
-                _real_real_experiment,
-                _real_real_series,
-                _properties['cells_ids']['left_cell'],
-                _fake_left_cell_fibers_densities
-            )
-            _fake_right_cell_fibers_densities = compute.remove_blacklist(
-                _real_real_experiment,
-                _real_real_series,
-                _properties['cells_ids']['right_cell'],
-                _fake_right_cell_fibers_densities
-            )
-
-            _real_left_cell_fibers_densities_filtered, _real_right_cell_fibers_densities_filtered = \
-                compute.longest_same_indices_shared_in_borders_sub_array(
-                    _real_left_cell_fibers_densities, _real_right_cell_fibers_densities
-                )
-
-            # ignore small arrays
-            if len(_real_left_cell_fibers_densities_filtered) < MINIMUM_CORRELATION_TIME_POINTS[_real_real_experiment]:
-                continue
-
-            _real_real_correlation = compute_lib.correlation(
-                compute_lib.derivative(_real_left_cell_fibers_densities_filtered, _n=DERIVATIVE),
-                compute_lib.derivative(_real_right_cell_fibers_densities_filtered, _n=DERIVATIVE)
+        _real_real_left_cell_fibers_densities_filtered, _real_real_right_cell_fibers_densities_filtered = \
+            compute.longest_same_indices_shared_in_borders_sub_array(
+                _real_real_left_cell_fibers_densities, _real_real_right_cell_fibers_densities
             )
 
-            for _real_cell_fiber_densities, _fake_cell_fiber_densities in \
-                    zip([_real_left_cell_fibers_densities, _real_right_cell_fibers_densities],
-                        [_fake_left_cell_fibers_densities, _fake_right_cell_fibers_densities]):
-                _real_cell_fiber_densities_filtered, _fake_cell_fiber_densities_filtered = \
-                    compute.longest_same_indices_shared_in_borders_sub_array(
-                        _real_cell_fiber_densities, _fake_cell_fiber_densities
-                    )
+        # ignore small arrays
+        if len(_real_real_left_cell_fibers_densities_filtered) < MINIMUM_CORRELATION_TIME_POINTS[_real_real_experiment]:
+            continue
 
-                # ignore small arrays
-                if len(_real_cell_fiber_densities_filtered) < MINIMUM_CORRELATION_TIME_POINTS[_real_real_experiment]:
-                    continue
+        _real_real_correlation = compute_lib.correlation(
+            compute_lib.derivative(_real_real_left_cell_fibers_densities_filtered, _n=DERIVATIVE),
+            compute_lib.derivative(_real_real_right_cell_fibers_densities_filtered, _n=DERIVATIVE)
+        )
 
-                _real_fake_correlation = compute_lib.correlation(
-                    compute_lib.derivative(_real_cell_fiber_densities_filtered, _n=DERIVATIVE),
-                    compute_lib.derivative(_fake_cell_fiber_densities_filtered, _n=DERIVATIVE)
-                )
+        _real_fake_left_cell_fiber_densities_filtered, _real_fake_right_cell_fiber_densities_filtered = \
+            compute.longest_same_indices_shared_in_borders_sub_array(
+                _real_fake_left_cell_fibers_densities, _real_fake_right_cell_fibers_densities
+            )
 
-                _real_real_correlations_array.append(_real_real_correlation)
-                _real_fake_correlations_array.append(_real_fake_correlation)
+        # ignore small arrays
+        if len(_real_fake_left_cell_fiber_densities_filtered) < MINIMUM_CORRELATION_TIME_POINTS[_real_real_experiment]:
+            continue
 
-                if _real_real_tuple not in _valid_real_real_tuples:
-                    _valid_real_real_tuples.append(_real_real_tuple)
+        _real_fake_correlation = compute_lib.correlation(
+            compute_lib.derivative(_real_fake_left_cell_fiber_densities_filtered, _n=DERIVATIVE),
+            compute_lib.derivative(_real_fake_right_cell_fiber_densities_filtered, _n=DERIVATIVE)
+        )
+
+        _real_real_correlations_array.append(_real_real_correlation)
+        _real_fake_correlations_array.append(_real_fake_correlation)
+
+        if _real_real_tuple not in _valid_real_real_tuples:
+            _valid_real_real_tuples.append(_real_real_tuple)
 
     print('Total real-real pairs:', len(_valid_real_real_tuples))
     _real_minus_fake = np.array(_real_real_correlations_array) - np.array(_real_fake_correlations_array)
@@ -247,7 +236,7 @@ def main(_offset_y=0.5, _high_time_resolution=False):
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        _filename='plot'
+        _filename='plot_high_' + str(_high_time_resolution)
     )
 
 
