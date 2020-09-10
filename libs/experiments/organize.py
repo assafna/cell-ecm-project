@@ -67,6 +67,29 @@ def by_matched_real_and_fake(_experiments_tuples):
     return _experiments_matched
 
 
+def by_matched_real_real_and_real_fake(_experiments_tuples, _real_fake_same_cell=True):
+    _experiments_matched = []
+    for _tuple in _experiments_tuples:
+        _experiment, _series_id, _group = _tuple
+        _group_split = _group.split('_')
+
+        if len(_group_split) < 4:
+            continue
+
+        _, _cell_1_id, _cell_2_id, _, _cell_real_id, _, _cell_fake_id = _group_split
+
+        if (_cell_real_id == _cell_fake_id) != _real_fake_same_cell:
+            continue
+
+        _real_real_group = 'cells_' + _cell_1_id + '_' + _cell_2_id
+        _real_real_tuple = (_experiment, _series_id, _real_real_group)
+
+        if _real_real_tuple in _experiments_tuples:
+            _experiments_matched.append((_real_real_tuple, _tuple))
+
+    return _experiments_matched
+
+
 def by_experiment(_experiments_tuples):
     _tuples_by_experiment = {}
     for _tuple in _experiments_tuples:
