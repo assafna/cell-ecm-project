@@ -14,6 +14,7 @@ from libs.experiments.config import FIBERS_CHANNEL_INDEX
 
 SHOW_PLOTS = False
 SMOOTH_AMOUNT = 0
+SECURE_DISTANCE = 25
 
 
 def process_real_fake(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell_2_id, _based_on_cell_id,
@@ -182,6 +183,8 @@ def process_real_fake(_experiment, _series_id, _cells_coordinates, _cell_1_id, _
         _new_resolutions['x'] = (_angle / 90) * _new_resolutions['y'] + ((90 - _angle) / 90) * _new_resolutions['x']
         _new_resolutions['y'] = (_angle / 90) * _new_resolutions['x'] + ((90 - _angle) / 90) * _new_resolutions['y']
 
+        # TODO: if the cell coordinates are out of image write it somewhere, so when checking for "overwrite"
+        #  it will know when to stop
         _image_z, _image_y, _image_x = _time_point_image_swapped_rotated.shape
         if not 0 <= _left_cell_coordinates[0] < _image_x or not \
                 0 <= _left_cell_coordinates[1] < _image_y or not \
@@ -274,10 +277,9 @@ def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell
             _point_x, _point_y = _point
 
             # ignore points out of the image
-            _secure_distance = 25
-            if _point_x < _secure_distance or _point_y < _secure_distance or \
-                    _point_x > _image_properties['dimensions']['width'] - _secure_distance or \
-                    _point_y > _image_properties['dimensions']['height'] - _secure_distance:
+            if _point_x < SECURE_DISTANCE or _point_y < SECURE_DISTANCE or \
+                    _point_x > _image_properties['dimensions']['width'] - SECURE_DISTANCE or \
+                    _point_y > _image_properties['dimensions']['height'] - SECURE_DISTANCE:
                 continue
 
             _shortest_distance = math.inf
