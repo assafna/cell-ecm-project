@@ -224,6 +224,8 @@ def process_real_fake(_experiment, _series_id, _cells_coordinates, _cell_1_id, _
         save_lib.to_pickle(_time_point_image_swapped_rotated, _time_point_pickle_path)
 
     # save properties
+    _based_on_properties = \
+        load.group_properties(_experiment, _series_id, 'cells_' + str(_cell_1_id) + '_' + str(_cell_2_id))
     _properties_data = {
         'experiment': _experiment,
         'series_id': _series_id,
@@ -232,7 +234,7 @@ def process_real_fake(_experiment, _series_id, _cells_coordinates, _cell_1_id, _
             'right_cell': _right_cell_id
         },
         'time_points': _time_points_data,
-        'band': False,
+        'band': _based_on_properties['band'],
         'fake': False,
         'static': False,
         'real_fake': True
