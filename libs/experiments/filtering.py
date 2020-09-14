@@ -11,7 +11,7 @@ def is_high_temporal_resolution(_experiment):
 
 
 def is_bleb(_experiment, _from_start=None):
-    return (_from_start is None and _experiment in BLEB) or (_from_start == (_experiment in BLEB_FROM_START))
+    return _experiment in BLEB and (_from_start is None or _from_start == (_experiment in BLEB_FROM_START))
 
 
 def by_categories(_experiments, _is_single_cell=None, _is_high_temporal_resolution=None, _is_bleb=None,
@@ -19,7 +19,7 @@ def by_categories(_experiments, _is_single_cell=None, _is_high_temporal_resoluti
     return [_experiment for _experiment in _experiments if
             (_is_single_cell is None or _is_single_cell == is_single_cell(_experiment)) and
             (_is_high_temporal_resolution is None or _is_high_temporal_resolution == is_high_temporal_resolution(_experiment)) and
-            (is_bleb is None or is_bleb == is_bleb(_experiment, _is_bleb_from_start))
+            (_is_bleb is None or (_is_bleb and is_bleb(_experiment, _is_bleb_from_start)) or (not _is_bleb and not is_bleb(_experiment)))
             ]
 
 
