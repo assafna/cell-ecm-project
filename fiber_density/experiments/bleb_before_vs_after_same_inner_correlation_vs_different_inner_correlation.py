@@ -41,17 +41,6 @@ def main(_band=True):
     _arguments = []
     for _tuple in _tuples:
         _experiment, _series_id, _group = _tuple
-
-        # stop when windows are overlapping
-        _properties = load.group_properties(_experiment, _series_id, _group)
-        _latest_time_frame = len(_properties['time_points'])
-        for _time_frame in range(len(_properties['time_points'])):
-            _pair_distance = \
-                compute.pair_distance_in_cell_size_time_frame(_experiment, _series_id, _group, _time_frame)
-            if _pair_distance - 1 - OFFSET_X * 2 < QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER * 2:
-                _latest_time_frame = _time_frame - 1
-                break
-
         for _cell_id in ['left_cell', 'right_cell']:
             _arguments.append({
                 'experiment': _experiment,
@@ -65,7 +54,7 @@ def main(_band=True):
                 'offset_z': OFFSET_Z,
                 'cell_id': _cell_id,
                 'direction': 'inside',
-                'time_points': _latest_time_frame
+                'time_points': compute.latest_time_frame_before_overlapping(_experiment, _series_id, _group, OFFSET_X)
             })
 
     _windows_dictionary, _windows_to_compute = compute.windows(_arguments,

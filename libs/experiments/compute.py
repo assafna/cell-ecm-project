@@ -12,7 +12,7 @@ from libs.experiments import load
 from libs.experiments.config import AVERAGE_CELL_DIAMETER_IN_MICRONS, \
     QUANTIFICATION_WINDOW_START_BY_AVERAGE_CELL_DIAMETER, \
     MAX_FRACTION_OUT_OF_BOUNDARIES_BLACK_PIXELS, MINIMUM_TIME_FRAMES_CORRELATION, DENSITY_TIME_FRAME, \
-    HIGH_TEMPORAL_RESOLUTION_IN_MINUTES
+    HIGH_TEMPORAL_RESOLUTION_IN_MINUTES, QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER
 
 
 def pair_distance_in_cell_size(_experiment, _series_id, _cell_1_coordinates, _cell_2_coordinates):
@@ -438,3 +438,16 @@ def density_time_frame(_experiment):
     if temporal_resolution_in_minutes(_experiment) == HIGH_TEMPORAL_RESOLUTION_IN_MINUTES:
         return DENSITY_TIME_FRAME['high_temporal_resolution']
     return DENSITY_TIME_FRAME['regular_temporal_resolution']
+
+
+def latest_time_frame_before_overlapping(_experiment, _series_id, _group, _offset_x):
+    _properties = load.group_properties(_experiment, _series_id, _group)
+    _latest_time_frame = len(_properties['time_points'])
+    for _time_frame in range(len(_properties['time_points'])):
+        _pair_distance = \
+            pair_distance_in_cell_size_time_frame(_experiment, _series_id, _group, _time_frame)
+        if _pair_distance - 1 - _offset_x * 2 < QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER * 2:
+            _latest_time_frame = _time_frame - 1
+            break
+
+    return _latest_time_frame
