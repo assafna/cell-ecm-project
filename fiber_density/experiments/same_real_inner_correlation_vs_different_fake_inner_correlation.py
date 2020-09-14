@@ -7,7 +7,7 @@ from scipy.stats import wilcoxon
 from tqdm import tqdm
 
 from libs import compute_lib
-from libs.experiments import load, filtering, compute, organize, paths
+from libs.experiments import load, filtering, compute, organize, paths, config
 from libs.experiments.config import QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER, \
     QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER, all_experiments, \
     DERIVATIVE
@@ -225,7 +225,7 @@ def main(_offset_y=0.5, _high_temporal_resolution=False):
     print('Wilcoxon real & fake:', wilcoxon(_distances_from_y_equal_x[0], _distances_from_y_equal_x[1]))
 
     # box plot
-    _colors_array = ['#844b00', '#ea8500']
+    _colors_array = config.colors(2)
     _names_array = ['Real', 'Fake']
     _fig = go.Figure(
         data=[

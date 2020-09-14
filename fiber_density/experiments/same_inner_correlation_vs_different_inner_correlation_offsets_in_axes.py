@@ -10,7 +10,7 @@ from tqdm import tqdm
 
 from libs import compute_lib
 from libs.config_lib import CPUS_TO_USE
-from libs.experiments import load, filtering, compute, paths, organize
+from libs.experiments import load, filtering, compute, paths, organize, config
 from libs.experiments.config import QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER, \
     QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER, all_experiments, \
     DERIVATIVE
@@ -256,7 +256,7 @@ def main(_band=True, _high_temporal_resolution=False, _offset_x=OFFSET_X, _offse
     # plot
     _offsets_y = np.arange(start=_offset_y_start, stop=_offset_y_end + _offset_y_step, step=_offset_y_step)
     _offsets_z = np.arange(start=_offset_z_start, stop=_offset_z_end + _offset_z_step, step=_offset_z_step)
-    _colors_array = ['black', 'white', '#ea8500']
+    _colors_array = ['black', 'white', config.colors(1)]
     _fig = go.Figure(
         data=go.Heatmap(
             x=_offsets_z,

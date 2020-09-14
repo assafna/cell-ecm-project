@@ -5,7 +5,7 @@ from statsmodels.tsa.stattools import kpss, adfuller
 from tqdm import tqdm
 
 from libs import compute_lib
-from libs.experiments import load, filtering, compute, paths
+from libs.experiments import load, filtering, compute, paths, config
 from libs.experiments.config import QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER, \
     QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, all_experiments, \
     OUT_OF_BOUNDARIES
@@ -117,7 +117,7 @@ def main():
               str(_stationary_count / len(_adf_y_arrays[_derivative_index]) * 100) + '%')
 
     # plot
-    _colors_array = ['#844b00', '#ea8500', '#edbc80']
+    _colors_array = config.colors(3)
     for _test_name, _y_title, _y_tickvals, _p_value_line, _y_arrays in \
             zip(
                 ['kpss', 'adf'],

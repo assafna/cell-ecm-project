@@ -9,7 +9,7 @@ from tqdm import tqdm
 
 from libs import compute_lib
 from libs.config_lib import CPUS_TO_USE
-from libs.simulations import load, filtering, compute, paths
+from libs.simulations import load, filtering, compute, paths, config
 from libs.simulations.config import QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, \
     QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER
 from plotting import save
@@ -87,7 +87,7 @@ def main():
         print(wilcoxon(np.array(_x_arrays[_distance_index]) - np.array(_y_arrays[_distance_index])))
 
     # 2d plots
-    _colors_array = ['#011f4b', '#00417c', '#2e82bf', '#56caed']
+    _colors_array = config.colors(4)
     _legendgroup_array = ['group_1', 'group_1', 'group_2', 'group_2']
     _fig = go.Figure(
         data=[

@@ -51,3 +51,14 @@ QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER = 1
 
 def all_experiments():
     return SINGLE_CELL + CELL_PAIRS
+
+
+def colors(_n):
+    if _n == 1:
+        return '#ea8500'
+    elif _n == 2:
+        return ['#844b00', '#ea8500']
+    elif _n == 3:
+        return ['#844b00', '#ea8500', '#edbc80']
+    else:
+        raise Exception('No colors encoded')

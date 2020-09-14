@@ -5,7 +5,7 @@ import plotly.graph_objs as go
 from tqdm import tqdm
 
 from libs import compute_lib
-from libs.experiments import load, compute, paths, filtering
+from libs.experiments import load, compute, paths, filtering, config
 from libs.experiments.config import QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER, \
     QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER, all_experiments
 from plotting import save
@@ -163,7 +163,7 @@ def compute_tuples(_tuples):
 
     # plots
     _names_array = ['Left cell', 'Right cell', 'Middle']
-    _colors_array = ['#844b00', '#ea8500', '#edbc80']
+    _colors_array = config.colors(3)
     for _tuple_data in _tuples_data:
         _tuple, _start_time_frame, _y_arrays, _correlation = _tuple_data
         _fig = go.Figure(

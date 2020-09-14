@@ -85,7 +85,7 @@ def main():
         print('Derivative:', _derivative, wilcoxon(_y_array))
 
     # plot
-    _colors_array = ['#011f4b', '#005b96', '#74c2e8']
+    _colors_array = config.colors(3)
     _fig = go.Figure(
         data=[
             go.Box(

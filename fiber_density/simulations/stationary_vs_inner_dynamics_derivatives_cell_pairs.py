@@ -9,7 +9,7 @@ from tqdm import tqdm
 
 from libs import compute_lib
 from libs.config_lib import CPUS_TO_USE
-from libs.simulations import load, filtering, compute, paths
+from libs.simulations import load, filtering, compute, paths, config
 from libs.simulations.config import QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, \
     QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER
 from plotting import save
@@ -92,7 +92,7 @@ def main():
               str(_stationary_count / len(_adf_y_arrays[_derivative_index]) * 100) + '%')
 
     # plot
-    _colors_array = ['#011f4b', '#005b96', '#74c2e8']
+    _colors_array = config.colors(3)
     for _test_name, _y_title, _y_tickvals, _p_value_line, _y_arrays in \
             zip(
                 ['kpss', 'adf'],

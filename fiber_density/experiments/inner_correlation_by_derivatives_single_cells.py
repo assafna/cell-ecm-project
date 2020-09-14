@@ -6,7 +6,7 @@ from scipy.stats import wilcoxon
 from tqdm import tqdm
 
 from libs import compute_lib
-from libs.experiments import load, filtering, compute, organize, paths
+from libs.experiments import load, filtering, compute, organize, paths, config
 from libs.experiments.config import QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER, \
     QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, OUT_OF_BOUNDARIES, \
     all_experiments
@@ -114,7 +114,7 @@ def main():
         print('Derivative:', _derivative, wilcoxon(_y_array))
 
     # plot
-    _colors_array = ['#844b00', '#ea8500', '#edbc80']
+    _colors_array = config.colors(3)
     _fig = go.Figure(
         data=[
             go.Box(

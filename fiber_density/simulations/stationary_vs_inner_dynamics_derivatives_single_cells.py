@@ -94,7 +94,7 @@ def main():
               str(_stationary_count / len(_adf_y_arrays[_derivative_index]) * 100) + '%')
 
     # plot
-    _colors_array = ['#011f4b', '#005b96', '#74c2e8']
+    _colors_array = config.colors(3)
     for _test_name, _y_title, _y_tickvals, _p_value_line, _y_arrays in \
             zip(
                 ['kpss', 'adf'],

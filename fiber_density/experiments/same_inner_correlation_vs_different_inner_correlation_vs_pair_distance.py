@@ -6,7 +6,7 @@ from scipy.stats import wilcoxon
 from tqdm import tqdm
 
 from libs import compute_lib
-from libs.experiments import load, filtering, compute, paths, organize
+from libs.experiments import load, filtering, compute, paths, organize, config
 from libs.experiments.config import QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER, \
     QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER, all_experiments, \
     DERIVATIVE
@@ -188,7 +188,7 @@ def main(_band=True, _high_temporal_resolution=False):
         _names_array.append(str(_distances_range[0]) + '-' + str(_distances_range[1]))
 
     # plot
-    _colors_array = ['#844b00', '#ea8500', '#edbc80']
+    _colors_array = config.colors(3)
     _fig = go.Figure(
         data=[
             go.Box(

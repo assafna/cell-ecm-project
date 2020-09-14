@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 from libs import compute_lib
 from libs.config_lib import CPUS_TO_USE
-from libs.simulations import compute, filtering, load, paths
+from libs.simulations import compute, filtering, load, paths, config
 from libs.simulations.config import QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, \
     QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER
 from plotting import save
@@ -111,7 +111,7 @@ def main(_low_connectivity=False):
         print('Higher same amount:', _higher_same_counter / len(_y_arrays[_distance_index]))
 
     # plot
-    _colors_array = ['#011f4b', '#00417c', '#2e82bf', '#56caed']
+    _colors_array = config.colors(4)
     _fig = go.Figure(
         data=[
             go.Box(

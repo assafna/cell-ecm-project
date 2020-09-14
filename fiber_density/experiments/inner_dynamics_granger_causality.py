@@ -10,7 +10,7 @@ from statsmodels.tsa.api import VAR
 from statsmodels.tsa.stattools import adfuller, kpss
 
 from libs import compute_lib
-from libs.experiments import load, filtering, compute, paths
+from libs.experiments import load, filtering, compute, paths, config
 from libs.experiments.config import QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER, \
     QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER, all_experiments
 from plotting import save
@@ -269,7 +269,7 @@ def main(_band=None, _high_temporal_resolution=True, _tuples_to_mark=None, _tupl
                                 _y_arrays = [_left_cell_fiber_densities_derivative,
                                              _right_cell_fiber_densities_derivative]
                                 _names_array = ['Left cell', 'Right cell']
-                                _colors_array = ['#844b00', '#ea8500']
+                                _colors_array = config.colors(2)
                                 _temporal_resolution = compute.temporal_resolution_in_minutes(_experiment)
                                 _fig = go.Figure(
                                     data=[

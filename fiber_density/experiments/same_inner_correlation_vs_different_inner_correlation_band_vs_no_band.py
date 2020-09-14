@@ -4,7 +4,7 @@ import plotly.graph_objs as go
 
 from fiber_density.experiments import same_inner_correlation_vs_different_inner_correlation
 from libs import compute_lib
-from libs.experiments import paths
+from libs.experiments import paths, config
 from plotting import save
 
 
@@ -26,7 +26,7 @@ def main(_high_temporal_resolution=False):
                 _y_arrays[_band_index].append(-_point_distance)
 
     # plot
-    _colors_array = ['#ea8500', '#844b00']
+    _colors_array = config.colors(2)
     _names_array = ['Band', 'No Band']
     _fig = go.Figure(
         data=[

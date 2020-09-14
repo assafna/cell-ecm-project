@@ -7,7 +7,7 @@ from scipy.stats import wilcoxon
 from tqdm import tqdm
 
 from libs import compute_lib
-from libs.experiments import load, filtering, compute, paths, organize
+from libs.experiments import load, filtering, compute, paths, organize, config
 from libs.experiments.config import QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER, \
     QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER, all_experiments, \
     AFTER_BLEB_INJECTION_FIRST_TIME_FRAME, DERIVATIVE
@@ -249,7 +249,7 @@ def main(_band=True):
     print('Wilcoxon before & after:', wilcoxon(_distances_from_y_equal_x[0], _distances_from_y_equal_x[1]))
 
     # box plot
-    _colors_array = ['#844b00', '#ea8500']
+    _colors_array = config.colors(2)
     _names_array = ['Before', 'After']
     _fig = go.Figure(
         data=[

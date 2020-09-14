@@ -6,7 +6,7 @@ from scipy.stats import wilcoxon
 from tqdm import tqdm
 
 from libs import compute_lib
-from libs.experiments import load, filtering, compute, paths
+from libs.experiments import load, filtering, compute, paths, config
 from libs.experiments.config import QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER, \
     QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, all_experiments, \
     OUT_OF_BOUNDARIES
@@ -117,7 +117,7 @@ def main(_directions=None):
 
         # plot
         _y_title = 'Inner correlation' if _direction == 'inside' else 'Outer correlation'
-        _colors_array = ['#844b00', '#ea8500', '#edbc80']
+        _colors_array = config.colors(3)
         _fig = go.Figure(
             data=[
                 go.Box(

@@ -4,7 +4,7 @@ import numpy as np
 import plotly.graph_objs as go
 
 from fiber_density.simulations import same_inner_correlation_vs_different_inner_correlation_cross_correlation
-from libs.simulations import paths
+from libs.simulations import paths, config
 from plotting import save
 
 # by low connectivity
@@ -83,7 +83,7 @@ def main(_type='alpha', _low_connectivity=False, _plots=None, _plot_types=None):
                         _y_arrays[1].append(_none_wins / _total)
                         _y_arrays[2].append(_right_wins / _total)
 
-                    _colors_array = ['#011f4b', '#005b96', '#74c2e8']
+                    _colors_array = config.colors(3)
                     _fig = go.Figure(
                         data=[
                             go.Bar(

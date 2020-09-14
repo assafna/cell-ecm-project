@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 from libs import compute_lib
 from libs.config_lib import CPUS_TO_USE
-from libs.simulations import load, filtering, compute, paths
+from libs.simulations import load, filtering, compute, paths, config
 from libs.simulations.config import QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, \
     QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER
 from plotting import save
@@ -97,7 +97,7 @@ def main(_low_connectivity=False):
         _names_array.append('Pair distance ' + str(_distance))
 
     # plot
-    _colors_array = ['#011f4b', '#005b96', '#74c2e8']
+    _colors_array = config.colors(3)
     _fig = go.Figure(
         data=[
             go.Scatter(

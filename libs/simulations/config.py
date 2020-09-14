@@ -18,3 +18,16 @@ ORIGIN_COORDINATES = {
 QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER = 1
 QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER = 1
 EPSILON = 1.0e-8
+
+
+def colors(_n):
+    if _n == 1:
+        return '#011f4b'
+    elif _n == 2:
+        return ['#011f4b', '#005b96']
+    elif _n == 3:
+        return ['#011f4b', '#005b96', '#74c2e8']
+    elif _n == 4:
+        return ['#011f4b', '#00417c', '#2e82bf', '#56caed']
+    else:
+        raise Exception('No colors encoded')
