@@ -26,7 +26,7 @@ def main():
     )
 
     _tuples = load.experiments_groups_as_tuples(_experiments)
-    _tuples = filtering.by_time_frames_amount(_tuples, compute.density_time_frame(_tuples[0]))
+    _tuples = filtering.by_time_frames_amount(_tuples, compute.density_time_frame(_experiments[0]))
     _tuples = filtering.by_real_pairs(_tuples)
     _tuples = filtering.by_band(_tuples)
 
