@@ -193,8 +193,10 @@ def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell
 
         # update resolutions
         _angle = abs(_angle)
-        _new_resolutions['x'] = (_angle / 90) * _new_resolutions['y'] + ((90 - _angle) / 90) * _new_resolutions['x']
-        _new_resolutions['y'] = (_angle / 90) * _new_resolutions['x'] + ((90 - _angle) / 90) * _new_resolutions['y']
+        _new_resolution_x = (_angle / 90) * _new_resolutions['y'] + ((90 - _angle) / 90) * _new_resolutions['x']
+        _new_resolution_y = (_angle / 90) * _new_resolutions['x'] + ((90 - _angle) / 90) * _new_resolutions['y']
+        _new_resolutions['x'] = _new_resolution_x
+        _new_resolutions['y'] = _new_resolution_y
 
         _image_z, _image_y, _image_x = _time_frame_image_swapped_rotated.shape
         if not 0 <= _left_cell_coordinates[0] < _image_x or not \

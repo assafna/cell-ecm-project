@@ -173,8 +173,10 @@ def process_real_fake(_experiment, _series_id, _cells_coordinates, _cell_1_id, _
 
         # update resolutions
         _angle = abs(_angle)
-        _new_resolutions['x'] = (_angle / 90) * _new_resolutions['y'] + ((90 - _angle) / 90) * _new_resolutions['x']
-        _new_resolutions['y'] = (_angle / 90) * _new_resolutions['x'] + ((90 - _angle) / 90) * _new_resolutions['y']
+        _new_resolution_x = (_angle / 90) * _new_resolutions['y'] + ((90 - _angle) / 90) * _new_resolutions['x']
+        _new_resolution_y = (_angle / 90) * _new_resolutions['x'] + ((90 - _angle) / 90) * _new_resolutions['y']
+        _new_resolutions['x'] = _new_resolution_x
+        _new_resolutions['y'] = _new_resolution_y
 
         # TODO: if the cell coordinates are out of image write it somewhere, so when checking for "overwrite"
         #  it will know when to stop
