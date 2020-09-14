@@ -5,6 +5,8 @@ https://www.biorxiv.org/content/10.1101/2020.07.30.223149v1
 
 [figures.py](figures.py) includes all figures generated for the paper by order.
 
+[fiji_scripts](fiji_scripts) includes all scripts used in Fiji software.
+
 [fiber_density](fiber_density) folder includes all methods for analyses made based on quantification of the fibrin channel for both simulations and experiments.
 
 [libs](libs) folder includes all methods used during the analysis process, including configurations and paths. Simulations-specific and experiments-specific methods are located in the inner folders.
