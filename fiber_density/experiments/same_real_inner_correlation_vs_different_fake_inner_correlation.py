@@ -9,33 +9,31 @@ from tqdm import tqdm
 from libs import compute_lib
 from libs.experiments import load, filtering, compute, organize, paths
 from libs.experiments.config import QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER, \
-    QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER
-# based on time resolution
+    QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER, all_experiments, \
+    DERIVATIVE
 from plotting import save
 
-EXPERIMENTS = {
-    False: ['SN16'],
-    True: ['SN41', 'SN44', 'SN45']
-}
 OFFSET_X = 0
 OFFSET_Z = 0
-DERIVATIVE = 1
+
 PAIR_DISTANCE_RANGE = [4, 10]
-MINIMUM_CORRELATION_TIME_FRAMES = {
-    'SN16': 15,
-    'SN18': 15,
-    'SN41': 50,
-    'SN44': 50,
-    'SN45': 50
-}
 
 
-def compute_fiber_densities(_offset_y=0.5, _high_time_resolution=False):
-    _experiments = load.experiments_groups_as_tuples(EXPERIMENTS[_high_time_resolution])
-    _experiments = filtering.by_pair_distance_range(_experiments, PAIR_DISTANCE_RANGE)
-    _experiments = filtering.by_band(_experiments)
-    _experiments = filtering.by_real_fake_pairs(_experiments, _real_fake_pairs=False)
-    _experiments_matched = organize.by_matched_real_and_fake(_experiments)
+def compute_fiber_densities(_offset_y=0.5, _high_temporal_resolution=False):
+    _experiments = all_experiments()
+    _experiments = filtering.by_categories(
+        _experiments=_experiments,
+        _is_single_cell=False,
+        _is_high_temporal_resolution=_high_temporal_resolution,
+        _is_bleb=False,
+        _is_bleb_from_start=False
+    )
+
+    _tuples = load.experiments_groups_as_tuples(_experiments)
+    _tuples = filtering.by_pair_distance_range(_tuples, PAIR_DISTANCE_RANGE)
+    _tuples = filtering.by_band(_tuples)
+    _tuples = filtering.by_real_fake_pairs(_tuples, _real_fake_pairs=False)
+    _experiments_matched = organize.by_matched_real_and_fake(_tuples)
     print('Total matched pairs:', len(_experiments_matched))
 
     _arguments = []
@@ -78,7 +76,7 @@ def compute_fiber_densities(_offset_y=0.5, _high_time_resolution=False):
         for _key in _windows_dictionary
     }
 
-    _tuples_by_experiment = organize.by_experiment(_experiments)
+    _tuples_by_experiment = organize.by_experiment(_tuples)
 
     # same (real, fake), different (real, fake)
     _correlations = [[[], []], [[], []]]
@@ -124,8 +122,7 @@ def compute_fiber_densities(_offset_y=0.5, _high_time_resolution=False):
                     )
 
                 # ignore small arrays
-                if len(_same_left_cell_fiber_densities_filtered) < \
-                        MINIMUM_CORRELATION_TIME_FRAMES[_same_experiment]:
+                if len(_same_left_cell_fiber_densities_filtered) < compute.minimum_time_frames_for_correlation(_same_experiment):
                     for _different_index in range(len(_experiments_matched)):
                         if _same_index != _different_index:
                             # for all combinations
@@ -179,8 +176,7 @@ def compute_fiber_densities(_offset_y=0.5, _high_time_resolution=False):
                                 )
 
                             # ignore small arrays
-                            if len(_same_fiber_densities_filtered) < \
-                                    MINIMUM_CORRELATION_TIME_FRAMES[_different_experiment]:
+                            if len(_same_fiber_densities_filtered) < compute.minimum_time_frames_for_correlation(_different_experiment):
                                 _correlations[0][_group_type_index].append(None)
                                 _correlations[1][_group_type_index].append(None)
                                 continue
@@ -224,8 +220,8 @@ def compute_fiber_densities(_offset_y=0.5, _high_time_resolution=False):
     return _distances_from_y_equal_x
 
 
-def main(_offset_y=0.5, _high_time_resolution=False):
-    _distances_from_y_equal_x = compute_fiber_densities(_offset_y, _high_time_resolution)
+def main(_offset_y=0.5, _high_temporal_resolution=False):
+    _distances_from_y_equal_x = compute_fiber_densities(_offset_y, _high_temporal_resolution)
 
     print('Total points:', len(_distances_from_y_equal_x[0]))
     print('Higher real same amount:', (np.array(_distances_from_y_equal_x[0]) > 0).sum() /
@@ -274,7 +270,7 @@ def main(_offset_y=0.5, _high_time_resolution=False):
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        _filename='plot_box_high_time_res_' + str(_high_time_resolution) + '_offset_y_' + str(_offset_y)
+        _filename='plot_box_high_temporal_res_' + str(_high_temporal_resolution) + '_offset_y_' + str(_offset_y)
     )
 
     # scatter plot
@@ -345,7 +341,7 @@ def main(_offset_y=0.5, _high_time_resolution=False):
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        _filename='plot_high_time_res_' + str(_high_time_resolution) + '_offset_y_' + str(_offset_y)
+        _filename='plot_high_temporal_res_' + str(_high_temporal_resolution) + '_offset_y_' + str(_offset_y)
     )
 
 

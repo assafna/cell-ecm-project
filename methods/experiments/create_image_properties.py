@@ -44,7 +44,7 @@ def process_experiment(_experiment, _overwrite=False):
 
 
 def process_all_experiments(_overwrite=False):
-    for _experiment in config.experiments():
+    for _experiment in config.all_experiments():
         process_experiment(_experiment, _overwrite)
 
 

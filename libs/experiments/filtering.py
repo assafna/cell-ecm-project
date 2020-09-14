@@ -1,4 +1,26 @@
 from libs.experiments import load, compute
+from libs.experiments.config import SINGLE_CELL, BLEB, BLEB_FROM_START, HIGH_TEMPORAL_RESOLUTION_IN_MINUTES
+
+
+def is_single_cell(_experiment):
+    return _experiment in SINGLE_CELL
+
+
+def is_high_temporal_resolution(_experiment):
+    return compute.temporal_resolution_in_minutes(_experiment) == HIGH_TEMPORAL_RESOLUTION_IN_MINUTES
+
+
+def is_bleb(_experiment, _from_start=None):
+    return (_from_start is None and _experiment in BLEB) or (_from_start == (_experiment in BLEB_FROM_START))
+
+
+def by_categories(_experiments, _is_single_cell=None, _is_high_temporal_resolution=None, _is_bleb=None,
+                  _is_bleb_from_start=None):
+    return [_experiment for _experiment in _experiments if
+            (_is_single_cell is None or _is_single_cell == is_single_cell(_experiment)) and
+            (_is_high_temporal_resolution is None or _is_high_temporal_resolution == _is_high_temporal_resolution(_experiment)) and
+            (is_bleb is None or is_bleb == is_bleb(_experiment, _is_bleb_from_start))
+            ]
 
 
 def by_pair_distance(_experiments_tuples, _distance, _time_frame=0, _range=1):

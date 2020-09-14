@@ -8,32 +8,30 @@ from tqdm import tqdm
 from libs import compute_lib
 from libs.experiments import load, filtering, compute, organize, paths
 from libs.experiments.config import QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER, \
-    QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER
+    QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER, all_experiments, \
+    DERIVATIVE
 from plotting import save
 
-# based on time resolution
-EXPERIMENTS = {
-    False: ['SN16'],
-    True: ['SN41', 'SN44', 'SN45']
-}
 OFFSET_X = 0
 OFFSET_Z = 0
-DERIVATIVE = 1
+
 PAIR_DISTANCE_RANGE = [4, 10]
-MINIMUM_CORRELATION_TIME_FRAMES = {
-    'SN16': 15,
-    'SN18': 15,
-    'SN41': 50,
-    'SN44': 50,
-    'SN45': 50
-}
 
 
-def main(_offset_y=0.5, _high_time_resolution=False):
-    _experiments = load.experiments_groups_as_tuples(EXPERIMENTS[_high_time_resolution])
-    _experiments = filtering.by_pair_distance_range(_experiments, PAIR_DISTANCE_RANGE)
-    _experiments = filtering.by_band(_experiments)
-    _tuples_matched = organize.by_matched_real_real_and_real_fake(_experiments)
+def main(_offset_y=0.5, _high_temporal_resolution=False):
+    _experiments = all_experiments()
+    _experiments = filtering.by_categories(
+        _experiments=_experiments,
+        _is_single_cell=False,
+        _is_high_temporal_resolution=_high_temporal_resolution,
+        _is_bleb=False,
+        _is_bleb_from_start=False
+    )
+
+    _tuples = load.experiments_groups_as_tuples(_experiments)
+    _tuples = filtering.by_pair_distance_range(_tuples, PAIR_DISTANCE_RANGE)
+    _tuples = filtering.by_band(_tuples)
+    _tuples_matched = organize.by_matched_real_real_and_real_fake(_tuples)
     print('Total matched pairs:', len(_tuples_matched))
 
     _arguments = []
@@ -136,7 +134,8 @@ def main(_offset_y=0.5, _high_time_resolution=False):
             )
 
         # ignore small arrays
-        if len(_real_real_left_cell_fiber_densities_filtered) < MINIMUM_CORRELATION_TIME_FRAMES[_real_real_experiment]:
+        _minimum_time_frame_for_correlation = compute.minimum_time_frames_for_correlation(_real_real_experiment)
+        if len(_real_real_left_cell_fiber_densities_filtered) < _minimum_time_frame_for_correlation:
             continue
 
         _real_real_correlation = compute_lib.correlation(
@@ -150,7 +149,7 @@ def main(_offset_y=0.5, _high_time_resolution=False):
             )
 
         # ignore small arrays
-        if len(_real_fake_left_cell_fiber_densities_filtered) < MINIMUM_CORRELATION_TIME_FRAMES[_real_real_experiment]:
+        if len(_real_fake_left_cell_fiber_densities_filtered) < _minimum_time_frame_for_correlation:
             continue
 
         _real_fake_correlation = compute_lib.correlation(
@@ -238,7 +237,7 @@ def main(_offset_y=0.5, _high_time_resolution=False):
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        _filename='plot_high_' + str(_high_time_resolution)
+        _filename='plot_high_' + str(_high_temporal_resolution)
     )
 
 

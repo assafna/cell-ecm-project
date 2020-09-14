@@ -11,7 +11,8 @@ from libs.config_lib import CPUS_TO_USE
 from libs.experiments import load
 from libs.experiments.config import AVERAGE_CELL_DIAMETER_IN_MICRONS, \
     QUANTIFICATION_WINDOW_START_BY_AVERAGE_CELL_DIAMETER, \
-    MAX_FRACTION_OUT_OF_BOUNDARIES_BLACK_PIXELS
+    MAX_FRACTION_OUT_OF_BOUNDARIES_BLACK_PIXELS, MINIMUM_TIME_FRAMES_CORRELATION, DENSITY_TIME_FRAME, \
+    HIGH_TEMPORAL_RESOLUTION_IN_MINUTES
 
 
 def pair_distance_in_cell_size(_experiment, _series_id, _cell_1_coordinates, _cell_2_coordinates):
@@ -420,3 +421,20 @@ def group_mean_z_position_from_substrate(_experiment, _series_id, _group, _time_
     _right_cell_z_position = cell_z_position_from_substrate(_experiment, _series_id, _right_cell_id, _time_frame)
 
     return (_left_cell_z_position + _right_cell_z_position) / 2
+
+
+def temporal_resolution_in_minutes(_experiment):
+    _properties = load.image_properties(_experiment, _series_id=1)
+    return round(_properties['frames_interval'] / 60)
+
+
+def minimum_time_frames_for_correlation(_experiment):
+    if temporal_resolution_in_minutes(_experiment) == HIGH_TEMPORAL_RESOLUTION_IN_MINUTES:
+        return MINIMUM_TIME_FRAMES_CORRELATION['high_temporal_resolution']
+    return MINIMUM_TIME_FRAMES_CORRELATION['regular_temporal_resolution']
+
+
+def density_time_frame(_experiment):
+    if temporal_resolution_in_minutes(_experiment) == HIGH_TEMPORAL_RESOLUTION_IN_MINUTES:
+        return DENSITY_TIME_FRAME['high_temporal_resolution']
+    return DENSITY_TIME_FRAME['regular_temporal_resolution']

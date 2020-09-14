@@ -79,7 +79,7 @@ def process_experiments(_experiments, _overwrite=False):
 
 
 def process_all_experiments(_overwrite=False):
-    process_experiments(config.PAIRS, _overwrite)
+    process_experiments(config.CELL_PAIRS, _overwrite)
 
 
 if __name__ == '__main__':

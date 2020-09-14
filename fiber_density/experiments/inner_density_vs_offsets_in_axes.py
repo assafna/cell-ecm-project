@@ -11,20 +11,9 @@ from libs import compute_lib
 from libs.config_lib import CPUS_TO_USE
 from libs.experiments import load, filtering, compute, paths
 from libs.experiments.config import QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER, \
-    QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER
+    QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, all_experiments
 from plotting import save
 
-# based on time resolution
-EXPERIMENTS = {
-    False: ['SN16'],
-    True: ['SN41', 'SN44', 'SN45']
-}
-TIME_FRAME = {
-    False: 18,
-    True: 52
-}
-REAL_CELLS = True
-STATIC = False
 OFFSET_X = 0
 OFFSET_Y_START = -1.1
 OFFSET_Y_END = 2.6
@@ -33,10 +22,9 @@ OFFSET_Z_START = -5
 OFFSET_Z_END = 5
 OFFSET_Z_STEP = 0.1
 PAIR_DISTANCE_RANGE = [4, 10]
-DIRECTION = 'inside'
 
 # globals
-_experiments = []
+_tuples = []
 _experiments_fiber_densities = {}
 _z_array = None
 
@@ -44,7 +32,7 @@ _z_array = None
 def compute_data(_arguments):
     _offset_y_index, _offset_y, _offset_z_index, _offset_z = _arguments
     _fiber_densities_array = []
-    for _tuple in _experiments:
+    for _tuple in _tuples:
         _experiment, _series_id, _group = _tuple
         _normalization = load.normalization_series_file_data(_experiment, _series_id)
         for _cell_id in ['left_cell', 'right_cell']:
@@ -68,24 +56,33 @@ def compute_data(_arguments):
         return _offset_y_index, _offset_z_index, None
 
 
-def compute_z_array(_band=True, _high_time_resolution=False, _offset_x=OFFSET_X, _offset_y_start=OFFSET_Y_START,
+def compute_z_array(_band=True, _high_temporal_resolution=False, _offset_x=OFFSET_X, _offset_y_start=OFFSET_Y_START,
                     _offset_y_end=OFFSET_Y_END, _offset_y_step=OFFSET_Y_STEP, _offset_z_start=OFFSET_Z_START,
                     _offset_z_end=OFFSET_Z_END, _offset_z_step=OFFSET_Z_STEP):
-    global _experiments, _experiments_fiber_densities, _z_array
+    global _tuples, _experiments_fiber_densities, _z_array
 
-    _experiments = load.experiments_groups_as_tuples(EXPERIMENTS[_high_time_resolution])
-    _experiments = filtering.by_time_frames_amount(_experiments, TIME_FRAME[_high_time_resolution])
-    _experiments = filtering.by_pair_distance_range(_experiments, PAIR_DISTANCE_RANGE)
-    _experiments = filtering.by_real_pairs(_experiments, _real_pairs=REAL_CELLS)
-    _experiments = filtering.by_fake_static_pairs(_experiments, _fake_static_pairs=STATIC)
-    _experiments = filtering.by_band(_experiments, _band=_band)
-    print('Total experiments:', len(_experiments))
+    _experiments = all_experiments()
+    _experiments = filtering.by_categories(
+        _experiments=_experiments,
+        _is_single_cell=False,
+        _is_high_temporal_resolution=_high_temporal_resolution,
+        _is_bleb=False,
+        _is_bleb_from_start=False
+    )
+
+    _tuples = load.experiments_groups_as_tuples(_experiments)
+    _tuples = filtering.by_time_frames_amount(_tuples, compute.minimum_time_frames_for_correlation(_experiments[0]))
+    _tuples = filtering.by_pair_distance_range(_tuples, PAIR_DISTANCE_RANGE)
+    _tuples = filtering.by_real_pairs(_tuples)
+    _tuples = filtering.by_band(_tuples, _band=_band)
+    print('Total tuples:', len(_tuples))
 
     _offsets_y = np.arange(start=_offset_y_start, stop=_offset_y_end + _offset_y_step, step=_offset_y_step)
     _offsets_z = np.arange(start=_offset_z_start, stop=_offset_z_end + _offset_z_step, step=_offset_z_step)
     _arguments = []
-    for _tuple in _experiments:
+    for _tuple in _tuples:
         _experiment, _series_id, _group = _tuple
+        _time_frame = compute.minimum_time_frames_for_correlation(_experiment)
         for _offset_y, _offset_z, _cell_id in product(_offsets_y, _offsets_z, ['left_cell', 'right_cell']):
             _arguments.append({
                 'experiment': _experiment,
@@ -98,8 +95,8 @@ def compute_z_array(_band=True, _high_time_resolution=False, _offset_x=OFFSET_X,
                 'offset_y': _offset_y,
                 'offset_z': _offset_z,
                 'cell_id': _cell_id,
-                'direction': DIRECTION,
-                'time_point': TIME_FRAME[_high_time_resolution] - 1
+                'direction': 'inside',
+                'time_point': _time_frame - 1
             })
 
     _windows_dictionary, _windows_to_compute = \
@@ -123,7 +120,7 @@ def compute_z_array(_band=True, _high_time_resolution=False, _offset_x=OFFSET_X,
     _z_array = np.zeros(shape=(len(_offsets_y), len(_offsets_z)))
     with Pool(CPUS_TO_USE) as _p:
         for _answer in tqdm(_p.imap_unordered(compute_data, _arguments), total=len(_arguments),
-                            desc='Computing Heatmap'):
+                            desc='Computing heatmap'):
             _offset_y_index, _offset_z_index, _mean = _answer
             _z_array[_offset_y_index, _offset_z_index] = _mean
         _p.close()
@@ -132,12 +129,12 @@ def compute_z_array(_band=True, _high_time_resolution=False, _offset_x=OFFSET_X,
     return _z_array
 
 
-def main(_band=True, _high_time_resolution=False, _offset_x=OFFSET_X, _offset_y_start=OFFSET_Y_START,
+def main(_band=True, _high_temporal_resolution=False, _offset_x=OFFSET_X, _offset_y_start=OFFSET_Y_START,
          _offset_y_end=OFFSET_Y_END, _offset_y_step=OFFSET_Y_STEP, _offset_z_start=OFFSET_Z_START,
          _offset_z_end=OFFSET_Z_END, _offset_z_step=OFFSET_Z_STEP):
-    global _experiments, _experiments_fiber_densities, _z_array
+    global _tuples, _experiments_fiber_densities, _z_array
 
-    compute_z_array(_band=_band, _high_time_resolution=_high_time_resolution, _offset_x=OFFSET_X,
+    compute_z_array(_band=_band, _high_temporal_resolution=_high_temporal_resolution, _offset_x=OFFSET_X,
                     _offset_y_start=OFFSET_Y_START, _offset_y_end=OFFSET_Y_END, _offset_y_step=OFFSET_Y_STEP,
                     _offset_z_start=OFFSET_Z_START, _offset_z_end=OFFSET_Z_END, _offset_z_step=OFFSET_Z_STEP)
 
@@ -180,8 +177,7 @@ def main(_band=True, _high_time_resolution=False, _offset_x=OFFSET_X, _offset_y_
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        _filename='plot_high_time_' + str(_high_time_resolution) + '_real_' + str(REAL_CELLS) + '_static_' + str(STATIC)
-                  + '_band_' + str(_band)
+        _filename='plot_high_time_' + str(_high_temporal_resolution) + '_band_' + str(_band)
     )
 
 

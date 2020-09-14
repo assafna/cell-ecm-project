@@ -12,6 +12,7 @@ from libs.experiments import config as experiments_config
 from libs.experiments import filtering as experiments_filtering
 from libs.experiments import load as experiments_load
 from libs.experiments import organize as experiments_organize
+from libs.experiments.config import all_experiments, OUT_OF_BOUNDARIES
 from libs.simulations import compute as simulations_compute
 from libs.simulations import config as simulations_config
 from libs.simulations import filtering as simulations_filtering
@@ -23,9 +24,8 @@ OFFSET_Y = 0
 
 # experiments
 EXPERIMENTS_TIME_FRAMES = 12
-EXPERIMENTS_TIME_RESOLUTION = 21
+EXPERIMENTS_TEMPORAL_RESOLUTION = 21
 OFFSET_Z = 0
-OUT_OF_BOUNDARIES = False
 
 # simulations
 SIMULATIONS_TIME_POINTS = 50
@@ -100,12 +100,21 @@ def main():
 
     # experiments
     print('Experiments')
-    _experiments = experiments_load.experiments_groups_as_tuples(experiments_config.SINGLE_CELL)
-    _experiments = experiments_filtering.by_time_frames_amount(_experiments, EXPERIMENTS_TIME_FRAMES)
-    _experiments = experiments_filtering.by_main_cell(_experiments)
+    _experiments = all_experiments()
+    _experiments = experiments_filtering.by_categories(
+        _experiments=_experiments,
+        _is_single_cell=True,
+        _is_high_temporal_resolution=False,
+        _is_bleb=False,
+        _is_bleb_from_start=False
+    )
+
+    _tuples = experiments_load.experiments_groups_as_tuples(_experiments)
+    _tuples = experiments_filtering.by_time_frames_amount(_tuples, EXPERIMENTS_TIME_FRAMES)
+    _tuples = experiments_filtering.by_main_cell(_tuples)
 
     _arguments = []
-    for _tuple in _experiments:
+    for _tuple in _tuples:
         _experiment, _series_id, _group = _tuple
         for _direction in ['left', 'right']:
             _arguments.append({
@@ -127,17 +136,17 @@ def main():
         experiments_compute.windows(_arguments, _keys=['experiment', 'series_id', 'group', 'direction'])
     _fiber_densities = experiments_compute.fiber_densities(_windows_to_compute)
 
-    _experiments = experiments_organize.by_single_cell_id(_experiments)
-    print('Total experiments:', len(_experiments))
+    _tuples = experiments_organize.by_single_cell_id(_tuples)
+    print('Total experiments:', len(_tuples))
 
     _experiments_fiber_densities = [[] for _i in range(EXPERIMENTS_TIME_FRAMES)]
-    for _tuple in tqdm(_experiments, desc='Experiments loop'):
+    for _tuple in tqdm(_tuples, desc='Experiments loop'):
         _experiment, _series_id, _ = _tuple
         _normalization = experiments_load.normalization_series_file_data(_experiment, _series_id)
 
         for _time_frame in range(EXPERIMENTS_TIME_FRAMES):
             _cell_fiber_densities = []
-            for _cell_tuple in _experiments[_tuple]:
+            for _cell_tuple in _tuples[_tuple]:
                 _, _, _group = _cell_tuple
                 for _direction in ['left', 'right']:
                     _window_tuple = _windows_dictionary[(_experiment, _series_id, _group, _direction)][_time_frame]
@@ -181,7 +190,7 @@ def main():
                 opacity=0.7
             ),
             go.Scatter(
-                x=np.array(range(EXPERIMENTS_TIME_FRAMES)) * EXPERIMENTS_TIME_RESOLUTION,
+                x=np.array(range(EXPERIMENTS_TIME_FRAMES)) * EXPERIMENTS_TEMPORAL_RESOLUTION,
                 xaxis='x2',
                 y=[np.mean(_array) for _array in _experiments_fiber_densities],
                 name='Experiments',

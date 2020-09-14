@@ -5,17 +5,17 @@ import plotly.graph_objs as go
 from tqdm import tqdm
 
 from libs import compute_lib
-from libs.experiments import load, compute, paths
+from libs.experiments import load, compute, paths, filtering
 from libs.experiments.config import QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER, \
-    QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER
+    QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER, all_experiments
 from plotting import save
 
-# based on time resolution
-EXPERIMENTS = ['SN16']
-TIME_RESOLUTION = 15
+TEMPORAL_RESOLUTION = 15
+
 OFFSET_X = 0
 OFFSET_Y = 0.5
 OFFSET_Z = 0
+
 DERIVATIVE = 0
 
 
@@ -172,7 +172,7 @@ def compute_tuples(_tuples):
                     x=np.arange(
                         start=_start_time_frame,
                         stop=_start_time_frame + len(_y_arrays[0]) - DERIVATIVE,
-                        step=1) * TIME_RESOLUTION,
+                        step=1) * TEMPORAL_RESOLUTION,
                     y=_y,
                     name=_name,
                     mode='lines',
@@ -215,10 +215,19 @@ def compute_tuples(_tuples):
 
 
 def main():
-    _experiments = load.experiments_groups_as_tuples(EXPERIMENTS)
-    print('Total experiments:', len(_experiments))
+    _experiments = all_experiments()
+    _experiments = filtering.by_categories(
+        _experiments=_experiments,
+        _is_single_cell=False,
+        _is_high_temporal_resolution=False,
+        _is_bleb=False,
+        _is_bleb_from_start=False
+    )
 
-    compute_tuples(_experiments)
+    _tuples = load.experiments_groups_as_tuples(_experiments)
+    print('Total tuples:', len(_tuples))
+
+    compute_tuples(_tuples)
 
 
 if __name__ == '__main__':

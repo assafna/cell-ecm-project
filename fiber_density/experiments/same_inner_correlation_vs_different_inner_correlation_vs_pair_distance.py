@@ -8,44 +8,39 @@ from tqdm import tqdm
 from libs import compute_lib
 from libs.experiments import load, filtering, compute, paths, organize
 from libs.experiments.config import QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER, \
-    QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER
+    QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER, all_experiments, \
+    DERIVATIVE
 from plotting import save
 
-# based on time resolution
-EXPERIMENTS = {
-    False: ['SN16'],
-    True: ['SN41', 'SN44', 'SN45']
-}
 OFFSET_X = 0
 OFFSET_Y = 0.5
 OFFSET_Z = 0
-DERIVATIVE = 1
+
 PAIR_DISTANCE_RANGES = [(4, 6), (6, 8), (8, 10)]
-REAL_CELLS = True
-STATIC = False
-MINIMUM_CORRELATION_TIME_FRAMES = {
-    'SN16': 15,
-    'SN18': 15,
-    'SN41': 50,
-    'SN44': 50,
-    'SN45': 50
-}
 
 
-def main(_band=True, _high_time_resolution=False):
+def main(_band=True, _high_temporal_resolution=False):
     _y_arrays = [[] for _i in PAIR_DISTANCE_RANGES]
     _names_array = []
     for _distances_index, _distances_range in enumerate(PAIR_DISTANCE_RANGES):
         print('Pair distance range:', str(_distances_range))
-        _experiments = load.experiments_groups_as_tuples(EXPERIMENTS[_high_time_resolution])
-        _experiments = filtering.by_pair_distance_range(_experiments, _distances_range)
-        _experiments = filtering.by_real_pairs(_experiments, _real_pairs=REAL_CELLS)
-        _experiments = filtering.by_fake_static_pairs(_experiments, _fake_static_pairs=STATIC)
-        _experiments = filtering.by_band(_experiments, _band=_band)
-        print('Total experiments:', len(_experiments))
+        _experiments = all_experiments()
+        _experiments = filtering.by_categories(
+            _experiments=_experiments,
+            _is_single_cell=False,
+            _is_high_temporal_resolution=_high_temporal_resolution,
+            _is_bleb=False,
+            _is_bleb_from_start=False
+        )
+
+        _tuples = load.experiments_groups_as_tuples(_experiments)
+        _tuples = filtering.by_pair_distance_range(_tuples, _distances_range)
+        _tuples = filtering.by_real_pairs(_tuples)
+        _tuples = filtering.by_band(_tuples, _band=_band)
+        print('Total tuples:', len(_tuples))
 
         _arguments = []
-        for _tuple in _experiments:
+        for _tuple in _tuples:
             _experiment, _series_id, _group = _tuple
 
             # stop when windows are overlapping
@@ -84,7 +79,7 @@ def main(_band=True, _high_time_resolution=False):
             for _key in _windows_dictionary
         }
 
-        _tuples_by_experiment = organize.by_experiment(_experiments)
+        _tuples_by_experiment = organize.by_experiment(_tuples)
 
         _higher_same_counter = 0
         _valid_tuples = []
@@ -126,8 +121,7 @@ def main(_band=True, _high_time_resolution=False):
                     )
 
                 # ignore small arrays
-                if len(_same_left_cell_fiber_densities_filtered) < \
-                        MINIMUM_CORRELATION_TIME_FRAMES[_same_experiment]:
+                if len(_same_left_cell_fiber_densities_filtered) < compute.minimum_time_frames_for_correlation(_same_experiment):
                     continue
 
                 _same_correlation = compute_lib.correlation(
@@ -176,8 +170,7 @@ def main(_band=True, _high_time_resolution=False):
                                 )
 
                             # ignore small arrays
-                            if len(_same_fiber_densities_filtered) < \
-                                    MINIMUM_CORRELATION_TIME_FRAMES[_different_experiment]:
+                            if len(_same_fiber_densities_filtered) < compute.minimum_time_frames_for_correlation(_different_experiment):
                                 continue
 
                             _different_correlation = compute_lib.correlation(
@@ -242,7 +235,7 @@ def main(_band=True, _high_time_resolution=False):
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        _filename='plot_band_' + str(_band) + '_high_time_res_' + str(_high_time_resolution)
+        _filename='plot_band_' + str(_band) + '_high_temporal_res_' + str(_high_temporal_resolution)
     )
 
 

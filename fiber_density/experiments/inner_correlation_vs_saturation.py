@@ -7,37 +7,33 @@ from tqdm import tqdm
 from libs import compute_lib
 from libs.experiments import load, filtering, compute, paths, organize
 from libs.experiments.config import QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER, \
-    QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER
+    QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER, all_experiments, \
+    DERIVATIVE
 from plotting import save
 
-# based on time resolution
-EXPERIMENTS = ['SN16']
 OFFSET_X = 0
 OFFSET_Z = 0
-DERIVATIVE = 1
 PAIR_DISTANCE_RANGE = [4, 10]
-BAND = True
-REAL_CELLS = True
-STATIC = False
-MINIMUM_CORRELATION_TIME_FRAMES = {
-    'SN16': 15,
-    'SN18': 15,
-    'SN41': 50,
-    'SN44': 50,
-    'SN45': 50
-}
 
 
 def compute_fiber_densities(_offset_y):
-    _experiments = load.experiments_groups_as_tuples(EXPERIMENTS)
-    _experiments = filtering.by_pair_distance_range(_experiments, PAIR_DISTANCE_RANGE)
-    _experiments = filtering.by_real_pairs(_experiments, _real_pairs=REAL_CELLS)
-    _experiments = filtering.by_fake_static_pairs(_experiments, _fake_static_pairs=STATIC)
-    _experiments = filtering.by_band(_experiments, _band=BAND)
-    print('Total experiments:', len(_experiments))
+    _experiments = all_experiments()
+    _experiments = filtering.by_categories(
+        _experiments=_experiments,
+        _is_single_cell=False,
+        _is_high_temporal_resolution=False,
+        _is_bleb=False,
+        _is_bleb_from_start=False
+    )
+
+    _tuples = load.experiments_groups_as_tuples(_experiments)
+    _tuples = filtering.by_pair_distance_range(_tuples, PAIR_DISTANCE_RANGE)
+    _tuples = filtering.by_real_pairs(_tuples)
+    _tuples = filtering.by_band(_tuples)
+    print('Total tuples:', len(_tuples))
 
     _arguments = []
-    for _tuple in _experiments:
+    for _tuple in _tuples:
         _experiment, _series_id, _group = _tuple
 
         # stop when windows are overlapping
@@ -80,7 +76,7 @@ def compute_fiber_densities(_offset_y):
         for _key in _windows_dictionary
     }
 
-    _tuples_by_experiment = organize.by_experiment(_experiments)
+    _tuples_by_experiment = organize.by_experiment(_tuples)
 
     _correlations_array = []
     _saturation_array = []
@@ -114,8 +110,7 @@ def compute_fiber_densities(_offset_y):
                 )
 
             # ignore small arrays
-            if len(_left_cell_fiber_densities_filtered) < \
-                    MINIMUM_CORRELATION_TIME_FRAMES[_experiment]:
+            if len(_left_cell_fiber_densities_filtered) < compute.minimum_time_frames_for_correlation(_experiment):
                 continue
 
             _correlation = compute_lib.correlation(

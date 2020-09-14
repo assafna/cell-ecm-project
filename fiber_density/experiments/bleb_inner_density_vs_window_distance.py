@@ -8,32 +8,30 @@ from tqdm import tqdm
 from libs import compute_lib
 from libs.experiments import load, filtering, compute, paths, organize
 from libs.experiments.config import QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER, \
-    QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER
+    QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, all_experiments, \
+    OUT_OF_BOUNDARIES
 from plotting import save
 
-EXPERIMENTS = ['SN16']
-EXPERIMENTS_BLEB = ['SN20_Bleb_fromStart']
-TIME_FRAME = 18
 PAIR_DISTANCE_RANGE = [4, 10]
 OFFSET_X_STEP = 0.2
 OFFSET_Z = 0
 OFFSET_Y = 0
-OUT_OF_BOUNDARIES = False
 
 
 def compute_fiber(_experiments):
-    _experiments = load.experiments_groups_as_tuples(_experiments)
-    _experiments = filtering.by_time_frames_amount(_experiments, TIME_FRAME)
-    _experiments = filtering.by_real_pairs(_experiments)
-    _experiments = filtering.by_pair_distance_range(_experiments, PAIR_DISTANCE_RANGE)
-    print('Total experiments:', len(_experiments))
+    _tuples = load.experiments_groups_as_tuples(_experiments)
+    _tuples = filtering.by_time_frames_amount(_tuples, compute.density_time_frame(_tuples[0]))
+    _tuples = filtering.by_real_pairs(_tuples)
+    _tuples = filtering.by_pair_distance_range(_tuples, PAIR_DISTANCE_RANGE)
+    print('Total tuples:', len(_tuples))
 
     _max_offsets_x = []
     _arguments = []
-    for _tuple in _experiments:
+    for _tuple in _tuples:
         _experiment, _series_id, _group = _tuple
+        _time_frame = compute.density_time_frame(_tuples)
         _pair_distance = compute.pair_distance_in_cell_size_time_frame(
-            _experiment, _series_id, _group, TIME_FRAME - 1
+            _experiment, _series_id, _group, _time_frame - 1
         )
         _offsets_x = \
             np.arange(start=0, stop=_pair_distance / 2 - 0.5 - QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER,
@@ -54,7 +52,7 @@ def compute_fiber(_experiments):
                     'offset_z': OFFSET_Z,
                     'cell_id': _cell_id,
                     'direction': 'inside',
-                    'time_point': TIME_FRAME - 1
+                    'time_point': _time_frame - 1
                 })
 
     _windows_dictionary, _windows_to_compute = \
@@ -62,7 +60,7 @@ def compute_fiber(_experiments):
     _fiber_densities = compute.fiber_densities(_windows_to_compute)
 
     _experiments_fiber_densities = [[] for _i in range(len(_max_offsets_x))]
-    for _tuple in tqdm(_experiments, desc='Experiments loop'):
+    for _tuple in tqdm(_tuples, desc='Experiments loop'):
         _experiment, _series_id, _group = _tuple
         for _offset_x_index, _offset_x in enumerate(_max_offsets_x):
             for _cell_id in ['left_cell', 'right_cell']:
@@ -87,10 +85,10 @@ def compute_fiber(_experiments):
 
 
 def compute_matched_fiber(_experiments):
-    _experiments = load.experiments_groups_as_tuples(_experiments)
-    _experiments = filtering.by_time_frames_amount(_experiments, TIME_FRAME)
-    _experiments = filtering.by_pair_distance_range(_experiments, PAIR_DISTANCE_RANGE)
-    _experiments_matched = organize.by_matched_real_and_fake(_experiments)
+    _tuples = load.experiments_groups_as_tuples(_experiments)
+    _tuples = filtering.by_time_frames_amount(_tuples, compute.density_time_frame(_tuples[0]))
+    _tuples = filtering.by_pair_distance_range(_tuples, PAIR_DISTANCE_RANGE)
+    _experiments_matched = organize.by_matched_real_and_fake(_tuples)
     print('Total matched pairs:', len(_experiments_matched))
 
     _max_offsets_x = []
@@ -98,8 +96,9 @@ def compute_matched_fiber(_experiments):
     for _matched_tuple in _experiments_matched:
         for _tuple in _matched_tuple:
             _experiment, _series_id, _group = _tuple
+            _time_frame = compute.density_time_frame(_tuples)
             _pair_distance = compute.pair_distance_in_cell_size_time_frame(
-                _experiment, _series_id, _group, TIME_FRAME - 1
+                _experiment, _series_id, _group, _time_frame - 1
             )
             _offsets_x = \
                 np.arange(start=0, stop=_pair_distance / 2 - 0.5 - QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER,
@@ -120,7 +119,7 @@ def compute_matched_fiber(_experiments):
                         'offset_z': OFFSET_Z,
                         'cell_id': _cell_id,
                         'direction': 'inside',
-                        'time_point': TIME_FRAME - 1
+                        'time_point': _time_frame - 1
                     })
 
     _windows_dictionary, _windows_to_compute = \
@@ -172,10 +171,26 @@ def compute_matched_fiber(_experiments):
 
 def main():
     print('Regular experiments')
-    _regular_experiments, _regular_offsets_x = compute_fiber(EXPERIMENTS)
+    _experiments = all_experiments()
+    _experiments = filtering.by_categories(
+        _experiments=_experiments,
+        _is_single_cell=False,
+        _is_high_temporal_resolution=False,
+        _is_bleb=False,
+        _is_bleb_from_start=False
+    )
+    _regular_experiments, _regular_offsets_x = compute_fiber(_experiments)
 
     print('Bleb experiments')
-    _bleb_experiments_real, _bleb_experiments_fake, _bleb_offsets_x = compute_matched_fiber(EXPERIMENTS_BLEB)
+    _experiments = all_experiments()
+    _experiments = filtering.by_categories(
+        _experiments=_experiments,
+        _is_single_cell=False,
+        _is_high_temporal_resolution=False,
+        _is_bleb=True,
+        _is_bleb_from_start=True
+    )
+    _bleb_experiments_real, _bleb_experiments_fake, _bleb_offsets_x = compute_matched_fiber(_experiments)
 
     print('\nWindow distance (cell diameter)', 'Regular # of cells', 'Regular Wilcoxon p-value', 'Bleb # of cells',
           'Bleb "real" Wilcoxon p-value', 'Bleb "fake" Wilcoxon p-value', sep='\t')

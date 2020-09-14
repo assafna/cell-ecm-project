@@ -9,47 +9,48 @@ from tqdm import tqdm
 from libs import compute_lib
 from libs.experiments import load, filtering, compute, paths, organize
 from libs.experiments.config import QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER, \
-    QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER
+    QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER, all_experiments, \
+    AFTER_BLEB_INJECTION_FIRST_TIME_FRAME, DERIVATIVE
 from plotting import save
 
-# based on time resolution
-EXPERIMENTS = ['SN26_BlebAdded']
-AFTER_BLEB_INJECTION_FIRST_TIME_FRAME = 9
 OFFSET_X = 0
 OFFSET_Y = 0.5
 OFFSET_Z = 0
 PAIR_DISTANCE_RANGE = [4, 10]
 REAL_CELLS = True
 STATIC = False
-DIRECTION = 'inside'
-MINIMUM_TIME_FRAMES = 20
-MINIMUM_TIME_FRAMES_CORRELATION = 8
-DERIVATIVE = 1
 
 
 def main(_band=True):
-    _experiments = load.experiments_groups_as_tuples(EXPERIMENTS)
-    _experiments = filtering.by_time_frames_amount(_experiments, _time_frames=MINIMUM_TIME_FRAMES)
-    _experiments = filtering.by_pair_distance_range(_experiments, _distance_range=PAIR_DISTANCE_RANGE)
-    _experiments = filtering.by_real_pairs(_experiments, _real_pairs=REAL_CELLS)
-    _experiments = filtering.by_fake_static_pairs(_experiments, _fake_static_pairs=STATIC)
-    _experiments = filtering.by_band(_experiments, _band=_band)
-    print('Total experiments:', len(_experiments))
+    _experiments = all_experiments()
+    _experiments = filtering.by_categories(
+        _experiments=_experiments,
+        _is_single_cell=False,
+        _is_high_temporal_resolution=None,
+        _is_bleb=True,
+        _is_bleb_from_start=False
+    )
+
+    _tuples = load.experiments_groups_as_tuples(_experiments)
+    _tuples = filtering.by_pair_distance_range(_experiments, _distance_range=PAIR_DISTANCE_RANGE)
+    _tuples = filtering.by_real_pairs(_tuples, _real_pairs=REAL_CELLS)
+    _tuples = filtering.by_fake_static_pairs(_tuples, _fake_static_pairs=STATIC)
+    _tuples = filtering.by_band(_tuples, _band=_band)
+    print('Total tuples:', len(_tuples))
 
     _arguments = []
-    for _tuple in _experiments:
+    for _tuple in _tuples:
         _experiment, _series_id, _group = _tuple
 
         # stop when windows are overlapping
         _properties = load.group_properties(_experiment, _series_id, _group)
         _latest_time_frame = len(_properties['time_points'])
-        if DIRECTION == 'inside':
-            for _time_frame in range(len(_properties['time_points'])):
-                _pair_distance = \
-                    compute.pair_distance_in_cell_size_time_frame(_experiment, _series_id, _group, _time_frame)
-                if _pair_distance - 1 - OFFSET_X * 2 < QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER * 2:
-                    _latest_time_frame = _time_frame - 1
-                    break
+        for _time_frame in range(len(_properties['time_points'])):
+            _pair_distance = \
+                compute.pair_distance_in_cell_size_time_frame(_experiment, _series_id, _group, _time_frame)
+            if _pair_distance - 1 - OFFSET_X * 2 < QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER * 2:
+                _latest_time_frame = _time_frame - 1
+                break
 
         for _cell_id in ['left_cell', 'right_cell']:
             _arguments.append({
@@ -63,7 +64,7 @@ def main(_band=True):
                 'offset_y': OFFSET_Y,
                 'offset_z': OFFSET_Z,
                 'cell_id': _cell_id,
-                'direction': DIRECTION,
+                'direction': 'inside',
                 'time_points': _latest_time_frame
             })
 
@@ -76,7 +77,7 @@ def main(_band=True):
         for _key in _windows_dictionary
     }
 
-    _tuples_by_experiment = organize.by_experiment(_experiments)
+    _tuples_by_experiment = organize.by_experiment(_tuples)
 
     # same (before, after), different (before, after)
     _correlations = [[[], []], [[], []]]
@@ -114,14 +115,14 @@ def main(_band=True):
             )
 
             _same_before_left_cell_fiber_densities = \
-                _same_left_cell_fiber_densities[:AFTER_BLEB_INJECTION_FIRST_TIME_FRAME]
+                _same_left_cell_fiber_densities[:AFTER_BLEB_INJECTION_FIRST_TIME_FRAME[_same_experiment]]
             _same_before_right_cell_fiber_densities = \
-                _same_right_cell_fiber_densities[:AFTER_BLEB_INJECTION_FIRST_TIME_FRAME]
+                _same_right_cell_fiber_densities[:AFTER_BLEB_INJECTION_FIRST_TIME_FRAME[_same_experiment]]
 
             _same_after_left_cell_fiber_densities = \
-                _same_left_cell_fiber_densities[AFTER_BLEB_INJECTION_FIRST_TIME_FRAME:]
+                _same_left_cell_fiber_densities[AFTER_BLEB_INJECTION_FIRST_TIME_FRAME[_same_experiment]:]
             _same_after_right_cell_fiber_densities = \
-                _same_right_cell_fiber_densities[AFTER_BLEB_INJECTION_FIRST_TIME_FRAME:]
+                _same_right_cell_fiber_densities[AFTER_BLEB_INJECTION_FIRST_TIME_FRAME[_same_experiment]:]
 
             _same_before_left_cell_fiber_densities_filtered, _same_before_right_cell_fiber_densities_filtered = \
                 compute.longest_same_indices_shared_in_borders_sub_array(
@@ -134,8 +135,9 @@ def main(_band=True):
                 )
 
             # ignore small arrays
-            if len(_same_before_left_cell_fiber_densities_filtered) < MINIMUM_TIME_FRAMES_CORRELATION or \
-                    len(_same_after_left_cell_fiber_densities_filtered) < MINIMUM_TIME_FRAMES_CORRELATION:
+            _minimum_time_frame_for_correlation = compute.minimum_time_frames_for_correlation(_same_experiment)
+            if len(_same_before_left_cell_fiber_densities_filtered) < _minimum_time_frame_for_correlation or \
+                    len(_same_after_left_cell_fiber_densities_filtered) < _minimum_time_frame_for_correlation:
                 continue
 
             _same_before_correlation = compute_lib.correlation(
@@ -183,14 +185,14 @@ def main(_band=True):
                         )
 
                         _same_before_fiber_densities = \
-                            _same_fiber_densities[:AFTER_BLEB_INJECTION_FIRST_TIME_FRAME]
+                            _same_fiber_densities[:AFTER_BLEB_INJECTION_FIRST_TIME_FRAME[_same_experiment]]
                         _same_after_fiber_densities = \
-                            _same_fiber_densities[AFTER_BLEB_INJECTION_FIRST_TIME_FRAME:]
+                            _same_fiber_densities[AFTER_BLEB_INJECTION_FIRST_TIME_FRAME[_same_experiment]:]
 
                         _different_before_fiber_densities = \
-                            _different_fiber_densities[:AFTER_BLEB_INJECTION_FIRST_TIME_FRAME]
+                            _different_fiber_densities[:AFTER_BLEB_INJECTION_FIRST_TIME_FRAME[_different_experiment]]
                         _different_after_fiber_densities = \
-                            _different_fiber_densities[AFTER_BLEB_INJECTION_FIRST_TIME_FRAME:]
+                            _different_fiber_densities[AFTER_BLEB_INJECTION_FIRST_TIME_FRAME[_different_experiment]:]
 
                         _same_before_fiber_densities_filtered, _different_before_fiber_densities_filtered = \
                             compute.longest_same_indices_shared_in_borders_sub_array(
@@ -203,8 +205,8 @@ def main(_band=True):
                             )
 
                         # ignore small arrays
-                        if len(_same_before_fiber_densities_filtered) < MINIMUM_TIME_FRAMES_CORRELATION or \
-                                len(_same_after_fiber_densities_filtered) < MINIMUM_TIME_FRAMES_CORRELATION:
+                        if len(_same_before_fiber_densities_filtered) < _minimum_time_frame_for_correlation or \
+                                len(_same_after_fiber_densities_filtered) < _minimum_time_frame_for_correlation:
                             continue
 
                         _different_before_correlation = compute_lib.correlation(

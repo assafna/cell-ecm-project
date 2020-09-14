@@ -12,16 +12,10 @@ from libs import compute_lib
 from libs.config_lib import CPUS_TO_USE
 from libs.experiments import load, filtering, compute, paths, organize
 from libs.experiments.config import QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER, \
-    QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER
+    QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER, all_experiments, \
+    DERIVATIVE
 from plotting import save
 
-# based on time resolution
-EXPERIMENTS = {
-    False: ['SN16'],
-    True: ['SN41', 'SN44', 'SN45']
-}
-REAL_CELLS = True
-STATIC = False
 OFFSET_X = 0
 OFFSET_Y_START = -1.1
 OFFSET_Y_END = 2.6
@@ -29,19 +23,11 @@ OFFSET_Y_STEP = 0.1
 OFFSET_Z_START = -5
 OFFSET_Z_END = 5
 OFFSET_Z_STEP = 0.1
-DERIVATIVE = 1
+
 PAIR_DISTANCE_RANGE = [4, 10]
-DIRECTION = 'inside'
-MINIMUM_CORRELATION_TIME_FRAMES = {
-    'SN16': 15,
-    'SN18': 15,
-    'SN41': 50,
-    'SN44': 50,
-    'SN45': 50
-}
 
 # globals
-_experiments = []
+_tuples = []
 _tuples_by_experiment = {}
 _experiments_fiber_densities = {}
 _z_array = None
@@ -91,8 +77,7 @@ def compute_data(_arguments):
                 )
 
             # ignore small arrays
-            if len(_same_left_cell_fiber_densities_filtered) < \
-                    MINIMUM_CORRELATION_TIME_FRAMES[_same_experiment]:
+            if len(_same_left_cell_fiber_densities_filtered) < compute.minimum_time_frames_for_correlation(_same_experiment):
                 continue
 
             _same_correlation = compute_lib.correlation(
@@ -147,8 +132,7 @@ def compute_data(_arguments):
                             )
 
                         # ignore small arrays
-                        if len(_same_fiber_densities_filtered) < \
-                                MINIMUM_CORRELATION_TIME_FRAMES[_different_experiment]:
+                        if len(_same_fiber_densities_filtered) < compute.minimum_time_frames_for_correlation(_different_experiment):
                             continue
 
                         _different_correlation = compute_lib.correlation(
@@ -183,22 +167,30 @@ def compute_data(_arguments):
     return _offset_y_index, _offset_z_index, _same_fraction, _annotation
 
 
-def compute_z_array(_band=True, _high_time_resolution=False, _offset_x=OFFSET_X, _offset_y_start=OFFSET_Y_START,
+def compute_z_array(_band=True, _high_temporal_resolution=False, _offset_x=OFFSET_X, _offset_y_start=OFFSET_Y_START,
                     _offset_y_end=OFFSET_Y_END, _offset_y_step=OFFSET_Y_STEP, _offset_z_start=OFFSET_Z_START,
                     _offset_z_end=OFFSET_Z_END, _offset_z_step=OFFSET_Z_STEP):
-    global _experiments, _tuples_by_experiment, _experiments_fiber_densities, _z_array, _annotations_array
+    global _tuples, _tuples_by_experiment, _experiments_fiber_densities, _z_array, _annotations_array
 
-    _experiments = load.experiments_groups_as_tuples(EXPERIMENTS[_high_time_resolution])
-    _experiments = filtering.by_pair_distance_range(_experiments, PAIR_DISTANCE_RANGE)
-    _experiments = filtering.by_real_pairs(_experiments, _real_pairs=REAL_CELLS)
-    _experiments = filtering.by_fake_static_pairs(_experiments, _fake_static_pairs=STATIC)
-    _experiments = filtering.by_band(_experiments, _band=_band)
-    print('Total experiments:', len(_experiments))
+    _experiments = all_experiments()
+    _experiments = filtering.by_categories(
+        _experiments=_experiments,
+        _is_single_cell=False,
+        _is_high_temporal_resolution=_high_temporal_resolution,
+        _is_bleb=False,
+        _is_bleb_from_start=False
+    )
+
+    _tuples = load.experiments_groups_as_tuples(_experiments)
+    _tuples = filtering.by_pair_distance_range(_tuples, PAIR_DISTANCE_RANGE)
+    _tuples = filtering.by_real_pairs(_tuples)
+    _tuples = filtering.by_band(_tuples, _band=_band)
+    print('Total tuples:', len(_tuples))
 
     _offsets_y = np.arange(start=_offset_y_start, stop=_offset_y_end + _offset_y_step, step=_offset_y_step)
     _offsets_z = np.arange(start=_offset_z_start, stop=_offset_z_end + _offset_z_step, step=_offset_z_step)
     _arguments = []
-    for _tuple in _experiments:
+    for _tuple in _tuples:
         _experiment, _series_id, _group = _tuple
 
         # stop when windows are overlapping
@@ -223,7 +215,7 @@ def compute_z_array(_band=True, _high_time_resolution=False, _offset_x=OFFSET_X,
                 'offset_y': _offset_y,
                 'offset_z': _offset_z,
                 'cell_id': _cell_id,
-                'direction': DIRECTION,
+                'direction': 'inside',
                 'time_points': _latest_time_frame
             })
 
@@ -235,7 +227,7 @@ def compute_z_array(_band=True, _high_time_resolution=False, _offset_x=OFFSET_X,
     for _key in tqdm(_windows_dictionary, desc='Organizing fiber Densities'):
         _experiments_fiber_densities[_key] = [_fiber_densities[_tuple] for _tuple in _windows_dictionary[_key]]
 
-    _tuples_by_experiment = organize.by_experiment(_experiments)
+    _tuples_by_experiment = organize.by_experiment(_tuples)
 
     # clean
     _fiber_densities = None
@@ -263,12 +255,12 @@ def compute_z_array(_band=True, _high_time_resolution=False, _offset_x=OFFSET_X,
     return _z_array
 
 
-def main(_band=True, _high_time_resolution=False, _offset_x=OFFSET_X, _offset_y_start=OFFSET_Y_START,
+def main(_band=True, _high_temporal_resolution=False, _offset_x=OFFSET_X, _offset_y_start=OFFSET_Y_START,
          _offset_y_end=OFFSET_Y_END, _offset_y_step=OFFSET_Y_STEP, _offset_z_start=OFFSET_Z_START,
          _offset_z_end=OFFSET_Z_END, _offset_z_step=OFFSET_Z_STEP):
-    global _experiments, _tuples_by_experiment, _experiments_fiber_densities, _z_array, _annotations_array
+    global _tuples, _tuples_by_experiment, _experiments_fiber_densities, _z_array, _annotations_array
 
-    compute_z_array(_band=_band, _high_time_resolution=_high_time_resolution, _offset_x=OFFSET_X,
+    compute_z_array(_band=_band, _high_temporal_resolution=_high_temporal_resolution, _offset_x=OFFSET_X,
                     _offset_y_start=OFFSET_Y_START, _offset_y_end=OFFSET_Y_END, _offset_y_step=OFFSET_Y_STEP,
                     _offset_z_start=OFFSET_Z_START, _offset_z_end=OFFSET_Z_END, _offset_z_step=OFFSET_Z_STEP)
 
@@ -312,8 +304,7 @@ def main(_band=True, _high_time_resolution=False, _offset_x=OFFSET_X, _offset_y_
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        _filename='plot_high_time_' + str(_high_time_resolution) + '_real_' + str(REAL_CELLS) + '_static_' +
-                  str(STATIC) + '_band_' + str(_band)
+        _filename='plot_high_time_' + str(_high_temporal_resolution) + '_band_' + str(_band)
     )
 
 

@@ -7,22 +7,21 @@ from tqdm import tqdm
 
 from libs import compute_lib
 from libs.experiments import load, filtering, compute, organize, paths
-from libs.experiments.config import SINGLE_CELL, QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER, \
-    QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER
+from libs.experiments.config import QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER, \
+    QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, OUT_OF_BOUNDARIES, \
+    all_experiments
 from plotting import save
 
 OFFSET_X = 0
 OFFSET_Y = 0
 OFFSET_Z = 0
-TIME_FRAMES = 18
-OUT_OF_BOUNDARIES = False
 DERIVATIVES = [0, 1, 2]
 DERIVATIVES_TEXT = ['D', 'D\'', 'D\'\'']
 
 
 def compute_single_cell_mean(_experiment, _series_id, _cell_tuples, _windows_dictionary, _fiber_densities):
     _cell_fiber_densities = []
-    for _time_frame in range(TIME_FRAMES):
+    for _time_frame in range(compute.density_time_frame(_experiment)):
         _time_frame_fiber_densities = []
         for _cell_tuple in _cell_tuples:
             _, _, _group = _cell_tuple
@@ -41,13 +40,23 @@ def compute_single_cell_mean(_experiment, _series_id, _cell_tuples, _windows_dic
 
 
 def main():
-    _experiments = load.experiments_groups_as_tuples(SINGLE_CELL)
-    _experiments = filtering.by_time_frames_amount(_experiments, TIME_FRAMES)
-    _experiments = filtering.by_main_cell(_experiments)
+    _experiments = all_experiments()
+    _experiments = filtering.by_categories(
+        _experiments=_experiments,
+        _is_single_cell=True,
+        _is_high_temporal_resolution=False,
+        _is_bleb=False,
+        _is_bleb_from_start=False
+    )
+
+    _tuples = load.experiments_groups_as_tuples(_experiments)
+    _tuples = filtering.by_time_frames_amount(_experiments, compute.density_time_frame(_experiments[0]))
+    _tuples = filtering.by_main_cell(_tuples)
 
     _arguments = []
-    for _tuple in _experiments:
+    for _tuple in _tuples:
         _experiment, _series_id, _group = _tuple
+        _time_frame = compute.density_time_frame(_experiment)
         for _direction in ['left', 'right']:
             _arguments.append({
                 'experiment': _experiment,
@@ -61,16 +70,16 @@ def main():
                 'offset_z': OFFSET_Z,
                 'cell_id': 'cell',
                 'direction': _direction,
-                'time_points': TIME_FRAMES
+                'time_points': _time_frame
             })
 
     _windows_dictionary, _windows_to_compute = \
         compute.windows(_arguments, _keys=['experiment', 'series_id', 'group', 'direction'])
     _fiber_densities = compute.fiber_densities(_windows_to_compute)
 
-    _experiments = organize.by_single_cell_id(_experiments)
-    print('Total experiments:', len(_experiments))
-    _experiments_ids = list(_experiments.keys())
+    _tuples = organize.by_single_cell_id(_tuples)
+    print('Total tuples:', len(_tuples))
+    _experiments_ids = list(_tuples.keys())
 
     _y_arrays = [[] for _i in DERIVATIVES]
     for _index_1 in tqdm(range(len(_experiments_ids)), desc='Main loop'):
@@ -79,7 +88,7 @@ def main():
         _fiber_densities_1 = compute_single_cell_mean(
             _experiment=_experiment_1,
             _series_id=_series_id_1,
-            _cell_tuples=_experiments[_tuple_1],
+            _cell_tuples=_tuples[_tuple_1],
             _windows_dictionary=_windows_dictionary,
             _fiber_densities=_fiber_densities
         )
@@ -89,7 +98,7 @@ def main():
             _fiber_densities_2 = compute_single_cell_mean(
                 _experiment=_experiment_2,
                 _series_id=_series_id_2,
-                _cell_tuples=_experiments[_tuple_2],
+                _cell_tuples=_tuples[_tuple_2],
                 _windows_dictionary=_windows_dictionary,
                 _fiber_densities=_fiber_densities
             )

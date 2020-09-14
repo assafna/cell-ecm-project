@@ -6,27 +6,17 @@ import plotly.graph_objs as go
 from libs import compute_lib
 from libs.experiments import load, filtering, compute, paths
 from libs.experiments.config import QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER, \
-    QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER
+    QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER, all_experiments, \
+    DERIVATIVE
 from plotting import save
 
-# based on time resolution
-EXPERIMENTS = {
-    False: ['SN16'],
-    True: ['SN41', 'SN44', 'SN45']
-}
 OFFSET_X = 0
 OFFSET_Y = 0
 OFFSET_Z = 0
-DERIVATIVE = 1
-TIME_RESOLUTION = {
-    False: 15,
-    True: 5
-}
+
 PAIR_DISTANCE_RANGE = [4, 10]
-REAL_CELLS = True
-STATIC = False
-BAND = True
-DIRECTION = 'inside'
+
+# according to temporal resolution
 MOVING_WINDOW_LENGTH = {
     False: 10,
     True: 50
@@ -41,30 +31,36 @@ END_TIME_FRAME = {
 }
 
 
-def main(_high_time_resolution=True):
-    _experiments = load.experiments_groups_as_tuples(EXPERIMENTS[_high_time_resolution])
-    _experiments = \
-        filtering.by_time_frames_amount(_experiments, _time_frames=MOVING_WINDOW_LENGTH[_high_time_resolution])
-    _experiments = filtering.by_pair_distance_range(_experiments, _distance_range=PAIR_DISTANCE_RANGE)
-    _experiments = filtering.by_real_pairs(_experiments, _real_pairs=REAL_CELLS)
-    _experiments = filtering.by_fake_static_pairs(_experiments, _fake_static_pairs=STATIC)
-    _experiments = filtering.by_band(_experiments, _band=BAND)
-    print('Total experiments:', len(_experiments))
+def main(_high_temporal_resolution=True):
+    _experiments = all_experiments()
+    _experiments = filtering.by_categories(
+        _experiments=_experiments,
+        _is_single_cell=False,
+        _is_high_temporal_resolution=_high_temporal_resolution,
+        _is_bleb=False,
+        _is_bleb_from_start=False
+    )
+
+    _tuples = load.experiments_groups_as_tuples(_experiments)
+    _tuples = filtering.by_time_frames_amount(_tuples, _time_frames=MOVING_WINDOW_LENGTH[_high_temporal_resolution])
+    _tuples = filtering.by_pair_distance_range(_tuples, _distance_range=PAIR_DISTANCE_RANGE)
+    _tuples = filtering.by_real_pairs(_tuples)
+    _tuples = filtering.by_band(_tuples)
+    print('Total tuples:', len(_tuples))
 
     _arguments = []
-    for _tuple in _experiments:
+    for _tuple in _tuples:
         _experiment, _series_id, _group = _tuple
 
         # stop when windows are overlapping
         _properties = load.group_properties(_experiment, _series_id, _group)
         _latest_time_frame = len(_properties['time_points'])
-        if DIRECTION == 'inside':
-            for _time_frame in range(len(_properties['time_points'])):
-                _pair_distance = \
-                    compute.pair_distance_in_cell_size_time_frame(_experiment, _series_id, _group, _time_frame)
-                if _pair_distance - 1 - OFFSET_X * 2 < QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER * 2:
-                    _latest_time_frame = _time_frame - 1
-                    break
+        for _time_frame in range(len(_properties['time_points'])):
+            _pair_distance = \
+                compute.pair_distance_in_cell_size_time_frame(_experiment, _series_id, _group, _time_frame)
+            if _pair_distance - 1 - OFFSET_X * 2 < QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER * 2:
+                _latest_time_frame = _time_frame - 1
+                break
 
         for _cell_id in ['left_cell', 'right_cell']:
             _arguments.append({
@@ -78,7 +74,7 @@ def main(_high_time_resolution=True):
                 'offset_y': OFFSET_Y,
                 'offset_z': OFFSET_Z,
                 'cell_id': _cell_id,
-                'direction': DIRECTION,
+                'direction': 'inside',
                 'time_points': _latest_time_frame
             })
 
@@ -91,7 +87,7 @@ def main(_high_time_resolution=True):
         for _key in _windows_dictionary
     }
 
-    for _tuple in _experiments:
+    for _tuple in _tuples:
         _correlations = []
         _experiment, _series_id, _group = _tuple
 
@@ -107,21 +103,21 @@ def main(_high_time_resolution=True):
             _experiment, _series_id, _properties['cells_ids']['right_cell'], _right_cell_fiber_densities)
 
         for _start_time_frame in \
-                range(0, END_TIME_FRAME[_high_time_resolution], TIME_FRAME_STEP[_high_time_resolution]):
+                range(0, END_TIME_FRAME[_high_temporal_resolution], TIME_FRAME_STEP[_high_temporal_resolution]):
 
             _left_cell_fiber_densities_window = _left_cell_fiber_densities[
                                                 _start_time_frame:_start_time_frame +
-                                                MOVING_WINDOW_LENGTH[_high_time_resolution]]
+                                                MOVING_WINDOW_LENGTH[_high_temporal_resolution]]
             _right_cell_fiber_densities_window = _right_cell_fiber_densities[
                                                  _start_time_frame:_start_time_frame +
-                                                 MOVING_WINDOW_LENGTH[_high_time_resolution]]
+                                                 MOVING_WINDOW_LENGTH[_high_temporal_resolution]]
 
             _left_cell_fiber_densities_filtered, _right_cell_fiber_densities_filtered = \
                 compute.longest_same_indices_shared_in_borders_sub_array(
                     _left_cell_fiber_densities_window, _right_cell_fiber_densities_window)
 
             # ignore small arrays
-            if len(_left_cell_fiber_densities_filtered) < MOVING_WINDOW_LENGTH[_high_time_resolution]:
+            if len(_left_cell_fiber_densities_filtered) < MOVING_WINDOW_LENGTH[_high_temporal_resolution]:
                 _correlations.append(None)
                 continue
 
@@ -131,12 +127,13 @@ def main(_high_time_resolution=True):
             ))
 
         # plot
+        _temporal_resolution = compute.temporal_resolution_in_minutes(_experiment)
         _fig = go.Figure(
             data=go.Scatter(
                 x=np.arange(
                     start=0,
                     stop=len(_correlations),
-                    step=1) * TIME_RESOLUTION[_high_time_resolution] * TIME_FRAME_STEP[_high_time_resolution],
+                    step=1) * _temporal_resolution * TIME_FRAME_STEP[_high_temporal_resolution],
                 y=_correlations,
                 mode='lines+markers',
                 line={'dash': 'solid'}

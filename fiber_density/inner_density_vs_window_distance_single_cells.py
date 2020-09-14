@@ -13,6 +13,7 @@ from libs.experiments import config as experiments_config
 from libs.experiments import filtering as experiments_filtering
 from libs.experiments import load as experiments_load
 from libs.experiments import organize as experiments_organize
+from libs.experiments.config import all_experiments, OUT_OF_BOUNDARIES
 from libs.simulations import compute as simulations_compute
 from libs.simulations import config as simulations_config
 from libs.simulations import filtering as simulations_filtering
@@ -27,7 +28,6 @@ OFFSET_Y = 0
 # experiments
 EXPERIMENTS_TIME_FRAME = 12
 OFFSET_Z = 0
-OUT_OF_BOUNDARIES = False
 
 # simulations
 SIMULATIONS_TIME_POINT = {
@@ -37,12 +37,21 @@ SIMULATIONS_TIME_POINT = {
 
 
 def compute_experiments_data():
-    _experiments = experiments_load.experiments_groups_as_tuples(experiments_config.SINGLE_CELL)
-    _experiments = experiments_filtering.by_time_frames_amount(_experiments, EXPERIMENTS_TIME_FRAME)
-    _experiments = experiments_filtering.by_main_cell(_experiments)
+    _experiments = all_experiments()
+    _experiments = experiments_filtering.by_categories(
+        _experiments=_experiments,
+        _is_single_cell=True,
+        _is_high_temporal_resolution=False,
+        _is_bleb=False,
+        _is_bleb_from_start=False
+    )
+
+    _tuples = experiments_load.experiments_groups_as_tuples(_experiments)
+    _tuples = experiments_filtering.by_time_frames_amount(_tuples, EXPERIMENTS_TIME_FRAME)
+    _tuples = experiments_filtering.by_main_cell(_tuples)
 
     _arguments = []
-    for _tuple in _experiments:
+    for _tuple in _tuples:
         _experiment, _series_id, _group = _tuple
         for _offset_x, _direction in product(OFFSETS_X, ['left', 'right']):
             _arguments.append({
@@ -64,16 +73,16 @@ def compute_experiments_data():
         experiments_compute.windows(_arguments, _keys=['experiment', 'series_id', 'group', 'offset_x', 'direction'])
     _fiber_densities = experiments_compute.fiber_densities(_windows_to_compute)
 
-    _experiments = experiments_organize.by_single_cell_id(_experiments)
+    _tuples = experiments_organize.by_single_cell_id(_tuples)
 
     _experiments_fiber_densities = [[] for _i in range(len(OFFSETS_X))]
-    for _tuple in tqdm(_experiments, desc='Experiments loop'):
+    for _tuple in tqdm(_tuples, desc='Experiments loop'):
         _experiment, _series_id, _cell_id = _tuple
         _normalization = experiments_load.normalization_series_file_data(_experiment, _series_id)
 
         for _offset_x_index, _offset_x in enumerate(OFFSETS_X):
             _cell_fiber_densities = []
-            for _cell_tuple in _experiments[_tuple]:
+            for _cell_tuple in _tuples[_tuple]:
                 _, _, _group = _cell_tuple
                 for _direction in ['left', 'right']:
                     _window_tuple = _windows_dictionary[(_experiment, _series_id, _group, _offset_x, _direction)][0]

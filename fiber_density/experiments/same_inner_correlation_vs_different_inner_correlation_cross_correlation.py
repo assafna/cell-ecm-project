@@ -8,61 +8,51 @@ from tqdm import tqdm
 from libs import compute_lib
 from libs.experiments import load, filtering, compute, paths
 from libs.experiments.config import QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER, \
-    QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER
+    QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER, all_experiments, \
+    DERIVATIVE
 from plotting import save
 
-# based on time resolution
-EXPERIMENTS = {
-    False: ['SN16'],
-    True: ['SN41', 'SN44', 'SN45']
-}
-TIME_RESOLUTION = {
-    False: 15,
-    True: 5
-}
 OFFSET_X = 0
 OFFSET_Y = 0.5
 OFFSET_Z = 0
-DERIVATIVE = 1
+
 PAIR_DISTANCE_RANGE = [4, 10]
-REAL_CELLS = True
-STATIC = False
-DIRECTION = 'inside'
-MINIMUM_CORRELATION_TIME_FRAMES = {
-    'SN16': 15,
-    'SN18': 15,
-    'SN41': 50,
-    'SN44': 50,
-    'SN45': 50
-}
+
 TIME_LAGS = {
     False: [0, 1, 2],
     True: [0, 1, 2, 3, 4, 5]
 }
 
 
-def compute_fiber_densities(_band=True, _high_time_resolution=True):
-    _experiments = load.experiments_groups_as_tuples(EXPERIMENTS[_high_time_resolution])
-    _experiments = filtering.by_pair_distance_range(_experiments, PAIR_DISTANCE_RANGE)
-    _experiments = filtering.by_real_pairs(_experiments, _real_pairs=REAL_CELLS)
-    _experiments = filtering.by_fake_static_pairs(_experiments, _fake_static_pairs=STATIC)
-    _experiments = filtering.by_band(_experiments, _band=_band)
-    print('Total experiments:', len(_experiments))
+def compute_fiber_densities(_band=True, _high_temporal_resolution=True):
+    _experiments = all_experiments()
+    _experiments = filtering.by_categories(
+        _experiments=_experiments,
+        _is_single_cell=False,
+        _is_high_temporal_resolution=_high_temporal_resolution,
+        _is_bleb=False,
+        _is_bleb_from_start=False
+    )
+
+    _tuples = load.experiments_groups_as_tuples(_experiments)
+    _tuples = filtering.by_pair_distance_range(_tuples, PAIR_DISTANCE_RANGE)
+    _tuples = filtering.by_real_pairs(_tuples)
+    _tuples = filtering.by_band(_tuples, _band=_band)
+    print('Total tuples:', len(_tuples))
 
     _arguments = []
-    for _tuple in _experiments:
+    for _tuple in _tuples:
         _experiment, _series_id, _group = _tuple
 
         # stop when windows are overlapping
         _properties = load.group_properties(_experiment, _series_id, _group)
         _latest_time_frame = len(_properties['time_points'])
-        if DIRECTION == 'inside':
-            for _time_frame in range(len(_properties['time_points'])):
-                _pair_distance = \
-                    compute.pair_distance_in_cell_size_time_frame(_experiment, _series_id, _group, _time_frame)
-                if _pair_distance - 1 - OFFSET_X * 2 < QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER * 2:
-                    _latest_time_frame = _time_frame - 1
-                    break
+        for _time_frame in range(len(_properties['time_points'])):
+            _pair_distance = \
+                compute.pair_distance_in_cell_size_time_frame(_experiment, _series_id, _group, _time_frame)
+            if _pair_distance - 1 - OFFSET_X * 2 < QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER * 2:
+                _latest_time_frame = _time_frame - 1
+                break
 
         for _cell_id in ['left_cell', 'right_cell']:
             _arguments.append({
@@ -76,7 +66,7 @@ def compute_fiber_densities(_band=True, _high_time_resolution=True):
                 'offset_y': OFFSET_Y,
                 'offset_z': OFFSET_Z,
                 'cell_id': _cell_id,
-                'direction': DIRECTION,
+                'direction': 'inside',
                 'time_points': _latest_time_frame
             })
 
@@ -90,13 +80,13 @@ def compute_fiber_densities(_band=True, _high_time_resolution=True):
     }
 
     _same_correlation_vs_time_lag = {}
-    _same_time_lags_arrays = [[] for _i in TIME_LAGS[_high_time_resolution]]
-    _different_time_lags_arrays = [[] for _i in TIME_LAGS[_high_time_resolution]]
-    _same_time_lags_highest = [0 for _i in TIME_LAGS[_high_time_resolution]]
-    _different_time_lags_highest = [0 for _i in TIME_LAGS[_high_time_resolution]]
+    _same_time_lags_arrays = [[] for _i in TIME_LAGS[_high_temporal_resolution]]
+    _different_time_lags_arrays = [[] for _i in TIME_LAGS[_high_temporal_resolution]]
+    _same_time_lags_highest = [0 for _i in TIME_LAGS[_high_temporal_resolution]]
+    _different_time_lags_highest = [0 for _i in TIME_LAGS[_high_temporal_resolution]]
     _valid_tuples = []
-    for _same_index in tqdm(range(len(_experiments)), desc='Main loop'):
-        _same_tuple = _experiments[_same_index]
+    for _same_index in tqdm(range(len(_tuples)), desc='Main loop'):
+        _same_tuple = _tuples[_same_index]
         _same_experiment, _same_series, _same_group = _same_tuple
 
         _same_left_cell_fiber_densities = \
@@ -127,7 +117,7 @@ def compute_fiber_densities(_band=True, _high_time_resolution=True):
         _same_highest_correlation = -1.1
         _same_highest_correlation_time_lag_index = 0
         _same_correlation_vs_time_lag[_same_tuple] = []
-        for _time_lag_index, _time_lag in enumerate(TIME_LAGS[_high_time_resolution]):
+        for _time_lag_index, _time_lag in enumerate(TIME_LAGS[_high_temporal_resolution]):
 
             # choose either negative or positive lag
             for _symbol in [-1, 1]:
@@ -154,8 +144,7 @@ def compute_fiber_densities(_band=True, _high_time_resolution=True):
                     )
 
                 # ignore small arrays
-                if len(_same_left_cell_fiber_densities_filtered) < \
-                        MINIMUM_CORRELATION_TIME_FRAMES[_same_experiment]:
+                if len(_same_left_cell_fiber_densities_filtered) < compute.minimum_time_frames_for_correlation(_same_experiment):
                     _same_correlation_vs_time_lag[_same_tuple].append(None)
                     continue
 
@@ -173,9 +162,9 @@ def compute_fiber_densities(_band=True, _high_time_resolution=True):
 
         _same_time_lags_highest[_same_highest_correlation_time_lag_index] += 1
 
-        for _different_index in range(len(_experiments)):
+        for _different_index in range(len(_tuples)):
             if _same_index != _different_index:
-                _different_tuple = _experiments[_different_index]
+                _different_tuple = _tuples[_different_index]
                 _different_experiment, _different_series, _different_group = \
                     _different_tuple
                 for _same_cell_id, _different_cell_id in product(['left_cell', 'right_cell'],
@@ -212,7 +201,7 @@ def compute_fiber_densities(_band=True, _high_time_resolution=True):
                     # time lag
                     _different_highest_correlation = -1.1
                     _different_highest_correlation_time_lag_index = 0
-                    for _time_lag_index, _time_lag in enumerate(TIME_LAGS[_high_time_resolution]):
+                    for _time_lag_index, _time_lag in enumerate(TIME_LAGS[_high_temporal_resolution]):
 
                         # choose either negative or positive lag
                         for _symbol in [-1, 1]:
@@ -239,8 +228,7 @@ def compute_fiber_densities(_band=True, _high_time_resolution=True):
                                 )
 
                             # ignore small arrays
-                            if len(_same_fiber_densities_filtered) < \
-                                    MINIMUM_CORRELATION_TIME_FRAMES[_different_experiment]:
+                            if len(_same_fiber_densities_filtered) < compute.minimum_time_frames_for_correlation(_different_experiment):
                                 continue
 
                             _different_correlation = compute_lib.correlation(
@@ -265,14 +253,14 @@ def compute_fiber_densities(_band=True, _high_time_resolution=True):
         _same_time_lags_highest, _different_time_lags_highest
 
 
-def main(_band=True, _high_time_resolution=True, _plots=None, _plot_types=None):
+def main(_band=True, _high_temporal_resolution=True, _plots=None, _plot_types=None):
     if _plots is None:
         _plots = ['same', 'different']
     if _plot_types is None:
         _plot_types = ['scatter', 'box', 'bar']
 
     _same_correlation_vs_time_lag, _same_time_lags_arrays, _different_time_lags_arrays, _same_time_lags_highest, \
-        _different_time_lags_highest = compute_fiber_densities(_band, _high_time_resolution)
+        _different_time_lags_highest = compute_fiber_densities(_band, _high_temporal_resolution)
 
     if _plots is not None:
 
@@ -280,9 +268,10 @@ def main(_band=True, _high_time_resolution=True, _plots=None, _plot_types=None):
         if 'scatter' in _plot_types:
             for _same_tuple in _same_correlation_vs_time_lag:
                 _experiment, _series_id, _group = _same_tuple
+                _temporal_resolution = compute.temporal_resolution_in_minutes(_experiment)
                 _fig = go.Figure(
                     data=go.Scatter(
-                        x=np.array(TIME_LAGS[_high_time_resolution]) * TIME_RESOLUTION[_high_time_resolution],
+                        x=np.array(TIME_LAGS[_high_temporal_resolution]) * _temporal_resolution,
                         y=_same_correlation_vs_time_lag[_same_tuple],
                         mode='markers',
                         marker={
@@ -295,8 +284,7 @@ def main(_band=True, _high_time_resolution=True, _plots=None, _plot_types=None):
                             'title': 'Time lag (minutes)',
                             'zeroline': False,
                             'tickmode': 'array',
-                            'tickvals': np.array(TIME_LAGS[_high_time_resolution]) *
-                                        TIME_RESOLUTION[_high_time_resolution]
+                            'tickvals': np.array(TIME_LAGS[_high_temporal_resolution]) * _temporal_resolution
                         },
                         'yaxis': {
                             'title': 'Correlation',
@@ -322,7 +310,7 @@ def main(_band=True, _high_time_resolution=True, _plots=None, _plot_types=None):
                         data=[
                             go.Box(
                                 y=_y,
-                                name=_time_lag * TIME_RESOLUTION[_high_time_resolution],
+                                name=_time_lag * 5 if _high_temporal_resolution else 15,
                                 boxpoints=False,
                                 line={
                                     'width': 1
@@ -332,15 +320,14 @@ def main(_band=True, _high_time_resolution=True, _plots=None, _plot_types=None):
                                     'color': '#ea8500'
                                 },
                                 showlegend=False
-                            ) for _y, _time_lag in zip(_arrays, TIME_LAGS[_high_time_resolution])
+                            ) for _y, _time_lag in zip(_arrays, TIME_LAGS[_high_temporal_resolution])
                         ],
                         layout={
                             'xaxis': {
                                 'title': 'Time lag (minutes)',
                                 'zeroline': False,
                                 'tickmode': 'array',
-                                'tickvals': np.array(TIME_LAGS[_high_time_resolution]) *
-                                            TIME_RESOLUTION[_high_time_resolution]
+                                'tickvals': np.array(TIME_LAGS[_high_temporal_resolution]) * 5 if _high_temporal_resolution else 15
                             },
                             'yaxis': {
                                 'title': 'Inner correlation' if _name == 'same' else 'Different network correlation',
@@ -355,7 +342,7 @@ def main(_band=True, _high_time_resolution=True, _plots=None, _plot_types=None):
                     save.to_html(
                         _fig=_fig,
                         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-                        _filename='plot_box_high_time_res_' + str(_high_time_resolution) + '_' + _name
+                        _filename='plot_box_high_temporal_res_' + str(_high_temporal_resolution) + '_' + _name
                     )
 
         # bar plot
@@ -364,7 +351,7 @@ def main(_band=True, _high_time_resolution=True, _plots=None, _plot_types=None):
                 if _name in _plots:
                     _fig = go.Figure(
                         data=go.Bar(
-                            x=np.array(TIME_LAGS[_high_time_resolution]) * TIME_RESOLUTION[_high_time_resolution],
+                            x=np.array(TIME_LAGS[_high_temporal_resolution]) * 5 if _high_temporal_resolution else 15,
                             y=np.array(_sums) / sum(_sums),
                             marker={
                                 'color': '#ea8500'
@@ -375,8 +362,7 @@ def main(_band=True, _high_time_resolution=True, _plots=None, _plot_types=None):
                                 'title': 'Time lag (minutes)',
                                 'zeroline': False,
                                 'tickmode': 'array',
-                                'tickvals': np.array(TIME_LAGS[_high_time_resolution]) *
-                                            TIME_RESOLUTION[_high_time_resolution]
+                                'tickvals': np.array(TIME_LAGS[_high_temporal_resolution]) * 5 if _high_temporal_resolution else 15
                             },
                             'yaxis': {
                                 'title': 'Highest correlations fraction',
@@ -391,7 +377,7 @@ def main(_band=True, _high_time_resolution=True, _plots=None, _plot_types=None):
                     save.to_html(
                         _fig=_fig,
                         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-                        _filename='plot_bar_high_time_res_' + str(_high_time_resolution) + '_' + _name
+                        _filename='plot_bar_high_temporal_res_' + str(_high_temporal_resolution) + '_' + _name
                     )
 
 

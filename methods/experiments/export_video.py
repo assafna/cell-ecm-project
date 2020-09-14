@@ -165,7 +165,7 @@ def process_experiments(_experiments, _pairs=True):
 
 
 def process_all_experiments():
-    process_experiments(config.PAIRS)
+    process_experiments(config.CELL_PAIRS)
     process_experiments(config.SINGLE_CELL, _pairs=False)
 
 

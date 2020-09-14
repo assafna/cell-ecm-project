@@ -12,26 +12,14 @@ from statsmodels.tsa.stattools import adfuller, kpss
 from libs import compute_lib
 from libs.experiments import load, filtering, compute, paths
 from libs.experiments.config import QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER, \
-    QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER
+    QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER, all_experiments
 from plotting import save
 
-# based on time resolution
-EXPERIMENTS = {
-    False: ['SN16'],
-    True: ['SN41', 'SN44', 'SN45']
-}
-TIME_FRAME = {
-    False: 18,
-    True: 52
-}
 OFFSET_X = 0
 OFFSET_Y = 0.5
 OFFSET_Z = 0
-TIME_RESOLUTION = 5
+
 PAIR_DISTANCE_RANGE = [4, 10]
-REAL_CELLS = True
-STATIC = False
-DIRECTION = 'inside'
 MINIMUM_TIME_FRAMES = 30
 MAXIMUM_LAG = 10
 
@@ -40,32 +28,39 @@ ADF_TEST = True
 KPSS_TEST = True
 
 
-def main(_band=None, _high_time_resolution=True, _tuples_to_mark=None, _tuples_to_plot=None, _plots=None):
+def main(_band=None, _high_temporal_resolution=True, _tuples_to_mark=None, _tuples_to_plot=None, _plots=None):
     if _plots is None:
         _plots = ['whiteness', 'granger']
 
-    _experiments = load.experiments_groups_as_tuples(EXPERIMENTS[_high_time_resolution])
-    _experiments = filtering.by_time_frames_amount(_experiments, _time_frames=MINIMUM_TIME_FRAMES)
-    _experiments = filtering.by_pair_distance_range(_experiments, _distance_range=PAIR_DISTANCE_RANGE)
-    _experiments = filtering.by_real_pairs(_experiments, _real_pairs=REAL_CELLS)
-    _experiments = filtering.by_fake_static_pairs(_experiments, _fake_static_pairs=STATIC)
-    _experiments = filtering.by_band(_experiments, _band=_band)
-    print('Total experiments:', len(_experiments))
+    _experiments = all_experiments()
+    _experiments = filtering.by_categories(
+        _experiments=_experiments,
+        _is_single_cell=False,
+        _is_high_temporal_resolution=_high_temporal_resolution,
+        _is_bleb=False,
+        _is_bleb_from_start=False
+    )
+
+    _tuples = load.experiments_groups_as_tuples(_experiments)
+    _tuples = filtering.by_time_frames_amount(_tuples, _time_frames=MINIMUM_TIME_FRAMES)
+    _tuples = filtering.by_pair_distance_range(_tuples, _distance_range=PAIR_DISTANCE_RANGE)
+    _tuples = filtering.by_real_pairs(_tuples)
+    _tuples = filtering.by_band(_tuples, _band=_band)
+    print('Total tuples:', len(_tuples))
 
     _arguments = []
-    for _tuple in _experiments:
+    for _tuple in _tuples:
         _experiment, _series_id, _group = _tuple
 
         # stop when windows are overlapping
         _properties = load.group_properties(_experiment, _series_id, _group)
         _latest_time_frame = len(_properties['time_points'])
-        if DIRECTION == 'inside':
-            for _time_frame in range(len(_properties['time_points'])):
-                _pair_distance = \
-                    compute.pair_distance_in_cell_size_time_frame(_experiment, _series_id, _group, _time_frame)
-                if _pair_distance - 1 - OFFSET_X * 2 < QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER * 2:
-                    _latest_time_frame = _time_frame - 1
-                    break
+        for _time_frame in range(len(_properties['time_points'])):
+            _pair_distance = \
+                compute.pair_distance_in_cell_size_time_frame(_experiment, _series_id, _group, _time_frame)
+            if _pair_distance - 1 - OFFSET_X * 2 < QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER * 2:
+                _latest_time_frame = _time_frame - 1
+                break
 
         for _cell_id in ['left_cell', 'right_cell']:
             _arguments.append({
@@ -79,7 +74,7 @@ def main(_band=None, _high_time_resolution=True, _tuples_to_mark=None, _tuples_t
                 'offset_y': OFFSET_Y,
                 'offset_z': OFFSET_Z,
                 'cell_id': _cell_id,
-                'direction': DIRECTION,
+                'direction': 'inside',
                 'time_points': _latest_time_frame
             })
 
@@ -101,7 +96,7 @@ def main(_band=None, _high_time_resolution=True, _tuples_to_mark=None, _tuples_t
     _correlations = []
     _time_lag_correlations = []
     _end_fiber_densities = []
-    for _tuple in _experiments:
+    for _tuple in _tuples:
         _experiment, _series_id, _group = _tuple
 
         _left_cell_fiber_densities = \
@@ -224,10 +219,11 @@ def main(_band=None, _high_time_resolution=True, _tuples_to_mark=None, _tuples_t
                         _time_lag_correlations.append(_time_lag_correlation)
 
                         # end fiber density
-                        if len(_left_cell_fiber_densities_filtered) > TIME_FRAME[_high_time_resolution]:
+                        _time_frame = compute.density_time_frame(_experiment)
+                        if len(_left_cell_fiber_densities_filtered) > _time_frame:
                             _end_fiber_density = \
-                                (_left_cell_fiber_densities_filtered[TIME_FRAME[_high_time_resolution]] +
-                                 _right_cell_fiber_densities_filtered[TIME_FRAME[_high_time_resolution]]) / 2
+                                (_left_cell_fiber_densities_filtered[_time_frame] +
+                                 _right_cell_fiber_densities_filtered[_time_frame]) / 2
                         else:
                             _end_fiber_density = \
                                 (_left_cell_fiber_densities_filtered[-1] +
@@ -284,13 +280,14 @@ def main(_band=None, _high_time_resolution=True, _tuples_to_mark=None, _tuples_t
                                              _right_cell_fiber_densities_derivative]
                                 _names_array = ['Left cell', 'Right cell']
                                 _colors_array = ['#844b00', '#ea8500']
+                                _temporal_resolution = compute.temporal_resolution_in_minutes(_experiment)
                                 _fig = go.Figure(
                                     data=[
                                         go.Scatter(
                                             x=np.arange(
                                                 start=_start_time_frame,
                                                 stop=_start_time_frame + len(_left_cell_fiber_densities_derivative),
-                                                step=1) * TIME_RESOLUTION,
+                                                step=1) * _temporal_resolution,
                                             y=_y,
                                             name=_name,
                                             mode='lines',
@@ -336,7 +333,7 @@ def main(_band=None, _high_time_resolution=True, _tuples_to_mark=None, _tuples_t
                                             x=np.arange(
                                                 start=_start_time_frame,
                                                 stop=_start_time_frame + len(_y),
-                                                step=1) * TIME_RESOLUTION,
+                                                step=1) * _temporal_resolution,
                                             y=_y,
                                             name=_name,
                                             mode='lines',

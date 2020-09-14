@@ -8,22 +8,14 @@ from tqdm import tqdm
 from libs import compute_lib
 from libs.experiments import load, filtering, compute, paths
 from libs.experiments.config import QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER, \
-    QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER
+    QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, all_experiments, \
+    OUT_OF_BOUNDARIES
 from plotting import save
 
-EXPERIMENTS = ['SN16']
 OFFSET_X = 0
 OFFSET_Y = 0
 OFFSET_Z = 0
-BAND = True
-OUT_OF_BOUNDARIES = False
 PAIR_DISTANCE_RANGE = [4, 10]
-MINIMUM_CORRELATION_TIME_FRAMES = {
-    'SN16': 15,
-    'SN18': 15,
-    'SN41': 50,
-    'SN44': 50
-}
 DERIVATIVES = [0, 1, 2]
 DERIVATIVES_TEXT = ['D', 'D\'', 'D\'\'']
 
@@ -32,14 +24,23 @@ def main(_directions=None):
     if _directions is None:
         _directions = ['inside', 'outside']
 
-    _experiments = load.experiments_groups_as_tuples(EXPERIMENTS)
-    _experiments = filtering.by_real_pairs(_experiments)
-    _experiments = filtering.by_band(_experiments)
-    _experiments = filtering.by_pair_distance_range(_experiments, PAIR_DISTANCE_RANGE)
-    print('Total experiments:', len(_experiments))
+    _experiments = all_experiments()
+    _experiments = filtering.by_categories(
+        _experiments=_experiments,
+        _is_single_cell=False,
+        _is_high_temporal_resolution=False,
+        _is_bleb=False,
+        _is_bleb_from_start=False
+    )
+
+    _tuples = load.experiments_groups_as_tuples(_experiments)
+    _tuples = filtering.by_real_pairs(_experiments)
+    _tuples = filtering.by_band(_tuples)
+    _tuples = filtering.by_pair_distance_range(_tuples, PAIR_DISTANCE_RANGE)
+    print('Total tuples:', len(_tuples))
 
     _arguments = []
-    for _tuple in _experiments:
+    for _tuple in _tuples:
         _experiment, _series_id, _group = _tuple
 
         # stop when windows are overlapping
@@ -79,7 +80,7 @@ def main(_directions=None):
 
     for _direction in _directions:
         _y_arrays = [[] for _i in DERIVATIVES]
-        for _tuple in tqdm(_experiments, desc='Experiments loop'):
+        for _tuple in tqdm(_tuples, desc='Experiments loop'):
             _experiment, _series_id, _group = _tuple
 
             if (_experiment, _series_id, _group, 'left_cell', _direction) not in _windows_dictionary or \
@@ -108,8 +109,9 @@ def main(_directions=None):
                 _right_cell_fiber_densities = [_fiber_density[0] for _fiber_density in _right_cell_fiber_densities]
 
             # ignore small arrays
-            if len(_left_cell_fiber_densities) < MINIMUM_CORRELATION_TIME_FRAMES[_experiment] or \
-                    len(_right_cell_fiber_densities) < MINIMUM_CORRELATION_TIME_FRAMES[_experiment]:
+            _minimum_time_frame_for_correlation = compute.minimum_time_frames_for_correlation(_experiment)
+            if len(_left_cell_fiber_densities) < _minimum_time_frame_for_correlation or \
+                    len(_right_cell_fiber_densities) < _minimum_time_frame_for_correlation:
                 continue
 
             for _derivative_index, _derivative in enumerate(DERIVATIVES):

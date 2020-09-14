@@ -10,25 +10,34 @@ from tqdm import tqdm
 from libs import compute_lib
 from libs.experiments import load, filtering, compute, paths
 from libs.experiments.config import QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER, \
-    QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER
+    QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER, all_experiments, \
+    DERIVATIVE
 from plotting import save
 
-EXPERIMENTS = ['SN16']
 MINIMUM_TIME_FRAMES = 18
 MINIMUM_PAIR_DISTANCE = 4
+
 OFFSET_X = 0
 OFFSET_Y = 0.5
 OFFSET_Z = 0
-DERIVATIVE = 1
 
 
 def main():
-    _experiments = load.experiments_groups_as_tuples(EXPERIMENTS)
-    _experiments = filtering.by_real_pairs(_experiments)
-    _experiments = filtering.by_band(_experiments)
-    _experiments = filtering.by_time_frames_amount(_experiments, MINIMUM_TIME_FRAMES)
-    _experiments = filtering.by_pair_distance_range(_experiments, [MINIMUM_PAIR_DISTANCE, sys.maxsize])
-    _triplets = filtering.by_triplets(_experiments)
+    _experiments = all_experiments()
+    _experiments = filtering.by_categories(
+        _experiments=_experiments,
+        _is_single_cell=False,
+        _is_high_temporal_resolution=False,
+        _is_bleb=False,
+        _is_bleb_from_start=False
+    )
+
+    _tuples = load.experiments_groups_as_tuples(_experiments)
+    _tuples = filtering.by_real_pairs(_tuples)
+    _tuples = filtering.by_band(_tuples)
+    _tuples = filtering.by_time_frames_amount(_tuples, MINIMUM_TIME_FRAMES)
+    _tuples = filtering.by_pair_distance_range(_tuples, [MINIMUM_PAIR_DISTANCE, sys.maxsize])
+    _triplets = filtering.by_triplets(_tuples)
     print('Total triplets:', len(_triplets))
 
     _arguments = []

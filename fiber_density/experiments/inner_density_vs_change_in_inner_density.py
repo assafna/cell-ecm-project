@@ -8,31 +8,28 @@ import libs.compute_lib
 from libs import compute_lib
 from libs.experiments import load, filtering, compute, paths
 from libs.experiments.config import QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER, \
-    QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER
+    QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER, all_experiments, \
+    DERIVATIVE
 from plotting import save
 
-EXPERIMENTS = ['SN16']
 MINIMUM_TIME_FRAMES = sys.maxsize
-# when using offset 0.5
-# TIME_FRAMES = {
-#     'early': [0, 6],
-#     'late': [17, 23]
-# }
-# when using offset 0:
-TIME_FRAMES = {
-    'early': [0, 6],
-    'late': [12, 18]
-}
 PAIR_DISTANCE_RANGE = (5, 18)
-DIRECTION = 'inside'
-REAL_CELLS = True
-STATIC = False
-BAND = True
 
 OFFSET_X = 0
 OFFSET_Y = 0
 OFFSET_Z = 0
-DERIVATIVE = 1
+
+# according to offset_y
+TIME_FRAMES = {
+    0.5: {
+        'early': [0, 6],
+        'late': [12, 18]
+    },
+    0: {
+        'early': [0, 6],
+        'late': [17, 23]
+    }
+}
 
 PLOT = True
 CONDITIONAL_NORMALIZATION = False
@@ -43,6 +40,7 @@ Y_LABELS_END = 3.4
 X_BINS = 1
 Y_BINS = 5
 Z_MIN = 0
+
 # according to conditional normalization
 Z_MAX = {
     True: 0.2,
@@ -51,15 +49,23 @@ Z_MAX = {
 
 
 def main(_early_time_frames=True):
-    _experiments = load.experiments_groups_as_tuples(EXPERIMENTS)
-    _experiments = filtering.by_pair_distance_range(_experiments, PAIR_DISTANCE_RANGE)
-    _experiments = filtering.by_real_pairs(_experiments, _real_pairs=REAL_CELLS)
-    _experiments = filtering.by_fake_static_pairs(_experiments, _fake_static_pairs=STATIC)
-    _experiments = filtering.by_band(_experiments, _band=BAND)
-    print('Total experiments:', len(_experiments))
+    _experiments = all_experiments()
+    _experiments = filtering.by_categories(
+        _experiments=_experiments,
+        _is_single_cell=False,
+        _is_high_temporal_resolution=False,
+        _is_bleb=False,
+        _is_bleb_from_start=False
+    )
+
+    _tuples = load.experiments_groups_as_tuples(_experiments)
+    _tuples = filtering.by_pair_distance_range(_tuples, PAIR_DISTANCE_RANGE)
+    _tuples = filtering.by_real_pairs(_tuples)
+    _tuples = filtering.by_band(_tuples)
+    print('Total tuples:', len(_tuples))
 
     _arguments = []
-    for _tuple in _experiments:
+    for _tuple in _tuples:
         _experiment, _series_id, _group = _tuple
         for _cell_id in ['left_cell', 'right_cell']:
             _arguments.append({
@@ -73,7 +79,7 @@ def main(_early_time_frames=True):
                 'offset_y': OFFSET_Y,
                 'offset_z': OFFSET_Z,
                 'cell_id': _cell_id,
-                'direction': DIRECTION
+                'direction': 'inside'
             })
 
     _windows_dictionary, _windows_to_compute = compute.windows(_arguments,
@@ -82,15 +88,15 @@ def main(_early_time_frames=True):
 
     _heatmap_fiber = []
     _heatmap_fiber_change = []
-    for _tuple in _experiments:
+    for _tuple in _tuples:
         _experiment, _series_id, _group = _tuple
         _series_normalization = load.normalization_series_file_data(_experiment, _series_id)
         for _cell_id in ['left_cell', 'right_cell']:
             _fiber_densities_by_time = [_fiber_densities[_tuple] for _tuple in
                                         _windows_dictionary[(_experiment, _series_id, _group, _cell_id)]]
             _cell_fiber_densities = \
-                _fiber_densities_by_time[TIME_FRAMES['early'][0] if _early_time_frames else TIME_FRAMES['late'][0]:
-                                         TIME_FRAMES['early'][1] if _early_time_frames else TIME_FRAMES['late'][1]]
+                _fiber_densities_by_time[TIME_FRAMES[OFFSET_Y]['early'][0] if _early_time_frames else TIME_FRAMES[OFFSET_Y]['late'][0]:
+                                         TIME_FRAMES[OFFSET_Y]['early'][1] if _early_time_frames else TIME_FRAMES[OFFSET_Y]['late'][1]]
             _properties = load.group_properties(_experiment, _series_id, _group)
             _cell_fiber_densities = compute.remove_blacklist(
                 _experiment, _series_id, _properties['cells_ids'][_cell_id], _cell_fiber_densities)
@@ -201,8 +207,7 @@ def main(_early_time_frames=True):
         save.to_html(
             _fig=_fig,
             _path=os.path.join(paths.PLOTS, save.get_module_name()),
-            _filename='plot_real_' + str(REAL_CELLS) + '_static_' + str(STATIC) + '_band_' +
-                      str(BAND) + '_direction_' + DIRECTION + '_early_' + str(_early_time_frames)
+            _filename='plot_early_' + str(_early_time_frames)
         )
 
 

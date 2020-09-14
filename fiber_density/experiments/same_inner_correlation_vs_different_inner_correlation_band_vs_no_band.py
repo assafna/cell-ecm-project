@@ -8,13 +8,13 @@ from libs.experiments import paths
 from plotting import save
 
 
-def main(_high_time_resolution=False):
+def main(_high_temporal_resolution=False):
     _y_arrays = [[], []]
     for _band_index, _band in enumerate([True, False]):
         print('Band:', _band)
         _same_correlations_array, _different_correlations_array = \
             same_inner_correlation_vs_different_inner_correlation.compute_fiber_densities(_band=_band,
-                                                                                          _high_time_resolution=_high_time_resolution)
+                                                                                          _high_temporal_resolution=_high_temporal_resolution)
         for _same, _different in zip(_same_correlations_array, _different_correlations_array):
             _point_distance = compute_lib.distance_from_a_point_to_a_line(
                 _line=[-1, -1, 1, 1],
@@ -55,7 +55,7 @@ def main(_high_time_resolution=False):
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        _filename='plot_high_time_res_' + str(_high_time_resolution)
+        _filename='plot_high_temporal_res_' + str(_high_temporal_resolution)
     )
 
 

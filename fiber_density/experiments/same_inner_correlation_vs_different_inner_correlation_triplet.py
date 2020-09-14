@@ -9,7 +9,7 @@ from tqdm import tqdm
 from libs import compute_lib
 from libs.experiments import load, compute, paths
 from libs.experiments.config import QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER, \
-    QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER
+    QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER, DERIVATIVE
 from plotting import save
 
 TRIPLET = [
@@ -17,10 +17,10 @@ TRIPLET = [
     ('SN16', 21, 'cells_1_3'),
     ('SN16', 21, 'cells_2_3')
 ]
+
 OFFSET_X = 0
 OFFSET_Y = 0.5
 OFFSET_Z = 0
-DERIVATIVE = 1
 
 
 def main():

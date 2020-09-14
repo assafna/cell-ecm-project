@@ -8,58 +8,49 @@ from scipy.stats import wilcoxon
 from libs import compute_lib
 from libs.experiments import load, filtering, compute, paths, organize
 from libs.experiments.config import QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER, \
-    QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER
+    QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER, all_experiments, \
+    DERIVATIVE
 from plotting import save
 
-# based on time resolution
-EXPERIMENTS = {
-    False: ['SN16'],
-    True: ['SN41', 'SN44', 'SN45']
-}
-TIME_FRAMES_STEPS = {
-    'SN16': range(1, 6),
-    'SN41': range(1, 18),
-    'SN44': range(1, 18),
-    'SN45': range(1, 18)
-}
-TIME_RESOLUTION = {
-    'SN16': 15,
-    'SN41': 5,
-    'SN44': 5,
-    'SN45': 5
-}
 OFFSET_X = 0
 OFFSET_Y = 0.5
 OFFSET_Z = 0
-DERIVATIVE = 1
+
 PAIR_DISTANCE_RANGE = [4, 10]
-REAL_CELLS = True
-STATIC = False
-MINIMUM_CORRELATION_TIME_FRAMES = {
-    'SN16': 15,
-    'SN18': 15,
-    'SN41': 50,
-    'SN44': 50,
-    'SN45': 50
+
+# according to high temporal resolution
+TIME_FRAMES_STEPS = {
+    False: range(1, 6),
+    True: range(1, 18)
+}
+TEMPORAL_RESOLUTION = {
+    False: 15,
+    True: 5
 }
 GENERAL_MINIMUM_CORRELATION_TIME_FRAMES = {
-    'SN16': 5,
-    'SN41': 15,
-    'SN44': 15,
-    'SN45': 15
+    False: 5,
+    True: 15
 }
 
 
-def main(_high_time_resolution=True):
-    _experiments = load.experiments_groups_as_tuples(EXPERIMENTS[_high_time_resolution])
-    _experiments = filtering.by_pair_distance_range(_experiments, PAIR_DISTANCE_RANGE)
-    _experiments = filtering.by_real_pairs(_experiments, _real_pairs=REAL_CELLS)
-    _experiments = filtering.by_fake_static_pairs(_experiments, _fake_static_pairs=STATIC)
-    _experiments = filtering.by_band(_experiments)
-    print('Total experiments:', len(_experiments))
+def main(_high_temporal_resolution=True):
+    _experiments = all_experiments()
+    _experiments = filtering.by_categories(
+        _experiments=_experiments,
+        _is_single_cell=False,
+        _is_high_temporal_resolution=_high_temporal_resolution,
+        _is_bleb=False,
+        _is_bleb_from_start=False
+    )
+
+    _tuples = load.experiments_groups_as_tuples(_experiments)
+    _tuples = filtering.by_pair_distance_range(_tuples, PAIR_DISTANCE_RANGE)
+    _tuples = filtering.by_real_pairs(_tuples)
+    _tuples = filtering.by_band(_tuples)
+    print('Total tuples:', len(_tuples))
 
     _arguments = []
-    for _tuple in _experiments:
+    for _tuple in _tuples:
         _experiment, _series_id, _group = _tuple
 
         # stop when windows are overlapping
@@ -97,12 +88,12 @@ def main(_high_time_resolution=True):
         for _key in _windows_dictionary
     }
 
-    _tuples_by_experiment = organize.by_experiment(_experiments)
+    _tuples_by_experiment = organize.by_experiment(_tuples)
 
-    _y_arrays = [[] for _i in TIME_FRAMES_STEPS[EXPERIMENTS[_high_time_resolution][0]]]
+    _y_arrays = [[] for _i in TIME_FRAMES_STEPS[_high_temporal_resolution]]
     _x_array = []
-    for _time_frame_index, _time_frame_every in enumerate(TIME_FRAMES_STEPS[EXPERIMENTS[_high_time_resolution][0]]):
-        print('Time resolution (minutes):', _time_frame_every * TIME_RESOLUTION[EXPERIMENTS[_high_time_resolution][0]])
+    for _time_frame_index, _time_frame_every in enumerate(TIME_FRAMES_STEPS[_high_temporal_resolution]):
+        print('Temporal resolution (minutes):', _time_frame_every * TEMPORAL_RESOLUTION[_high_temporal_resolution])
         _higher_same_counter = 0
         _valid_tuples = []
         for _time_frame_begin in range(_time_frame_every):
@@ -143,8 +134,7 @@ def main(_high_time_resolution=True):
                         )
 
                     # ignore small arrays
-                    if len(_same_left_cell_fiber_densities_filtered) < \
-                            MINIMUM_CORRELATION_TIME_FRAMES[_same_experiment]:
+                    if len(_same_left_cell_fiber_densities_filtered) < compute.minimum_time_frames_for_correlation(_same_experiment):
                         continue
 
                     _same_left_cell_fiber_densities_filtered = \
@@ -203,8 +193,7 @@ def main(_high_time_resolution=True):
                                     )
 
                                 # ignore small arrays
-                                if len(_same_fiber_densities_filtered) < \
-                                        MINIMUM_CORRELATION_TIME_FRAMES[_different_experiment]:
+                                if len(_same_fiber_densities_filtered) < compute.minimum_time_frames_for_correlation(_different_experiment):
                                     continue
 
                                 _same_fiber_densities_filtered = \
@@ -240,7 +229,7 @@ def main(_high_time_resolution=True):
         print('Wilcoxon around the zero:')
         print(wilcoxon(_y_arrays[_time_frame_index]))
         print('Higher same amount:', _higher_same_counter / len(_y_arrays[_time_frame_index]))
-        _x_array.append(_time_frame_every * TIME_RESOLUTION[EXPERIMENTS[_high_time_resolution][0]])
+        _x_array.append(_time_frame_every * TEMPORAL_RESOLUTION[_high_temporal_resolution])
 
     # plot
     _fig = go.Figure(
@@ -262,7 +251,7 @@ def main(_high_time_resolution=True):
         ),
         layout={
             'xaxis': {
-                'title': 'Time resolution (minutes)',
+                'title': 'Temporal resolution (minutes)',
                 'zeroline': False
             },
             'yaxis': {
@@ -278,7 +267,7 @@ def main(_high_time_resolution=True):
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        _filename='plot_high_time_res_' + str(_high_time_resolution)
+        _filename='plot_high_temporal_res_' + str(_high_temporal_resolution)
     )
 
 

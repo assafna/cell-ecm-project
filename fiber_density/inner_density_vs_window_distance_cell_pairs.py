@@ -11,6 +11,7 @@ from libs.experiments import compute as experiments_compute
 from libs.experiments import config as experiments_config
 from libs.experiments import filtering as experiments_filtering
 from libs.experiments import load as experiments_load
+from libs.experiments.config import all_experiments, OUT_OF_BOUNDARIES
 from libs.simulations import compute as simulations_compute
 from libs.simulations import config as simulations_config
 from libs.simulations import filtering as simulations_filtering
@@ -22,11 +23,9 @@ OFFSET_Y = 0
 
 # experiments
 PAIR_DISTANCE_RANGE = (6, 8)
-EXPERIMENTS = ['SN16']
-EXPERIMENTS_TIME_FRAME = 18
-BAND = True
+EXPERIMENTS_TIME_FRAME = experiments_config.DENSITY_TIME_FRAME['regular_temporal_resolution']
 OFFSET_Z = 0
-OUT_OF_BOUNDARIES = False
+
 
 # simulations
 PAIR_DISTANCE = 7
@@ -41,18 +40,25 @@ SIMULATIONS_TIME_POINT = {
 
 
 def compute_experiments_data():
-    _experiments = experiments_load.experiments_groups_as_tuples(EXPERIMENTS)
-    _experiments = experiments_filtering.by_time_frames_amount(_experiments, EXPERIMENTS_TIME_FRAME)
-    _experiments = experiments_filtering.by_real_pairs(_experiments)
-    _experiments = experiments_filtering.by_pair_distance(
-        _experiments, PAIR_DISTANCE)
-    if BAND:
-        _experiments = experiments_filtering.by_band(_experiments)
-    print('Total experiments:', len(_experiments))
+    _experiments = all_experiments()
+    _experiments = experiments_filtering.by_categories(
+        _experiments=_experiments,
+        _is_single_cell=False,
+        _is_high_temporal_resolution=False,
+        _is_bleb=False,
+        _is_bleb_from_start=False
+    )
+
+    _tuples = experiments_load.experiments_groups_as_tuples(_experiments)
+    _tuples = experiments_filtering.by_time_frames_amount(_tuples, EXPERIMENTS_TIME_FRAME)
+    _tuples = experiments_filtering.by_real_pairs(_tuples)
+    _tuples = experiments_filtering.by_pair_distance(_tuples, PAIR_DISTANCE)
+    _tuples = experiments_filtering.by_band(_tuples)
+    print('Total experiments:', len(_tuples))
 
     _max_offsets_x = []
     _arguments = []
-    for _tuple in _experiments:
+    for _tuple in _tuples:
         _experiment, _series_id, _group = _tuple
         _pair_distance = experiments_compute.pair_distance_in_cell_size_time_frame(
             _experiment, _series_id, _group, EXPERIMENTS_TIME_FRAME - 1
@@ -85,7 +91,7 @@ def compute_experiments_data():
     _fiber_densities = experiments_compute.fiber_densities(_windows_to_compute)
 
     _experiments_fiber_densities = [[] for _i in range(len(_max_offsets_x))]
-    for _tuple in tqdm(_experiments, desc='Experiments loop'):
+    for _tuple in tqdm(_tuples, desc='Experiments loop'):
         _experiment, _series_id, _group = _tuple
         for _offset_x_index, _offset_x in enumerate(_max_offsets_x):
             for _cell_id in ['left_cell', 'right_cell']:

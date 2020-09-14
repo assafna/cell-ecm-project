@@ -9,41 +9,38 @@ from tqdm import tqdm
 from libs import compute_lib
 from libs.experiments import load, filtering, compute, paths, organize
 from libs.experiments.config import QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER, \
-    QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER
+    QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER, all_experiments, \
+    DERIVATIVE
 from plotting import save
 
-# based on time resolution
-EXPERIMENTS = {
-    False: ['SN16'],
-    True: ['SN41', 'SN44', 'SN45']
-}
 OFFSET_X = 0
-DERIVATIVE = 1
+
 PAIR_DISTANCE_RANGE = [4, 10]
-MINIMUM_CORRELATION_TIME_FRAMES = {
-    'SN16': 15,
-    'SN18': 15,
-    'SN20_Bleb_fromStart': 15,
-    'SN41': 50,
-    'SN44': 50,
-    'SN45': 50
-}
 
 
-def compute_fiber_densities(_real_cells=True, _static=False, _band=True, _high_time_resolution=False,
+def compute_fiber_densities(_real_cells=True, _static=False, _band=True, _high_temporal_resolution=False,
                             _pair_distance_range=None, _offset_y=0.5, _offset_z=0):
     if _pair_distance_range is None:
         _pair_distance_range = PAIR_DISTANCE_RANGE
 
-    _experiments = load.experiments_groups_as_tuples(EXPERIMENTS[_high_time_resolution])
-    _experiments = filtering.by_pair_distance_range(_experiments, _pair_distance_range)
-    _experiments = filtering.by_real_pairs(_experiments, _real_pairs=_real_cells)
-    _experiments = filtering.by_fake_static_pairs(_experiments, _fake_static_pairs=_static)
-    _experiments = filtering.by_band(_experiments, _band=_band)
-    print('Total experiments:', len(_experiments))
+    _experiments = all_experiments()
+    _experiments = filtering.by_categories(
+        _experiments=_experiments,
+        _is_single_cell=False,
+        _is_high_temporal_resolution=_high_temporal_resolution,
+        _is_bleb=False,
+        _is_bleb_from_start=False
+    )
+
+    _tuples = load.experiments_groups_as_tuples(_experiments)
+    _tuples = filtering.by_pair_distance_range(_tuples, _pair_distance_range)
+    _tuples = filtering.by_real_pairs(_tuples, _real_pairs=_real_cells)
+    _tuples = filtering.by_fake_static_pairs(_tuples, _fake_static_pairs=_static)
+    _tuples = filtering.by_band(_tuples, _band=_band)
+    print('Total tuples:', len(_tuples))
 
     _arguments = []
-    for _tuple in _experiments:
+    for _tuple in _tuples:
         _experiment, _series_id, _group = _tuple
 
         # stop when windows are overlapping
@@ -81,7 +78,7 @@ def compute_fiber_densities(_real_cells=True, _static=False, _band=True, _high_t
         for _key in _windows_dictionary
     }
 
-    _tuples_by_experiment = organize.by_experiment(_experiments)
+    _tuples_by_experiment = organize.by_experiment(_tuples)
 
     _same_correlations_array = []
     _different_correlations_array = []
@@ -124,8 +121,7 @@ def compute_fiber_densities(_real_cells=True, _static=False, _band=True, _high_t
                 )
 
             # ignore small arrays
-            if len(_same_left_cell_fiber_densities_filtered) < \
-                    MINIMUM_CORRELATION_TIME_FRAMES[_same_experiment]:
+            if len(_same_left_cell_fiber_densities_filtered) < compute.minimum_time_frames_for_correlation(_same_experiment):
                 continue
 
             _same_correlation = compute_lib.correlation(
@@ -174,8 +170,7 @@ def compute_fiber_densities(_real_cells=True, _static=False, _band=True, _high_t
                             )
 
                         # ignore small arrays
-                        if len(_same_fiber_densities_filtered) < \
-                                MINIMUM_CORRELATION_TIME_FRAMES[_different_experiment]:
+                        if len(_same_fiber_densities_filtered) < compute.minimum_time_frames_for_correlation(_different_experiment):
                             continue
 
                         _different_correlation = compute_lib.correlation(
@@ -202,14 +197,14 @@ def compute_fiber_densities(_real_cells=True, _static=False, _band=True, _high_t
     return _same_correlations_array, _different_correlations_array
 
 
-def main(_real_cells=True, _static=False, _band=True, _high_time_resolution=False, _pair_distance_range=None,
+def main(_real_cells=True, _static=False, _band=True, _high_temporal_resolution=False, _pair_distance_range=None,
          _offset_y=0.5, _offset_z=0):
     if _pair_distance_range is None:
         _pair_distance_range = PAIR_DISTANCE_RANGE
 
     _same_correlations_array, _different_correlations_array = \
         compute_fiber_densities(
-            _real_cells, _static, _band, _high_time_resolution, _pair_distance_range, _offset_y, _offset_z)
+            _real_cells, _static, _band, _high_temporal_resolution, _pair_distance_range, _offset_y, _offset_z)
 
     # plot
     _fig = go.Figure(
@@ -280,7 +275,7 @@ def main(_real_cells=True, _static=False, _band=True, _high_time_resolution=Fals
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
         _filename='plot_real_' + str(_real_cells) + '_static_' + str(_static) + '_band_' + str(_band) +
-                  '_high_time_' + str(_high_time_resolution) + '_range_' +
+                  '_high_time_' + str(_high_temporal_resolution) + '_range_' +
                   '_'.join([str(_distance) for _distance in _pair_distance_range]) + '_y_' + str(_offset_y) + '_z_'
                   + str(_offset_z)
     )

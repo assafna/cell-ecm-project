@@ -2,7 +2,7 @@ SINGLE_CELL = [
     'Single_Cell_Ortal'
 ]
 
-PAIRS = [
+CELL_PAIRS = [
     'SN16',
     'SN41',
     'SN44',
@@ -10,6 +10,33 @@ PAIRS = [
     'SN20_Bleb_fromStart',
     'SN26_BlebAdded'
 ]
+
+BLEB = [
+    'SN20_Bleb_fromStart',
+    'SN26_BlebAdded'
+]
+
+BLEB_FROM_START = [
+    'SN20_Bleb_fromStart'
+]
+
+AFTER_BLEB_INJECTION_FIRST_TIME_FRAME = {
+    'SN26_BlebAdded': 9
+}
+
+MINIMUM_TIME_FRAMES_CORRELATION = {
+    'regular_temporal_resolution': 15,
+    'high_temporal_resolution': 50
+}
+
+DENSITY_TIME_FRAME = {
+    'regular_temporal_resolution': 18,
+    'high_temporal_resolution': 52
+}
+
+HIGH_TEMPORAL_RESOLUTION_IN_MINUTES = 5
+DERIVATIVE = 1
+OUT_OF_BOUNDARIES = False
 
 IMAGE_FIBER_CHANNEL_INDEX = 0
 IMAGE_CELL_CHANNEL_INDEX = 1
@@ -22,5 +49,5 @@ QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER = 1
 QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER = 1
 
 
-def experiments():
-    return SINGLE_CELL + PAIRS
+def all_experiments():
+    return SINGLE_CELL + CELL_PAIRS

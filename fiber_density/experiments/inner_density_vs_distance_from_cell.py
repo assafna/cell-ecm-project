@@ -5,35 +5,44 @@ import numpy as np
 import plotly.graph_objs as go
 
 from libs import compute_lib
-from libs.experiments import load, compute, config, filtering, organize, paths
+from libs.experiments import load, compute, filtering, organize, paths
 from libs.experiments.config import QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER, \
-    QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER
+    QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER, all_experiments, \
+    OUT_OF_BOUNDARIES
 from plotting import save
 
-PAIRS_EXPERIMENTS = ['SN16']
-PAIRS_PAIR_DISTANCE = 7
-PAIRS_BAND = True
-TIME_FRAME = 18
+PAIR_DISTANCE = 7
+
+# according to pair distance
 OFFSET_X_END = {
     5: 2.8,
     7: 5.3
 }
+
 OFFSET_X_STEP = 0.1
-OFFSETS_X = np.arange(start=0, stop=OFFSET_X_END[PAIRS_PAIR_DISTANCE] + OFFSET_X_STEP, step=OFFSET_X_STEP)
+OFFSETS_X = np.arange(start=0, stop=OFFSET_X_END[PAIR_DISTANCE] + OFFSET_X_STEP, step=OFFSET_X_STEP)
 OFFSET_Y = 0
 OFFSET_Z = 0
-OUT_OF_BOUNDARIES = False
 
 
 def main():
-    # single cell
     print('Single Cell')
-    _experiments = load.experiments_groups_as_tuples(config.SINGLE_CELL)
-    _experiments = filtering.by_time_frames_amount(_experiments, TIME_FRAME)
+    _experiments = all_experiments()
+    _experiments = filtering.by_categories(
+        _experiments=_experiments,
+        _is_single_cell=True,
+        _is_high_temporal_resolution=False,
+        _is_bleb=False,
+        _is_bleb_from_start=False
+    )
+
+    _tuples = load.experiments_groups_as_tuples(_experiments)
+    _tuples = filtering.by_time_frames_amount(_tuples, compute.minimum_time_frames_for_correlation(_experiments[0]))
 
     _arguments = []
-    for _tuple in _experiments:
+    for _tuple in _tuples:
         _experiment, _series_id, _group = _tuple
+        _time_frame = compute.minimum_time_frames_for_correlation(_experiment)
         for _offset_x, _direction in product(OFFSETS_X, ['left', 'right']):
             _arguments.append({
                 'experiment': _experiment,
@@ -47,24 +56,24 @@ def main():
                 'offset_z': OFFSET_Z,
                 'cell_id': 'cell',
                 'direction': _direction,
-                'time_point': TIME_FRAME - 1
+                'time_point': _time_frame - 1
             })
 
     _windows_dictionary, _windows_to_compute = \
         compute.windows(_arguments, _keys=['experiment', 'series_id', 'group', 'offset_x', 'direction'])
     _fiber_densities = compute.fiber_densities(_windows_to_compute)
 
-    _experiments = organize.by_single_cell_id(_experiments)
+    _tuples = organize.by_single_cell_id(_tuples)
 
     _single_cell_fiber_densities = [[] for _i in range(len(OFFSETS_X))]
-    for _tuple in _experiments:
+    for _tuple in _tuples:
         _experiment, _series_id, _cell_id = _tuple
         print('Experiment:', _experiment, 'Series ID:', _series_id, 'Cell ID:', _cell_id, sep='\t')
         _offset_index = 0
         _normalization = load.normalization_series_file_data(_experiment, _series_id)
         for _offset_x in OFFSETS_X:
             _cell_fiber_densities = []
-            for _cell_tuple in _experiments[_tuple]:
+            for _cell_tuple in _tuples[_tuple]:
                 _, _, _group = _cell_tuple
                 for _direction in ['left', 'right']:
                     _window_tuple = _windows_dictionary[(_experiment, _series_id, _group, _offset_x, _direction)][0]
@@ -85,18 +94,26 @@ def main():
                 _single_cell_fiber_densities[_offset_index].append(np.mean(_cell_fiber_densities))
             _offset_index += 1
 
-    # pairs
     print('Pairs')
-    _experiments = load.experiments_groups_as_tuples(PAIRS_EXPERIMENTS)
-    _experiments = filtering.by_time_frames_amount(_experiments, TIME_FRAME)
-    _experiments = filtering.by_real_pairs(_experiments)
-    _experiments = filtering.by_pair_distance(_experiments, PAIRS_PAIR_DISTANCE)
-    if PAIRS_BAND:
-        _experiments = filtering.by_band(_experiments)
+    _experiments = all_experiments()
+    _experiments = filtering.by_categories(
+        _experiments=_experiments,
+        _is_single_cell=False,
+        _is_high_temporal_resolution=False,
+        _is_bleb=False,
+        _is_bleb_from_start=False
+    )
+
+    _tuples = load.experiments_groups_as_tuples(_experiments)
+    _tuples = filtering.by_time_frames_amount(_tuples, compute.minimum_time_frames_for_correlation(_experiments[0]))
+    _tuples = filtering.by_real_pairs(_tuples)
+    _tuples = filtering.by_pair_distance(_tuples, PAIR_DISTANCE)
+    _tuples = filtering.by_band(_tuples)
 
     _arguments = []
-    for _tuple in _experiments:
+    for _tuple in _tuples:
         _experiment, _series_id, _group = _tuple
+        _time_frame = compute.minimum_time_frames_for_correlation(_experiment)
         for _offset_x in OFFSETS_X:
             _arguments.append({
                 'experiment': _experiment,
@@ -110,7 +127,7 @@ def main():
                 'offset_z': OFFSET_Z,
                 'cell_id': 'left_cell',
                 'direction': 'inside',
-                'time_point': TIME_FRAME - 1
+                'time_point': _time_frame - 1
             })
 
     _windows_dictionary, _windows_to_compute = \
@@ -118,7 +135,7 @@ def main():
     _fiber_densities = compute.fiber_densities(_windows_to_compute)
 
     _pairs_fiber_densities = [[] for _i in range(len(OFFSETS_X))]
-    for _tuple in _experiments:
+    for _tuple in _tuples:
         _experiment, _series_id, _group = _tuple
         print('Experiment:', _experiment, 'Series ID:', _series_id, 'Group:', _group, sep='\t')
         _offset_index = 0
@@ -188,7 +205,7 @@ def main():
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        _filename='plot_distance_' + str(PAIRS_PAIR_DISTANCE) + '_time_frame_' + str(TIME_FRAME)
+        _filename='plot_distance_' + str(PAIR_DISTANCE)
     )
 
 

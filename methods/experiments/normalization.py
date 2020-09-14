@@ -109,7 +109,7 @@ def process_experiments(_experiments, _overwrite=False):
 
 
 def process_all_experiments(_overwrite=False):
-    process_experiments(config.experiments())
+    process_experiments(config.all_experiments())
 
 
 if __name__ == '__main__':

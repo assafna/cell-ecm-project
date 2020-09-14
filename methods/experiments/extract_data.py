@@ -26,7 +26,7 @@ def process_experiments(_experiments):
 
 def process_all_experiments():
     # TODO: handle single cell
-    process_experiments(config.PAIRS)
+    process_experiments(config.CELL_PAIRS)
 
 
 if __name__ == '__main__':

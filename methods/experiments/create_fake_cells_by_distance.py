@@ -346,7 +346,7 @@ def process_experiment(_experiment, _overwrite=False):
 
 
 def process_all_experiments(_overwrite=False):
-    for _experiment in config.PAIRS:
+    for _experiment in config.CELL_PAIRS:
         process_experiment(_experiment, _overwrite)
 
 

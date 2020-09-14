@@ -127,11 +127,11 @@ def figure_4_main():
 
     print('\nPanel D')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(_band=True,
-                                                                                         _high_time_resolution=False)
+                                                                                         _high_temporal_resolution=False)
 
     print('\nPanel E')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_vs_pair_distance.main(
-        _band=True, _high_time_resolution=False)
+        _band=True, _high_temporal_resolution=False)
 
     print('\nPanel G')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_triplet.main()
@@ -174,63 +174,63 @@ def figure_si_4_detrending_experiments():
 def figure_si_4_same_vs_diff_distances():
     print('\nPanel A')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(
-        _band=True, _high_time_resolution=False, _pair_distance_range=[4, 6])
+        _band=True, _high_temporal_resolution=False, _pair_distance_range=[4, 6])
 
     print('\nPanel B')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(
-        _band=True, _high_time_resolution=False, _pair_distance_range=[6, 8])
+        _band=True, _high_temporal_resolution=False, _pair_distance_range=[6, 8])
 
     print('\nPanel C')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(
-        _band=True, _high_time_resolution=False, _pair_distance_range=[8, 10])
+        _band=True, _high_temporal_resolution=False, _pair_distance_range=[8, 10])
 
 
 def figure_si_4_same_vs_diff_controls():
     print('\nPanel B')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(
-        _real_cells=False, _static=False, _band=True, _high_time_resolution=False)
+        _real_cells=False, _static=False, _band=True, _high_temporal_resolution=False)
 
     print('\nPanel D')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(
-        _real_cells=False, _static=True, _band=False, _high_time_resolution=False)
+        _real_cells=False, _static=True, _band=False, _high_temporal_resolution=False)
 
 
 def figure_si_4_real_vs_fake():
     print('\nPanels A & B')
     fiber_density.experiments.same_real_inner_correlation_vs_different_fake_inner_correlation.main(
-        _offset_y=0, _high_time_resolution=False)
+        _offset_y=0, _high_temporal_resolution=False)
 
     print('\nPanels C & D')
     fiber_density.experiments.same_real_inner_correlation_vs_different_fake_inner_correlation.main(
-        _offset_y=0.5, _high_time_resolution=False)
+        _offset_y=0.5, _high_temporal_resolution=False)
 
     print('\nPanels E & F')
     fiber_density.experiments.same_real_inner_correlation_vs_different_fake_inner_correlation.main(
-        _offset_y=0, _high_time_resolution=True)
+        _offset_y=0, _high_temporal_resolution=True)
 
     print('\nPanels G & H')
     fiber_density.experiments.same_real_inner_correlation_vs_different_fake_inner_correlation.main(
-        _offset_y=0.5, _high_time_resolution=True)
+        _offset_y=0.5, _high_temporal_resolution=True)
 
 
-def figure_si_4_same_vs_diff_high_time_res():
+def figure_si_4_same_vs_diff_high_temporal_res():
     print('\nPanel A')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(
-        _band=True, _high_time_resolution=True)
+        _band=True, _high_temporal_resolution=True)
 
     print('\nPanel B')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(
-        _band=False, _high_time_resolution=True)
+        _band=False, _high_temporal_resolution=True)
 
 
 def figure_si_4_temporal_assessment():
     print('\nPanel A')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_temporal_assessment.main(
-        _high_time_resolution=False)
+        _high_temporal_resolution=False)
 
     print('\nPanel B')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_temporal_assessment.main(
-        _high_time_resolution=True)
+        _high_temporal_resolution=True)
 
 
 def figure_4_all():
@@ -248,7 +248,7 @@ def figure_4_all():
     figure_si_4_same_vs_diff_distances()
 
     print('\nFigure SI 4 - Same vs. Different - High Temporal Resolution (S11)')
-    figure_si_4_same_vs_diff_high_time_res()
+    figure_si_4_same_vs_diff_high_temporal_res()
 
     print('\nFigure SI 4 - Temporal Assessment (S12)')
     figure_si_4_temporal_assessment()
@@ -262,11 +262,11 @@ def figure_4_all():
 
 def figure_5_main():
     print('\nPanel A')
-    fiber_density.experiments.inner_density_vs_offsets_in_axes.main(_high_time_resolution=False)
+    fiber_density.experiments.inner_density_vs_offsets_in_axes.main(_high_temporal_resolution=False)
 
     print('\nPanel B')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_offsets_in_axes.main(
-        _high_time_resolution=False)
+        _high_temporal_resolution=False)
 
     print('\nPanel C')
     fiber_density.experiments.inner_density_vs_same_inner_correlation_vs_different_inner_correlation_vs_z_offset.main()
@@ -276,11 +276,11 @@ def figure_5_main():
 
     print('\nPanel G')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(_band=False,
-                                                                                         _high_time_resolution=False)
+                                                                                         _high_temporal_resolution=False)
 
     print('\nPanel H')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_band_vs_no_band.main(
-        _high_time_resolution=False)
+        _high_temporal_resolution=False)
 
 
 def figure_si_5_saturation():
@@ -291,13 +291,13 @@ def figure_si_5_saturation():
     fiber_density.experiments.inner_correlation_vs_saturation.main(_offset_y=0.5)
 
 
-def figure_si_5_high_time_res():
+def figure_si_5_high_temporal_res():
     print('\nPanel A')
-    fiber_density.experiments.inner_density_vs_offsets_in_axes.main(_high_time_resolution=True)
+    fiber_density.experiments.inner_density_vs_offsets_in_axes.main(_high_temporal_resolution=True)
 
     print('\nPanel B')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_offsets_in_axes.main(
-        _high_time_resolution=True)
+        _high_temporal_resolution=True)
 
 
 def figure_si_5_simulations():
@@ -311,11 +311,11 @@ def figure_si_5_simulations():
 
 def figure_si_5_no_band():
     print('\nPanel A')
-    fiber_density.experiments.inner_density_vs_offsets_in_axes.main(_band=False, _high_time_resolution=False)
+    fiber_density.experiments.inner_density_vs_offsets_in_axes.main(_band=False, _high_temporal_resolution=False)
 
     print('\nPanel B')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_offsets_in_axes.main(
-        _band=False, _high_time_resolution=False)
+        _band=False, _high_temporal_resolution=False)
 
 
 def figure_5_all():
@@ -327,7 +327,7 @@ def figure_5_all():
     figure_si_5_saturation()
 
     print('\nFigure SI 5 - High Temporal Resolution (S17)')
-    figure_si_5_high_time_res()
+    figure_si_5_high_temporal_res()
 
     # print('\nFigure SI 5 - Simulations')
     # figure_si_5_simulations()
@@ -339,23 +339,23 @@ def figure_5_all():
 def figure_6_main():
     print('\nPanels B & C')
     fiber_density.experiments.matchmaking_by_inner_correlation.main(
-        _real_cells=True, _offset_y=0.5, _high_time_resolution=False)
+        _real_cells=True, _offset_y=0.5, _high_temporal_resolution=False)
 
     print('\nPanel D')
     fiber_density.experiments.matchmaking_by_inner_correlation.main(
-        _real_cells=True, _offset_y=0, _high_time_resolution=False)
+        _real_cells=True, _offset_y=0, _high_temporal_resolution=False)
 
     print('\nPanel E')
     fiber_density.experiments.matchmaking_by_inner_correlation.main(
-        _real_cells=False, _offset_y=0.5, _high_time_resolution=False)
+        _real_cells=False, _offset_y=0.5, _high_temporal_resolution=False)
 
     print('\nPanel F')
     fiber_density.experiments.matchmaking_by_inner_correlation.main(
-        _real_cells=True, _offset_y=0.5, _high_time_resolution=True)
+        _real_cells=True, _offset_y=0.5, _high_temporal_resolution=True)
 
     print('\nPanel G')
     fiber_density.experiments.matchmaking_by_inner_correlation.main(
-        _real_cells=True, _offset_y=0.5, _high_time_resolution=True, _band=False)
+        _real_cells=True, _offset_y=0.5, _high_temporal_resolution=True, _band=False)
 
 
 def figure_6_all():
@@ -383,7 +383,7 @@ def figure_7_main():
 
     print('\nPanel F')
     fiber_density.experiments.inner_dynamics_granger_causality.main(
-        _band=None, _high_time_resolution=True, _tuples_to_mark=[('SN45', 2, 'cells_2_3'), ('SN45', 1, 'cells_1_3')],
+        _band=None, _high_temporal_resolution=True, _tuples_to_mark=[('SN45', 2, 'cells_2_3'), ('SN45', 1, 'cells_1_3')],
         _plots=['granger'])
 
 
@@ -423,16 +423,16 @@ def figure_si_7_different_network():
 def figure_si_7_granger_causality():
     print('\nPanels B & C')
     fiber_density.experiments.inner_dynamics_granger_causality.main(
-        _band=None, _high_time_resolution=True, _tuples_to_plot=[('SN45', 2, 'cells_2_3')])
+        _band=None, _high_temporal_resolution=True, _tuples_to_plot=[('SN45', 2, 'cells_2_3')])
 
     print('\nPanels E & F')
     fiber_density.experiments.inner_dynamics_granger_causality.main(
-        _band=None, _high_time_resolution=True, _tuples_to_plot=[('SN45', 1, 'cells_1_3')])
+        _band=None, _high_temporal_resolution=True, _tuples_to_plot=[('SN45', 1, 'cells_1_3')])
 
 
 def figure_si_7_whiteness():
     fiber_density.experiments.inner_dynamics_granger_causality.main(
-        _band=None, _high_time_resolution=True, _tuples_to_mark=[('SN45', 2, 'cells_2_3'), ('SN45', 1, 'cells_1_3')],
+        _band=None, _high_temporal_resolution=True, _tuples_to_mark=[('SN45', 2, 'cells_2_3'), ('SN45', 1, 'cells_1_3')],
         _plots=['whiteness'])
 
 

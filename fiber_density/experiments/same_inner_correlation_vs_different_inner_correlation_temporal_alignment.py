@@ -9,28 +9,17 @@ from tqdm import tqdm
 from libs import compute_lib
 from libs.experiments import load, filtering, compute, paths, organize
 from libs.experiments.config import QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER, \
-    QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER
+    QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER, all_experiments, \
+    DERIVATIVE
 from plotting import save
 
-# based on time resolution
-EXPERIMENTS = {
-    False: ['SN16'],
-    True: ['SN41', 'SN44', 'SN45']
-}
 OFFSET_X = 0
 OFFSET_Y = 0.5
 ALIGNMENT_OFFSET_Y = 0
 OFFSET_Z = 0
-BAND = True
-DERIVATIVE = 1
+
 PAIR_DISTANCE_RANGE = [4, 10]
-MINIMUM_CORRELATION_TIME_FRAMES = {
-    'SN16': 15,
-    'SN18': 15,
-    'SN41': 50,
-    'SN44': 50,
-    'SN45': 50
-}
+
 START_TIME_FRAME_Z_SCORE = 5
 BLOCK_ALREADY_DENSE = False
 
@@ -87,15 +76,24 @@ def align_by_z_score(_experiments, _experiments_fiber_densities):
     return _experiments_fiber_densities_aligned
 
 
-def main(_high_time_resolution=True):
-    _experiments = load.experiments_groups_as_tuples(EXPERIMENTS[_high_time_resolution])
-    _experiments = filtering.by_pair_distance_range(_experiments, PAIR_DISTANCE_RANGE)
-    _experiments = filtering.by_real_pairs(_experiments)
-    _experiments = filtering.by_band(_experiments, _band=BAND)
-    print('Total experiments:', len(_experiments))
+def main(_high_temporal_resolution=True):
+    _experiments = all_experiments()
+    _experiments = filtering.by_categories(
+        _experiments=_experiments,
+        _is_single_cell=False,
+        _is_high_temporal_resolution=_high_temporal_resolution,
+        _is_bleb=False,
+        _is_bleb_from_start=False
+    )
+
+    _tuples = load.experiments_groups_as_tuples(_experiments)
+    _tuples = filtering.by_pair_distance_range(_tuples, PAIR_DISTANCE_RANGE)
+    _tuples = filtering.by_real_pairs(_tuples)
+    _tuples = filtering.by_band(_tuples)
+    print('Total tuples:', len(_tuples))
 
     _arguments = []
-    for _tuple in _experiments:
+    for _tuple in _tuples:
         _experiment, _series_id, _group = _tuple
 
         # stop when windows are overlapping
@@ -148,8 +146,8 @@ def main(_high_time_resolution=True):
         for _key in _windows_dictionary
     }
 
-    _experiments_fiber_densities_aligned = align_by_z_score(_experiments, _experiments_fiber_densities)
-    _tuples_by_experiment = organize.by_experiment(_experiments)
+    _experiments_fiber_densities_aligned = align_by_z_score(_tuples, _experiments_fiber_densities)
+    _tuples_by_experiment = organize.by_experiment(_tuples)
 
     _same_correlations_array = []
     _different_correlations_array = []
@@ -192,8 +190,7 @@ def main(_high_time_resolution=True):
                 )
 
             # ignore small arrays
-            if len(_same_left_cell_fiber_densities_filtered) < \
-                    MINIMUM_CORRELATION_TIME_FRAMES[_same_experiment]:
+            if len(_same_left_cell_fiber_densities_filtered) < compute.minimum_time_frames_for_correlation(_same_experiment):
                 continue
 
             _same_correlation = compute_lib.correlation(
@@ -242,8 +239,7 @@ def main(_high_time_resolution=True):
                             )
 
                         # ignore small arrays
-                        if len(_same_fiber_densities_filtered) < \
-                                MINIMUM_CORRELATION_TIME_FRAMES[_different_experiment]:
+                        if len(_same_fiber_densities_filtered) < compute.minimum_time_frames_for_correlation(_different_experiment):
                             continue
 
                         _different_correlation = compute_lib.correlation(
@@ -334,7 +330,7 @@ def main(_high_time_resolution=True):
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        _filename='plot_band_' + str(BAND) + '_high_time_' + str(_high_time_resolution)
+        _filename='plot_high_time_' + str(_high_temporal_resolution)
     )
 
 
