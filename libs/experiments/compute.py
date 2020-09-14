@@ -1,21 +1,20 @@
 import math
-import os
 import sys
-from itertools import product
 from multiprocessing.pool import Pool
 
 import numpy as np
 from scipy.ndimage import rotate
 from tqdm import tqdm
 
-from libs import compute_lib
-from libs.compute_lib import roi
+from libs.compute_lib import window
 from libs.config_lib import CPUS_TO_USE
-from libs.experiments import load, save, paths, organize
-from libs.experiments.config import AVERAGE_CELL_DIAMETER_IN_MICRONS, ROI_START_BY_AVERAGE_CELL_DIAMETER, NO_RETURN
+from libs.experiments import load
+from libs.experiments.config import AVERAGE_CELL_DIAMETER_IN_MICRONS, \
+    QUANTIFICATION_WINDOW_START_BY_AVERAGE_CELL_DIAMETER, \
+    MAX_FRACTION_OUT_OF_BOUNDARIES_BLACK_PIXELS
 
 
-def cells_distance_in_cell_size(_experiment, _series_id, _cell_1_coordinates, _cell_2_coordinates):
+def pair_distance_in_cell_size(_experiment, _series_id, _cell_1_coordinates, _cell_2_coordinates):
     _image_properties = load.image_properties(_experiment, _series_id)
     _image_resolutions = _image_properties['resolutions']
     _x1, _y1, _z1 = [float(_value) for _value in _cell_1_coordinates[0]]
@@ -26,14 +25,14 @@ def cells_distance_in_cell_size(_experiment, _series_id, _cell_1_coordinates, _c
     return math.sqrt((_x1 - _x2) ** 2 + (_y1 - _y2) ** 2 + (_z1 - _z2) ** 2) / AVERAGE_CELL_DIAMETER_IN_MICRONS
 
 
-def cells_distance_in_cell_size_time_point(_experiment, _series_id, _group, _time_point):
+def pair_distance_in_cell_size_time_frame(_experiment, _series_id, _group, _time_frame):
     _group_properties = load.group_properties(_experiment, _series_id, _group)
     _left_cell_coordinates = \
-        [list(_group_properties['time_points'][_time_point]['left_cell']['coordinates'].values())]
+        [list(_group_properties['time_points'][_time_frame]['left_cell']['coordinates'].values())]
     _right_cell_coordinates = \
-        [list(_group_properties['time_points'][_time_point]['right_cell']['coordinates'].values())]
+        [list(_group_properties['time_points'][_time_frame]['right_cell']['coordinates'].values())]
 
-    return cells_distance_in_cell_size(_experiment, _series_id, _left_cell_coordinates, _right_cell_coordinates)
+    return pair_distance_in_cell_size(_experiment, _series_id, _left_cell_coordinates, _right_cell_coordinates)
 
 
 def angle_between_three_points(_a, _b, _c):
@@ -65,15 +64,16 @@ def axes_padding(_2d_image_shape, _angle):
 
     # return x, y
     return int(round((_image_zeros_shape[1] - _2d_image_shape[1]) / 2)), \
-           int(round((_image_zeros_shape[0] - _2d_image_shape[0]) / 2))
+        int(round((_image_zeros_shape[0] - _2d_image_shape[0]) / 2))
 
 
 def image_center_coordinates(_image_shape):
     return [_value / 2 for _value in _image_shape]
 
 
-def roi_by_microns(_resolution_x, _resolution_y, _resolution_z, _length_x, _length_y, _length_z, _offset_x, _offset_y,
-                   _offset_z, _cell_coordinates, _cell_diameter_in_microns, _direction):
+def window_by_microns(_resolution_x, _resolution_y, _resolution_z, _length_x, _length_y, _length_z, _offset_x,
+                      _offset_y,
+                      _offset_z, _cell_coordinates, _cell_diameter_in_microns, _direction):
     # always by average
     _length_x_in_pixels = (AVERAGE_CELL_DIAMETER_IN_MICRONS * _length_x) / _resolution_x
     _length_y_in_pixels = (AVERAGE_CELL_DIAMETER_IN_MICRONS * _length_y) / _resolution_y
@@ -82,7 +82,7 @@ def roi_by_microns(_resolution_x, _resolution_y, _resolution_z, _length_x, _leng
     _offset_y_in_pixels = (AVERAGE_CELL_DIAMETER_IN_MICRONS * _offset_y) / _resolution_y
     _offset_z_in_pixels = (AVERAGE_CELL_DIAMETER_IN_MICRONS * _offset_z) / _resolution_z
 
-    _x1, _y1, _x2, _y2 = [int(round(_value)) for _value in roi(
+    _x1, _y1, _x2, _y2 = [int(round(_value)) for _value in window(
         _length_x=_length_x_in_pixels,
         _length_y=_length_y_in_pixels,
         _offset_x=_offset_x_in_pixels,
@@ -101,14 +101,14 @@ def roi_by_microns(_resolution_x, _resolution_y, _resolution_z, _length_x, _leng
     return _x1, _y1, _z1, _x2, _y2, _z2
 
 
-def roi_fibers_density(_experiment, _series_id, _group, _time_point, _roi, _time_point_image=None):
-    if _time_point_image is None:
-        _time_point_image = load.structured_image(_experiment, _series_id, _group, _time_point)
-    _x1, _y1, _z1, _x2, _y2, _z2 = [int(round(_value)) for _value in _roi]
+def window_fiber_density(_experiment, _series_id, _group, _time_frame, _window, _time_frame_image=None):
+    if _time_frame_image is None:
+        _time_frame_image = load.structured_image(_experiment, _series_id, _group, _time_frame)
+    _x1, _y1, _z1, _x2, _y2, _z2 = [int(round(_value)) for _value in _window]
 
     _out_of_boundaries = False
 
-    _z_shape, _y_shape, _x_shape = _time_point_image.shape
+    _z_shape, _y_shape, _x_shape = _time_frame_image.shape
     if any([_x1 < 0, _y1 < 0, _z1 < 0, _x2 >= _x_shape, _y2 >= _y_shape, _z2 >= _z_shape]):
         _out_of_boundaries = True
 
@@ -116,36 +116,32 @@ def roi_fibers_density(_experiment, _series_id, _group, _time_point, _roi, _time
         _x1, _y1, _z1 = max(0, _x1), max(0, _y1), max(0, _z1)
         _x2, _y2, _z2 = min(_x2, _x_shape), min(_y2, _y_shape), min(_z2, _z_shape)
 
-    _roi_pixels = _time_point_image[_z1:_z2, _y1:_y2, _x1:_x2]
-    _non_zero_mask = np.nonzero(_roi_pixels)
+    _window_pixels = _time_frame_image[_z1:_z2, _y1:_y2, _x1:_x2]
+    _non_zero_mask = np.nonzero(_window_pixels)
 
-    # check if more than 5% is black
+    # count black pixel amount
     if not _out_of_boundaries and \
-            (np.size(_roi_pixels) == 0 or np.count_nonzero(_roi_pixels == 0) / np.size(_roi_pixels) > 0.05):
+            (np.size(_window_pixels) == 0 or
+             np.count_nonzero(_window_pixels == 0) / np.size(
+                        _window_pixels) > MAX_FRACTION_OUT_OF_BOUNDARIES_BLACK_PIXELS):
         _out_of_boundaries = True
 
-    # saturation
-    if np.size(_roi_pixels) != 0:
-        _saturation_fraction = np.count_nonzero(_roi_pixels == 255) / np.size(_roi_pixels)
+    # saturation amount
+    if np.size(_window_pixels) != 0:
+        _saturation_fraction = np.count_nonzero(_window_pixels == 255) / np.size(_window_pixels)
     else:
         _saturation_fraction = None
 
-    return np.mean(_roi_pixels[_non_zero_mask]), _out_of_boundaries, _saturation_fraction
+    return np.mean(_window_pixels[_non_zero_mask]), _out_of_boundaries, _saturation_fraction
 
 
-def roi_fibers_density_time_point(_arguments):
-    # stop if needed
-    if os.path.isfile(os.path.join(paths.EXPERIMENTS, 'stop.txt')):
-        return
-
+def window_fiber_density_time_frame(_arguments):
     if 'group_properties' not in _arguments:
         _arguments['group_properties'] = \
             load.group_properties(_arguments['experiment'], _arguments['series_id'], _arguments['group'])
 
-    _time_point_properties = _arguments['group_properties']['time_points'][_arguments['time_point']]
-    _time_point_fibers_densities = load.fibers_densities(
-        _arguments['experiment'], _arguments['series_id'], _arguments['group'], _arguments['time_point'])
-    if ROI_START_BY_AVERAGE_CELL_DIAMETER:
+    _time_frame_properties = _arguments['group_properties']['time_points'][_arguments['time_point']]
+    if QUANTIFICATION_WINDOW_START_BY_AVERAGE_CELL_DIAMETER:
         _cell_diameter_in_microns = AVERAGE_CELL_DIAMETER_IN_MICRONS
     else:
         _cell_diameter_in_microns = load.mean_distance_to_surface_in_microns(
@@ -153,7 +149,7 @@ def roi_fibers_density_time_point(_arguments):
             _series_id=_arguments['series_id'],
             _cell_id=_arguments['group_properties']['cells_ids'][_arguments['cell_id']]) * 2 \
             if _arguments['cell_id'] != 'cell' else _arguments['group_properties']['cell_id'] * 2
-    _time_point_roi = roi_by_microns(
+    _time_frame_window = window_by_microns(
         _resolution_x=_arguments['group_properties']['time_points'][_arguments['time_point']]['resolutions']['x'],
         _resolution_y=_arguments['group_properties']['time_points'][_arguments['time_point']]['resolutions']['y'],
         _resolution_z=_arguments['group_properties']['time_points'][_arguments['time_point']]['resolutions']['z'],
@@ -171,35 +167,22 @@ def roi_fibers_density_time_point(_arguments):
         (_arguments['cell_id'], _arguments['direction']) == ('right_cell', 'outside') or
         (_arguments['cell_id'], _arguments['direction']) == ('cell', 'right') else 'left'
     )
-    if _time_point_roi in _time_point_fibers_densities:
-        if NO_RETURN:
-            return None
-        else:
-            return _arguments, _time_point_fibers_densities[_time_point_roi]
-    else:
-        if 'print' in _arguments and _arguments['print']:
-            print('Computing:', _arguments['experiment'], _arguments['series_id'], _arguments['group'],
-                  _arguments['cell_id'], 'roi', _time_point_roi, 'direction', _arguments['direction'], 'tp',
-                  _arguments['time_point'], sep='\t')
-        _roi_fibers_density = roi_fibers_density(_arguments['experiment'], _arguments['series_id'], _arguments['group'],
-                                                 _arguments['time_point'], _time_point_roi)[:2]
-        if 'save' in _arguments and _arguments['save']:
-            _time_point_fibers_densities[_time_point_roi] = _roi_fibers_density
-            save.fibers_densities(_arguments['experiment'], _arguments['series_id'], _arguments['group'],
-                                  _arguments['time_point'], _time_point_fibers_densities)
+    if 'print' in _arguments and _arguments['print']:
+        print('Computing:', _arguments['experiment'], _arguments['series_id'], _arguments['group'],
+              _arguments['cell_id'], 'window', _time_frame_window, 'direction', _arguments['direction'], 'tp',
+              _arguments['time_point'], sep='\t')
+    _window_fiber_density = window_fiber_density(_arguments['experiment'], _arguments['series_id'], _arguments['group'],
+                                                 _arguments['time_point'], _time_frame_window)[:2]
 
-        if NO_RETURN:
-            return None
-        else:
-            return _arguments, _roi_fibers_density
+    return _arguments, _window_fiber_density
 
 
-def roi_fibers_density_by_time(_experiment, _series_id, _group, _length_x, _length_y, _length_z, _offset_x, _offset_y,
-                               _offset_z, _cell_id, _direction, _time_points=sys.maxsize, _print=False, _save=True,
-                               _out_of_borders=True):
+def window_fiber_density_by_time(_experiment, _series_id, _group, _length_x, _length_y, _length_z, _offset_x, _offset_y,
+                                 _offset_z, _cell_id, _direction, _time_frames=sys.maxsize, _print=False, _save=True,
+                                 _out_of_borders=True):
     _group_properties = load.group_properties(_experiment, _series_id, _group)
-    _fibers_densities = [
-        roi_fibers_density_time_point({
+    _fiber_densities = [
+        window_fiber_density_time_frame({
             'experiment': _experiment,
             'series_id': _series_id,
             'group': _group,
@@ -211,133 +194,83 @@ def roi_fibers_density_by_time(_experiment, _series_id, _group, _length_x, _leng
             'offset_z': _offset_z,
             'cell_id': _cell_id,
             'direction': _direction,
-            'time_point': _time_point,
+            'time_point': _time_frame,
             'group_properties': _group_properties,
             'print': _print,
             'save': _save
-        })[1] for _time_point in range(min(_time_points, len(_group_properties['time_points'])))
+        })[1] for _time_frame in range(min(_time_frames, len(_group_properties['time_points'])))
     ]
 
     if not _out_of_borders:
-        return longest_fibers_densities_ascending_sequence(_fibers_densities)
+        return longest_fiber_densities_ascending_sequence(_fiber_densities)
     else:
-        return _fibers_densities
+        return _fiber_densities
 
 
-def roi_fibers_density_by_time_pairs(_arguments):
-    # stop if needed
-    if os.path.isfile(os.path.join(paths.EXPERIMENTS, 'stop.txt')):
-        return
-
-    return _arguments, {
-        'left_cell': roi_fibers_density_by_time(
-            _arguments['experiment'],
-            _arguments['series_id'],
-            _arguments['group'],
-            _arguments['length_x'],
-            _arguments['length_y'],
-            _arguments['length_z'],
-            _arguments['offset_x'],
-            _arguments['offset_y'],
-            _arguments['offset_z'],
-            'left_cell',
-            _arguments['direction'],
-            _arguments['time_points'] if 'time_points' in _arguments else sys.maxsize,
-            _arguments['print'] if 'print' in _arguments else False,
-            _arguments['save'] if 'save' in _arguments else True,
-            _arguments['out_of_borders'] if 'out_of_borders' in _arguments else True
-        ),
-        'right_cell': roi_fibers_density_by_time(
-            _arguments['experiment'],
-            _arguments['series_id'],
-            _arguments['group'],
-            _arguments['length_x'],
-            _arguments['length_y'],
-            _arguments['length_z'],
-            _arguments['offset_x'],
-            _arguments['offset_y'],
-            _arguments['offset_z'],
-            'right_cell',
-            _arguments['direction'],
-            _arguments['time_points'] if 'time_points' in _arguments else sys.maxsize,
-            _arguments['print'] if 'print' in _arguments else False,
-            _arguments['save'] if 'save' in _arguments else True,
-            _arguments['out_of_borders'] if 'out_of_borders' in _arguments else True
-        )
-    }
-
-
-def minimum_time_points(_experiments_tuples):
-    _minimum_time_points = sys.maxsize
-    for _tuple in _experiments_tuples:
-        _experiment, _series_id, _group = _tuple
-        _group_properties = load.group_properties(_experiment, _series_id, _group)
-        _minimum_time_points = min(_minimum_time_points, len(_group_properties['time_points']))
-
-    return _minimum_time_points
-
-
-def longest_fibers_densities_ascending_sequence(_fibers_densities):
-    _out_of_boundaries = np.array([_fibers_density[1] for _fibers_density in _fibers_densities])
+def longest_fiber_densities_ascending_sequence(_fiber_density):
+    _out_of_boundaries = np.array([_fiber_density[1] for _fiber_density in _fiber_density])
     if False not in _out_of_boundaries:
         return []
 
     _idx_pairs = np.where(np.diff(np.hstack(([False], _out_of_boundaries == False, [False]))))[0].reshape(-1, 2)
+    if len(_idx_pairs) == 0:
+        return []
+
     _start_longest_seq = _idx_pairs[np.diff(_idx_pairs, axis=1).argmax(), 0]
     _end_longest_seq_indices = np.where(_out_of_boundaries[_start_longest_seq:] == 1)
 
     if len(_end_longest_seq_indices[0]) > 0:
-        _longest_seq = _fibers_densities[_start_longest_seq:_end_longest_seq_indices[0][0] + _start_longest_seq]
+        _longest_seq = _fiber_density[_start_longest_seq:_end_longest_seq_indices[0][0] + _start_longest_seq]
     else:
-        _longest_seq = _fibers_densities[_start_longest_seq:]
+        _longest_seq = _fiber_density[_start_longest_seq:]
 
-    return [_fibers_density[0] for _fibers_density in _longest_seq]
+    return [_fiber_density[0] for _fiber_density in _longest_seq]
 
 
-def longest_same_indices_shared_in_borders_sub_array(_fibers_densities1, _fibers_densities2):
-    _out_of_boundaries1 = np.array([_fibers_density[1] for _fibers_density in _fibers_densities1])
-    _out_of_boundaries2 = np.array([_fibers_density[1] for _fibers_density in _fibers_densities2])
+def longest_same_indices_shared_in_borders_sub_array(_fiber_densities_1, _fiber_densities_2):
+    _out_of_boundaries_1 = np.array([_fiber_density[1] for _fiber_density in _fiber_densities_1])
+    _out_of_boundaries_2 = np.array([_fiber_density[1] for _fiber_density in _fiber_densities_2])
 
     # based on the shortest
-    _min_size = min(len(_out_of_boundaries1), len(_out_of_boundaries2))
-    _out_of_boundaries1 = _out_of_boundaries1[:_min_size]
-    _out_of_boundaries2 = _out_of_boundaries2[:_min_size]
+    _min_size = min(len(_out_of_boundaries_1), len(_out_of_boundaries_2))
+    _out_of_boundaries_1 = _out_of_boundaries_1[:_min_size]
+    _out_of_boundaries_2 = _out_of_boundaries_2[:_min_size]
 
     # not-and on both
     _out_of_boundaries = np.logical_not(
-        np.logical_and(np.logical_not(_out_of_boundaries1), np.logical_not(_out_of_boundaries2))
+        np.logical_and(np.logical_not(_out_of_boundaries_1), np.logical_not(_out_of_boundaries_2))
     )
 
-    _fibers_densities1_filtered = []
-    _fibers_densities2_filtered = []
-    for _fibers_density1, _fibers_density2, _out_of_boundaries_value in \
-            zip(_fibers_densities1, _fibers_densities2, _out_of_boundaries):
-        _fibers_densities1_filtered.append((_fibers_density1[0], _out_of_boundaries_value))
-        _fibers_densities2_filtered.append((_fibers_density2[0], _out_of_boundaries_value))
+    _fiber_densities_1_filtered = []
+    _fiber_densities_2_filtered = []
+    for _fiber_density_1, _fiber_density_2, _out_of_boundaries_value in \
+            zip(_fiber_densities_1, _fiber_densities_2, _out_of_boundaries):
+        _fiber_densities_1_filtered.append((_fiber_density_1[0], _out_of_boundaries_value))
+        _fiber_densities_2_filtered.append((_fiber_density_2[0], _out_of_boundaries_value))
 
-    return longest_fibers_densities_ascending_sequence(_fibers_densities1_filtered), \
-        longest_fibers_densities_ascending_sequence(_fibers_densities2_filtered)
+    return longest_fiber_densities_ascending_sequence(_fiber_densities_1_filtered), \
+        longest_fiber_densities_ascending_sequence(_fiber_densities_2_filtered)
 
 
-def remove_blacklist(_experiment, _series_id, _cell_id, _fibers_densities):
+def remove_blacklist(_experiment, _series_id, _cell_id, _fiber_densities):
     _blacklist = load.blacklist(_experiment, _series_id)
 
     if _cell_id in _blacklist or None in _blacklist:
-        _out_of_boundaries = np.array([_fibers_density[1] for _fibers_density in _fibers_densities])
+        _out_of_boundaries = np.array([_fiber_density[1] for _fiber_density in _fiber_densities])
         if _cell_id in _blacklist:
-            for _time_point in _blacklist[_cell_id]:
-                if _time_point < len(_out_of_boundaries):
-                    _out_of_boundaries[_time_point] = True
+            for _time_frame in _blacklist[_cell_id]:
+                if _time_frame < len(_out_of_boundaries):
+                    _out_of_boundaries[_time_frame] = True
         if None in _blacklist:
-            for _time_point in _blacklist[None]:
-                if _time_point < len(_out_of_boundaries):
-                    _out_of_boundaries[_time_point] = True
+            for _time_frame in _blacklist[None]:
+                if _time_frame < len(_out_of_boundaries):
+                    _out_of_boundaries[_time_frame] = True
         return [
-            (_fibers_density[0], _out_of_boundaries_value)
-            for _fibers_density, _out_of_boundaries_value in zip(_fibers_densities, _out_of_boundaries)
+            (_fiber_density[0], _out_of_boundaries_value)
+            for _fiber_density, _out_of_boundaries_value in zip(_fiber_densities, _out_of_boundaries)
         ]
     else:
-        return _fibers_densities
+        return _fiber_densities
 
 
 def coordinates_mean(_coordinates):
@@ -364,23 +297,24 @@ def smooth_coordinates_in_time(_coordinates, _n=5):
     return _coordinates_smoothed
 
 
-def rois_fibers_densities(_tuple):
-    _key, _rois, _saturation = _tuple
-    _experiment, _series_id, _group, _time_point = _key
-    _time_point_image = load.structured_image(_experiment, _series_id, _group, _time_point)
+def windows_fiber_densities(_tuple):
+    _key, _windows, _saturation = _tuple
+    _experiment, _series_id, _group, _time_frame = _key
+    _time_frame_image = load.structured_image(_experiment, _series_id, _group, _time_frame)
     return {
-        (_experiment, _series_id, _group, _time_point, _roi):
-            roi_fibers_density(_experiment, _series_id, _group, _time_point, _roi, _time_point_image) if _saturation
-            else roi_fibers_density(_experiment, _series_id, _group, _time_point, _roi, _time_point_image)[:2]
-        for _roi in _rois
+        (_experiment, _series_id, _group, _time_frame, _window):
+            window_fiber_density(_experiment, _series_id, _group, _time_frame, _window,
+                                 _time_frame_image) if _saturation
+            else window_fiber_density(_experiment, _series_id, _group, _time_frame, _window, _time_frame_image)[:2]
+        for _window in _windows
     }
 
 
-def fibers_densities(_tuples, _saturation=False):
+def fiber_densities(_tuples, _saturation=False):
     _organized_tuples = {}
     for _tuple in _tuples:
-        _experiment, _series_id, _group, _time_point, _roi = _tuple
-        _key, _value = (_experiment, _series_id, _group, _time_point), _roi
+        _experiment, _series_id, _group, _time_frame, _window = _tuple
+        _key, _value = (_experiment, _series_id, _group, _time_frame), _window
         if _key in _organized_tuples:
             _organized_tuples[_key].append(_value)
         else:
@@ -390,25 +324,23 @@ def fibers_densities(_tuples, _saturation=False):
     for _key in _organized_tuples:
         _arguments.append((_key, _organized_tuples[_key], _saturation))
 
-    _fibers_densities = {}
+    _fiber_densities = {}
     with Pool(CPUS_TO_USE) as _p:
-        for _rois in tqdm(_p.imap_unordered(rois_fibers_densities, _arguments), total=len(_arguments),
-                          desc='Computing Fibers Densities'):
-            _fibers_densities.update(_rois)
+        for _windows in tqdm(_p.imap_unordered(windows_fiber_densities, _arguments), total=len(_arguments),
+                             desc='Computing fiber densities'):
+            _fiber_densities.update(_windows)
         _p.close()
         _p.join()
 
-    return _fibers_densities
+    return _fiber_densities
 
 
-def roi_time_point(_arguments):
+def window_time_frame(_arguments):
     if 'group_properties' not in _arguments:
         _arguments['group_properties'] = \
             load.group_properties(_arguments['experiment'], _arguments['series_id'], _arguments['group'])
-    _time_point_properties = _arguments['group_properties']['time_points'][_arguments['time_point']]
-    _time_point_fibers_densities = load.fibers_densities(
-        _arguments['experiment'], _arguments['series_id'], _arguments['group'], _arguments['time_point'])
-    if ROI_START_BY_AVERAGE_CELL_DIAMETER:
+    _time_frame_properties = _arguments['group_properties']['time_points'][_arguments['time_point']]
+    if QUANTIFICATION_WINDOW_START_BY_AVERAGE_CELL_DIAMETER:
         _cell_diameter_in_microns = AVERAGE_CELL_DIAMETER_IN_MICRONS
     else:
         _cell_diameter_in_microns = load.mean_distance_to_surface_in_microns(
@@ -416,7 +348,7 @@ def roi_time_point(_arguments):
             _series_id=_arguments['series_id'],
             _cell_id=_arguments['group_properties']['cells_ids'][_arguments['cell_id']]) * 2 \
             if _arguments['cell_id'] != 'cell' else _arguments['group_properties']['cell_id'] * 2
-    _time_point_roi = roi_by_microns(
+    _time_frame_window = window_by_microns(
         _resolution_x=_arguments['group_properties']['time_points'][_arguments['time_point']]['resolutions']['x'],
         _resolution_y=_arguments['group_properties']['time_points'][_arguments['time_point']]['resolutions']['y'],
         _resolution_z=_arguments['group_properties']['time_points'][_arguments['time_point']]['resolutions']['z'],
@@ -435,57 +367,56 @@ def roi_time_point(_arguments):
         (_arguments['cell_id'], _arguments['direction']) == ('cell', 'right') else 'left'
     )
 
-    return _arguments['experiment'], _arguments['series_id'], _arguments['group'], _arguments['time_point'], _time_point_roi
+    return _arguments['experiment'], _arguments['series_id'], _arguments['group'], _arguments[
+        'time_point'], _time_frame_window
 
 
-def rois_by_time(_arguments):
+def windows_by_time(_arguments):
     _group_properties = load.group_properties(_arguments['experiment'], _arguments['series_id'], _arguments['group'])
 
     # single time point
     if 'time_point' in _arguments:
-        return _arguments, [roi_time_point(_arguments)]
+        return _arguments, [window_time_frame(_arguments)]
 
     # multiple time points
     if 'time_points' not in _arguments:
         _arguments['time_points'] = sys.maxsize
-    _rois = []
-    for _time_point in range(min(_arguments['time_points'], len(_group_properties['time_points']))):
-        _arguments['time_point'] = _time_point
-        _rois.append(roi_time_point(_arguments))
+    _windows = []
+    for _time_frame in range(min(_arguments['time_points'], len(_group_properties['time_points']))):
+        _arguments['time_point'] = _time_frame
+        _windows.append(window_time_frame(_arguments))
 
-    return _arguments, _rois
+    return _arguments, _windows
 
 
-def rois(_arguments, _keys):
-    _rois_to_compute = []
-    _rois_dictionary = {}
+def windows(_arguments, _keys):
+    _windows_to_compute = []
+    _windows_dictionary = {}
     with Pool(CPUS_TO_USE) as _p:
-        for _argument_keys, _value in tqdm(_p.imap_unordered(rois_by_time, _arguments), total=len(_arguments),
-                                           desc='Computing Rois'):
+        for _argument_keys, _value in tqdm(_p.imap_unordered(windows_by_time, _arguments), total=len(_arguments),
+                                           desc='Computing windows'):
             _key = tuple(_argument_keys[_argument] for _argument in _keys)
-            _rois_dictionary[_key] = _value
-            _rois_to_compute += _value
+            _windows_dictionary[_key] = _value
+            _windows_to_compute += _value
         _p.close()
         _p.join()
 
-    return _rois_dictionary, _rois_to_compute
+    return _windows_dictionary, _windows_to_compute
 
 
-def cell_z_position_from_substrate(_experiment, _series_id, _cell_id, _time_point=0):
+def cell_z_position_from_substrate(_experiment, _series_id, _cell_id, _time_frame=0):
     _properties = load.image_properties(_experiment, _series_id)
     _series_z_position = _properties['position']['z']
     _cells_coordinates_tracked = \
-        load.cell_coordinates_tracked_series_file_data(_experiment, 'series_' + str(_series_id) + '.txt')
-    _cell_z_position = _cells_coordinates_tracked[int(_cell_id)][_time_point][2] * _properties['resolutions']['z']
+        load.cell_coordinates_tracked_series_file_data(_experiment, _series_id)
+    _cell_z_position = _cells_coordinates_tracked[int(_cell_id)][_time_frame][2] * _properties['resolutions']['z']
 
     return _series_z_position + _cell_z_position
 
 
-def group_mean_z_position_from_substrate(_experiment, _series_id, _group, _time_point=0):
+def group_mean_z_position_from_substrate(_experiment, _series_id, _group, _time_frame=0):
     _, _left_cell_id, _right_cell_id = _group.split('_')
-    _left_cell_z_position = cell_z_position_from_substrate(_experiment, _series_id, _left_cell_id, _time_point)
-    _right_cell_z_position = cell_z_position_from_substrate(_experiment, _series_id, _right_cell_id, _time_point)
+    _left_cell_z_position = cell_z_position_from_substrate(_experiment, _series_id, _left_cell_id, _time_frame)
+    _right_cell_z_position = cell_z_position_from_substrate(_experiment, _series_id, _right_cell_id, _time_frame)
 
     return (_left_cell_z_position + _right_cell_z_position) / 2
-
-

@@ -23,7 +23,7 @@ def main():
         print('Cell pairs distance range:', _distance_range)
 
         # total
-        _distance_range_cell_pairs = filtering.by_distance_range(_cell_pairs, _distance_range=_distance_range)
+        _distance_range_cell_pairs = filtering.by_pair_distance_range(_cell_pairs, _distance_range=_distance_range)
         print('\tTotal cell pairs:', len(_distance_range_cell_pairs))
 
         for _experiment in CELL_PAIRS:
@@ -31,24 +31,24 @@ def main():
 
             _experiment_cell_pairs = load.experiment_groups_as_tuples(_experiment)
             _distance_range_experiment_cell_pairs = \
-                filtering.by_distance_range(_experiment_cell_pairs, _distance_range=_distance_range)
+                filtering.by_pair_distance_range(_experiment_cell_pairs, _distance_range=_distance_range)
             print('\t\tTotal cell pairs:', len(_distance_range_experiment_cell_pairs))
 
             # real cell pairs
-            _real_cell_pairs = filtering.by_real_cells(_distance_range_experiment_cell_pairs)
+            _real_cell_pairs = filtering.by_real_pairs(_distance_range_experiment_cell_pairs)
             print('\t\tTotal real cell pairs:', len(_real_cell_pairs))
 
             _real_cell_pairs_with_band = filtering.by_band(_real_cell_pairs)
             print('\t\tTotal real cell pairs with band:', len(_real_cell_pairs_with_band))
 
             # fake cell pairs
-            _fake_cell_pairs = filtering.by_real_cells(_distance_range_experiment_cell_pairs, _real_cells=False)
+            _fake_cell_pairs = filtering.by_real_pairs(_distance_range_experiment_cell_pairs, _real_pairs=False)
             print('\t\tTotal fake cell pairs:', len(_fake_cell_pairs))
 
-            _fake_static_cell_pairs = filtering.by_static_cells(_fake_cell_pairs)
+            _fake_static_cell_pairs = filtering.by_fake_static_pairs(_fake_cell_pairs)
             print('\t\tTotal fake static cell pairs:', len(_fake_static_cell_pairs))
 
-            _fake_following_cell_pairs = filtering.by_static_cells(_fake_cell_pairs, _static=False)
+            _fake_following_cell_pairs = filtering.by_fake_static_pairs(_fake_cell_pairs, _fake_static_pairs=False)
             print('\t\tTotal fake following cell pairs:', len(_fake_following_cell_pairs))
 
             _fake_following_cell_pairs_with_band = filtering.by_band(_fake_following_cell_pairs)

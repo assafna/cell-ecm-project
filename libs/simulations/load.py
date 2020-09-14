@@ -1,7 +1,6 @@
-import gzip
 import os
-import pickle
 
+from libs import load_lib
 from libs.simulations import paths
 from libs.simulations.config import CELLS_DIAMETERS_FILE_NAME
 
@@ -11,23 +10,20 @@ def raw_files(_simulation):
     return [_file for _file in os.listdir(_simulation_path) if _file.endswith('.txt')]
 
 
-def cells_diameters(_simulation):
+def pair_diameters(_simulation):
     _simulation_path = paths.raw(_simulation)
     _cells_diameters_path = os.path.join(_simulation_path, CELLS_DIAMETERS_FILE_NAME)
     _diameters = []
-    try:
-        with open(_cells_diameters_path, 'r') as _f:
+    with open(_cells_diameters_path, 'r') as _f:
+        _l = _f.readline()
+        while _l:
+            if '\t' in _l:
+                _l_split = [_x.strip() for _x in _l.split('\t')]
+            else:
+                _l_split = [_x.strip() for _x in _l.split('   ')]
+            _cells_diameters = [float(_l_split[1]), float(_l_split[2])] if len(_l_split) > 2 else float(_l_split[1])
+            _diameters.append(_cells_diameters)
             _l = _f.readline()
-            while _l:
-                if '\t' in _l:
-                    _l_split = [_x.strip() for _x in _l.split('\t')]
-                else:
-                    _l_split = [_x.strip() for _x in _l.split('   ')]
-                _cells_diameters = [float(_l_split[1]), float(_l_split[2])] if len(_l_split) > 2 else float(_l_split[1])
-                _diameters.append(_cells_diameters)
-                _l = _f.readline()
-    finally:
-        _f.close()
 
     return _diameters
 
@@ -40,56 +36,19 @@ def time_points(_simulation):
 
 
 def properties(_simulation):
-    _simulation_structured_path = paths.structured(_simulation)
-    _properties_path = os.path.join(_simulation_structured_path, 'properties.pkl')
-    try:
-        with gzip.open(_properties_path, 'rb') as _pickle:
-            return pickle.load(_pickle)
-    finally:
-        _pickle.close()
+    return load_lib.from_pickle(os.path.join(paths.structured(_simulation), 'properties.pkl'))
 
 
 def elements(_simulation):
-    _simulation_structured_path = paths.structured(_simulation)
-    _elements_path = os.path.join(_simulation_structured_path, 'elements.pkl')
-    try:
-        with gzip.open(_elements_path, 'rb') as _pickle:
-            return pickle.load(_pickle)
-    finally:
-        _pickle.close()
+    return load_lib.from_pickle(os.path.join(paths.structured(_simulation), 'elements.pkl'))
 
 
 def intersections(_simulation, _time_point):
-    _simulation_structured_path = paths.structured(_simulation)
-    _intersections_path = os.path.join(_simulation_structured_path, str(_time_point) + '.pkl')
-    try:
-        with gzip.open(_intersections_path, 'rb') as _pickle:
-            return pickle.load(_pickle)
-    finally:
-        _pickle.close()
+    return load_lib.from_pickle(os.path.join(paths.structured(_simulation), str(_time_point) + '.pkl'))
 
 
-def fibers_lengths(_simulation, _time_point):
-    _simulation_fibers_lengths_path = paths.fibers_lengths(_simulation)
-    _fibers_lengths_path = os.path.join(_simulation_fibers_lengths_path, str(_time_point) + '.pkl')
-    try:
-        with gzip.open(_fibers_lengths_path, 'rb') as _pickle:
-            return pickle.load(_pickle)
-    finally:
-        _pickle.close()
-
-
-def fibers_densities(_simulation, _time_point):
-    _simulation_fibers_densities_path = paths.fibers_densities(_simulation)
-    _fibers_densities_path = os.path.join(_simulation_fibers_densities_path, str(_time_point) + '.pkl')
-    if os.path.isfile(_fibers_densities_path):
-        try:
-            with gzip.open(_fibers_densities_path, 'rb') as _pickle:
-                return pickle.load(_pickle)
-        finally:
-            _pickle.close()
-    else:
-        return {}
+def fiber_lengths(_simulation, _time_point):
+    return load_lib.from_pickle(os.path.join(paths.fiber_lengths(_simulation), str(_time_point) + '.pkl'))
 
 
 def raw():
@@ -103,9 +62,4 @@ def structured():
 
 
 def normalization(_simulation):
-    _path = paths.normalization(_simulation + '.pkl')
-    try:
-        with gzip.open(_path, 'rb') as _pickle:
-            return pickle.load(_pickle)
-    finally:
-        _pickle.close()
+    return load_lib.from_pickle(paths.normalization(_simulation + '.pkl'))

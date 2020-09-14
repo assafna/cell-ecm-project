@@ -1,31 +1,31 @@
-import fibers_density
+import fiber_density
 
 
 def figure_1_main():
     print('\nPanel D')
-    fibers_density.fibers_vs_distance_single_cells.main(_low_connectivity=False)
+    fiber_density.inner_density_vs_window_distance_single_cells.main(_low_connectivity=False)
 
     print('\nPanel F')
-    fibers_density.fibers_vs_distance_pairs.main(_low_connectivity=False)
+    fiber_density.inner_density_vs_window_distance_cell_pairs.main(_low_connectivity=False)
 
     print('\nPanel G')
-    fibers_density.fibers_vs_distance_differences.main(_low_connectivity=False)
+    fiber_density.inner_density_vs_window_distance_differences.main(_low_connectivity=False)
 
 
 def figure_si_1_distances():
     print('\nPanel A')
-    fibers_density.simulations.fibers_vs_distance_multiple_cell_distances.main(_low_connectivity=False)
+    fiber_density.simulations.inner_density_vs_window_distance.main(_low_connectivity=False)
 
     print('\nPanel B')
-    fibers_density.experiments.fibers_vs_distance_multiple_cell_distances.main()
+    fiber_density.experiments.inner_density_vs_window_distance.main()
 
 
 def figure_si_1_correlation_distance_density_offset():
     print('\nPanels B (main panel) & C')
-    fibers_density.experiments.fibers_and_pairs_cells_distance_correlations_vs_distance.main()
+    fiber_density.experiments.inner_density_vs_pair_distance_correlations_vs_window_distance.main()
 
     print('\nPanel B (secondary panels)')
-    fibers_density.experiments.fibers_vs_pairs_cells_distance_in_offset.main()
+    fiber_density.experiments.inner_density_vs_pair_distance.main()
 
 
 def figure_1_all():
@@ -42,20 +42,20 @@ def figure_1_all():
 
 def figure_2_main():
     print('\nPanel B')
-    fibers_density.fibers_in_time_single_cells.main()
+    fiber_density.inner_density_vs_time_single_cells.main()
 
     print('\nPanel D')
-    fibers_density.fibers_in_time_pairs.main()
+    fiber_density.inner_density_vs_time_cell_pairs.main()
 
     print('\nPanel E')
-    fibers_density.simulations.fibers_vs_change.main()
+    fiber_density.simulations.inner_density_vs_change_in_inner_density.main()
 
     print('\nPanel F')
-    fibers_density.experiments.fibers_vs_change.main(_early_time_points=True)
+    fiber_density.experiments.inner_density_vs_change_in_inner_density.main(_early_time_frames=True)
 
 
 def figure_si_2_density_vs_change_in_density_in_late_time_points():
-    fibers_density.experiments.fibers_vs_change.main(_early_time_points=False)
+    fiber_density.experiments.inner_density_vs_change_in_inner_density.main(_early_time_frames=False)
 
 
 def figure_2_all():
@@ -69,37 +69,37 @@ def figure_2_all():
 
 def figure_3_main():
     print('\nPanels B & C')
-    fibers_density.simulations.correlations_by_derivatives_pairs.main()
+    fiber_density.simulations.inner_correlation_by_derivatives_cell_pairs.main()
 
     print('\nPanels D & E')
-    fibers_density.simulations.insides_vs_outsides_stds.main()
+    fiber_density.simulations.inner_correlation_vs_outer_correlation_heterogeneity.main()
 
 
 def figure_si_3_detrending_simulations():
     print('\nPanels A, B & C')
-    fibers_density.simulations.fibers_vs_time_derivatives.main()
+    fiber_density.simulations.inner_density_vs_time_derivatives.main()
 
     print('\nPanel D')
-    fibers_density.simulations.correlations_by_derivatives_pairs.main(_directions=['inside'])
+    fiber_density.simulations.inner_correlation_by_derivatives_cell_pairs.main(_directions=['inside'])
 
     print('\nPanels E & F')
-    fibers_density.simulations.stationary_vs_fibers_derivatives_pairs.main()
+    fiber_density.simulations.stationary_vs_inner_dynamics_derivatives_cell_pairs.main()
 
     print('\nPanel G')
-    fibers_density.simulations.correlations_by_derivatives_single_cells.main()
+    fiber_density.simulations.inner_correlation_by_derivatives_single_cells.main()
 
     print('\nPanels H & I')
-    fibers_density.simulations.stationary_vs_fibers_derivatives_single_cells.main()
+    fiber_density.simulations.stationary_vs_inner_dynamics_derivatives_single_cells.main()
 
 
 def figure_si_3_insides_vs_outsides_distances():
     print('\nPanels A & B')
-    fibers_density.simulations.insides_vs_outsides_distances.main()
+    fiber_density.simulations.inner_correlation_vs_outer_correlation_pair_distance.main()
 
 
 def figure_si_3_insides_vs_outsides_offsets():
     print('\nPanels A & B')
-    fibers_density.simulations.insides_vs_outsides_offsets.main()
+    fiber_density.simulations.inner_correlation_vs_outer_correlation_offsets.main()
 
 
 def figure_3_all():
@@ -119,107 +119,118 @@ def figure_3_all():
 
 def figure_4_main():
     print('\nPanel B')
-    fibers_density.simulations.same_vs_different.main(_low_connectivity=False)
+    fiber_density.simulations.same_inner_correlation_vs_different_inner_correlation.main(_low_connectivity=False)
 
     print('\nPanel C')
-    fibers_density.simulations.same_vs_different_distances.main(_low_connectivity=False)
+    fiber_density.simulations.same_inner_correlation_vs_different_inner_correlation_pair_distance.main(
+        _low_connectivity=False)
 
     print('\nPanel D')
-    fibers_density.experiments.same_vs_different.main(_band=True, _high_time_resolution=False)
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(_band=True,
+                                                                                         _high_time_resolution=False)
 
     print('\nPanel E')
-    fibers_density.experiments.same_vs_different_distances.main(_band=True, _high_time_resolution=False)
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_vs_pair_distance.main(
+        _band=True, _high_time_resolution=False)
 
     print('\nPanel G')
-    fibers_density.experiments.same_vs_different_triplet.main()
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_triplet.main()
 
     print('\nPanel H')
-    fibers_density.experiments.same_vs_different_triplets.main()
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_triplets.main()
 
 
 def figure_si_4_same_vs_diff_offsets():
     print('\nPanel A')
-    fibers_density.experiments.same_vs_different.main(_offset_y=0, _offset_z=0)
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(_offset_y=0, _offset_z=0)
 
     print('\nPanel B')
-    fibers_density.experiments.same_vs_different.main(_offset_y=-0.5, _offset_z=0)
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(_offset_y=-0.5, _offset_z=0)
 
     print('\nPanel C')
-    fibers_density.experiments.same_vs_different.main(_offset_y=0.5, _offset_z=0)
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(_offset_y=0.5, _offset_z=0)
 
     print('\nPanel D')
-    fibers_density.experiments.same_vs_different.main(_offset_y=0, _offset_z=-0.5)
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(_offset_y=0, _offset_z=-0.5)
 
     print('\nPanel E')
-    fibers_density.experiments.same_vs_different.main(_offset_y=0, _offset_z=0.5)
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(_offset_y=0, _offset_z=0.5)
 
 
 def figure_si_4_detrending_experiments():
     print('\nPanel A')
-    fibers_density.experiments.correlations_by_derivatives_pairs.main(_directions=['inside'])
+    fiber_density.experiments.inner_correlation_by_derivatives_cell_pairs.main(_directions=['inside'])
 
     print('\nPanels B & C')
-    fibers_density.experiments.stationary_vs_fibers_derivatives_pairs.main()
+    fiber_density.experiments.stationary_vs_inner_dynamics_derivatives_cell_pairs.main()
 
     print('\nPanel D')
-    fibers_density.experiments.correlations_by_derivatives_single_cells.main()
+    fiber_density.experiments.inner_correlation_by_derivatives_single_cells.main()
 
     print('\nPanels E & F')
-    fibers_density.experiments.stationary_vs_fibers_derivatives_single_cells.main()
+    fiber_density.experiments.stationary_vs_inner_dynamics_derivatives_single_cells.main()
 
 
 def figure_si_4_same_vs_diff_distances():
     print('\nPanel A')
-    fibers_density.experiments.same_vs_different.main(
-        _band=True, _high_time_resolution=False, _cells_distance_range=[4, 6])
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(
+        _band=True, _high_time_resolution=False, _pair_distance_range=[4, 6])
 
     print('\nPanel B')
-    fibers_density.experiments.same_vs_different.main(
-        _band=True, _high_time_resolution=False, _cells_distance_range=[6, 8])
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(
+        _band=True, _high_time_resolution=False, _pair_distance_range=[6, 8])
 
     print('\nPanel C')
-    fibers_density.experiments.same_vs_different.main(
-        _band=True, _high_time_resolution=False, _cells_distance_range=[8, 10])
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(
+        _band=True, _high_time_resolution=False, _pair_distance_range=[8, 10])
 
 
 def figure_si_4_same_vs_diff_controls():
     print('\nPanel B')
-    fibers_density.experiments.same_vs_different.main(
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(
         _real_cells=False, _static=False, _band=True, _high_time_resolution=False)
 
     print('\nPanel D')
-    fibers_density.experiments.same_vs_different.main(
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(
         _real_cells=False, _static=True, _band=False, _high_time_resolution=False)
 
 
 def figure_si_4_real_vs_fake():
     print('\nPanels A & B')
-    fibers_density.experiments.same_vs_different_real_vs_fake.main(_offset_y=0, _high_time_resolution=False)
+    fiber_density.experiments.same_real_inner_correlation_vs_different_fake_inner_correlation.main(
+        _offset_y=0, _high_time_resolution=False)
 
     print('\nPanels C & D')
-    fibers_density.experiments.same_vs_different_real_vs_fake.main(_offset_y=0.5, _high_time_resolution=False)
+    fiber_density.experiments.same_real_inner_correlation_vs_different_fake_inner_correlation.main(
+        _offset_y=0.5, _high_time_resolution=False)
 
     print('\nPanels E & F')
-    fibers_density.experiments.same_vs_different_real_vs_fake.main(_offset_y=0, _high_time_resolution=True)
+    fiber_density.experiments.same_real_inner_correlation_vs_different_fake_inner_correlation.main(
+        _offset_y=0, _high_time_resolution=True)
 
     print('\nPanels G & H')
-    fibers_density.experiments.same_vs_different_real_vs_fake.main(_offset_y=0.5, _high_time_resolution=True)
+    fiber_density.experiments.same_real_inner_correlation_vs_different_fake_inner_correlation.main(
+        _offset_y=0.5, _high_time_resolution=True)
 
 
 def figure_si_4_same_vs_diff_high_time_res():
     print('\nPanel A')
-    fibers_density.experiments.same_vs_different.main(_band=True, _high_time_resolution=True)
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(
+        _band=True, _high_time_resolution=True)
 
     print('\nPanel B')
-    fibers_density.experiments.same_vs_different.main(_band=False, _high_time_resolution=True)
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(
+        _band=False, _high_time_resolution=True)
 
 
 def figure_si_4_temporal_assessment():
     print('\nPanel A')
-    fibers_density.experiments.same_vs_different_temporal_assessment.main(_high_time_resolution=False)
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_temporal_assessment.main(
+        _high_time_resolution=False)
 
     print('\nPanel B')
-    fibers_density.experiments.same_vs_different_temporal_assessment.main(_high_time_resolution=True)
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_temporal_assessment.main(
+        _high_time_resolution=True)
 
 
 def figure_4_all():
@@ -251,54 +262,60 @@ def figure_4_all():
 
 def figure_5_main():
     print('\nPanel A')
-    fibers_density.experiments.fibers_vs_offsets_in_axes.main(_high_time_resolution=False)
+    fiber_density.experiments.inner_density_vs_offsets_in_axes.main(_high_time_resolution=False)
 
     print('\nPanel B')
-    fibers_density.experiments.same_vs_different_offsets_in_axes.main(_high_time_resolution=False)
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_offsets_in_axes.main(
+        _high_time_resolution=False)
 
     print('\nPanel C')
-    fibers_density.experiments.density_vs_communication_vs_z_offset.main()
+    fiber_density.experiments.inner_density_vs_same_inner_correlation_vs_different_inner_correlation_vs_z_offset.main()
 
     print('\nPanel F')
-    fibers_density.experiments.fibers_vs_time.compute_tuples([('SN16', 3, 'cells_0_1')])
+    fiber_density.experiments.inner_density_vs_time.compute_tuples([('SN16', 3, 'cells_0_1')])
 
     print('\nPanel G')
-    fibers_density.experiments.same_vs_different.main(_band=False, _high_time_resolution=False)
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(_band=False,
+                                                                                         _high_time_resolution=False)
 
     print('\nPanel H')
-    fibers_density.experiments.same_vs_different_band_vs_no_band.main(_high_time_resolution=False)
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_band_vs_no_band.main(
+        _high_time_resolution=False)
 
 
 def figure_si_5_saturation():
     print('\nPanel A')
-    fibers_density.experiments.inner_regions_saturation.main(_offset_y=0)
+    fiber_density.experiments.inner_correlation_vs_saturation.main(_offset_y=0)
 
     print('\nPanel B')
-    fibers_density.experiments.inner_regions_saturation.main(_offset_y=0.5)
+    fiber_density.experiments.inner_correlation_vs_saturation.main(_offset_y=0.5)
 
 
 def figure_si_5_high_time_res():
     print('\nPanel A')
-    fibers_density.experiments.fibers_vs_offsets_in_axes.main(_high_time_resolution=True)
+    fiber_density.experiments.inner_density_vs_offsets_in_axes.main(_high_time_resolution=True)
 
     print('\nPanel B')
-    fibers_density.experiments.same_vs_different_offsets_in_axes.main(_high_time_resolution=True)
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_offsets_in_axes.main(
+        _high_time_resolution=True)
 
 
 def figure_si_5_simulations():
     print('\nPanel A')
-    fibers_density.simulations.fibers_vs_offsets_in_axes.main(_low_connectivity=False)
+    fiber_density.simulations.inner_density_vs_offsets_in_axes.main(_low_connectivity=False)
 
     print('\nPanel B')
-    fibers_density.simulations.same_vs_different_offsets_in_axes.main(_low_connectivity=False)
+    fiber_density.simulations.same_inner_correlation_vs_different_inner_correlation_offsets_in_axes.main(
+        _low_connectivity=False)
 
 
 def figure_si_5_no_band():
     print('\nPanel A')
-    fibers_density.experiments.fibers_vs_offsets_in_axes.main(_band=False, _high_time_resolution=False)
+    fiber_density.experiments.inner_density_vs_offsets_in_axes.main(_band=False, _high_time_resolution=False)
 
     print('\nPanel B')
-    fibers_density.experiments.same_vs_different_offsets_in_axes.main(_band=False, _high_time_resolution=False)
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_offsets_in_axes.main(
+        _band=False, _high_time_resolution=False)
 
 
 def figure_5_all():
@@ -321,23 +338,23 @@ def figure_5_all():
 
 def figure_6_main():
     print('\nPanels B & C')
-    fibers_density.experiments.matchmaking_by_correlation.main(
+    fiber_density.experiments.matchmaking_by_inner_correlation.main(
         _real_cells=True, _offset_y=0.5, _high_time_resolution=False)
 
     print('\nPanel D')
-    fibers_density.experiments.matchmaking_by_correlation.main(
+    fiber_density.experiments.matchmaking_by_inner_correlation.main(
         _real_cells=True, _offset_y=0, _high_time_resolution=False)
 
     print('\nPanel E')
-    fibers_density.experiments.matchmaking_by_correlation.main(
+    fiber_density.experiments.matchmaking_by_inner_correlation.main(
         _real_cells=False, _offset_y=0.5, _high_time_resolution=False)
 
     print('\nPanel F')
-    fibers_density.experiments.matchmaking_by_correlation.main(
+    fiber_density.experiments.matchmaking_by_inner_correlation.main(
         _real_cells=True, _offset_y=0.5, _high_time_resolution=True)
 
     print('\nPanel G')
-    fibers_density.experiments.matchmaking_by_correlation.main(
+    fiber_density.experiments.matchmaking_by_inner_correlation.main(
         _real_cells=True, _offset_y=0.5, _high_time_resolution=True, _band=False)
 
 
@@ -348,73 +365,73 @@ def figure_6_all():
 
 def figure_7_main():
     print('\nPanel B')
-    fibers_density.simulations.same_vs_different_cross_correlation.main(
+    fiber_density.simulations.same_inner_correlation_vs_different_inner_correlation_cross_correlation.main(
         _alpha=1, _beta=1, _low_connectivity=False, _plots=['same'], _plot_types=['box'])
 
     print('\nPanel C')
-    fibers_density.simulations.same_vs_different_cross_correlation_alphas_betas.main(
+    fiber_density.simulations.same_inner_correlation_vs_different_inner_correlation_cross_correlation_alphas_betas.main(
         _type='alpha', _low_connectivity=False, _plots=['same'], _plot_types=['box'])
 
     print('\nPanel D')
-    fibers_density.simulations.same_vs_different_cross_correlation_alphas_betas.main(
+    fiber_density.simulations.same_inner_correlation_vs_different_inner_correlation_cross_correlation_alphas_betas.main(
         _type='alpha', _low_connectivity=False, _plots=['same'], _plot_types=['stacked_bar']
     )
 
     print('\nPanel E')
-    fibers_density.simulations.same_vs_different_cross_correlation_alphas_betas.main(
+    fiber_density.simulations.same_inner_correlation_vs_different_inner_correlation_cross_correlation_alphas_betas.main(
         _type='beta', _low_connectivity=False, _plots=['same'], _plot_types=['box'])
 
     print('\nPanel F')
-    fibers_density.experiments.inner_regions_granger_causality.main(
+    fiber_density.experiments.inner_dynamics_granger_causality.main(
         _band=None, _high_time_resolution=True, _tuples_to_mark=[('SN45', 2, 'cells_2_3'), ('SN45', 1, 'cells_1_3')],
         _plots=['granger'])
 
 
 def figure_si_7_simulate_time_lag_distribution():
     print('\nPanel A')
-    fibers_density.simulations.same_vs_different_cross_correlation.main(
+    fiber_density.simulations.same_inner_correlation_vs_different_inner_correlation_cross_correlation.main(
         _alpha=1, _beta=1, _low_connectivity=False, _plots=['same'], _plot_types=['bar'])
 
     print('\nPanel B')
-    fibers_density.simulations.same_vs_different_cross_correlation_alphas_betas.main(
+    fiber_density.simulations.same_inner_correlation_vs_different_inner_correlation_cross_correlation_alphas_betas.main(
         _type='alpha', _low_connectivity=False, _plots=['same'], _plot_types=['bar'])
 
     print('\nPanel C')
-    fibers_density.simulations.same_vs_different_cross_correlation_alphas_betas.main(
+    fiber_density.simulations.same_inner_correlation_vs_different_inner_correlation_cross_correlation_alphas_betas.main(
         _type='beta', _low_connectivity=False, _plots=['same'], _plot_types=['bar'])
 
 
 def figure_si_7_leader_follower_cross_correlation_experiments():
-    fibers_density.experiments.same_vs_different_cross_correlation.main(
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_cross_correlation.main(
         _plots=['same', 'different'], _plot_types=['box', 'bar'])
 
 
 def figure_si_7_different_network():
     print('\nPanels A & B')
-    fibers_density.simulations.same_vs_different_cross_correlation.main(
+    fiber_density.simulations.same_inner_correlation_vs_different_inner_correlation_cross_correlation.main(
         _alpha=1, _beta=1, _low_connectivity=False, _plots=['different'])
 
     print('\nPanels C & D')
-    fibers_density.simulations.same_vs_different_cross_correlation_alphas_betas.main(
+    fiber_density.simulations.same_inner_correlation_vs_different_inner_correlation_cross_correlation_alphas_betas.main(
         _type='alpha', _low_connectivity=False, _plots=['different'])
 
     print('\nPanels E & F')
-    fibers_density.simulations.same_vs_different_cross_correlation_alphas_betas.main(
+    fiber_density.simulations.same_inner_correlation_vs_different_inner_correlation_cross_correlation_alphas_betas.main(
         _type='beta', _low_connectivity=False, _plots=['different'])
 
 
 def figure_si_7_granger_causality():
     print('\nPanels B & C')
-    fibers_density.experiments.inner_regions_granger_causality.main(
+    fiber_density.experiments.inner_dynamics_granger_causality.main(
         _band=None, _high_time_resolution=True, _tuples_to_plot=[('SN45', 2, 'cells_2_3')])
 
     print('\nPanels E & F')
-    fibers_density.experiments.inner_regions_granger_causality.main(
+    fiber_density.experiments.inner_dynamics_granger_causality.main(
         _band=None, _high_time_resolution=True, _tuples_to_plot=[('SN45', 1, 'cells_1_3')])
 
 
 def figure_si_7_whiteness():
-    fibers_density.experiments.inner_regions_granger_causality.main(
+    fiber_density.experiments.inner_dynamics_granger_causality.main(
         _band=None, _high_time_resolution=True, _tuples_to_mark=[('SN45', 2, 'cells_2_3'), ('SN45', 1, 'cells_1_3')],
         _plots=['whiteness'])
 
@@ -441,7 +458,8 @@ def figure_7_all():
 
 
 def figure_si_discussion_plasticity():
-    fibers_density.experiments.fibers_vs_same_vs_different_offsets_in_axes.main()
+    fiber_density.experiments.inner_density_vs_same_inner_correlation_vs_different_inner_correlation_offsets_in_axes.\
+        main()
 
 
 def figure_discussion_all():

@@ -41,13 +41,13 @@ def main():
         _e, _s, _g, _b = _tuple
         _p = load.group_properties(_e, _s, _g)
         _p['band'] = _b
-        _group_structured_path = paths.structured(_e, 'Series ' + str(_s), _g)
+        _group_structured_path = paths.structured(_e, _s, _g)
         _properties_json_path = os.path.join(_group_structured_path, 'properties.json')
         save_lib.to_json(_p, _properties_json_path)
         print(_tuple)
 
         _g_fake = 'fake_' + _g.split('cells_')[1]
-        _group_structured_path = paths.structured(_e, 'Series ' + str(_s), _g_fake)
+        _group_structured_path = paths.structured(_e, _s, _g_fake)
         _properties_json_path = os.path.join(_group_structured_path, 'properties.json')
         if os.path.isfile(_properties_json_path):
             print(_g_fake)

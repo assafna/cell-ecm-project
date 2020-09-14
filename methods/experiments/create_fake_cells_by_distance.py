@@ -10,7 +10,7 @@ from tifffile import tifffile
 from libs import save_lib
 from libs.config_lib import CPUS_TO_USE
 from libs.experiments import paths, load, compute, config, organize, filtering
-from libs.experiments.config import FIBERS_CHANNEL_INDEX
+from libs.experiments.config import IMAGE_FIBER_CHANNEL_INDEX
 
 SHOW_PLOTS = False
 SMOOTH_AMOUNT = 0
@@ -18,11 +18,11 @@ SECURE_DISTANCE = 25
 
 
 def process_real_fake(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell_2_id, _based_on_cell_id,
-                      _fake_cell_x, _fake_cell_y, _series_image_by_time_points, _resolutions, _overwrite=False):
-    _time_points_data = []
+                      _fake_cell_x, _fake_cell_y, _series_image_by_time_frames, _resolutions, _overwrite=False):
+    _time_frames_data = []
     _left_cell_id = None
     _right_cell_id = None
-    _time_points_amount = len([_value for _value in _cells_coordinates[_based_on_cell_id] if _value is not None])
+    _time_frames_amount = len([_value for _value in _cells_coordinates[_based_on_cell_id] if _value is not None])
 
     # smooth coordinates
     _cells_coordinates_based_on_cell_smoothed = compute.smooth_coordinates_in_time(
@@ -38,19 +38,12 @@ def process_real_fake(_experiment, _series_id, _cells_coordinates, _cell_1_id, _
     # check if needed (missing time-point / properties file)
     if not _overwrite:
         _missing = False
-        for _time_point in range(_time_points_amount):
-            _time_point_pickle_path = paths.structured(
-                _experiment=_experiment,
-                _series='Series ' + str(_series_id),
-                _group=_group,
-                _time_point=str(_time_point) + '.pkl'
-            )
-            if not os.path.isfile(_time_point_pickle_path):
+        for _time_frame in range(_time_frames_amount):
+            _time_frame_pickle_path = paths.structured(_experiment, _series_id, _group, _time_frame)
+            if not os.path.isfile(_time_frame_pickle_path):
                 _missing = True
                 break
-        _group_structured_path = paths.structured(
-            _experiment, 'Series ' + str(_series_id), _group
-        )
+        _group_structured_path = paths.structured(_experiment, _series_id, _group)
         _properties_json_path = os.path.join(_group_structured_path, 'properties.json')
         if not os.path.isfile(_properties_json_path):
             _missing = True
@@ -62,10 +55,10 @@ def process_real_fake(_experiment, _series_id, _cells_coordinates, _cell_1_id, _
     _y_change = _fake_cell_y - _cells_coordinates_based_on_cell_smoothed[0][1]
 
     # running for each time point
-    for _time_point in range(_time_points_amount):
-        _time_point_image = _series_image_by_time_points[_time_point]
-        _based_on_cell_coordinates = [_value for _value in _cells_coordinates_based_on_cell_smoothed[_time_point]]
-        _fake_cell_coordinates = [_value for _value in _cells_coordinates_fake_cell_smoothed[_time_point]]
+    for _time_frame in range(_time_frames_amount):
+        _time_frame_image = _series_image_by_time_frames[_time_frame]
+        _based_on_cell_coordinates = [_value for _value in _cells_coordinates_based_on_cell_smoothed[_time_frame]]
+        _fake_cell_coordinates = [_value for _value in _cells_coordinates_fake_cell_smoothed[_time_frame]]
 
         # update coordinates of fake
         _fake_cell_coordinates = [
@@ -75,14 +68,14 @@ def process_real_fake(_experiment, _series_id, _cells_coordinates, _cell_1_id, _
         ]
 
         # choose left and right cells
-        if _time_point == 0:
+        if _time_frame == 0:
             if _based_on_cell_coordinates[0] <= _fake_cell_coordinates[0]:
                 _left_cell_id, _right_cell_id = _cell_1_id, _cell_2_id
             else:
                 _right_cell_id, _left_cell_id = _cell_1_id, _cell_2_id
 
         print(_experiment, 'Series ' + str(_series_id), 'Cell 1 #:', _cell_1_id, 'Cell 2 #:', _cell_2_id,
-              'Based on cell #:', _based_on_cell_id, 'Time point:', _time_point, sep='\t')
+              'Based on cell #:', _based_on_cell_id, 'Time point:', _time_frame, sep='\t')
 
         # set coordinates
         if _left_cell_id == _cell_1_id:
@@ -95,24 +88,24 @@ def process_real_fake(_experiment, _series_id, _cells_coordinates, _cell_1_id, _
         _angle = compute.angle_between_three_points(
             _right_cell_coordinates, _left_cell_coordinates, _helper_coordinates
         )
-        _padding_x, _padding_y = compute.axes_padding(_2d_image_shape=_time_point_image[0].shape, _angle=_angle)
+        _padding_x, _padding_y = compute.axes_padding(_2d_image_shape=_time_frame_image[0].shape, _angle=_angle)
         _left_cell_coordinates[0] += _padding_x
         _left_cell_coordinates[1] += _padding_y
         _right_cell_coordinates[0] += _padding_x
         _right_cell_coordinates[1] += _padding_y
 
         # rotate image and change axes
-        _time_point_image_rotated = np.array([rotate(_z, _angle) for _z in _time_point_image])
-        _time_point_image_swapped = np.swapaxes(_time_point_image_rotated, 0, 1)
+        _time_frame_image_rotated = np.array([rotate(_z, _angle) for _z in _time_frame_image])
+        _time_frame_image_swapped = np.swapaxes(_time_frame_image_rotated, 0, 1)
 
         if SHOW_PLOTS:
-            plt.imshow(_time_point_image_rotated[int(round(_left_cell_coordinates[2]))])
+            plt.imshow(_time_frame_image_rotated[int(round(_left_cell_coordinates[2]))])
             plt.show()
-            plt.imshow(_time_point_image_rotated[int(round(_right_cell_coordinates[2]))])
+            plt.imshow(_time_frame_image_rotated[int(round(_right_cell_coordinates[2]))])
             plt.show()
 
         # update coordinates
-        _image_center = compute.image_center_coordinates(_image_shape=reversed(_time_point_image_rotated[0].shape))
+        _image_center = compute.image_center_coordinates(_image_shape=reversed(_time_frame_image_rotated[0].shape))
         _left_cell_coordinates = compute.rotate_point_around_another_point(
             _point=_left_cell_coordinates,
             _angle_in_radians=math.radians(_angle),
@@ -132,7 +125,7 @@ def process_real_fake(_experiment, _series_id, _cells_coordinates, _cell_1_id, _
         _right_cell_coordinates[2] = _fixed_y
 
         if SHOW_PLOTS:
-            plt.imshow(_time_point_image_swapped[int(round(_left_cell_coordinates[2]))])
+            plt.imshow(_time_frame_image_swapped[int(round(_left_cell_coordinates[2]))])
             plt.show()
 
         # swap resolutions
@@ -147,18 +140,18 @@ def process_real_fake(_experiment, _series_id, _cells_coordinates, _cell_1_id, _
         _angle = compute.angle_between_three_points(
             _right_cell_coordinates, _left_cell_coordinates, _helper_coordinates
         )
-        _padding_x, _padding_y = compute.axes_padding(_2d_image_shape=_time_point_image_swapped[0].shape, _angle=_angle)
+        _padding_x, _padding_y = compute.axes_padding(_2d_image_shape=_time_frame_image_swapped[0].shape, _angle=_angle)
         _left_cell_coordinates[0] += _padding_x
         _left_cell_coordinates[1] += _padding_y
         _right_cell_coordinates[0] += _padding_x
         _right_cell_coordinates[1] += _padding_y
 
         # rotate image
-        _time_point_image_swapped_rotated = np.array([rotate(_z, _angle) for _z in _time_point_image_swapped])
+        _time_frame_image_swapped_rotated = np.array([rotate(_z, _angle) for _z in _time_frame_image_swapped])
 
         # update coordinates
         _image_center = compute.image_center_coordinates(
-            _image_shape=reversed(_time_point_image_swapped_rotated[0].shape))
+            _image_shape=reversed(_time_frame_image_swapped_rotated[0].shape))
         _left_cell_coordinates = compute.rotate_point_around_another_point(
             _point=_left_cell_coordinates,
             _angle_in_radians=math.radians(_angle),
@@ -174,8 +167,8 @@ def process_real_fake(_experiment, _series_id, _cells_coordinates, _cell_1_id, _
         _right_cell_coordinates[1] = _fixed_y
 
         if SHOW_PLOTS:
-            if _time_point == 0 or _time_point == 50 or _time_point == 150:
-                plt.imshow(_time_point_image_swapped_rotated[int(round(_left_cell_coordinates[2]))])
+            if _time_frame == 0 or _time_frame == 50 or _time_frame == 150:
+                plt.imshow(_time_frame_image_swapped_rotated[int(round(_left_cell_coordinates[2]))])
                 plt.show()
 
         # update resolutions
@@ -185,7 +178,7 @@ def process_real_fake(_experiment, _series_id, _cells_coordinates, _cell_1_id, _
 
         # TODO: if the cell coordinates are out of image write it somewhere, so when checking for "overwrite"
         #  it will know when to stop
-        _image_z, _image_y, _image_x = _time_point_image_swapped_rotated.shape
+        _image_z, _image_y, _image_x = _time_frame_image_swapped_rotated.shape
         if not 0 <= _left_cell_coordinates[0] < _image_x or not \
                 0 <= _left_cell_coordinates[1] < _image_y or not \
                 0 <= _left_cell_coordinates[2] < _image_z:
@@ -196,7 +189,7 @@ def process_real_fake(_experiment, _series_id, _cells_coordinates, _cell_1_id, _
             break
 
         # add to array
-        _time_points_data.append({
+        _time_frames_data.append({
             'left_cell': {
                 'coordinates': {
                     'x': _left_cell_coordinates[0],
@@ -215,13 +208,8 @@ def process_real_fake(_experiment, _series_id, _cells_coordinates, _cell_1_id, _
         })
 
         # save to pickle
-        _time_point_pickle_path = paths.structured(
-            _experiment=_experiment,
-            _series='Series ' + str(_series_id),
-            _group=_group,
-            _time_point=str(_time_point) + '.pkl'
-        )
-        save_lib.to_pickle(_time_point_image_swapped_rotated, _time_point_pickle_path)
+        _time_frame_pickle_path = paths.structured(_experiment, _series_id, _group, _time_frame)
+        save_lib.to_pickle(_time_frame_image_swapped_rotated, _time_frame_pickle_path)
 
     # save properties
     _based_on_properties = \
@@ -233,13 +221,13 @@ def process_real_fake(_experiment, _series_id, _cells_coordinates, _cell_1_id, _
             'left_cell': _left_cell_id,
             'right_cell': _right_cell_id
         },
-        'time_points': _time_points_data,
+        'time_points': _time_frames_data,
         'band': _based_on_properties['band'],
         'fake': False,
         'static': False,
         'real_fake': True
     }
-    _group_structured_path = paths.structured(_experiment, 'Series ' + str(_series_id), _group)
+    _group_structured_path = paths.structured(_experiment, _series_id, _group)
     _properties_json_path = os.path.join(_group_structured_path, 'properties.json')
     save_lib.to_json(_properties_data, _properties_json_path)
 
@@ -250,7 +238,7 @@ def points_on_circumference(_x=0, _y=0, _radius=50, _num_of_points=100):
              ) for _point in range(0, _num_of_points + 1)]
 
 
-def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell_2_id, _series_image_by_time_points,
+def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell_2_id, _series_image_by_time_frames,
                   _resolutions, _image_properties, _overwrite=False):
     # compute pair distance
     _cell_1_x, _cell_1_y, _ = _cells_coordinates[_cell_1_id][0]
@@ -287,9 +275,9 @@ def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell
             _shortest_distance = math.inf
             for _cell_coordinates in _all_cell_coordinates:
                 _cell_x, _cell_y, _ = _cell_coordinates
-                _cells_distance = math.sqrt(((_point_x - _cell_x) ** 2 + (_point_y - _cell_y) ** 2))
-                if _cells_distance < _shortest_distance:
-                    _shortest_distance = _cells_distance
+                _distance_between_point_and_cell = math.sqrt(((_point_x - _cell_x) ** 2 + (_point_y - _cell_y) ** 2))
+                if _distance_between_point_and_cell < _shortest_distance:
+                    _shortest_distance = _distance_between_point_and_cell
 
             if _shortest_distance > _best_distance:
                 _best_distance = _shortest_distance
@@ -309,28 +297,26 @@ def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell
             _based_on_cell_id=_based_on_cell_id,
             _fake_cell_x=_best_point[0],
             _fake_cell_y=_best_point[1],
-            _series_image_by_time_points=_series_image_by_time_points,
+            _series_image_by_time_frames=_series_image_by_time_frames,
             _resolutions=_image_properties['resolutions'],
             _overwrite=_overwrite
         )
 
 
 def process_series(_experiment, _series_id, _overwrite=False):
-    _series_image_path = paths.serieses(_experiment, 'series_' + str(_series_id) + '_bc.tif')
+    _series_image_path = paths.serieses(_experiment, _series_id)
     _image_properties = load.image_properties(_experiment, _series_id)
     _series_image = tifffile.imread(_series_image_path)
-    _cells_coordinates = load.cell_coordinates_tracked_series_file_data(
-        _experiment, 'series_' + str(_series_id) + '.txt'
-    )
-    _series_image_by_time_points = [
-        np.array([_z[FIBERS_CHANNEL_INDEX] for _z in _series_image[_time_point]])
-        for _time_point in range(_series_image.shape[0])
+    _cells_coordinates = load.cell_coordinates_tracked_series_file_data(_experiment, _series_id)
+    _series_image_by_time_frames = [
+        np.array([_z[IMAGE_FIBER_CHANNEL_INDEX] for _z in _series_image[_time_frame]])
+        for _time_frame in range(_series_image.shape[0])
     ]
 
     _tuples = load.experiment_groups_as_tuples(_experiment)
     _tuples = organize.by_experiment(_tuples)[_experiment]
-    _tuples = filtering.by_real_cells(_tuples)
-    _tuples = filtering.by_real_fake_cells(_tuples, _real_fake_cells=False)
+    _tuples = filtering.by_real_pairs(_tuples)
+    _tuples = filtering.by_real_fake_pairs(_tuples, _real_fake_pairs=False)
     _tuples = filtering.by_series_id(_tuples, _series_id)
 
     for _tuple in _tuples:
@@ -342,7 +328,7 @@ def process_series(_experiment, _series_id, _overwrite=False):
             _cells_coordinates=_cells_coordinates,
             _cell_1_id=_cell_1_id,
             _cell_2_id=_cell_2_id,
-            _series_image_by_time_points=_series_image_by_time_points,
+            _series_image_by_time_frames=_series_image_by_time_frames,
             _resolutions=_image_properties['resolutions'],
             _image_properties=_image_properties,
             _overwrite=_overwrite

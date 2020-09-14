@@ -26,11 +26,8 @@ def div_to_website(_div, _filepath):
     </html>
     '''
 
-    try:
-        with open(_filepath + '.html', 'w') as _html:
-            _html.write(_web_page)
-    finally:
-        _html.close()
+    with open(_filepath + '.html', 'w') as _html:
+        _html.write(_web_page)
 
 
 def get_module_name():

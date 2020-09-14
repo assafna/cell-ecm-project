@@ -6,29 +6,29 @@ import numpy as np
 
 from libs import save_lib
 from libs.config_lib import CPUS_TO_USE
-from libs.experiments import load, save, paths, config
+from libs.experiments import load, paths, config
 from libs.experiments.config import AVERAGE_CELL_DIAMETER_IN_MICRONS
 
 STEP_PERCENTAGE = 0.1
 CELL_BORDERS_VALUES = [-2, -1, 0, 1, 2]
 
 
-def is_in_roi(_x1, _y1, _z1, _x2, _y2, _z2, _point_x, _point_y, _point_z):
+def is_in_window(_x1, _y1, _z1, _x2, _y2, _z2, _point_x, _point_y, _point_z):
     return all([_x1 <= _point_x <= _x2, _y1 <= _point_y <= _y2, _z1 <= _point_z <= _z2])
 
 
 def process_series(_experiment, _series_id, _overwrite=False):
-    _normalization_path = os.path.join(paths.normalization(_experiment), 'series_' + str(_series_id) + '.json')
+    _normalization_path = os.path.join(paths.normalization(_experiment), _series_id)
     if not _overwrite and os.path.isfile(_normalization_path):
         return
 
-    _series_image_first_time_point = load.series_image(_experiment, _series_id)[0]
+    _series_image_first_time_frame = load.series_image(_experiment, _series_id)[0]
     _image_properties = load.image_properties(_experiment, _series_id)
-    _cells = load.objects_time_point_file_data(_experiment, 'Series ' + str(_series_id), _time_point='tp_1.txt')
+    _cells = load.objects_time_frame_file_data(_experiment, _series_id, _time_frame=1)
     _cell_diameter_x = AVERAGE_CELL_DIAMETER_IN_MICRONS / _image_properties['resolutions']['x']
     _cell_diameter_y = AVERAGE_CELL_DIAMETER_IN_MICRONS / _image_properties['resolutions']['y']
     _cell_diameter_z = AVERAGE_CELL_DIAMETER_IN_MICRONS / _image_properties['resolutions']['z']
-    _z_shape, _y_shape, _x_shape = _series_image_first_time_point.shape
+    _z_shape, _y_shape, _x_shape = _series_image_first_time_frame.shape
     _z_step, _y_step, _x_step = [int(round(_value * STEP_PERCENTAGE)) for _value in [_z_shape, _y_shape, _x_shape]]
 
     _averages = []
@@ -41,11 +41,11 @@ def process_series(_experiment, _series_id, _overwrite=False):
         _z2 = _z1 + _cell_diameter_z
         _x1, _y1, _z1, _x2, _y2, _z2 = [int(round(_value)) for _value in [_x1, _y1, _z1, _x2, _y2, _z2]]
 
-        # roi is in borders
+        # window is in borders
         if all([_x1 >= 0, _x2 < _x_shape, _y1 >= 0, _y2 < _y_shape, _z1 >= 0, _z2 < _z_shape]):
 
             # make sure no cells are around
-            _in_roi = False
+            _in_window = False
             for _cell in _cells:
                 _cell_x, _cell_y, _cell_z = _cell
 
@@ -53,25 +53,25 @@ def process_series(_experiment, _series_id, _overwrite=False):
                 for _value_x, _value_y, _value_z in product(
                         CELL_BORDERS_VALUES, CELL_BORDERS_VALUES, CELL_BORDERS_VALUES
                 ):
-                    if is_in_roi(
-                        _x1, _y1, _z1, _x2, _y2, _z2,
-                        _cell_x + _cell_diameter_x * _value_x,
-                        _cell_y + _cell_diameter_y * _value_y,
-                        _cell_z + _cell_diameter_z * _value_z
+                    if is_in_window(
+                            _x1, _y1, _z1, _x2, _y2, _z2,
+                            _cell_x + _cell_diameter_x * _value_x,
+                            _cell_y + _cell_diameter_y * _value_y,
+                            _cell_z + _cell_diameter_z * _value_z
                     ):
-                        _in_roi = True
+                        _in_window = True
                         break
 
                 # one cell is enough
-                if _in_roi:
+                if _in_window:
                     break
 
             # one cell is enough
-            if _in_roi:
+            if _in_window:
                 continue
 
             # no cells are around, compute
-            _averages.append(np.mean(_series_image_first_time_point[_z1:_z2, _y1:_y2, _x1:_x2]))
+            _averages.append(np.mean(_series_image_first_time_frame[_z1:_z2, _y1:_y2, _x1:_x2]))
 
     # compute average and std of averages
     _average, _std = np.mean(_averages), np.std(_averages)

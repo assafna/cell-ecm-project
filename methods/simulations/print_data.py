@@ -63,7 +63,7 @@ def main():
         print('\nCell pairs distance:', _distance)
 
         # total
-        _distance_simulations = filtering.by_distance(_cell_pairs_simulations, _distance=_distance)
+        _distance_simulations = filtering.by_pair_distance(_cell_pairs_simulations, _distance=_distance)
         print('\tTotal cell pairs simulations:', len(_distance_simulations))
 
         # no heterogeneity

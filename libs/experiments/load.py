@@ -1,26 +1,10 @@
-import gzip
-import json
-import os
-
-import pickle
-
 import numpy as np
 from tifffile import tifffile
 
 from libs import load_lib
 from libs.experiments import paths
-from libs.experiments.config import FIBERS_CHANNEL_INDEX
-
+from libs.experiments.config import IMAGE_FIBER_CHANNEL_INDEX
 from methods.experiments.update_blacklist import add_to_blacklist
-
-
-# TODO: change everywhere to use the save_lib and load_lib
-def time_point_file_name_to_number(_time_point_file_name):
-    return int(str(_time_point_file_name.split('tp_')[1]).split('.')[0])
-
-
-def series_file_name_to_name(_series_file_name):
-    return 'Series ' + str(str(_series_file_name.split('series_')[1]).split('.')[0])
 
 
 def experiment_serieses_as_tuples(_experiment):
@@ -38,8 +22,9 @@ def experiments_serieses_as_tuples(_experiments):
 def experiment_groups_as_tuples(_experiment):
     _tuples = []
     for _series in paths.folders(paths.structured(_experiment)):
-        for _group in paths.folders(paths.structured(_experiment, _series)):
-            _tuples.append((_experiment, int(_series.split()[1]), _group))
+        _series_id = int(_series.split()[1])
+        for _group in paths.folders(paths.structured(_experiment, _series_id)):
+            _tuples.append((_experiment, _series_id, _group))
 
     return _tuples
 
@@ -53,167 +38,104 @@ def experiments_groups_as_tuples(_experiments):
 
 
 def image_properties(_experiment, _series_id):
-    _file_path = paths.image_properties(_experiment, 'series_' + str(_series_id) + '.json')
-    try:
-        with open(_file_path) as _json:
-            return json.load(_json)
-    finally:
-        _json.close()
+    return load_lib.from_json(paths.image_properties(_experiment, _series_id))
 
 
 def group_properties(_experiment, _series_id, _group):
-    _file_path = paths.group_properties(_experiment, 'Series ' + str(_series_id), _group)
-    try:
-        with open(_file_path) as _json:
-            return json.load(_json)
-    finally:
-        _json.close()
+    return load_lib.from_json(paths.group_properties(_experiment, _series_id, _group))
 
 
-def structured_image(_experiment, _series_id, _group, _time_point):
-    _image_path = paths.structured(_experiment, 'Series ' + str(_series_id), _group, str(_time_point) + '.pkl')
-    try:
-        with gzip.open(_image_path, 'rb') as _pickle:
-            return pickle.load(_pickle)
-    finally:
-        _pickle.close()
+def structured_image(_experiment, _series_id, _group, _time_frame):
+    return load_lib.from_pickle(paths.structured(_experiment, _series_id, _group, _time_frame))
 
 
-def mean_distance_to_surface_in_microns(_experiment, _series_id, _cell_id, _time_point=0):
-    _objects_file_path = paths.objects(_experiment, 'Series ' + str(_series_id), 'tp_' + str(_time_point + 1) + '.txt')
-    try:
-        with open(_objects_file_path) as _f:
-            _lines = _f.readlines()
-            _headers = _lines[0].split('\t')
-            _index = _headers.index('Mean dist. to surf. (micron)')
-            return float(_lines[_cell_id + 1].split('\t')[_index])
-    finally:
-        _f.close()
+def mean_distance_to_surface_in_microns(_experiment, _series_id, _cell_id, _time_frame=0):
+    _objects_file_path = paths.objects(_experiment, _series_id, _time_frame + 1)
+    with open(_objects_file_path) as _f:
+        _lines = _f.readlines()
+        _headers = _lines[0].split('\t')
+        _index = _headers.index('Mean dist. to surf. (micron)')
+        return float(_lines[_cell_id + 1].split('\t')[_index])
 
 
-def objects_time_point_file_data(_experiment, _series, _time_point):
-    _file_path = paths.objects(_experiment, _series, _time_point)
-    try:
-        _cells = []
-        with open(_file_path) as _f:
-            _lines = _f.readlines()
+def objects_time_frame_file_data(_experiment, _series_id, _time_frame):
+    _file_path = paths.objects(_experiment, _series_id, _time_frame)
+    _cells = []
+    with open(_file_path) as _f:
+        _lines = _f.readlines()
 
-            # check for black image
-            if _lines[0] == 'BLACK':
-                _tp = int(str(_time_point.split('_')[1]).split('.')[0])
-                for _cell_id in ['left_cell', 'right_cell']:
-                    add_to_blacklist(
-                        _experiment=_experiment,
-                        _series_id=_series,
-                        _cell_id=_cell_id,
-                        _time_point_start=_tp,
-                        _time_point_end=_tp,
-                        _reason='Black image'
-                    )
+        # check for black image
+        if _lines[0] == 'BLACK':
+            for _cell_id in ['left_cell', 'right_cell']:
+                add_to_blacklist(
+                    _experiment=_experiment,
+                    _series_id=_series_id,
+                    _cell_id=_cell_id,
+                    _time_frame_start=_time_frame,
+                    _time_frame_end=_time_frame,
+                    _reason='Black image'
+                )
 
-                # return previous time point data
-                return objects_time_point_file_data(_experiment, _series, 'tp_' + str(_tp - 1) + '.txt')
+            # return previous time point data
+            return objects_time_frame_file_data(_experiment, _series_id, _time_frame - 1)
 
-            _headers = _lines[0].split('\t')
-            _x_index, _y_index, _z_index = _headers.index('X'), _headers.index('Y'), _headers.index('Z')
-            for _line in _lines[1:]:
-                _line = _line.split('\t')
-                _x, _y, _z = float(_line[_x_index]), float(_line[_y_index]), float(_line[_z_index])
-                _cells.append((_x, _y, _z))
-    finally:
-        _f.close()
+        _headers = _lines[0].split('\t')
+        _x_index, _y_index, _z_index = _headers.index('X'), _headers.index('Y'), _headers.index('Z')
+        for _line in _lines[1:]:
+            _line = _line.split('\t')
+            _x, _y, _z = float(_line[_x_index]), float(_line[_y_index]), float(_line[_z_index])
+            _cells.append((_x, _y, _z))
 
     return _cells
 
 
-def objects_series_file_data(_experiment, _series):
-    _objects_by_time = list([None] * len(paths.text_files(paths.objects(_experiment, _series))))
-    for _time_point_file in paths.text_files(paths.objects(_experiment, _series)):
-        _time_point = time_point_file_name_to_number(_time_point_file)
-        _objects_by_time[_time_point - 1] = objects_time_point_file_data(_experiment, _series, _time_point_file)
+def objects_series_file_data(_experiment, _series_id):
+    _objects_by_time = list([None] * len(paths.text_files(paths.objects(_experiment, _series_id))))
+    for _time_frame_file in paths.text_files(paths.objects(_experiment, _series_id)):
+        _time_frame = int(str(_time_frame_file.split('tp_')[1]).split('.')[0])
+        _objects_by_time[_time_frame - 1] = objects_time_frame_file_data(_experiment, _series_id, _time_frame)
 
     return _objects_by_time
 
 
-def objects_experiment_file_data(_experiment):
-    return {_series: objects_series_file_data(_experiment, _series) for
-            _series in paths.folders(paths.objects(_experiment))}
-
-
-def cell_coordinates_tracked_series_file_data(_experiment, _series):
-    _file_path = paths.cell_coordinates_tracked(_experiment, _series)
-    try:
-        _cells = []
-        with open(_file_path) as _f:
-            _lines = _f.readlines()
-            for _line in _lines:
-                _line = _line.replace('\n', '')
-                _line = _line.split('\t')
-                _coordinates_by_time = []
-                for _coordinates in _line:
-                    if _coordinates == 'None':
-                        _coordinates_by_time.append(None)
-                    else:
-                        _coordinates_split = _coordinates.split()
-                        _x, _y, _z = float(_coordinates_split[0]), float(_coordinates_split[1]), float(_coordinates_split[2])
-                        _coordinates_by_time.append((_x, _y, _z))
-                _cells.append(_coordinates_by_time)
-    finally:
-        _f.close()
+def cell_coordinates_tracked_series_file_data(_experiment, _series_id):
+    _file_path = paths.cell_coordinates_tracked(_experiment, _series_id)
+    _cells = []
+    with open(_file_path) as _f:
+        _lines = _f.readlines()
+        for _line in _lines:
+            _line = _line.replace('\n', '')
+            _line = _line.split('\t')
+            _coordinates_by_time = []
+            for _coordinates in _line:
+                if _coordinates == 'None':
+                    _coordinates_by_time.append(None)
+                else:
+                    _coordinates_split = _coordinates.split()
+                    _x, _y, _z = \
+                        float(_coordinates_split[0]), float(_coordinates_split[1]), float(_coordinates_split[2])
+                    _coordinates_by_time.append((_x, _y, _z))
+            _cells.append(_coordinates_by_time)
 
     return _cells
 
 
-def cell_coordinates_tracked_experiment_file_data(_experiment):
-    return {_series: cell_coordinates_tracked_series_file_data(_experiment, _series) for
-            _series in paths.folders(paths.cell_coordinates_tracked(_experiment))}
+def normalization_series_file_data(_experiment, _series_id):
+    return load_lib.from_json(paths.normalization(_experiment, _series_id))
 
 
-def fibers_densities(_experiment, _series_id, _group, _time_point):
-    _fibers_densities_path = paths.fibers_densities(_experiment, 'Series ' + str(_series_id), _group, str(_time_point) + '.pkl')
-    if os.path.isfile(_fibers_densities_path):
-        try:
-            with gzip.open(_fibers_densities_path, 'rb') as _pickle:
-                return pickle.load(_pickle)
-        except (EOFError, OSError):
-            return {}
-        finally:
-            _pickle.close()
-    else:
-        return {}
-
-
-def normalization_series_file_data(_experiment, _series):
-    _file_path = paths.normalization(_experiment, _series)
-    try:
-        with open(_file_path) as _json:
-            return json.load(_json)
-    finally:
-        _json.close()
-
-
-def normalization_experiment_file_data(_experiment):
-    return {series_file_name_to_name(_series):
-            normalization_series_file_data(_experiment, series_file_name_to_name(_series)) for
-            _series in paths.text_files(paths.normalization(_experiment))}
-
-
-def series_image(_experiment, _series_id, _fibers_channel=True):
-    _series_image_path = paths.serieses(_experiment, 'series_' + str(_series_id) + '_bc.tif')
+def series_image(_experiment, _series_id, _fiber_channel=True):
+    _series_image_path = paths.serieses(_experiment, _series_id)
     _series_image = tifffile.imread(_series_image_path)
 
-    if _fibers_channel:
+    if _fiber_channel:
         return np.array([
-            np.array([_z[FIBERS_CHANNEL_INDEX] for _z in _series_image[_time_point]])
-            for _time_point in range(_series_image.shape[0])
+            np.array([_z[IMAGE_FIBER_CHANNEL_INDEX] for _z in _series_image[_time_frame]])
+            for _time_frame in range(_series_image.shape[0])
         ])
     else:
         return _series_image
 
 
 def blacklist(_experiment, _series_id=None):
-    _path = paths.blacklist(_experiment, _series_id)
-    if not os.path.isfile(_path):
-        return {}
-
-    return load_lib.from_pickle(_path)
+    return load_lib.from_pickle(paths.blacklist(_experiment, _series_id))

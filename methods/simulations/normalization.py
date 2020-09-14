@@ -7,7 +7,8 @@ from tqdm import tqdm
 
 from libs.config_lib import CPUS_TO_USE
 from libs.simulations import paths, compute, load, save
-from libs.simulations.config import ROI_WIDTH, ROI_HEIGHT, CELL_DIAMETER
+from libs.simulations.config import QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, \
+    QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER, CELL_DIAMETER
 
 BORDER = 0.2
 OFFSET_X_START = -BORDER
@@ -26,24 +27,26 @@ def process_simulation(_simulation, _overwrite=False):
     if not _overwrite and os.path.isfile(_normalization_pickle_path):
         return
 
-    _fibers_densities = []
-    _offsets_x = list(np.arange(OFFSET_X_START, OFFSET_X_END - ROI_WIDTH * CELL_DIAMETER, STEP))
-    _offsets_y = list(np.arange(OFFSET_Y_START, CELLS_ZONE_Y_START - ROI_HEIGHT * CELL_DIAMETER, STEP)) + \
-        list(np.arange(CELLS_ZONE_Y_END, OFFSET_Y_END - ROI_HEIGHT * CELL_DIAMETER, STEP))
+    _fiber_density = []
+    _offsets_x = list(np.arange(
+        OFFSET_X_START, OFFSET_X_END - QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER * CELL_DIAMETER, STEP))
+    _offsets_y = list(np.arange(
+        OFFSET_Y_START, CELLS_ZONE_Y_START - QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER * CELL_DIAMETER, STEP)) + \
+        list(np.arange(
+            CELLS_ZONE_Y_END, OFFSET_Y_END - QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER * CELL_DIAMETER, STEP))
 
-    # prepare rois
-    _rois = []
+    # prepare windows
+    _windows = []
     for _offset_x in _offsets_x:
         for _offset_y in _offsets_y:
-            _rois.append(
-                (_offset_x, _offset_y, _offset_x + ROI_WIDTH * CELL_DIAMETER, _offset_y + ROI_HEIGHT * CELL_DIAMETER)
-            )
+            _windows.append((_offset_x, _offset_y, _offset_x + QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER *
+                             CELL_DIAMETER, _offset_y + QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER * CELL_DIAMETER))
 
     # compute
-    _rois_sums = compute.rois_fibers_densities(_simulation, _time_point=0, _rois=_rois)
+    _windows_sums = compute.quantification_windows_fiber_densities(_simulation, _time_point=0, _windows=_windows)
 
     # save
-    _sums = list(_rois_sums.values())
+    _sums = list(_windows_sums.values())
     _normalization = {
         'average': np.mean(_sums),
         'std': np.std(_sums)

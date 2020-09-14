@@ -1,4 +1,3 @@
-import json
 import os
 
 from libs import save_lib
@@ -13,26 +12,13 @@ def cell_coordinates_tracked(_experiment, _series_id, _cell_coordinates):
     _lines = ''
     for _cell_index, _cell in enumerate(_cell_coordinates):
         _line = ''
-        for _tp_index, _tp in enumerate(_cell):
-            _tp_str = str(_tp[0]) + ' ' + str(_tp[1]) + ' ' + str(_tp[2]) if _tp is not None else 'None'
-            _line += _tp_str + '\t' if _tp_index < len(_cell) - 1 else _tp_str
+        for _time_frame_index, _time_frame in enumerate(_cell):
+            _time_frame_str = str(_time_frame[0]) + ' ' + str(_time_frame[1]) + ' ' + str(_time_frame[2]) \
+                if _time_frame is not None else 'None'
+            _line += _time_frame_str + '\t' if _time_frame_index < len(_cell) - 1 else _time_frame_str
         _lines += _line + '\n' if _cell_index < len(_cell_coordinates) - 1 else _line
-    try:
-        with open(_file_path, 'w') as _f:
-            _f.write(_lines)
-    finally:
-        _f.close()
-
-
-def normalization_line(_experiment, _series, _line):
-    _experiment_path = paths.normalization_lines(_experiment)
-    os.mkdir(_experiment_path) if not os.path.isdir(_experiment_path) else None
-    _file_path = os.path.join(_experiment_path, 'series_' + str(_series.split()[1]) + '.txt')
-    try:
-        with open(_file_path, 'w') as _f:
-            _f.write(str(_line[0]) + '\t' + str(_line[1]) + '\t' + str(_line[2]) + '\t' + str(_line[3]))
-    finally:
-        _f.close()
+    with open(_file_path, 'w') as _f:
+        _f.write(_lines)
 
 
 def image_properties(_experiment, _series_id, _image_properties):
@@ -40,11 +26,6 @@ def image_properties(_experiment, _series_id, _image_properties):
     os.mkdir(_experiment_path) if not os.path.isdir(_experiment_path) else None
     _path = os.path.join(_experiment_path, 'series_' + str(_series_id) + '.json')
     save_lib.to_json(_image_properties, _path)
-
-
-def fibers_densities(_experiment, _series_id, _group, _time_point, _fibers_densities):
-    _fibers_densities_path = paths.fibers_densities(_experiment, 'Series ' + str(_series_id), _group, str(_time_point) + '.pkl')
-    to_pickle(_fibers_densities, _fibers_densities_path)
 
 
 def blacklist(_experiment, _series_id=None, _blacklist=None):

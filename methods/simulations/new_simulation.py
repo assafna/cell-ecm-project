@@ -3,16 +3,16 @@ import os
 import time
 
 import libs.simulations.load
+from libs.save_lib import to_pickle
 from libs.simulations import load, paths
 from libs.simulations.config import CELL_DIAMETER, NET_DIMENSIONS, ORIGIN_COORDINATES, \
     ELEMENTS_FILE_NAME
-from libs.save_lib import to_pickle
 
 
 def create_properties(_simulation):
     print(_simulation, 'Creating properties')
     _simulation_path = paths.raw(_simulation)
-    _cells_diameters = load.cells_diameters(_simulation)
+    _cells_diameters = load.pair_diameters(_simulation)
     _time_points = load.time_points(_simulation)
     _time_points_data = []
     if 'D_' in _simulation:
@@ -52,16 +52,13 @@ def create_elements(_simulation):
     _simulation_path = paths.raw(_simulation)
     _elements_path = os.path.join(_simulation_path, ELEMENTS_FILE_NAME)
     _elements = []
-    try:
-        with open(_elements_path, 'r') as _f:
+    with open(_elements_path, 'r') as _f:
+        _l = _f.readline()
+        while _l:
+            _l_split = [_x.strip() for _x in _l.split(',')]
+            _element = [int(_l_split[1]), int(_l_split[2])]
+            _elements.append(_element)
             _l = _f.readline()
-            while _l:
-                _l_split = [_x.strip() for _x in _l.split(',')]
-                _element = [int(_l_split[1]), int(_l_split[2])]
-                _elements.append(_element)
-                _l = _f.readline()
-    finally:
-        _f.close()
 
     return _elements
 
@@ -70,16 +67,13 @@ def create_time_point(_simulation, _time_point):
     _simulation_path = paths.raw(_simulation)
     _time_point_path = os.path.join(_simulation_path, 'tp_' + str(_time_point) + '.txt')
     _intersections = [0]
-    try:
-        with open(_time_point_path, 'r') as _f:
+    with open(_time_point_path, 'r') as _f:
+        _l = _f.readline()
+        while _l:
+            _l_split = [_x.strip() for _x in _l.split(',')]
+            _i_id, _x, _y = _l_split
+            _intersections.append([float(_x), float(_y)])
             _l = _f.readline()
-            while _l:
-                _l_split = [_x.strip() for _x in _l.split(',')]
-                _i_id, _x, _y = _l_split
-                _intersections.append([float(_x), float(_y)])
-                _l = _f.readline()
-    finally:
-        _f.close()
 
     return _intersections
 
@@ -87,9 +81,9 @@ def create_time_point(_simulation, _time_point):
 def create_fiber_lengths(_elements, _intersections):
     _fiber_lengths = []
     for _element in _elements:
-        _i1_id, _i2_id = _element
-        _x1, _y1 = _intersections[_i1_id]
-        _x2, _y2 = _intersections[_i2_id]
+        _intersection_1_id, _intersection_2_id = _element
+        _x1, _y1 = _intersections[_intersection_1_id]
+        _x2, _y2 = _intersections[_intersection_2_id]
         _fiber_lengths.append(math.hypot(_x2 - _x1, _y2 - _y1))
 
     return _fiber_lengths
@@ -124,7 +118,7 @@ def process_simulation(_simulation, _overwrite=False):
             to_pickle(_time_point_data, _time_point_pickle_path)
 
     # fiber lengths
-    _simulation_fiber_lengths_path = paths.fibers_lengths(_simulation)
+    _simulation_fiber_lengths_path = paths.fiber_lengths(_simulation)
     os.makedirs(_simulation_fiber_lengths_path) if not os.path.isdir(_simulation_fiber_lengths_path) else None
     _elements = None
     for _time_point in load.time_points(_simulation):

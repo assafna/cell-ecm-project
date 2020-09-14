@@ -2,17 +2,23 @@
   <dictionary name="Assaf">
     <words>
       <w>assaf</w>
+      <w>assafna</w>
       <w>autocorrelation</w>
+      <w>barmode</w>
       <w>bgcolor</w>
+      <w>bleb</w>
       <w>bordercolor</w>
       <w>borderwidth</w>
       <w>detrending</w>
+      <w>finterval</w>
       <w>heatmap</w>
       <w>heterogeneities</w>
       <w>kpss</w>
       <w>legendgroup</w>
       <w>ortal</w>
+      <w>plotly</w>
       <w>serieses</w>
+      <w>showarrow</w>
       <w>showgrid</w>
       <w>stds</w>
       <w>tickangle</w>
@@ -21,6 +27,7 @@
       <w>ticktext</w>
       <w>tickvals</w>
       <w>titlefont</w>
+      <w>viridis</w>
       <w>wilcoxon</w>
       <w>xanchor</w>
       <w>xaxis</w>
@@ -28,6 +35,8 @@
       <w>yaxis</w>
       <w>yoni</w>
       <w>zeroline</w>
+      <w>zerolinecolor</w>
+      <w>zerolinewidth</w>
     </words>
   </dictionary>
 </component>

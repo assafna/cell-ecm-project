@@ -1,5 +1,5 @@
 from libs.simulations import load
-from libs.simulations.compute import cells_distance
+from libs.simulations.compute import pair_distance
 
 
 def by_time_points_amount(_simulations, _time_points, _exactly=False):
@@ -11,14 +11,14 @@ def by_time_points_amount(_simulations, _time_points, _exactly=False):
                 len(load.properties(_simulation)['time_points']) >= _time_points]
 
 
-def by_distance(_simulations, _distance):
+def by_pair_distance(_simulations, _distance):
     return [_simulation for _simulation in _simulations if
-            cells_distance(load.properties(_simulation)) == _distance]
+            pair_distance(load.properties(_simulation)) == _distance]
 
 
-def by_distances(_simulations, _distances):
+def by_pair_distances(_simulations, _distances):
     return [_simulation for _simulation in _simulations if
-            cells_distance(load.properties(_simulation)) in _distances]
+            pair_distance(load.properties(_simulation)) in _distances]
 
 
 def by_heterogeneity(_simulations, _std):

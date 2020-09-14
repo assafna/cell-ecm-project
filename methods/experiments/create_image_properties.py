@@ -13,7 +13,7 @@ def process_series(_experiment, _series_id, _overwrite=False):
         return
 
     print('Creating image properties for:', _experiment, 'Series ' + str(_series_id), sep='\t')
-    _path = paths.serieses(_experiment, 'series_' + str(_series_id) + '_bc.tif')
+    _path = paths.serieses(_experiment, _series_id)
     with Image.open(_path) as _img:
         _meta_dict = {TAGS[_key]: _img.tag[_key] for _key in _img.tag}
 
@@ -32,7 +32,7 @@ def process_series(_experiment, _series_id, _overwrite=False):
             'slices': int(str(_meta_dict['ImageDescription'][0].split('slices=')[1]).split()[0]),
             'frames': int(str(_meta_dict['ImageDescription'][0].split('frames=')[1]).split()[0]),
             'frames_interval': float(str(_meta_dict['ImageDescription'][0].split('finterval=')[1]).split()[0])
-            # TODO: add position X, Y & Z
+            # TODO: add location position X, Y & Z
         }
 
     save.image_properties(_experiment, _series_id, _properties)

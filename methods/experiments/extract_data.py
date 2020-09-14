@@ -1,15 +1,16 @@
-from libs.experiments import load, paths, config, compute
+from libs.experiments import load, config, compute
 
 
 def process_group(_experiment, _series_id, _group):
     _properties = load.group_properties(_experiment, _series_id, _group)
     _cell_1_coordinates = _properties['time_points'][0]['left_cell']['coordinates'].values()
     _cell_2_coordinates = _properties['time_points'][0]['right_cell']['coordinates'].values()
-    _distance = compute.cells_distance_in_cell_size(
+    _pair_distance = compute.pair_distance_in_cell_size(
         _experiment, _series_id, [_cell_1_coordinates], [_cell_2_coordinates]
     )
 
-    print(_experiment, _series_id, _group, _distance, _properties['band'], _properties['fake'], _properties['static'], len(_properties['time_points']), sep='\t')
+    print(_experiment, _series_id, _group, _pair_distance, _properties['band'], _properties['fake'],
+          _properties['static'], len(_properties['time_points']), sep='\t')
 
 
 def process_experiment(_experiment):
@@ -29,4 +30,5 @@ def process_all_experiments():
 
 
 if __name__ == '__main__':
+    print('Experiment', 'Series ID', 'Group', 'Pair Distance', 'Band', 'Fake', 'Fake-static', 'Time Frames', sep='\t')
     process_all_experiments()
