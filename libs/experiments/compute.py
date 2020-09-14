@@ -178,36 +178,6 @@ def window_fiber_density_time_frame(_arguments):
     return _arguments, _window_fiber_density
 
 
-def window_fiber_density_by_time(_experiment, _series_id, _group, _length_x, _length_y, _length_z, _offset_x, _offset_y,
-                                 _offset_z, _cell_id, _direction, _time_frames=sys.maxsize, _print=False, _save=True,
-                                 _out_of_borders=True):
-    _group_properties = load.group_properties(_experiment, _series_id, _group)
-    _fiber_densities = [
-        window_fiber_density_time_frame({
-            'experiment': _experiment,
-            'series_id': _series_id,
-            'group': _group,
-            'length_x': _length_x,
-            'length_y': _length_y,
-            'length_z': _length_z,
-            'offset_x': _offset_x,
-            'offset_y': _offset_y,
-            'offset_z': _offset_z,
-            'cell_id': _cell_id,
-            'direction': _direction,
-            'time_point': _time_frame,
-            'group_properties': _group_properties,
-            'print': _print,
-            'save': _save
-        })[1] for _time_frame in range(min(_time_frames, len(_group_properties['time_points'])))
-    ]
-
-    if not _out_of_borders:
-        return longest_fiber_densities_ascending_sequence(_fiber_densities)
-    else:
-        return _fiber_densities
-
-
 def longest_fiber_densities_ascending_sequence(_fiber_density):
     _out_of_boundaries = np.array([_fiber_density[1] for _fiber_density in _fiber_density])
     if False not in _out_of_boundaries:
