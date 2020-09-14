@@ -18,7 +18,7 @@ def by_categories(_experiments, _is_single_cell=None, _is_high_temporal_resoluti
                   _is_bleb_from_start=None):
     return [_experiment for _experiment in _experiments if
             (_is_single_cell is None or _is_single_cell == is_single_cell(_experiment)) and
-            (_is_high_temporal_resolution is None or _is_high_temporal_resolution == _is_high_temporal_resolution(_experiment)) and
+            (_is_high_temporal_resolution is None or _is_high_temporal_resolution == is_high_temporal_resolution(_experiment)) and
             (is_bleb is None or is_bleb == is_bleb(_experiment, _is_bleb_from_start))
             ]
 
