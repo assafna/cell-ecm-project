@@ -81,7 +81,7 @@ def main():
         'right_cell_out_of_boundaries'
     ]
 
-    _csv_path = os.path.join(paths.OUTPUTS, 'density_cell_pairs.csv')
+    _csv_path = os.path.join(paths.OUTPUTS, 'experiments_density_cell_pairs.csv')
     with open(_csv_path, 'w', newline='') as _csv_file:
         _csv_writer = csv.writer(_csv_file)
         _csv_writer.writerow(_headers)
