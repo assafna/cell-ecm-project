@@ -11,6 +11,7 @@ from libs.simulations import load, filtering, config, compute, paths, organize
 
 PAIR_DISTANCE = [4, 5, 7, 9]
 CAUSALITY = False
+DOMINANT_PASSIVE = False
 TIME_POINTS = math.inf
 
 
@@ -21,7 +22,8 @@ def main():
         _is_single_cell=False,
         _is_heterogeneity=None,
         _is_low_connectivity=False,
-        _is_causality=CAUSALITY
+        _is_causality=CAUSALITY,
+        _is_dominant_passive=DOMINANT_PASSIVE
     )
     _simulations = filtering.by_pair_distances(_simulations, _distances=PAIR_DISTANCE)
     print('Total simulations:', len(_simulations))
