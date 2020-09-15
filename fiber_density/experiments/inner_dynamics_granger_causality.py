@@ -51,7 +51,7 @@ def main(_band=None, _high_temporal_resolution=True, _tuples_to_mark=None, _tupl
     _arguments = []
     for _tuple in _tuples:
         _experiment, _series_id, _group = _tuple
-
+        _latest_time_frame = compute.latest_time_frame_before_overlapping(_experiment, _series_id, _group, OFFSET_X)
         for _cell_id in ['left_cell', 'right_cell']:
             _arguments.append({
                 'experiment': _experiment,
@@ -65,7 +65,7 @@ def main(_band=None, _high_temporal_resolution=True, _tuples_to_mark=None, _tupl
                 'offset_z': OFFSET_Z,
                 'cell_id': _cell_id,
                 'direction': 'inside',
-                'time_points': compute.latest_time_frame_before_overlapping(_experiment, _series_id, _group, OFFSET_X)
+                'time_points': _latest_time_frame
             })
 
     _windows_dictionary, _windows_to_compute = compute.windows(_arguments,

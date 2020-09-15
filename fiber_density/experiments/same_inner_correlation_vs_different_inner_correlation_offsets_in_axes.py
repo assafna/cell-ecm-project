@@ -192,6 +192,7 @@ def compute_z_array(_band=True, _high_temporal_resolution=False, _offset_x=OFFSE
     _arguments = []
     for _tuple in _tuples:
         _experiment, _series_id, _group = _tuple
+        _latest_time_frame = compute.latest_time_frame_before_overlapping(_experiment, _series_id, _group, OFFSET_X)
         for _offset_y, _offset_z, _cell_id in product(_offsets_y, _offsets_z, ['left_cell', 'right_cell']):
             _arguments.append({
                 'experiment': _experiment,
@@ -205,7 +206,7 @@ def compute_z_array(_band=True, _high_temporal_resolution=False, _offset_x=OFFSE
                 'offset_z': _offset_z,
                 'cell_id': _cell_id,
                 'direction': 'inside',
-                'time_points': compute.latest_time_frame_before_overlapping(_experiment, _series_id, _group, OFFSET_X)
+                'time_points': _latest_time_frame
             })
 
     _windows_dictionary, _windows_to_compute = \
@@ -233,7 +234,7 @@ def compute_z_array(_band=True, _high_temporal_resolution=False, _offset_x=OFFSE
     _annotations_array = []
     with Pool(CPUS_TO_USE) as _p:
         for _answer in tqdm(_p.imap_unordered(compute_data, _arguments), total=len(_arguments),
-                            desc='Computing Heatmap'):
+                            desc='Computing heatmap'):
             _offset_y_index, _offset_z_index, _same_fraction, _annotation = _answer
             _z_array[_offset_y_index, _offset_z_index] = _same_fraction
             if _annotation is not None:

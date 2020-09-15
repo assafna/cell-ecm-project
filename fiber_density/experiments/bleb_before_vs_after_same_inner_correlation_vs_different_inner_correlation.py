@@ -32,7 +32,7 @@ def main(_band=True):
     )
 
     _tuples = load.experiments_groups_as_tuples(_experiments)
-    _tuples = filtering.by_pair_distance_range(_experiments, _distance_range=PAIR_DISTANCE_RANGE)
+    _tuples = filtering.by_pair_distance_range(_tuples, _distance_range=PAIR_DISTANCE_RANGE)
     _tuples = filtering.by_real_pairs(_tuples, _real_pairs=REAL_CELLS)
     _tuples = filtering.by_fake_static_pairs(_tuples, _fake_static_pairs=STATIC)
     _tuples = filtering.by_band(_tuples, _band=_band)
@@ -41,6 +41,7 @@ def main(_band=True):
     _arguments = []
     for _tuple in _tuples:
         _experiment, _series_id, _group = _tuple
+        _latest_time_frame = compute.latest_time_frame_before_overlapping(_experiment, _series_id, _group, OFFSET_X)
         for _cell_id in ['left_cell', 'right_cell']:
             _arguments.append({
                 'experiment': _experiment,
@@ -54,7 +55,7 @@ def main(_band=True):
                 'offset_z': OFFSET_Z,
                 'cell_id': _cell_id,
                 'direction': 'inside',
-                'time_points': compute.latest_time_frame_before_overlapping(_experiment, _series_id, _group, OFFSET_X)
+                'time_points': _latest_time_frame
             })
 
     _windows_dictionary, _windows_to_compute = compute.windows(_arguments,
