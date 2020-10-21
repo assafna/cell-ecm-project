@@ -42,7 +42,12 @@ def by_matched_real_and_fake(_experiments_tuples):
     _experiments_matched = []
     for _tuple in _experiments_tuples:
         _experiment, _series_id, _group = _tuple
-        _type, _cell_1_id, _cell_2_id = _group.split('_')
+        _group_split = _group.split('_')
+
+        if len(_group_split) > 3:
+            continue
+
+        _type, _cell_1_id, _cell_2_id = _group_split
 
         if _type != 'cells':
             continue

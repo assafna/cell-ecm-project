@@ -29,7 +29,7 @@ def compute_fiber(_experiments):
     _arguments = []
     for _tuple in _tuples:
         _experiment, _series_id, _group = _tuple
-        _time_frame = compute.density_time_frame(_tuples)
+        _time_frame = compute.density_time_frame(_experiment)
         _pair_distance = compute.pair_distance_in_cell_size_time_frame(
             _experiment, _series_id, _group, _time_frame - 1
         )
@@ -96,7 +96,7 @@ def compute_matched_fiber(_experiments):
     for _matched_tuple in _experiments_matched:
         for _tuple in _matched_tuple:
             _experiment, _series_id, _group = _tuple
-            _time_frame = compute.density_time_frame(_tuples)
+            _time_frame = compute.density_time_frame(_experiment)
             _pair_distance = compute.pair_distance_in_cell_size_time_frame(
                 _experiment, _series_id, _group, _time_frame - 1
             )
