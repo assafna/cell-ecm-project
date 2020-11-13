@@ -81,6 +81,11 @@ def main(_band=True, _offset_y=0):
         for _cell_id in ['left_cell', 'right_cell']:
             _cell_fiber_densities = \
                 _experiments_fiber_densities[(_experiment, _series_id, _group, _cell_id)]
+
+            # not enough time frames
+            if len(_cell_fiber_densities) < AFTER_BLEB_INJECTION_FIRST_TIME_FRAME[_experiment]:
+                continue
+
             _cell_fiber_densities = compute.remove_blacklist(
                 _experiment, _series_id, _properties['cells_ids'][_cell_id], _cell_fiber_densities)
 
