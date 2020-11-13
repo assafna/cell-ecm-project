@@ -71,65 +71,60 @@ def main(_band=True, _offset_y=0):
     }
 
     _valid_tuples = []
+    _valid_cells = []
     _densities = [[] for _ in range(_longest_time_frame)]
     for _tuple in tqdm(_tuples, desc='Experiments loop'):
         _experiment, _series_id, _group = _tuple
         _normalization = load.normalization_series_file_data(_experiment, _series_id)
-
-        _left_cell_fiber_densities = \
-            _experiments_fiber_densities[(_experiment, _series_id, _group, 'left_cell')]
-        _right_cell_fiber_densities = \
-            _experiments_fiber_densities[(_experiment, _series_id, _group, 'right_cell')]
-
         _properties = load.group_properties(_experiment, _series_id, _group)
-        _left_cell_fiber_densities = compute.remove_blacklist(
-            _experiment, _series_id, _properties['cells_ids']['left_cell'], _left_cell_fiber_densities)
-        _right_cell_fiber_densities = compute.remove_blacklist(
-            _experiment, _series_id, _properties['cells_ids']['right_cell'], _right_cell_fiber_densities)
 
-        _previous_left_cell_fiber_density_normalized = None
-        _previous_right_cell_fiber_density_normalized = None
-        for _time_frame, (_left_cell_fiber_density, _right_cell_fiber_density) in \
-                enumerate(zip(_left_cell_fiber_densities, _right_cell_fiber_densities)):
+        for _cell_id in ['left_cell', 'right_cell']:
+            _cell_fiber_densities = \
+                _experiments_fiber_densities[(_experiment, _series_id, _group, _cell_id)]
 
-            # not out of border
-            if _left_cell_fiber_density[1] or _right_cell_fiber_density[1]:
-                _previous_left_cell_fiber_density_normalized = None
-                _previous_right_cell_fiber_density_normalized = None
+            # not enough time frames
+            if len(_cell_fiber_densities) < AFTER_BLEB_INJECTION_FIRST_TIME_FRAME[_experiment]:
                 continue
 
-            # normalize
-            _left_cell_fiber_density_normalized = compute_lib.z_score(
-                _x=_left_cell_fiber_density[0],
-                _average=_normalization['average'],
-                _std=_normalization['std']
-            )
-            _right_cell_fiber_density_normalized = compute_lib.z_score(
-                _x=_right_cell_fiber_density[0],
-                _average=_normalization['average'],
-                _std=_normalization['std']
-            )
+            _cell_fiber_densities = compute.remove_blacklist(
+                _experiment, _series_id, _properties['cells_ids'][_cell_id], _cell_fiber_densities)
 
-            # previous density exist
-            if _previous_left_cell_fiber_density_normalized is None \
-                    or _previous_right_cell_fiber_density_normalized is None:
-                _previous_left_cell_fiber_density_normalized = _left_cell_fiber_density_normalized
-                _previous_right_cell_fiber_density_normalized = _right_cell_fiber_density_normalized
-                continue
+            _previous_cell_fiber_density_normalized = None
+            for _time_frame, _cell_fiber_density in enumerate(_cell_fiber_densities):
 
-            _left_cell_fiber_density_change_normalized = _left_cell_fiber_density_normalized - _previous_left_cell_fiber_density_normalized
-            _right_cell_fiber_density_change_normalized = _right_cell_fiber_density_normalized - _previous_right_cell_fiber_density_normalized
-            _previous_left_cell_fiber_density_normalized = _left_cell_fiber_density_normalized
-            _previous_right_cell_fiber_density_normalized = _right_cell_fiber_density_normalized
+                # not out of border
+                if _cell_fiber_density[1]:
+                    _previous_cell_fiber_density_normalized = None
+                    continue
 
-            # save both
-            _densities[_time_frame].append(_left_cell_fiber_density_change_normalized)
-            _densities[_time_frame].append(_right_cell_fiber_density_change_normalized)
+                # normalize
+                _cell_fiber_density_normalized = compute_lib.z_score(
+                    _x=_cell_fiber_density[0],
+                    _average=_normalization['average'],
+                    _std=_normalization['std']
+                )
 
-            if _tuple not in _valid_tuples:
-                _valid_tuples.append(_tuple)
+                # no previous
+                if _previous_cell_fiber_density_normalized is None:
+                    _previous_cell_fiber_density_normalized = _cell_fiber_density_normalized
+                    continue
+
+                # change
+                _cell_fiber_density_normalized_change = _cell_fiber_density_normalized - _previous_cell_fiber_density_normalized
+                _previous_cell_fiber_density_normalized = _cell_fiber_density_normalized
+
+                # save
+                _densities[_time_frame].append(_cell_fiber_density_normalized_change)
+
+                if _tuple not in _valid_tuples:
+                    _valid_tuples.append(_tuple)
+
+                _cell_tuple = (_experiment, _series_id, _group, _cell_id)
+                if _cell_tuple not in _valid_cells:
+                    _valid_cells.append(_cell_tuple)
 
     print('Total pairs:', len(_valid_tuples))
+    print('Total cells:', len(_valid_cells))
 
     # plot
     _temporal_resolution = compute.temporal_resolution_in_minutes(_experiments[0])
@@ -138,7 +133,7 @@ def main(_band=True, _offset_y=0):
         data=go.Scatter(
             x=np.array(range(_longest_time_frame)) * _temporal_resolution,
             y=[np.mean(_array) for _array in _densities],
-            name='Fiber density (z-score)',
+            name='Fiber density change (z-score)',
             error_y={
                 'type': 'data',
                 'array': [np.std(_array) for _array in _densities],
@@ -158,16 +153,16 @@ def main(_band=True, _offset_y=0):
                 'zeroline': False
             },
             'yaxis': {
-                'title': 'Fiber density (z-score)',
+                'title': 'Fiber density change (z-score)',
                 'zeroline': False
             },
             'shapes': [
                 {
                     'type': 'line',
                     'x0': -_temporal_resolution,
-                    'y0': -1,
+                    'y0': -0.5,
                     'x1': -_temporal_resolution,
-                    'y1': 8,
+                    'y1': 2,
                     'line': {
                         'color': 'black',
                         'width': 2
@@ -176,9 +171,9 @@ def main(_band=True, _offset_y=0):
                 {
                     'type': 'line',
                     'x0': -_temporal_resolution,
-                    'y0': -1,
+                    'y0': -0.5,
                     'x1': 350,
-                    'y1': -1,
+                    'y1': -0.5,
                     'line': {
                         'color': 'black',
                         'width': 2
@@ -186,10 +181,10 @@ def main(_band=True, _offset_y=0):
                 },
                 {
                     'type': 'line',
-                    'x0': (_first_time_frame_after_injection - 0.5) * _temporal_resolution,
-                    'y0': -1,
-                    'x1': (_first_time_frame_after_injection - 0.5) * _temporal_resolution,
-                    'y1': 8,
+                    'x0': (_first_time_frame_after_injection + 0.5) * _temporal_resolution,
+                    'y0': -0.5,
+                    'x1': (_first_time_frame_after_injection + 0.5) * _temporal_resolution,
+                    'y1': 2,
                     'line': {
                         'color': 'red',
                         'width': 2
@@ -202,7 +197,7 @@ def main(_band=True, _offset_y=0):
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        _filename='plot_change_band_' + str(_band) + '_offset_y_' + str(_offset_y)
+        _filename='plot_band_' + str(_band) + '_offset_y_' + str(_offset_y)
     )
 
 
