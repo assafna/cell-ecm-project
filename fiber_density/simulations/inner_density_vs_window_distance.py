@@ -64,7 +64,8 @@ def main(_low_connectivity=False):
             _is_heterogeneity=False,
             _is_low_connectivity=_low_connectivity,
             _is_causality=False,
-            _is_dominant_passive=False
+            _is_dominant_passive=False,
+            _is_fibrin=False
         )
         _simulations = filtering.by_pair_distance(_simulations, _distance=_distance)
         _simulations = filtering.by_time_points_amount(_simulations, _time_points=TIME_POINT[_low_connectivity])

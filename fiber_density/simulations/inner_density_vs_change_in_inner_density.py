@@ -74,7 +74,8 @@ def main():
         _is_heterogeneity=HETEROGENEITY,
         _is_low_connectivity=False,
         _is_causality=False,
-        _is_dominant_passive=False
+        _is_dominant_passive=False,
+        _is_fibrin=False
     )
     _simulations = filtering.by_pair_distances(_simulations, PAIR_DISTANCE)
     print('Total simulations:', len(_simulations))

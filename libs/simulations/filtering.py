@@ -49,14 +49,19 @@ def is_dominant_passive(_simulation):
     return 'dominant_passive' in _simulation
 
 
+def is_fibrin(_simulation):
+    return 'fibrin' in _simulation
+
+
 def by_categories(_simulations, _is_single_cell=None, _is_heterogeneity=None, _is_low_connectivity=None,
-                  _is_causality=None, _is_dominant_passive=None):
+                  _is_causality=None, _is_dominant_passive=None, _is_fibrin=None):
     return [_simulation for _simulation in _simulations if
             (_is_single_cell is None or _is_single_cell == is_single_cell(_simulation)) and
             (_is_heterogeneity is None or _is_heterogeneity == is_heterogeneity(_simulation)) and
             (_is_low_connectivity is None or _is_low_connectivity == is_low_connectivity(_simulation)) and
             (_is_causality is None or _is_causality == is_causality(_simulation)) and
-            (_is_dominant_passive is None or _is_dominant_passive == is_dominant_passive(_simulation))
+            (_is_dominant_passive is None or _is_dominant_passive == is_dominant_passive(_simulation)) and
+            (_is_fibrin is None or _is_fibrin == is_fibrin(_simulation))
             ]
 
 

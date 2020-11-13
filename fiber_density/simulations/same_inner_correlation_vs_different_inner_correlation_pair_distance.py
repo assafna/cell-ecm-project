@@ -62,7 +62,8 @@ def main(_low_connectivity=False):
         _is_heterogeneity=True,
         _is_low_connectivity=_low_connectivity,
         _is_causality=False,
-        _is_dominant_passive=False
+        _is_dominant_passive=False,
+        _is_fibrin=False
     )
     _simulations = filtering.by_heterogeneity(_simulations, _std=STD)
     _simulations = filtering.by_pair_distances(_simulations, _distances=PAIR_DISTANCE)

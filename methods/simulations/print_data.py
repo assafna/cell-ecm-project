@@ -9,6 +9,7 @@ BETAS = [1, 1.05, 1.1, 1.2]
 
 
 def main():
+    # TODO: add support for the new fibrin simulations
     _simulations = load.structured()
 
     # single cell

@@ -149,7 +149,8 @@ def compute_simulations_data(_low_connectivity):
         _is_heterogeneity=False,
         _is_low_connectivity=_low_connectivity,
         _is_causality=False,
-        _is_dominant_passive=False
+        _is_dominant_passive=False,
+        _is_fibrin=False
     )
 
     _fiber_densities = compute_simulations_fiber_densities(_simulations, _low_connectivity)

@@ -34,7 +34,8 @@ def compute_fiber_densities(_alpha=1, _beta=1, _low_connectivity=False):
         _is_heterogeneity=True,
         _is_low_connectivity=_low_connectivity,
         _is_causality=True,
-        _is_dominant_passive=False
+        _is_dominant_passive=False,
+        _is_fibrin=False
     )
     _simulations = filtering.by_causality(_simulations, _alpha=_alpha, _beta=_beta)
     _simulations = filtering.by_pair_distance(_simulations, _distance=PAIR_DISTANCE)

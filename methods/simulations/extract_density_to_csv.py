@@ -23,7 +23,8 @@ def main():
         _is_heterogeneity=None,
         _is_low_connectivity=False,
         _is_causality=CAUSALITY,
-        _is_dominant_passive=DOMINANT_PASSIVE
+        _is_dominant_passive=DOMINANT_PASSIVE,
+        _is_fibrin=False
     )
     _simulations = filtering.by_pair_distances(_simulations, _distances=PAIR_DISTANCE)
     print('Total simulations:', len(_simulations))

@@ -56,7 +56,8 @@ def main():
         _is_heterogeneity=False,
         _is_low_connectivity=False,
         _is_causality=False,
-        _is_dominant_passive=False
+        _is_dominant_passive=False,
+        _is_fibrin=False
     )
     print('Total simulations:', len(_simulations))
 
