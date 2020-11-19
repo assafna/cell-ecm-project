@@ -17,7 +17,7 @@ def process_series(_experiment, _series_id, _overwrite=False):
     _series_data = load.objects_series_file_data(_experiment, _series_id)
     _cell_coordinates = [[_coordinates] for _coordinates in _series_data[0]]
     _time_frame = 2
-    for _time_frame in _series_data[1:]:
+    for _tf in _series_data[1:]:
         for _cell_index, _cell in enumerate(_cell_coordinates):
             if _cell[-1] is not None:
                 _previous_cell_x, _previous_cell_y, _previous_cell_z = _cell[-1]
@@ -26,11 +26,11 @@ def process_series(_experiment, _series_id, _overwrite=False):
                     (_previous_cell_x - _optional_cell_x) ** 2 +
                     (_previous_cell_y - _optional_cell_y) ** 2 +
                     (_previous_cell_z - _optional_cell_z) ** 2
-                ) for _optional_cell_x, _optional_cell_y, _optional_cell_z in _time_frame]
+                ) for _optional_cell_x, _optional_cell_y, _optional_cell_z in _tf]
 
                 _min_distance_index = int(np.argmin(_distances)) if len(_distances) > 0 else None
                 _cell_coordinates[_cell_index].append(
-                    _time_frame[_min_distance_index] if _min_distance_index is not None and
+                    _tf[_min_distance_index] if _min_distance_index is not None and
                     min(_distances) < MAX_TRACKING_DISTANCE_CHANGE else None
                 )
             else:
