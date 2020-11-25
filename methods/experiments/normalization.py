@@ -18,7 +18,7 @@ def is_in_window(_x1, _y1, _z1, _x2, _y2, _z2, _point_x, _point_y, _point_z):
 
 
 def process_series(_experiment, _series_id, _overwrite=False):
-    _normalization_path = os.path.join(paths.normalization(_experiment), _series_id)
+    _normalization_path = paths.normalization(_experiment, _series_id)
     if not _overwrite and os.path.isfile(_normalization_path):
         return
 
