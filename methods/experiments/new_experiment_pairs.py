@@ -14,6 +14,7 @@ from libs.experiments.config import IMAGE_FIBER_CHANNEL_INDEX
 
 SHOW_PLOTS = False
 SMOOTH_AMOUNT = 0
+CONVERT_TO_COLOR_DEPTH_8_BIT = False
 
 
 # PROCESS:
@@ -168,6 +169,11 @@ def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell
 
         # rotate image
         _time_frame_image_swapped_rotated = np.array([rotate(_z, _angle) for _z in _time_frame_image_swapped])
+
+        # convert to 8 bit color depth
+        if CONVERT_TO_COLOR_DEPTH_8_BIT:
+            _time_frame_image_swapped_rotated = \
+                np.rint(_time_frame_image_swapped_rotated / (math.pow(2, 16) - 1) * (math.pow(2, 8) - 1)).astype(int)
 
         # update coordinates
         _image_center = compute.image_center_coordinates(
