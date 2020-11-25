@@ -173,7 +173,7 @@ def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell
         # convert to 8 bit color depth
         if CONVERT_TO_COLOR_DEPTH_8_BIT:
             _time_frame_image_swapped_rotated = \
-                np.rint(_time_frame_image_swapped_rotated / (math.pow(2, 16) - 1) * (math.pow(2, 8) - 1)).astype(int)
+                np.rint(_time_frame_image_swapped_rotated / (math.pow(2, 16) - 1) * (math.pow(2, 8) - 1)).astype(np.uint8)
 
         # update coordinates
         _image_center = compute.image_center_coordinates(
