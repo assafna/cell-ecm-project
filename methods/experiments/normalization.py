@@ -1,3 +1,4 @@
+import math
 import os
 from itertools import product
 from multiprocessing.pool import Pool
@@ -11,6 +12,7 @@ from libs.experiments.config import AVERAGE_CELL_DIAMETER_IN_MICRONS
 
 STEP_PERCENTAGE = 0.1
 CELL_BORDERS_VALUES = [-2, -1, 0, 1, 2]
+CONVERT_TO_COLOR_DEPTH_8_BIT = False
 
 
 def is_in_window(_x1, _y1, _z1, _x2, _y2, _z2, _point_x, _point_y, _point_z):
@@ -71,7 +73,13 @@ def process_series(_experiment, _series_id, _overwrite=False):
                 continue
 
             # no cells are around, compute
-            _averages.append(np.mean(_series_image_first_time_frame[_z1:_z2, _y1:_y2, _x1:_x2]))
+            _pixels = _series_image_first_time_frame[_z1:_z2, _y1:_y2, _x1:_x2]
+
+            # convert to 8 bit color depth
+            if CONVERT_TO_COLOR_DEPTH_8_BIT:
+                _pixels = np.rint(_pixels / (math.pow(2, 16) - 1) * (math.pow(2, 8) - 1)).astype(np.uint8)
+
+            _averages.append(np.mean(_pixels))
 
     # compute average and std of averages
     _average, _std = np.mean(_averages), np.std(_averages)
