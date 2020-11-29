@@ -41,16 +41,34 @@ def remove_from_blacklist(_experiment, _series_id, _cell_id, _time_frame_start, 
 
 if __name__ == '__main__':
     _tuples = [
-        ('SN44', 6, 0, 0, 250, 'Bad segmentation'),
-        ('SN44', 6, 2, 0, 250, 'Bad segmentation'),
-        ('SN44', 6, 5, 0, 250, 'Bad segmentation'),
-
-        ('SN44', 9, 0, 0, 250, 'Bad segmentation'),
-        ('SN44', 9, 1, 0, 250, 'Bad segmentation'),
-        ('SN44', 9, 2, 0, 250, 'Bad segmentation'),
-        ('SN44', 9, 3, 0, 250, 'Bad segmentation'),
-        ('SN44', 9, 4, 0, 250, 'Bad segmentation'),
-        ('SN44', 9, 5, 0, 250, 'Bad segmentation')
+        ('Bleb_150', 3, 0, 2, 2, 'Light wave'),
+        ('Bleb_150', 3, 1, 2, 2, 'Light wave'),
+        ('Bleb_150', 3, 0, 11, 12, 'Light wave'),
+        ('Bleb_150', 3, 1, 11, 12, 'Light wave'),
+        ('Bleb_150', 4, 0, 0, 1, 'Light wave'),
+        ('Bleb_150', 4, 1, 0, 1, 'Light wave'),
+        ('Bleb_150', 4, 2, 0, 1, 'Light wave'),
+        ('Bleb_150', 6, 0, 11, 12, 'Light wave'),
+        ('Bleb_150', 6, 1, 11, 12, 'Light wave'),
+        ('Bleb_150', 6, 2, 11, 12, 'Light wave'),
+        ('Bleb_150', 7, 0, 0, 1, 'Light wave'),
+        ('Bleb_150', 7, 1, 0, 1, 'Light wave'),
+        ('Bleb_150', 7, 2, 0, 1, 'Light wave'),
+        ('Bleb_150', 8, 0, 0, 1, 'Light wave'),
+        ('Bleb_150', 8, 1, 0, 1, 'Light wave'),
+        ('Bleb_150', 8, 2, 0, 1, 'Light wave'),
+        ('Bleb_150', 8, 3, 0, 1, 'Light wave'),
+        ('Bleb_150', 8, 4, 0, 1, 'Light wave'),
+        ('Bleb_150', 9, 0, 0, 1, 'Light wave'),
+        ('Bleb_150', 9, 1, 0, 1, 'Light wave'),
+        ('Bleb_150', 10, 0, 0, 1, 'Light wave'),
+        ('Bleb_150', 10, 1, 11, 12, 'Light wave'),
+        ('Bleb_150', 10, 2, 0, 1, 'Light wave'),
+        ('Bleb_150', 10, 0, 11, 12, 'Light wave'),
+        ('Bleb_150', 10, 1, 0, 1, 'Light wave'),
+        ('Bleb_150', 10, 2, 11, 12, 'Light wave'),
+        ('Bleb_150', 18, 1, 12, 13, 'Light wave'),
+        ('Bleb_150', 18, 2, 12, 13, 'Light wave')
     ]
     for _tuple in _tuples:
         add_to_blacklist(
