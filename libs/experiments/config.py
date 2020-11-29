@@ -8,16 +8,19 @@ CELL_PAIRS = [
     'SN44',
     'SN45',
     'SN20_Bleb_fromStart',
-    'SN26_BlebAdded'
+    'SN26_BlebAdded',
+    'Bleb_150'
 ]
 
 BLEB = [
     'SN20_Bleb_fromStart',
-    'SN26_BlebAdded'
+    'SN26_BlebAdded',
+    'Bleb_150'
 ]
 
 BLEB_FROM_START = [
-    'SN20_Bleb_fromStart'
+    'SN20_Bleb_fromStart',
+    'Bleb_150'
 ]
 
 AFTER_BLEB_INJECTION_FIRST_TIME_FRAME = {
