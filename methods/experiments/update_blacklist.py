@@ -41,9 +41,19 @@ def remove_from_blacklist(_experiment, _series_id, _cell_id, _time_frame_start, 
 
 if __name__ == '__main__':
     _tuples = [
-        ('LiveDead_201115', 3, 0, 1, 1, 'Light wave'),
-        ('LiveDead_201115', 3, 1, 1, 1, 'Light wave'),
-        ('LiveDead_201115', 3, 2, 1, 1, 'Light wave')
+        ('LiveDead_201117', 8, 0, 1, 1, 'Light wave'),
+        ('LiveDead_201117', 8, 1, 1, 1, 'Light wave'),
+        ('LiveDead_201117', 10, 0, 1, 1, 'Light wave'),
+        ('LiveDead_201117', 10, 1, 1, 1, 'Light wave'),
+        ('LiveDead_201117', 11, 0, 1, 1, 'Light wave'),
+        ('LiveDead_201117', 11, 1, 1, 1, 'Light wave'),
+        ('LiveDead_201117', 13, 0, 3, 4, 'Light wave'),
+        ('LiveDead_201117', 13, 1, 3, 4, 'Light wave'),
+        ('LiveDead_201117', 13, 2, 3, 4, 'Light wave'),
+        ('LiveDead_201117', 15, 0, 1, 1, 'Light wave'),
+        ('LiveDead_201117', 15, 1, 1, 1, 'Light wave'),
+        ('LiveDead_201117', 15, 2, 1, 1, 'Light wave'),
+        ('LiveDead_201117', 15, 3, 1, 1, 'Light wave')
     ]
     for _tuple in _tuples:
         add_to_blacklist(

@@ -6,9 +6,17 @@ from libs.experiments import load, paths
 
 def main():
     _tuples = [
-        ('LiveDead_201115', 5, 'cells_0_1', True),
-        ('LiveDead_201115', 7, 'cells_0_1', True),
-        ('LiveDead_201115', 17, 'cells_1_2', True)
+        ('LiveDead_201117', 2, 'cells_1_2', True),
+        ('LiveDead_201117', 5, 'cells_0_1', True),
+        ('LiveDead_201117', 7, 'cells_0_1', True),
+        ('LiveDead_201117', 7, 'cells_0_2', True),
+        ('LiveDead_201117', 7, 'cells_1_2', True),
+        ('LiveDead_201117', 9, 'cells_0_2', True),
+        ('LiveDead_201117', 9, 'cells_1_2', True),
+        ('LiveDead_201117', 13, 'cells_0_2', True),
+        ('LiveDead_201117', 15, 'cells_0_3', True),
+        ('LiveDead_201117', 16, 'cells_0_1', True),
+        ('LiveDead_201117', 18, 'cells_0_1', True)
     ]
 
     for _tuple in _tuples:
