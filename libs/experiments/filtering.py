@@ -1,5 +1,5 @@
 from libs.experiments import load, compute
-from libs.experiments.config import SINGLE_CELL, BLEB, BLEB_FROM_START, HIGH_TEMPORAL_RESOLUTION_IN_MINUTES
+from libs.experiments.config import SINGLE_CELL, BLEB, BLEB_FROM_START, HIGH_TEMPORAL_RESOLUTION_IN_MINUTES, DEAD_LIVE
 
 
 def is_single_cell(_experiment):
@@ -14,12 +14,17 @@ def is_bleb(_experiment, _from_start=None):
     return _experiment in BLEB and (_from_start is None or _from_start == (_experiment in BLEB_FROM_START))
 
 
+def is_dead_live(_experiment):
+    return _experiment in DEAD_LIVE
+
+
 def by_categories(_experiments, _is_single_cell=None, _is_high_temporal_resolution=None, _is_bleb=None,
-                  _is_bleb_from_start=None):
+                  _is_bleb_from_start=None, _is_dead_live=None):
     return [_experiment for _experiment in _experiments if
             (_is_single_cell is None or _is_single_cell == is_single_cell(_experiment)) and
             (_is_high_temporal_resolution is None or _is_high_temporal_resolution == is_high_temporal_resolution(_experiment)) and
-            (_is_bleb is None or (_is_bleb and is_bleb(_experiment, _is_bleb_from_start)) or (not _is_bleb and not is_bleb(_experiment)))
+            (_is_bleb is None or (_is_bleb and is_bleb(_experiment, _is_bleb_from_start)) or (not _is_bleb and not is_bleb(_experiment))) and
+            (_is_dead_live is None or _is_dead_live == is_dead_live(_experiment))
             ]
 
 
@@ -186,3 +191,28 @@ def by_triplets(_experiments_tuples):
                             ])
 
     return _experiments_triplets
+
+
+def by_dead_live(_experiments_tuples, _dead=None, _live=None):
+    _experiments_tuples_filtered = []
+    for _tuple in _experiments_tuples:
+        _experiment, _series_id, _group = _tuple
+        _group_split = _group.split('_')
+        _cell_id_1 = int(_group_split[1])
+        _cell_id_2 = int(_group_split[2])
+        _properties = load.image_properties(_experiment, _series_id)
+
+        _cell_1_dead = _cell_id_1 in _properties['dead_cell_ids']
+        _cell_2_dead = _cell_id_2 in _properties['dead_cell_ids']
+
+        # both dead
+        if (_dead is None or _dead) and (_live is None or not _live) and _cell_1_dead and _cell_2_dead:
+            _experiments_tuples_filtered.append(_tuple)
+        # both live
+        elif (_dead is None or not _dead) and (_live is None or _live) and not _cell_1_dead and not _cell_2_dead:
+            _experiments_tuples_filtered.append(_tuple)
+        # one is dead, one is alive
+        elif (_dead is None or _dead) and (_live is None or _live) and ((_cell_1_dead and not _cell_2_dead) or (not _cell_1_dead and _cell_2_dead)):
+            _experiments_tuples_filtered.append(_tuple)
+
+    return _experiments_tuples_filtered
