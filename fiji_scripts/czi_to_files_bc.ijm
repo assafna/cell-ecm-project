@@ -8,6 +8,7 @@ experiment_serieses_path = serieses_path + experiment + "/";
 for (s = 1; s <= 20; s++) {
 	run("Bio-Formats", "open=[" + file_path + "] autoscale color_mode=Default rois_import=[ROI manager] view=Hyperstack stack_order=XYCZT series_" + s);
 	rename("new_image");
+	run("8-bit");
 	run("Duplicate...", "title=red duplicate channels=2");
 	run("Grays");
 	run("Bleach Correction", "correction=[Histogram Matching]");

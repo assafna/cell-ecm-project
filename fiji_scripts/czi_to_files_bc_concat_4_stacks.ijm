@@ -11,16 +11,18 @@ experiment_serieses_path = serieses_path + experiment + "/";
 for (s = 1; s <= 24; s++) {
 	run("Bio-Formats", "open=[" + first_file_path + "] autoscale color_mode=Default rois_import=[ROI manager] view=Hyperstack stack_order=XYCZT series_" + s);
 	rename("first");
+	run("8-bit");
 	run("Bio-Formats", "open=[" + second_file_path + "] autoscale color_mode=Default rois_import=[ROI manager] view=Hyperstack stack_order=XYCZT series_" + s);
 	rename("second");
+	run("8-bit");
 	run("Bio-Formats", "open=[" + third_file_path + "] autoscale color_mode=Default rois_import=[ROI manager] view=Hyperstack stack_order=XYCZT series_" + s);
 	rename("third");
-	
+	run("8-bit");
 	run("Duplicate...", "duplicate frames=1");
 	rename("third_new");
-	
 	run("Bio-Formats", "open=[" + fourth_file_path + "] autoscale color_mode=Default rois_import=[ROI manager] view=Hyperstack stack_order=XYCZT series_" + s);
 	rename("fourth");
+	run("8-bit");
 	run("Concatenate...", "  title=new_image open image1=first image2=second image3=third_new image4=fourth image5=[-- None --]");
 	run("Duplicate...", "title=red duplicate channels=2");
 	run("Grays");
