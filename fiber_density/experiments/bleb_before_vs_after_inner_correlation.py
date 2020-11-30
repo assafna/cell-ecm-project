@@ -27,7 +27,8 @@ def main(_band=True):
         _is_single_cell=False,
         _is_high_temporal_resolution=None,
         _is_bleb=True,
-        _is_bleb_from_start=False
+        _is_bleb_from_start=False,
+        _is_dead_live=False
     )
 
     _tuples = load.experiments_groups_as_tuples(_experiments)

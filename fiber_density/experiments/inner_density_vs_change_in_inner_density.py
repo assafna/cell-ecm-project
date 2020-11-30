@@ -55,7 +55,8 @@ def main(_early_time_frames=True):
         _is_single_cell=False,
         _is_high_temporal_resolution=False,
         _is_bleb=False,
-        _is_bleb_from_start=False
+        _is_bleb_from_start=False,
+        _is_dead_live=False
     )
 
     _tuples = load.experiments_groups_as_tuples(_experiments)
