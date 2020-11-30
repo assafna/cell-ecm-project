@@ -206,13 +206,22 @@ def by_dead_live(_experiments_tuples, _dead=None, _live=None):
         _cell_2_dead = _cell_id_2 in _properties['dead_cell_ids']
 
         # both dead
-        if (_dead is None or _dead) and (_live is None or not _live) and _cell_1_dead and _cell_2_dead:
+        if _dead and not _live and _cell_1_dead and _cell_2_dead:
             _experiments_tuples_filtered.append(_tuple)
         # both live
-        elif (_dead is None or not _dead) and (_live is None or _live) and not _cell_1_dead and not _cell_2_dead:
+        elif not _dead and _live and not _cell_1_dead and not _cell_2_dead:
+            _experiments_tuples_filtered.append(_tuple)
+        # at least one is dead
+        elif _dead and _live is None and (_cell_1_dead or _cell_2_dead):
+            _experiments_tuples_filtered.append(_tuple)
+        # at least one is alive
+        elif _dead is None and _live and (not _cell_1_dead or not _cell_2_dead):
             _experiments_tuples_filtered.append(_tuple)
         # one is dead, one is alive
-        elif (_dead is None or _dead) and (_live is None or _live) and ((_cell_1_dead and not _cell_2_dead) or (not _cell_1_dead and _cell_2_dead)):
+        elif _dead and _live and ((_cell_1_dead and not _cell_2_dead) or (not _cell_1_dead and _cell_2_dead)):
             _experiments_tuples_filtered.append(_tuple)
+        # return all
+        elif _dead is None and _live is None:
+            return _experiments_tuples
 
     return _experiments_tuples_filtered
