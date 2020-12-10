@@ -24,8 +24,9 @@ CONVERT_TO_COLOR_DEPTH_8_BIT = False
 # 4. Python script "create_image_properties"
 # 5. This Python script "new_experiment_pairs"
 # 6. Python script "normalization"
-# 7. Python script "set_band_property" *** BETTER TO DO MANUALLY ***
-# 8. Python script "export_video" for visualization
+# 7. Python script "export_video" for visualization
+# 8. Python script "set_band_property" *** BETTER TO DO MANUALLY ***
+# 9. Python script "update_blacklist"
 
 
 def process_group(_experiment, _series_id, _cells_coordinates, _cell_1_id, _cell_2_id, _series_image_by_time_frames,
