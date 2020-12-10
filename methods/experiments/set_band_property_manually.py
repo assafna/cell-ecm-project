@@ -6,17 +6,70 @@ from libs.experiments import load, paths
 
 def main():
     _tuples = [
-        ('LiveDead_201117', 2, 'cells_1_2', True),
-        ('LiveDead_201117', 5, 'cells_0_1', True),
-        ('LiveDead_201117', 7, 'cells_0_1', True),
-        ('LiveDead_201117', 7, 'cells_0_2', True),
-        ('LiveDead_201117', 7, 'cells_1_2', True),
-        ('LiveDead_201117', 9, 'cells_0_2', True),
-        ('LiveDead_201117', 9, 'cells_1_2', True),
-        ('LiveDead_201117', 13, 'cells_0_2', True),
-        ('LiveDead_201117', 15, 'cells_0_3', True),
-        ('LiveDead_201117', 16, 'cells_0_1', True),
-        ('LiveDead_201117', 18, 'cells_0_1', True)
+        ('LiveLive_201207', 1, 'cells_1_3', True),
+        ('LiveLive_201207', 1, 'cells_1_4', True),
+        ('LiveLive_201207', 1, 'cells_2_3', True),
+        ('LiveLive_201207', 1, 'cells_2_4', True),
+        ('LiveLive_201207', 1, 'cells_3_4', True),
+
+        ('LiveLive_201207', 3, 'cells_0_1', True),
+        ('LiveLive_201207', 3, 'cells_0_2', True),
+        ('LiveLive_201207', 3, 'cells_1_2', True),
+        ('LiveLive_201207', 3, 'cells_1_3', True),
+        ('LiveLive_201207', 3, 'cells_2_3', True),
+
+        ('LiveLive_201207', 4, 'cells_0_1', True),
+        ('LiveLive_201207', 4, 'cells_0_2', True),
+        ('LiveLive_201207', 4, 'cells_1_2', True),
+
+        ('LiveLive_201207', 5, 'cells_0_1', True),
+        ('LiveLive_201207', 5, 'cells_1_4', True),
+
+        ('LiveLive_201207', 6, 'cells_1_3', True),
+        ('LiveLive_201207', 6, 'cells_1_4', True),
+        ('LiveLive_201207', 6, 'cells_3_4', True),
+
+        ('LiveLive_201207', 7, 'cells_0_1', True),
+        ('LiveLive_201207', 7, 'cells_0_2', True),
+        ('LiveLive_201207', 7, 'cells_1_2', True),
+        ('LiveLive_201207', 7, 'cells_1_3', True),
+        ('LiveLive_201207', 7, 'cells_2_3', True),
+
+        ('LiveLive_201207', 8, 'cells_0_1', True),
+        ('LiveLive_201207', 8, 'cells_0_3', True),
+        ('LiveLive_201207', 8, 'cells_1_3', True),
+        ('LiveLive_201207', 8, 'cells_2_3', True),
+
+        ('LiveLive_201207', 9, 'cells_0_2', True),
+        ('LiveLive_201207', 9, 'cells_0_3', True),
+        ('LiveLive_201207', 9, 'cells_1_2', True),
+        ('LiveLive_201207', 9, 'cells_1_3', True),
+        ('LiveLive_201207', 9, 'cells_2_3', True),
+
+        ('LiveLive_201207', 10, 'cells_2_6', True),
+        ('LiveLive_201207', 10, 'cells_2_7', True),
+        ('LiveLive_201207', 10, 'cells_4_6', True),
+        ('LiveLive_201207', 10, 'cells_4_7', True),
+        ('LiveLive_201207', 10, 'cells_4_8', True),
+        ('LiveLive_201207', 10, 'cells_6_7', True),
+        ('LiveLive_201207', 10, 'cells_7_8', True),
+
+        ('LiveLive_201207', 12, 'cells_0_1', True),
+        ('LiveLive_201207', 12, 'cells_0_2', True),
+        ('LiveLive_201207', 12, 'cells_1_2', True),
+
+        ('LiveLive_201207', 13, 'cells_1_3', True),
+        ('LiveLive_201207', 13, 'cells_1_4', True),
+        ('LiveLive_201207', 13, 'cells_2_3', True),
+        ('LiveLive_201207', 13, 'cells_2_4', True),
+        ('LiveLive_201207', 13, 'cells_3_4', True),
+
+        ('LiveLive_201207', 14, 'cells_0_1', True),
+
+        ('LiveLive_201207', 15, 'cells_0_1', True),
+        ('LiveLive_201207', 15, 'cells_0_2', True),
+
+        ('LiveLive_201207', 16, 'cells_2_4', True)
     ]
 
     for _tuple in _tuples:

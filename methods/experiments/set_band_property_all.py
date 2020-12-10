@@ -5,7 +5,7 @@ from libs.experiments import load, paths
 
 
 def main():
-    _experiment = 'LiveDead_201117'
+    _experiment = 'LiveLive_201207'
     _band = False
 
     _tuples = load.experiment_groups_as_tuples(_experiment)
