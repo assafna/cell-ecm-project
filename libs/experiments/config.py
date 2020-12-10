@@ -11,7 +11,8 @@ CELL_PAIRS = [
     'SN26_BlebAdded',
     'Bleb_150',
     'LiveDead_201115',
-    'LiveDead_201117'
+    'LiveDead_201117',
+    'LiveLive_201207'
 ]
 
 DEAD_LIVE = [
