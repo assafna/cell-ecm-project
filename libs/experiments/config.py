@@ -12,12 +12,14 @@ CELL_PAIRS = [
     'Bleb_150',
     'LiveDead_201115',
     'LiveDead_201117',
-    'LiveLive_201207'
+    'LiveLive_201207',
+    'DeadDead_201208'
 ]
 
 DEAD_LIVE = [
     'LiveDead_201115',
-    'LiveDead_201117'
+    'LiveDead_201117',
+    'DeadDead_201208'
 ]
 
 BLEB = [
