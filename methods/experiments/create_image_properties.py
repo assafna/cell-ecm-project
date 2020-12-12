@@ -1,9 +1,10 @@
 import os
 
+import numpy as np
 from PIL import Image
 from PIL.TiffTags import TAGS
 
-from libs.experiments import paths, save, config
+from libs.experiments import paths, save, config, load
 
 
 def process_series(_experiment, _series_id, _overwrite=False):
@@ -13,6 +14,7 @@ def process_series(_experiment, _series_id, _overwrite=False):
         return
 
     print('Creating image properties for:', _experiment, 'Series ' + str(_series_id), sep='\t')
+    _series_image = load.series_image(_experiment, _series_id)
     _path = paths.serieses(_experiment, _series_id)
     with Image.open(_path) as _img:
         _meta_dict = {TAGS[_key]: _img.tag[_key] for _key in _img.tag}
@@ -31,7 +33,13 @@ def process_series(_experiment, _series_id, _overwrite=False):
             },
             'slices': int(str(_meta_dict['ImageDescription'][0].split('slices=')[1]).split()[0]),
             'frames': int(str(_meta_dict['ImageDescription'][0].split('frames=')[1]).split()[0]),
-            'frames_interval': float(str(_meta_dict['ImageDescription'][0].split('finterval=')[1]).split()[0])
+            'frames_interval': float(str(_meta_dict['ImageDescription'][0].split('finterval=')[1]).split()[0]),
+            'time_frames': [
+                {
+                    'mean': np.mean(_time_frame_image),
+                    'std': np.std(_time_frame_image)
+                }
+                for _time_frame_image in _series_image]
             # TODO: add location position X, Y & Z
         }
 
