@@ -22,17 +22,6 @@ def process_series(_experiment, _series_id, _overwrite=False):
             if _cell[-1] is not None:
                 _previous_cell_x, _previous_cell_y, _previous_cell_z = _cell[-1]
 
-                if _series_id in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]:
-                    if _time_frame == 7:
-                        _previous_cell_x += 42
-                        _previous_cell_y += 27
-                        _previous_cell_z += -2
-                if _series_id in [16, 17, 18]:
-                    if _time_frame == 6:
-                        _previous_cell_x += 42
-                        _previous_cell_y += 27
-                        _previous_cell_z += -2
-
                 _distances = [math.sqrt(
                     (_previous_cell_x - _optional_cell_x) ** 2 +
                     (_previous_cell_y - _optional_cell_y) ** 2 +
@@ -62,5 +51,4 @@ def process_all_experiments(_overwrite=False):
 
 
 if __name__ == '__main__':
-    # process_all_experiments()
-    process_experiment('DeadDead_201208')
+    process_all_experiments()
