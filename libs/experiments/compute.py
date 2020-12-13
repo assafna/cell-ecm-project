@@ -133,7 +133,14 @@ def window_fiber_density(_experiment, _series_id, _group, _time_frame, _window, 
     else:
         _saturation_fraction = None
 
-    return np.mean(_window_pixels[_non_zero_mask]), _out_of_boundaries, _saturation_fraction
+    # fiber density as mean of non zero pixels
+    _fiber_density = np.mean(_window_pixels[_non_zero_mask])
+
+    # subtract time frame background mean
+    # _series_properties = load.image_properties(_experiment, _series_id)
+    # _fiber_density -= _series_properties['time_frames'][_time_frame]['mean']
+
+    return _fiber_density, _out_of_boundaries, _saturation_fraction
 
 
 def window_fiber_density_time_frame(_arguments):
