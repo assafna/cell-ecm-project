@@ -3,24 +3,25 @@ from libs.experiments import load, save
 
 def main():
     _tuples = [
-        ('LiveDead_201117', 1, [1]),
-        ('LiveDead_201117', 2, [0]),
-        ('LiveDead_201117', 3, [0, 1]),
-        ('LiveDead_201117', 4, [0, 1]),
-        ('LiveDead_201117', 5, [0]),
-        ('LiveDead_201117', 6, [0]),
-        ('LiveDead_201117', 7, []),
-        ('LiveDead_201117', 8, [0]),
-        ('LiveDead_201117', 9, [0, 3]),
-        ('LiveDead_201117', 10, [0]),
-        ('LiveDead_201117', 11, [1]),
-        ('LiveDead_201117', 12, []),
-        ('LiveDead_201117', 13, [1, 2]),
-
-        ('LiveDead_201117', 15, [1, 2]),
-        ('LiveDead_201117', 16, [0]),
-        ('LiveDead_201117', 17, [1, 2, 3]),
-        ('LiveDead_201117', 18, [0])
+        ('LiveDead_201220', 1, [1]),
+        ('LiveDead_201220', 2, [1]),
+        ('LiveDead_201220', 3, [0, 1]),
+        ('LiveDead_201220', 4, [0, 1, 2]),
+        ('LiveDead_201220', 5, [1, 2]),
+        ('LiveDead_201220', 6, [0]),
+        ('LiveDead_201220', 7, [0, 2]),
+        ('LiveDead_201220', 8, [0, 1]),
+        ('LiveDead_201220', 9, [0, 1]),
+        ('LiveDead_201220', 10, [0]),
+        ('LiveDead_201220', 11, [1, 2, 3]),
+        ('LiveDead_201220', 12, [0, 1]),
+        ('LiveDead_201220', 13, [1, 2, 3, 4]),
+        ('LiveDead_201220', 14, [0, 2, 3]),
+        ('LiveDead_201220', 15, [0, 1]),
+        ('LiveDead_201220', 16, [0, 1, 2, 3]),
+        ('LiveDead_201220', 17, [0]),
+        ('LiveDead_201220', 18, [0, 1, 3]),
+        ('LiveDead_201220', 19, [1, 3])
     ]
 
     for _tuple in _tuples:
