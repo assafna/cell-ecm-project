@@ -120,6 +120,14 @@ def window_fiber_density(_experiment, _series_id, _group, _time_frame, _window, 
     _window_pixels = _time_frame_image[_z1:_z2, _y1:_y2, _x1:_x2]
     _non_zero_mask = np.nonzero(_window_pixels)
 
+    # pixels to subtract
+    _padding_x, _padding_y, _padding_z = 0, _y2 - _y1, _z2 - _z1
+    _padding_x1, _padding_y1, _padding_z1 = max(0, _x1 - _padding_x), max(0, _y1 - _padding_y), max(0, _z1 - _padding_z)
+    _padding_x2, _padding_y2, _padding_z2 = min(_x2 + _padding_x, _x_shape), min(_y2 + _padding_y, _y_shape), min(_z2 + _padding_z, _z_shape)
+    _subtract_window = _time_frame_image[_padding_z1:_padding_z2, _padding_y1:_padding_y2, _padding_x1:_padding_x2].copy()
+    _subtract_window[_padding_z:-_padding_z, _padding_y:-_padding_y, _padding_x:-_padding_x] = 0
+    _subtract_value = np.mean(_subtract_window[np.nonzero(_subtract_window)])
+
     # count black pixel amount
     if not _out_of_boundaries and \
             (np.size(_window_pixels) == 0 or
@@ -139,6 +147,9 @@ def window_fiber_density(_experiment, _series_id, _group, _time_frame, _window, 
     # subtract time frame background mean
     # _series_properties = load.image_properties(_experiment, _series_id)
     # _fiber_density -= _series_properties['time_frames'][_time_frame]['mean']
+
+    # subtract the subtract value
+    _fiber_density -= _subtract_value
 
     return _fiber_density, _out_of_boundaries, _saturation_fraction
 
