@@ -102,6 +102,111 @@ def window_by_microns(_resolution_x, _resolution_y, _resolution_z, _length_x, _l
     return _x1, _y1, _z1, _x2, _y2, _z2
 
 
+def window_fiber_density_normalized_3d(_time_frame_image, _x1, _x2, _y1, _y2, _z1, _z2):
+    _factor = 3
+
+    # size of window in each axis
+    _z_size = _z2 - _z1
+    _y_size = _y2 - _y1
+    _x_size = _x2 - _x1
+
+    # step size, divided by 3 in each axis
+    _z_step = int(round(_z_size / 3))
+    _y_step = int(round(_y_size / 3))
+    _x_step = int(round(_x_size / 3))
+
+    # split the window into 3 in each axis (like a rubik's cube), each is a mini-cube
+    _counter = 0
+    _center_mean = 0
+    _border_means = 0
+    _mini_cube_normalized_means = 0
+    for _z in range(3):
+        _z_start = _z1 + _z * _z_step
+        _z_end = _z1 + (_z + 1) * _z_step
+        for _y in range(3):
+            _y_start = _y1 + _y * _y_step
+            _y_end = _y1 + (_y + 1) * _y_step
+            for _x in range(3):
+                _x_start = _x1 + _x * _x_step
+                _x_end = _x1 + (_x + 1) * _x_step
+
+                # compute mini cube mean
+                _mini_cube = _time_frame_image[_z_start:_z_end, _y_start:_y_end, _x_start:_x_end]
+                _mini_cube_non_zero = _mini_cube[np.nonzero(_mini_cube)]
+
+                # all is zero
+                if len(_mini_cube_non_zero) == 0:
+                    continue
+
+                _mini_cube_sum = np.sum(_mini_cube_non_zero)
+                _mini_cube_count = len(_mini_cube_non_zero.ravel())
+                _mini_cube_mean = np.mean(_mini_cube_non_zero)
+
+                # compute around the mini cube mean of pixels
+                _around_pixels_mean = 0
+                _around_pixels = None
+
+                # corners
+                if _z in [0, 2] and _y in [0, 2]:
+                    if _z == 0 and _y == 0:
+                        _around_pixels = _time_frame_image[max(0, _z_start - _z_step * _factor):_z_end, max(0, _y_start - _y_step * _factor):_y_end, _x_start:_x_end]
+                    elif _z == 0 and _y == 2:
+                        _around_pixels = _time_frame_image[max(0, _z_start - _z_step * _factor):_z_end, _y_end - _y_step * _factor:min(_time_frame_image.shape[1], _y_end + _y_step * _factor),
+                                         _x_start:_x_end]
+                    elif _z == 2 and _y == 0:
+                        _around_pixels = _time_frame_image[_z_end - _z_step * _factor:min(_time_frame_image.shape[0], _z_end + _z_step * _factor), max(0, _y_start - _y_step * _factor):_y_end,
+                                         _x_start:_x_end]
+                    elif _z == 2 and _y == 2:
+                        _around_pixels = _time_frame_image[_z_end - _z_step * _factor:min(_time_frame_image.shape[2], _z_end + _z_step * _factor), _y_end - _y_step * _factor:min(_time_frame_image.shape[1], _y_end + _y_step * _factor),
+                                         _x_start:_x_end]
+                    _around_pixels_non_zero = _around_pixels[np.nonzero(_around_pixels)]
+                    _around_pixels_sum = np.sum(_around_pixels_non_zero)
+                    _around_pixels_count = len(_around_pixels_non_zero.ravel())
+                    _around_pixels_mean = (_around_pixels_sum - _mini_cube_sum) / (
+                            _around_pixels_count - _mini_cube_count)
+                # edges
+                else:
+                    if _z == 1 and _y == 0:
+                        _around_pixels = _time_frame_image[_z_start:_z_end, max(0, _y_start - _y_step * _factor):_y_start, _x_start:_x_end]
+                    elif _z == 1 and _y == 2:
+                        _around_pixels = _time_frame_image[_z_start:_z_end, min(_time_frame_image.shape[1], _y_end - _y_step * _factor):_y_end, _x_start:_x_end]
+                    elif _z == 0 and _y == 1:
+                        _around_pixels = _time_frame_image[max(0, _z_start - _z_step * _factor):_z_start, _y_start:_y_end, _x_start:_x_end]
+                    elif _z == 2 and _y == 1:
+                        _around_pixels = _time_frame_image[min(_time_frame_image.shape[0], _z_end - _z_step * _factor):_z_end, _y_start:_y_end, _x_start:_x_end]
+                    # center
+                    else:
+                        _center_mean = _mini_cube_mean
+                        continue
+                    _around_pixels_non_zero = _around_pixels[np.nonzero(_around_pixels)]
+
+                    # all is zero
+                    if len(_around_pixels_non_zero) == 0:
+                        continue
+
+                    _around_pixels_mean = np.mean(_around_pixels_non_zero)
+
+                # collect the data, normalize by subtracting the mean of pixels around
+                _counter += 1
+                _border_means += _around_pixels_mean
+                _normalized_mini_cube = _mini_cube_mean - _around_pixels_mean
+                _mini_cube_normalized_means += _normalized_mini_cube
+
+    # no windows
+    if _counter == 0:
+        return 0
+
+    # add the center normalized by all around means
+    _normalized_center = _center_mean - _border_means / _counter
+    _mini_cube_normalized_means += _normalized_center
+    _counter += 1
+
+    # calculate the mean of all means
+    _fiber_density_normalized = _mini_cube_normalized_means / _counter
+
+    return _fiber_density_normalized
+
+
 def window_fiber_density(_experiment, _series_id, _group, _time_frame, _window, _time_frame_image=None):
     if _time_frame_image is None:
         _time_frame_image = load.structured_image(_experiment, _series_id, _group, _time_frame)
@@ -121,7 +226,7 @@ def window_fiber_density(_experiment, _series_id, _group, _time_frame, _window, 
     _non_zero_mask = np.nonzero(_window_pixels)
 
     # pixels to subtract
-    _padding_x, _padding_y, _padding_z = 0, _y2 - _y1, _z2 - _z1
+    _padding_x, _padding_y, _padding_z = 0, int(round((_y2 - _y1) / 2)), int(round((_z2 - _z1) / 2))
     _padding_x1, _padding_y1, _padding_z1 = max(0, _x1 - _padding_x), max(0, _y1 - _padding_y), max(0, _z1 - _padding_z)
     _padding_x2, _padding_y2, _padding_z2 = min(_x2 + _padding_x, _x_shape), min(_y2 + _padding_y, _y_shape), min(_z2 + _padding_z, _z_shape)
     _subtract_window = _time_frame_image[_padding_z1:_padding_z2, _padding_y1:_padding_y2, _padding_x1:_padding_x2].copy()
@@ -150,6 +255,8 @@ def window_fiber_density(_experiment, _series_id, _group, _time_frame, _window, 
 
     # subtract the subtract value
     _fiber_density -= _subtract_value
+
+    # _fiber_density = window_fiber_density_normalized_3d(_time_frame_image, _x1, _x2, _y1, _y2, _z1, _z2)
 
     return _fiber_density, _out_of_boundaries, _saturation_fraction
 
@@ -241,7 +348,10 @@ def longest_same_indices_shared_in_borders_sub_array(_fiber_densities_1, _fiber_
         longest_fiber_densities_ascending_sequence(_fiber_densities_2_filtered)
 
 
-def remove_blacklist(_experiment, _series_id, _cell_id, _fiber_densities):
+def remove_blacklist(_experiment, _series_id, _cell_id, _fiber_densities, _exclude_reasons=None):
+    if _exclude_reasons is None:
+        _exclude_reasons = ['Light wave']
+
     _blacklist = load.blacklist(_experiment, _series_id)
 
     if _cell_id in _blacklist or None in _blacklist:
@@ -249,11 +359,15 @@ def remove_blacklist(_experiment, _series_id, _cell_id, _fiber_densities):
         if _cell_id in _blacklist:
             for _time_frame in _blacklist[_cell_id]:
                 if _time_frame < len(_out_of_boundaries):
-                    _out_of_boundaries[_time_frame] = True
+                    _reason = _blacklist[_cell_id][_time_frame][0]
+                    if _exclude_reasons is False or _reason not in _exclude_reasons:
+                        _out_of_boundaries[_time_frame] = True
         if None in _blacklist:
             for _time_frame in _blacklist[None]:
                 if _time_frame < len(_out_of_boundaries):
-                    _out_of_boundaries[_time_frame] = True
+                    _reason = _blacklist[None][_time_frame][0]
+                    if _exclude_reasons is False or _reason not in _exclude_reasons:
+                        _out_of_boundaries[_time_frame] = True
         return [
             (_fiber_density[0], _out_of_boundaries_value)
             for _fiber_density, _out_of_boundaries_value in zip(_fiber_densities, _out_of_boundaries)
