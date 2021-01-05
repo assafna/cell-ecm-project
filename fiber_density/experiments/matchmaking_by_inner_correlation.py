@@ -1,4 +1,5 @@
 import os
+import random
 
 import numpy as np
 import plotly.graph_objs as go
@@ -18,6 +19,7 @@ PAIR_DISTANCE_RANGE = [4, 10]
 STATIC = False
 
 MAX_RANK = 7
+POTENTIAL_MATCHES = 50
 
 
 def main(_real_cells=True, _offset_y=0.5, _high_temporal_resolution=False, _band=True):
@@ -70,98 +72,120 @@ def main(_real_cells=True, _offset_y=0.5, _high_temporal_resolution=False, _band
     _tuples_by_experiment = organize.by_experiment(_tuples)
 
     _n = 0
-    _cells_potential_matches = []
     _cells_ranks = []
     for _experiment in _tuples_by_experiment:
         print('Experiment:', _experiment)
         _experiment_tuples = _tuples_by_experiment[_experiment]
 
-        for _tuple_1 in tqdm(_experiment_tuples, desc='Main loop'):
-            _experiment_1, _series_id_1, _group_1 = _tuple_1
-            _experiment_1_properties = load.group_properties(_experiment_1, _series_id_1, _group_1)
+        for _pivot_tuple in tqdm(_experiment_tuples, desc='Main loop'):
+            _pivot_experiment, _pivot_series_id, _pivot_group = _pivot_tuple
+            _pivot_experiment_properties = load.group_properties(_pivot_experiment, _pivot_series_id, _pivot_group)
 
-            for _cell_1_id, _cell_1_correct_match_cell_id in \
+            for _pivot_cell_id, _pivot_cell_correct_match_cell_id in \
                     zip(['left_cell', 'right_cell'], ['right_cell', 'left_cell']):
-                _cell_1 = (_experiment_1, _series_id_1, _group_1, _cell_1_id)
-                _cell_1_correct_match = (_experiment_1, _series_id_1, _group_1, _cell_1_correct_match_cell_id)
-                _cell_1_fiber_densities = \
-                    _experiments_fiber_densities[(_experiment_1, _series_id_1, _group_1, _cell_1_id)]
-                _cell_1_fiber_densities = compute.remove_blacklist(
-                    _experiment_1,
-                    _series_id_1,
-                    _experiment_1_properties['cells_ids'][_cell_1_id],
-                    _cell_1_fiber_densities
+                _pivot_cell = (_pivot_experiment, _pivot_series_id, _pivot_group, _pivot_cell_id)
+                _pivot_cell_correct_match_cell = (_pivot_experiment, _pivot_series_id, _pivot_group, _pivot_cell_correct_match_cell_id)
+                _pivot_cell_fiber_densities = _experiments_fiber_densities[_pivot_cell]
+                _pivot_cell_fiber_densities = compute.remove_blacklist(
+                    _pivot_experiment,
+                    _pivot_series_id,
+                    _pivot_experiment_properties['cells_ids'][_pivot_cell_id],
+                    _pivot_cell_fiber_densities
                 )
 
-                _cell_1_correlations = []
-                _cell_1_correct_match_correlation = None
-                for _tuple_2 in _experiment_tuples:
-                    _experiment_2, _series_id_2, _group_2 = _tuple_2
-                    _experiment_2_properties = load.group_properties(_experiment_2, _series_id_2, _group_2)
+                _pivot_cell_correlations = []
 
-                    for _cell_2_id in ['left_cell', 'right_cell']:
-                        _cell_2 = (_experiment_2, _series_id_2, _group_2, _cell_2_id)
+                # correct match
+                _pivot_cell_correct_match_fiber_densities = _experiments_fiber_densities[_pivot_cell_correct_match_cell]
+                _pivot_cell_correct_match_fiber_densities = compute.remove_blacklist(
+                    _pivot_experiment,
+                    _pivot_series_id,
+                    _pivot_experiment_properties['cells_ids'][_pivot_cell_correct_match_cell_id],
+                    _pivot_cell_correct_match_fiber_densities
+                )
+                _pivot_cell_fiber_densities_filtered, _pivot_cell_correct_match_fiber_densities_filtered = \
+                    compute.longest_same_indices_shared_in_borders_sub_array(
+                        _pivot_cell_fiber_densities, _pivot_cell_correct_match_fiber_densities
+                    )
+                # ignore small arrays
+                if len(_pivot_cell_fiber_densities_filtered) < compute.minimum_time_frames_for_correlation(
+                        _pivot_experiment):
+                    continue
+                _correlation = compute_lib.correlation(
+                    compute_lib.derivative(_pivot_cell_fiber_densities_filtered, _n=DERIVATIVE),
+                    compute_lib.derivative(_pivot_cell_correct_match_fiber_densities_filtered, _n=DERIVATIVE)
+                )
+                _pivot_cell_correlations.append(_correlation)
+                _pivot_cell_correct_match_correlation = _correlation
 
-                        # same cell
-                        if _cell_1 == _cell_2:
+                # create list of potential cells
+                _candidate_tuples = []
+                for _candidate_tuple in _experiment_tuples:
+                    _candidate_experiment, _candidate_series_id, _candidate_group = _candidate_tuple
+                    for _candidate_cell_id in ['left_cell', 'right_cell']:
+                        _candidate_cell = (_candidate_experiment, _candidate_series_id, _candidate_group, _candidate_cell_id)
+
+                        # skip if same cell or correct match
+                        if _candidate_cell == _pivot_cell or _candidate_cell == _pivot_cell_correct_match_cell:
                             continue
 
-                        _cell_2_fiber_densities = \
-                            _experiments_fiber_densities[(_experiment_2, _series_id_2, _group_2, _cell_2_id)]
-                        _cell_2_fiber_densities = compute.remove_blacklist(
-                            _experiment_2,
-                            _series_id_2,
-                            _experiment_2_properties['cells_ids'][_cell_2_id],
-                            _cell_2_fiber_densities
+                        _candidate_tuples.append(_candidate_cell)
+
+                # compare with each potential candidate, until reached the maximum or nothing to compare with
+                while len(_pivot_cell_correlations) < POTENTIAL_MATCHES and len(_candidate_tuples) > 0:
+
+                    # sample randomly
+                    _candidate_cell = random.choice(_candidate_tuples)
+                    _candidate_experiment, _candidate_series_id, _candidate_group, _candidate_cell_id = _candidate_cell
+                    _candidate_experiment_properties = load.group_properties(_candidate_experiment, _candidate_series_id, _candidate_group)
+
+                    _candidate_cell_fiber_densities = _experiments_fiber_densities[_candidate_cell]
+                    _candidate_cell_fiber_densities = compute.remove_blacklist(
+                        _candidate_experiment,
+                        _candidate_series_id,
+                        _candidate_experiment_properties['cells_ids'][_candidate_cell_id],
+                        _candidate_cell_fiber_densities
+                    )
+
+                    _pivot_cell_fiber_densities_filtered, _candidate_cell_fiber_densities_filtered = \
+                        compute.longest_same_indices_shared_in_borders_sub_array(
+                            _pivot_cell_fiber_densities, _candidate_cell_fiber_densities
                         )
 
-                        _cell_1_fiber_densities_filtered, _cell_2_fiber_densities_filtered = \
-                            compute.longest_same_indices_shared_in_borders_sub_array(
-                                _cell_1_fiber_densities, _cell_2_fiber_densities
-                            )
+                    # ignore small arrays
+                    if len(_pivot_cell_fiber_densities_filtered) < compute.minimum_time_frames_for_correlation(_pivot_experiment):
+                        _candidate_tuples.remove(_candidate_cell)
+                        continue
 
-                        # ignore small arrays
-                        if len(_cell_1_fiber_densities_filtered) < compute.minimum_time_frames_for_correlation(_experiment_1):
-                            continue
+                    _correlation = compute_lib.correlation(
+                        compute_lib.derivative(_pivot_cell_fiber_densities_filtered, _n=DERIVATIVE),
+                        compute_lib.derivative(_candidate_cell_fiber_densities_filtered, _n=DERIVATIVE)
+                    )
 
-                        _correlation = compute_lib.correlation(
-                            compute_lib.derivative(_cell_1_fiber_densities_filtered, _n=DERIVATIVE),
-                            compute_lib.derivative(_cell_2_fiber_densities_filtered, _n=DERIVATIVE)
-                        )
+                    _pivot_cell_correlations.append(_correlation)
 
-                        _cell_1_correlations.append(_correlation)
-
-                        # correct match
-                        if _cell_2 == _cell_1_correct_match:
-                            _cell_1_correct_match_correlation = _correlation
-
-                # correct match does not exist
-                if _cell_1_correct_match_correlation is None:
+                # nothing to compare with
+                if len(_pivot_cell_correlations) == 1:
                     continue
 
                 # check matchmaking
-                _cell_1_total_potential_matches = len(_cell_1_correlations)
-                if _cell_1_total_potential_matches > 1:
-                    _cell_1_correct_match_rank = 1
-                    for _potential_match_correlation in sorted(_cell_1_correlations, reverse=True):
-                        if _cell_1_correct_match_correlation == _potential_match_correlation:
-                            break
-                        _cell_1_correct_match_rank += 1
+                _pivot_cell_correct_match_rank = 1
+                for _potential_match_correlation in sorted(_pivot_cell_correlations, reverse=True):
+                    if _pivot_cell_correct_match_correlation == _potential_match_correlation:
+                        break
+                    _pivot_cell_correct_match_rank += 1
 
-                    _n += 1
-                    _cells_potential_matches.append(_cell_1_total_potential_matches)
-                    _cells_ranks.append(_cell_1_correct_match_rank)
+                _n += 1
+                _cells_ranks.append(_pivot_cell_correct_match_rank)
 
     # results
-    _mean_cells_potential_matches = float(np.mean(_cells_potential_matches))
-    _mean_correct_match_probability = 1 / _mean_cells_potential_matches
+    _correct_match_probability = 1 / POTENTIAL_MATCHES
     _first_place_correct_matches = sum([1 for _rank in _cells_ranks if _rank == 1])
     _first_place_fraction = _first_place_correct_matches / _n
 
     print('Matchmaking results:')
     print('Total cells:', _n)
-    print('Average potential matches per cell:', round(_mean_cells_potential_matches, 2))
-    print('Average correct match probability:', round(_mean_correct_match_probability, 2))
+    print('Correct match probability:', round(_correct_match_probability, 2))
     print('Fraction of first place correct matches:', round(_first_place_fraction, 2))
 
     # plot
@@ -209,8 +233,7 @@ def main(_real_cells=True, _offset_y=0.5, _high_temporal_resolution=False, _band
     )
 
     # correct match probability plot
-    _y = [_mean_correct_match_probability] * (MAX_RANK - 1) + [_mean_correct_match_probability *
-                                                               (_mean_cells_potential_matches - MAX_RANK + 1)]
+    _y = [_correct_match_probability] * (MAX_RANK - 1) + [_correct_match_probability * (POTENTIAL_MATCHES - MAX_RANK + 1)]
     _fig = go.Figure(
         data=go.Bar(
             x=_x,
