@@ -212,7 +212,7 @@ def compute_z_array(_band=True, _high_temporal_resolution=False, _offset_x=OFFSE
 
     _windows_dictionary, _windows_to_compute = \
         compute.windows(_arguments, _keys=['experiment', 'series_id', 'group', 'offset_y', 'offset_z', 'cell_id'])
-    _fiber_densities = compute.fiber_densities(_windows_to_compute)
+    _fiber_densities = compute.fiber_densities(_windows_to_compute, _subtract_border=True)
 
     _experiments_fiber_densities = {}
     for _key in tqdm(_windows_dictionary, desc='Organizing fiber Densities'):

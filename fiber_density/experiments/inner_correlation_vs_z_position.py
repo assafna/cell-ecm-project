@@ -29,7 +29,7 @@ def compute_fiber_densities(_band=True, _high_temporal_resolution=False):
     )
 
     _tuples = load.experiments_groups_as_tuples(_experiments)
-    _tuples = filtering.by_pair_distance_range(_experiments, PAIR_DISTANCE_RANGE)
+    _tuples = filtering.by_pair_distance_range(_tuples, PAIR_DISTANCE_RANGE)
     _tuples = filtering.by_real_pairs(_tuples)
     _tuples = filtering.by_band(_tuples, _band=_band)
     print('Total tuples:', len(_tuples))
@@ -56,7 +56,7 @@ def compute_fiber_densities(_band=True, _high_temporal_resolution=False):
 
     _windows_dictionary, _windows_to_compute = compute.windows(_arguments,
                                                                _keys=['experiment', 'series_id', 'group', 'cell_id'])
-    _fiber_densities = compute.fiber_densities(_windows_to_compute)
+    _fiber_densities = compute.fiber_densities(_windows_to_compute, _subtract_border=True)
 
     _experiments_fiber_densities = {
         _key: [_fiber_densities[_tuple] for _tuple in _windows_dictionary[_key]]

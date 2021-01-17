@@ -207,7 +207,8 @@ def window_fiber_density_normalized_3d(_time_frame_image, _x1, _x2, _y1, _y2, _z
     return _fiber_density_normalized
 
 
-def window_fiber_density(_experiment, _series_id, _group, _time_frame, _window, _time_frame_image=None):
+def window_fiber_density(_experiment, _series_id, _group, _time_frame, _window, _time_frame_image=None,
+                         _subtract_border=False):
     if _time_frame_image is None:
         _time_frame_image = load.structured_image(_experiment, _series_id, _group, _time_frame)
     _x1, _y1, _z1, _x2, _y2, _z2 = [int(round(_value)) for _value in _window]
@@ -225,14 +226,6 @@ def window_fiber_density(_experiment, _series_id, _group, _time_frame, _window, 
     _window_pixels = _time_frame_image[_z1:_z2, _y1:_y2, _x1:_x2]
     _non_zero_mask = np.nonzero(_window_pixels)
 
-    # pixels to subtract
-    _padding_x, _padding_y, _padding_z = 0, int(round((_y2 - _y1) / 2)), int(round((_z2 - _z1) / 2))
-    _padding_x1, _padding_y1, _padding_z1 = max(0, _x1 - _padding_x), max(0, _y1 - _padding_y), max(0, _z1 - _padding_z)
-    _padding_x2, _padding_y2, _padding_z2 = min(_x2 + _padding_x, _x_shape), min(_y2 + _padding_y, _y_shape), min(_z2 + _padding_z, _z_shape)
-    _subtract_window = _time_frame_image[_padding_z1:_padding_z2, _padding_y1:_padding_y2, _padding_x1:_padding_x2].copy()
-    _subtract_window[_padding_z:-_padding_z, _padding_y:-_padding_y, _padding_x:-_padding_x] = 0
-    _subtract_value = np.mean(_subtract_window[np.nonzero(_subtract_window)])
-
     # count black pixel amount
     if not _out_of_boundaries and \
             (np.size(_window_pixels) == 0 or
@@ -249,13 +242,17 @@ def window_fiber_density(_experiment, _series_id, _group, _time_frame, _window, 
     # fiber density as mean of non zero pixels
     _fiber_density = np.mean(_window_pixels[_non_zero_mask])
 
-    # subtract time frame background mean
-    # _series_properties = load.image_properties(_experiment, _series_id)
-    # _fiber_density -= _series_properties['time_frames'][_time_frame]['mean']
+    # subtract border
+    if _subtract_border:
+        _padding_x, _padding_y, _padding_z = 0, int(round((_y2 - _y1) / 2)), int(round((_z2 - _z1) / 2))
+        _padding_x1, _padding_y1, _padding_z1 = max(0, _x1 - _padding_x), max(0, _y1 - _padding_y), max(0, _z1 - _padding_z)
+        _padding_x2, _padding_y2, _padding_z2 = min(_x2 + _padding_x, _x_shape), min(_y2 + _padding_y, _y_shape), min(_z2 + _padding_z, _z_shape)
+        _subtract_window = _time_frame_image[_padding_z1:_padding_z2, _padding_y1:_padding_y2, _padding_x1:_padding_x2].copy()
+        _subtract_window[_padding_z:-_padding_z, _padding_y:-_padding_y, _padding_x:-_padding_x] = 0
+        _subtract_value = np.mean(_subtract_window[np.nonzero(_subtract_window)])
+        _fiber_density -= _subtract_value
 
-    # subtract the subtract value
-    _fiber_density -= _subtract_value
-
+    # subtract border in 3d
     # _fiber_density = window_fiber_density_normalized_3d(_time_frame_image, _x1, _x2, _y1, _y2, _z1, _z2)
 
     return _fiber_density, _out_of_boundaries, _saturation_fraction
@@ -297,8 +294,11 @@ def window_fiber_density_time_frame(_arguments):
         print('Computing:', _arguments['experiment'], _arguments['series_id'], _arguments['group'],
               _arguments['cell_id'], 'window', _time_frame_window, 'direction', _arguments['direction'], 'tp',
               _arguments['time_point'], sep='\t')
+    if 'subtract_border' not in _arguments:
+        _arguments['subtract_border'] = False
     _window_fiber_density = window_fiber_density(_arguments['experiment'], _arguments['series_id'], _arguments['group'],
-                                                 _arguments['time_point'], _time_frame_window)[:2]
+                                                 _arguments['time_point'], _time_frame_window,
+                                                 _arguments['subtract_border'])[:2]
 
     return _arguments, _window_fiber_density
 
@@ -401,19 +401,20 @@ def smooth_coordinates_in_time(_coordinates, _n=5):
 
 
 def windows_fiber_densities(_tuple):
-    _key, _windows, _saturation = _tuple
+    _key, _windows, _saturation, _subtract_border = _tuple
     _experiment, _series_id, _group, _time_frame = _key
     _time_frame_image = load.structured_image(_experiment, _series_id, _group, _time_frame)
     return {
         (_experiment, _series_id, _group, _time_frame, _window):
             window_fiber_density(_experiment, _series_id, _group, _time_frame, _window,
-                                 _time_frame_image) if _saturation
-            else window_fiber_density(_experiment, _series_id, _group, _time_frame, _window, _time_frame_image)[:2]
+                                 _time_frame_image, _subtract_border) if _saturation
+            else window_fiber_density(_experiment, _series_id, _group, _time_frame, _window, _time_frame_image,
+                                      _subtract_border)[:2]
         for _window in _windows
     }
 
 
-def fiber_densities(_tuples, _saturation=False):
+def fiber_densities(_tuples, _saturation=False, _subtract_border=False):
     _organized_tuples = {}
     for _tuple in _tuples:
         _experiment, _series_id, _group, _time_frame, _window = _tuple
@@ -425,7 +426,7 @@ def fiber_densities(_tuples, _saturation=False):
 
     _arguments = []
     for _key in _organized_tuples:
-        _arguments.append((_key, _organized_tuples[_key], _saturation))
+        _arguments.append((_key, _organized_tuples[_key], _saturation, _subtract_border))
 
     _fiber_densities = {}
     with Pool(CPUS_TO_USE) as _p:

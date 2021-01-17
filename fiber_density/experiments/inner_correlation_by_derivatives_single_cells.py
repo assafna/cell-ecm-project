@@ -76,7 +76,7 @@ def main():
 
     _windows_dictionary, _windows_to_compute = \
         compute.windows(_arguments, _keys=['experiment', 'series_id', 'group', 'direction'])
-    _fiber_densities = compute.fiber_densities(_windows_to_compute)
+    _fiber_densities = compute.fiber_densities(_windows_to_compute, _subtract_border=True)
 
     _tuples = organize.by_single_cell_id(_tuples)
     print('Total tuples:', len(_tuples))

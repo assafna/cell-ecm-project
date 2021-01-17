@@ -10,11 +10,11 @@ CELL_PAIRS = [
     'SN20_Bleb_fromStart',
     'SN26_BlebAdded',
     'Bleb_150',
-    'LiveDead_201115',
-    'LiveDead_201117',
-    'LiveLive_201207',
+    # 'LiveDead_201115',
+    # 'LiveDead_201117',
+    # 'LiveLive_201207',
     'DeadDead_201208',
-    'BeadBead_201209',
+    # 'BeadBead_201209',
     'LiveDead_201220'
 ]
 

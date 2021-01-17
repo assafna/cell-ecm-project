@@ -141,20 +141,20 @@ def figure_4_main():
 
 
 def figure_si_4_same_vs_diff_offsets():
-    print('\nPanel A')
-    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(_offset_y=0, _offset_z=0)
-
-    print('\nPanel B')
-    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(_offset_y=-0.5, _offset_z=0)
-
-    print('\nPanel C')
+    print('\nTop panel')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(_offset_y=0.5, _offset_z=0)
 
-    print('\nPanel D')
+    print('\nLeft panel')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(_offset_y=0, _offset_z=-0.5)
 
-    print('\nPanel E')
+    print('\nMiddle panel')
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(_offset_y=0, _offset_z=0)
+
+    print('\nRight panel')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(_offset_y=0, _offset_z=0.5)
+
+    print('\nBottom panel')
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(_offset_y=-0.5, _offset_z=0)
 
 
 def figure_si_4_detrending_experiments():
@@ -229,8 +229,7 @@ def figure_si_4_temporal_assessment():
         _high_temporal_resolution=False)
 
     print('\nPanel B')
-    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_temporal_assessment.main(
-        _high_temporal_resolution=True)
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_temporal_assessment.main()
 
 
 def figure_4_all():
@@ -261,24 +260,24 @@ def figure_4_all():
 
 
 def figure_5_main():
-    print('\nPanel A')
+    print('\nPanel B')
     fiber_density.experiments.inner_density_vs_offsets_in_axes.main(_high_temporal_resolution=False)
 
-    print('\nPanel B')
+    print('\nPanel C')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_offsets_in_axes.main(
         _high_temporal_resolution=False)
 
-    print('\nPanel C')
+    print('\nPanel D')
     fiber_density.experiments.inner_density_vs_same_inner_correlation_vs_different_inner_correlation_vs_z_offset.main()
 
-    print('\nPanel F')
+    print('\nPanel G')
     fiber_density.experiments.inner_density_vs_time.compute_tuples([('SN16', 3, 'cells_0_1')])
 
-    print('\nPanel G')
+    print('\nPanel H')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(_band=False,
                                                                                          _high_temporal_resolution=False)
 
-    print('\nPanel H')
+    print('\nPanel I')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_band_vs_no_band.main(
         _high_temporal_resolution=False)
 

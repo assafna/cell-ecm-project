@@ -55,7 +55,7 @@ def compute_fiber_densities(_offset_y):
 
     _windows_dictionary, _windows_to_compute = compute.windows(_arguments,
                                                                _keys=['experiment', 'series_id', 'group', 'cell_id'])
-    _fiber_densities = compute.fiber_densities(_windows_to_compute, _saturation=True)
+    _fiber_densities = compute.fiber_densities(_windows_to_compute, _saturation=True, _subtract_border=True)
 
     _experiments_fiber_densities = {
         _key: [_fiber_densities[_tuple][:2] for _tuple in _windows_dictionary[_key]]
