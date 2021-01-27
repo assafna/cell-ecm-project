@@ -244,16 +244,19 @@ def window_fiber_density(_experiment, _series_id, _group, _time_frame, _window, 
 
     # subtract border
     if _subtract_border:
-        _padding_x, _padding_y, _padding_z = 0, int(round((_y2 - _y1) / 2)), int(round((_z2 - _z1) / 2))
-        _padding_x1, _padding_y1, _padding_z1 = max(0, _x1 - _padding_x), max(0, _y1 - _padding_y), max(0, _z1 - _padding_z)
-        _padding_x2, _padding_y2, _padding_z2 = min(_x2 + _padding_x, _x_shape), min(_y2 + _padding_y, _y_shape), min(_z2 + _padding_z, _z_shape)
+        _padding_x, _padding_y, _padding_z = 0, int(round((_y2 - _y1) / 4)), int(round((_z2 - _z1) / 4))
+        _space_x, _space_y, _space_z = 0, int(round((_y2 - _y1) / 4)), int(round((_z2 - _z1) / 4))
+        _padding_x1, _padding_y1, _padding_z1 = max(0, _x1 - _space_x - _padding_x), max(0, _y1 - _space_y - _padding_y), max(0, _z1 - _space_z - _padding_z)
+        _padding_x2, _padding_y2, _padding_z2 = min(_x2 + _space_x + _padding_x, _x_shape), min(_y2 + _space_y + _padding_y, _y_shape), min(_z2 + _space_z + _padding_z, _z_shape)
         _subtract_window = _time_frame_image[_padding_z1:_padding_z2, _padding_y1:_padding_y2, _padding_x1:_padding_x2].copy()
         _subtract_window[_padding_z:-_padding_z, _padding_y:-_padding_y, _padding_x:-_padding_x] = 0
         _subtract_value = np.mean(_subtract_window[np.nonzero(_subtract_window)])
         _fiber_density -= _subtract_value
 
     # subtract border in 3d
-    # _fiber_density = window_fiber_density_normalized_3d(_time_frame_image, _x1, _x2, _y1, _y2, _z1, _z2)
+    # _normalized_fiber_density = window_fiber_density_normalized_3d(_time_frame_image, _x1, _x2, _y1, _y2, _z1, _z2)
+    # if _normalized_fiber_density > 0:
+    #     _fiber_density = _normalized_fiber_density
 
     return _fiber_density, _out_of_boundaries, _saturation_fraction
 
