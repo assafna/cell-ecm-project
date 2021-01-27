@@ -108,12 +108,10 @@ def window_fiber_density_normalized_3d(_time_frame_image, _x1, _x2, _y1, _y2, _z
     # size of window in each axis
     _z_size = _z2 - _z1
     _y_size = _y2 - _y1
-    _x_size = _x2 - _x1
 
     # step size, divided by 3 in each axis
     _z_step = int(round(_z_size / 3))
     _y_step = int(round(_y_size / 3))
-    _x_step = int(round(_x_size / 3))
 
     # split the window into 3 in each axis (like a rubik's cube), each is a mini-cube
     _counter = 0
@@ -126,71 +124,64 @@ def window_fiber_density_normalized_3d(_time_frame_image, _x1, _x2, _y1, _y2, _z
         for _y in range(3):
             _y_start = _y1 + _y * _y_step
             _y_end = _y1 + (_y + 1) * _y_step
-            for _x in range(3):
-                _x_start = _x1 + _x * _x_step
-                _x_end = _x1 + (_x + 1) * _x_step
 
-                # compute mini cube mean
-                _mini_cube = _time_frame_image[_z_start:_z_end, _y_start:_y_end, _x_start:_x_end]
-                _mini_cube_non_zero = _mini_cube[np.nonzero(_mini_cube)]
+            # compute mini cube mean
+            _mini_cube = _time_frame_image[_z_start:_z_end, _y_start:_y_end, _x1:_x2]
+            _mini_cube_non_zero = _mini_cube[np.nonzero(_mini_cube)]
+
+            # all is zero
+            if len(_mini_cube_non_zero) == 0:
+                continue
+
+            _mini_cube_sum = np.sum(_mini_cube_non_zero)
+            _mini_cube_count = len(_mini_cube_non_zero.ravel())
+            _mini_cube_mean = np.mean(_mini_cube_non_zero)
+
+            # compute around the mini cube mean of pixels
+            _around_pixels_mean = 0
+            _around_pixels = None
+
+            # corners
+            if _z in [0, 2] and _y in [0, 2]:
+                if _z == 0 and _y == 0:
+                    _around_pixels = _time_frame_image[max(0, _z_start - _z_step * _factor):_z_end, max(0, _y_start - _y_step * _factor):_y_end, _x1:_x2]
+                elif _z == 0 and _y == 2:
+                    _around_pixels = _time_frame_image[max(0, _z_start - _z_step * _factor):_z_end, _y_start:min(_time_frame_image.shape[1], _y_end + _y_step * _factor), _x1:_x2]
+                elif _z == 2 and _y == 0:
+                    _around_pixels = _time_frame_image[_z_start:min(_time_frame_image.shape[0], _z_end + _z_step * _factor), max(0, _y_start - _y_step * _factor):_y_end, _x1:_x2]
+                elif _z == 2 and _y == 2:
+                    _around_pixels = _time_frame_image[_z_start:min(_time_frame_image.shape[0], _z_end + _z_step * _factor), _y_start:min(_time_frame_image.shape[1], _y_end + _y_step * _factor), _x1:_x2]
+                _around_pixels_non_zero = _around_pixels[np.nonzero(_around_pixels)]
+                _around_pixels_sum = np.sum(_around_pixels_non_zero)
+                _around_pixels_count = len(_around_pixels_non_zero.ravel())
+                _around_pixels_mean = (_around_pixels_sum - _mini_cube_sum) / (_around_pixels_count - _mini_cube_count)
+            # edges
+            else:
+                if _y == 0:
+                    _around_pixels = _time_frame_image[_z_start:_z_end, max(0, _y_start - _y_step * _factor):_y_start, _x1:_x2]
+                elif _y == 2:
+                    _around_pixels = _time_frame_image[_z_start:_z_end, _y_end:min(_time_frame_image.shape[1], _y_end + _y_step * _factor), _x1:_x2]
+                elif _z == 0:
+                    _around_pixels = _time_frame_image[max(0, _z_start - _z_step * _factor):_z_start, _y_start:_y_end, _x1:_x2]
+                elif _z == 2:
+                    _around_pixels = _time_frame_image[_z_end:min(_time_frame_image.shape[0], _z_end + _z_step * _factor), _y_start:_y_end, _x1:_x2]
+                # center
+                else:
+                    _center_mean = _mini_cube_mean
+                    continue
+                _around_pixels_non_zero = _around_pixels[np.nonzero(_around_pixels)]
 
                 # all is zero
-                if len(_mini_cube_non_zero) == 0:
+                if len(_around_pixels_non_zero) == 0:
                     continue
 
-                _mini_cube_sum = np.sum(_mini_cube_non_zero)
-                _mini_cube_count = len(_mini_cube_non_zero.ravel())
-                _mini_cube_mean = np.mean(_mini_cube_non_zero)
+                _around_pixels_mean = np.mean(_around_pixels_non_zero)
 
-                # compute around the mini cube mean of pixels
-                _around_pixels_mean = 0
-                _around_pixels = None
-
-                # corners
-                if _z in [0, 2] and _y in [0, 2]:
-                    if _z == 0 and _y == 0:
-                        _around_pixels = _time_frame_image[max(0, _z_start - _z_step * _factor):_z_end, max(0, _y_start - _y_step * _factor):_y_end, _x_start:_x_end]
-                    elif _z == 0 and _y == 2:
-                        _around_pixels = _time_frame_image[max(0, _z_start - _z_step * _factor):_z_end, _y_end - _y_step * _factor:min(_time_frame_image.shape[1], _y_end + _y_step * _factor),
-                                         _x_start:_x_end]
-                    elif _z == 2 and _y == 0:
-                        _around_pixels = _time_frame_image[_z_end - _z_step * _factor:min(_time_frame_image.shape[0], _z_end + _z_step * _factor), max(0, _y_start - _y_step * _factor):_y_end,
-                                         _x_start:_x_end]
-                    elif _z == 2 and _y == 2:
-                        _around_pixels = _time_frame_image[_z_end - _z_step * _factor:min(_time_frame_image.shape[2], _z_end + _z_step * _factor), _y_end - _y_step * _factor:min(_time_frame_image.shape[1], _y_end + _y_step * _factor),
-                                         _x_start:_x_end]
-                    _around_pixels_non_zero = _around_pixels[np.nonzero(_around_pixels)]
-                    _around_pixels_sum = np.sum(_around_pixels_non_zero)
-                    _around_pixels_count = len(_around_pixels_non_zero.ravel())
-                    _around_pixels_mean = (_around_pixels_sum - _mini_cube_sum) / (
-                            _around_pixels_count - _mini_cube_count)
-                # edges
-                else:
-                    if _z == 1 and _y == 0:
-                        _around_pixels = _time_frame_image[_z_start:_z_end, max(0, _y_start - _y_step * _factor):_y_start, _x_start:_x_end]
-                    elif _z == 1 and _y == 2:
-                        _around_pixels = _time_frame_image[_z_start:_z_end, min(_time_frame_image.shape[1], _y_end - _y_step * _factor):_y_end, _x_start:_x_end]
-                    elif _z == 0 and _y == 1:
-                        _around_pixels = _time_frame_image[max(0, _z_start - _z_step * _factor):_z_start, _y_start:_y_end, _x_start:_x_end]
-                    elif _z == 2 and _y == 1:
-                        _around_pixels = _time_frame_image[min(_time_frame_image.shape[0], _z_end - _z_step * _factor):_z_end, _y_start:_y_end, _x_start:_x_end]
-                    # center
-                    else:
-                        _center_mean = _mini_cube_mean
-                        continue
-                    _around_pixels_non_zero = _around_pixels[np.nonzero(_around_pixels)]
-
-                    # all is zero
-                    if len(_around_pixels_non_zero) == 0:
-                        continue
-
-                    _around_pixels_mean = np.mean(_around_pixels_non_zero)
-
-                # collect the data, normalize by subtracting the mean of pixels around
-                _counter += 1
-                _border_means += _around_pixels_mean
-                _normalized_mini_cube = _mini_cube_mean - _around_pixels_mean
-                _mini_cube_normalized_means += _normalized_mini_cube
+            # collect the data, normalize by subtracting the mean of pixels around
+            _counter += 1
+            _border_means += _around_pixels_mean
+            _normalized_mini_cube = _mini_cube_mean - _around_pixels_mean
+            _mini_cube_normalized_means += _normalized_mini_cube
 
     # no windows
     if _counter == 0:
