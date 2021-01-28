@@ -8,7 +8,7 @@ from fiber_density.experiments import inner_density_vs_window_distance, \
     same_inner_correlation_vs_different_inner_correlation_temporal_assessment, \
     same_inner_correlation_vs_different_inner_correlation_triplet, \
     same_inner_correlation_vs_different_inner_correlation_band_vs_no_band, \
-    inner_density_vs_time, inner_density_vs_offsets_in_axes, \
+    inner_density_vs_time_tuple, inner_density_vs_offsets_in_axes, \
     inner_density_vs_same_inner_correlation_vs_different_inner_correlation_offsets_in_axes, \
     same_real_inner_correlation_vs_different_fake_inner_correlation, matchmaking_by_inner_correlation, \
     same_inner_correlation_vs_different_inner_correlation_offsets_in_axes, \
@@ -31,7 +31,7 @@ __all__ = [
     same_inner_correlation_vs_different_inner_correlation_triplet,
     same_inner_correlation_vs_different_inner_correlation_temporal_assessment,
     same_inner_correlation_vs_different_inner_correlation_band_vs_no_band,
-    inner_density_vs_time,
+    inner_density_vs_time_tuple,
     inner_density_vs_offsets_in_axes,
     inner_density_vs_same_inner_correlation_vs_different_inner_correlation_offsets_in_axes,
     same_real_inner_correlation_vs_different_fake_inner_correlation,

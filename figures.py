@@ -271,7 +271,7 @@ def figure_5_main():
     fiber_density.experiments.inner_density_vs_same_inner_correlation_vs_different_inner_correlation_vs_z_offset.main()
 
     print('\nPanel G')
-    fiber_density.experiments.inner_density_vs_time.compute_tuples([('SN16', 3, 'cells_0_1')])
+    fiber_density.experiments.inner_density_vs_time_tuple.compute_tuples([('SN16', 3, 'cells_0_1')])
 
     print('\nPanel H')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(_band=False,
