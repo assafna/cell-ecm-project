@@ -48,6 +48,7 @@ def compute_data(_arguments):
             )
 
             _previous_cell_fiber_density_normalized = None
+            _cell_values = []
             for _time_frame, _cell_fiber_density in enumerate(_cell_fiber_densities):
 
                 # not out of border
@@ -68,11 +69,15 @@ def compute_data(_arguments):
                     continue
 
                 # change
-                _cell_fiber_density_normalized_change = _cell_fiber_density_normalized - _previous_cell_fiber_density_normalized
+                _cell_fiber_density_normalized_change = abs(_cell_fiber_density_normalized - _previous_cell_fiber_density_normalized)
                 _previous_cell_fiber_density_normalized = _cell_fiber_density_normalized
 
                 # save
-                _fiber_density_changes_array.append(_cell_fiber_density_normalized_change)
+                _cell_values.append(_cell_fiber_density_normalized_change)
+
+            # save
+            if len(_cell_values) > 0:
+                _fiber_density_changes_array.append(np.mean(_cell_values))
 
     if len(_fiber_density_changes_array) > 0:
         return _offset_y_index, _offset_z_index, np.mean(_fiber_density_changes_array)
