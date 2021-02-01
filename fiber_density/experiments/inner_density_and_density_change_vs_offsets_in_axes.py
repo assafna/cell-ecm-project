@@ -1,180 +1,30 @@
 import os
-from itertools import product
-from multiprocessing.pool import Pool
 
 import numpy as np
 import plotly.graph_objs as go
 import seaborn as sns
-from tqdm import tqdm
 
-from libs import compute_lib
-from libs.config_lib import CPUS_TO_USE
-from libs.experiments import load, filtering, compute, paths, config
-from libs.experiments.config import QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER, \
-    QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER, QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER, all_experiments
+from fiber_density.experiments import inner_density_vs_offsets_in_axes, inner_density_change_vs_offsets_in_axes
+from fiber_density.experiments.inner_density_vs_offsets_in_axes import OFFSET_Y_START, OFFSET_Y_END, OFFSET_Y_STEP, \
+    OFFSET_Z_START, OFFSET_Z_END, OFFSET_Z_STEP
+from libs.experiments import paths, config
 from plotting import save
 
-OFFSET_X = 0
-OFFSET_Y_START = -1.1
-OFFSET_Y_END = 2.6
-OFFSET_Y_STEP = 0.1
-OFFSET_Z_START = -5
-OFFSET_Z_END = 5
-OFFSET_Z_STEP = 0.1
-PAIR_DISTANCE_RANGE = [4, 10]
 
-# globals
-_tuples = []
-_experiments_fiber_densities = {}
-_z_array = None
+def main(_band=True, _high_temporal_resolution=False):
+    print('Computing fiber densities vs. offsets in axes:')
+    _fiber_densities_z_array = inner_density_vs_offsets_in_axes.compute_z_array(
+        _band=_band, _high_temporal_resolution=_high_temporal_resolution)
 
+    print('Computing fiber density changes vs. offsets in axes:')
+    _fiber_density_changes_z_array = inner_density_change_vs_offsets_in_axes.compute_z_array(
+        _band=_band, _high_temporal_resolution=_high_temporal_resolution)
 
-def compute_data(_arguments):
-    _offset_y_index, _offset_y, _offset_z_index, _offset_z = _arguments
-    _normalized_array = []
-    for _tuple in _tuples:
-        _experiment, _series_id, _group = _tuple
-        _normalization = load.normalization_series_file_data(_experiment, _series_id)
-        _properties = load.group_properties(_experiment, _series_id, _group)
-        for _cell_id in ['left_cell', 'right_cell']:
-            _cell_fiber_densities = \
-                _experiments_fiber_densities[(_experiment, _series_id, _group, _offset_y, _offset_z, _cell_id)]
-
-            _cell_fiber_densities = compute.remove_blacklist(
-                _experiment,
-                _series_id,
-                _properties['cells_ids'][_cell_id],
-                _cell_fiber_densities
-            )
-
-            _previous_cell_fiber_density_normalized = None
-            _cell_normalized_values = []
-            for _time_frame, _cell_fiber_density in enumerate(_cell_fiber_densities):
-
-                # not out of border
-                if _cell_fiber_density[1]:
-                    _previous_cell_fiber_density_normalized = None
-                    continue
-
-                # normalize
-                _cell_fiber_density_normalized = compute_lib.z_score(
-                    _x=_cell_fiber_density[0],
-                    _average=_normalization['average'],
-                    _std=_normalization['std']
-                )
-
-                # no previous
-                if _previous_cell_fiber_density_normalized is None:
-                    _previous_cell_fiber_density_normalized = _cell_fiber_density_normalized
-                    continue
-
-                # change
-                _cell_fiber_density_normalized_change = abs(_cell_fiber_density_normalized - _previous_cell_fiber_density_normalized)
-                _previous_cell_fiber_density_normalized = _cell_fiber_density_normalized
-
-                # normalize
-                _normalized_value = _cell_fiber_density_normalized_change / _cell_fiber_density_normalized
-
-                # save
-                _cell_normalized_values.append(_normalized_value)
-
-            # save
-            if len(_cell_normalized_values) > 0:
-                _normalized_array.append(np.mean(_cell_normalized_values))
-
-    if len(_normalized_array) > 0:
-        return _offset_y_index, _offset_z_index, np.mean(_normalized_array)
-    else:
-        return _offset_y_index, _offset_z_index, None
-
-
-def compute_z_array(_band=True, _high_temporal_resolution=False, _offset_x=OFFSET_X, _offset_y_start=OFFSET_Y_START,
-                    _offset_y_end=OFFSET_Y_END, _offset_y_step=OFFSET_Y_STEP, _offset_z_start=OFFSET_Z_START,
-                    _offset_z_end=OFFSET_Z_END, _offset_z_step=OFFSET_Z_STEP):
-    global _tuples, _experiments_fiber_densities, _z_array
-
-    _experiments = all_experiments()
-    _experiments = filtering.by_categories(
-        _experiments=_experiments,
-        _is_single_cell=False,
-        _is_high_temporal_resolution=_high_temporal_resolution,
-        _is_bleb=False,
-        _is_bleb_from_start=False,
-        _is_dead_live=False
-    )
-
-    _tuples = load.experiments_groups_as_tuples(_experiments)
-    _tuples = filtering.by_time_frames_amount(_tuples, compute.minimum_time_frames_for_correlation(_experiments[0]))
-    _tuples = filtering.by_pair_distance_range(_tuples, PAIR_DISTANCE_RANGE)
-    _tuples = filtering.by_real_pairs(_tuples)
-    _tuples = filtering.by_band(_tuples, _band=_band)
-    print('Total tuples:', len(_tuples))
-
-    _offsets_y = np.arange(start=_offset_y_start, stop=_offset_y_end + _offset_y_step, step=_offset_y_step)
-    _offsets_z = np.arange(start=_offset_z_start, stop=_offset_z_end + _offset_z_step, step=_offset_z_step)
-    _arguments = []
-    for _tuple in _tuples:
-        _experiment, _series_id, _group = _tuple
-        _latest_time_frame = compute.latest_time_frame_before_overlapping(_experiment, _series_id, _group, OFFSET_X)
-        for _offset_y, _offset_z, _cell_id in product(_offsets_y, _offsets_z, ['left_cell', 'right_cell']):
-            _arguments.append({
-                'experiment': _experiment,
-                'series_id': _series_id,
-                'group': _group,
-                'length_x': QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER,
-                'length_y': QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER,
-                'length_z': QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER,
-                'offset_x': OFFSET_X,
-                'offset_y': _offset_y,
-                'offset_z': _offset_z,
-                'cell_id': _cell_id,
-                'direction': 'inside',
-                'time_points': _latest_time_frame
-            })
-
-    _windows_dictionary, _windows_to_compute = \
-        compute.windows(_arguments, _keys=['experiment', 'series_id', 'group', 'offset_y', 'offset_z', 'cell_id'])
-    _fiber_densities = compute.fiber_densities(_windows_to_compute)
-
-    _experiments_fiber_densities = {
-        _key: [_fiber_densities[_tuple] for _tuple in _windows_dictionary[_key]]
-        for _key in _windows_dictionary
-    }
-
-    # clean
-    _fiber_densities = None
-    _windows_dictionary = None
-    _windows_to_compute = None
-
-    _arguments = []
-    for (_offset_y_index, _offset_y), (_offset_z_index, _offset_z) in \
-            product(enumerate(_offsets_y), enumerate(_offsets_z)):
-        _arguments.append((_offset_y_index, _offset_y, _offset_z_index, _offset_z))
-
-    _z_array = np.zeros(shape=(len(_offsets_y), len(_offsets_z)))
-    with Pool(CPUS_TO_USE) as _p:
-        for _answer in tqdm(_p.imap_unordered(compute_data, _arguments), total=len(_arguments),
-                            desc='Computing heatmap'):
-            _offset_y_index, _offset_z_index, _mean = _answer
-            _z_array[_offset_y_index, _offset_z_index] = _mean
-        _p.close()
-        _p.join()
-
-    return _z_array
-
-
-def main(_band=True, _high_temporal_resolution=False, _offset_x=OFFSET_X, _offset_y_start=OFFSET_Y_START,
-         _offset_y_end=OFFSET_Y_END, _offset_y_step=OFFSET_Y_STEP, _offset_z_start=OFFSET_Z_START,
-         _offset_z_end=OFFSET_Z_END, _offset_z_step=OFFSET_Z_STEP):
-    global _tuples, _experiments_fiber_densities, _z_array
-
-    compute_z_array(_band=_band, _high_temporal_resolution=_high_temporal_resolution, _offset_x=OFFSET_X,
-                    _offset_y_start=OFFSET_Y_START, _offset_y_end=OFFSET_Y_END, _offset_y_step=OFFSET_Y_STEP,
-                    _offset_z_start=OFFSET_Z_START, _offset_z_end=OFFSET_Z_END, _offset_z_step=OFFSET_Z_STEP)
+    _z_array = _fiber_density_changes_z_array / _fiber_densities_z_array
 
     # plot
-    _offsets_y = np.arange(start=_offset_y_start, stop=_offset_y_end + _offset_y_step, step=_offset_y_step)
-    _offsets_z = np.arange(start=_offset_z_start, stop=_offset_z_end + _offset_z_step, step=_offset_z_step)
+    _offsets_y = np.arange(start=OFFSET_Y_START, stop=OFFSET_Y_END + OFFSET_Y_STEP, step=OFFSET_Y_STEP)
+    _offsets_z = np.arange(start=OFFSET_Z_START, stop=OFFSET_Z_END + OFFSET_Z_STEP, step=OFFSET_Z_STEP)
     _colors_array = ['white', config.colors(1)]
     _fig = go.Figure(
         data=go.Heatmap(
@@ -184,12 +34,12 @@ def main(_band=True, _high_temporal_resolution=False, _offset_x=OFFSET_X, _offse
             colorscale=sns.color_palette(_colors_array).as_hex(),
             colorbar={
                 'tickmode': 'array',
-                'tickvals': [-0.2, 0.15, 0.5],
-                'ticktext': ['-0.2', 'Z-score change / z-score', '0.5'],
+                'tickvals': [0, 0.25, 0.5],
+                'ticktext': ['0.0', 'Z-score change / z-score', '0.5'],
                 'tickangle': -90
             },
             showscale=True,
-            zmin=-0.2,
+            zmin=-0,
             zmax=0.5
         ),
         layout={
