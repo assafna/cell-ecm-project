@@ -181,13 +181,13 @@ def main(_band=True, _high_temporal_resolution=False, _offset_x=OFFSET_X, _offse
             colorscale=sns.color_palette(_colors_array).as_hex(),
             colorbar={
                 'tickmode': 'array',
-                'tickvals': [0, 0.15, 0.3],
-                'ticktext': ['0.0', 'Z-score change', '0.3'],
+                'tickvals': [0, 0.35, 0.7],
+                'ticktext': ['0.0', 'Z-score change', '0.7'],
                 'tickangle': -90
             },
             showscale=True,
             zmin=0,
-            zmax=0.3
+            zmax=0.7
         ),
         layout={
             'xaxis': {
