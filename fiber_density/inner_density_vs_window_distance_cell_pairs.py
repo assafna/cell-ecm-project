@@ -53,7 +53,7 @@ def compute_experiments_data():
     _tuples = experiments_load.experiments_groups_as_tuples(_experiments)
     _tuples = experiments_filtering.by_time_frames_amount(_tuples, EXPERIMENTS_TIME_FRAME)
     _tuples = experiments_filtering.by_real_pairs(_tuples)
-    _tuples = experiments_filtering.by_pair_distance(_tuples, PAIR_DISTANCE)
+    _tuples = experiments_filtering.by_pair_distance_range(_tuples, PAIR_DISTANCE_RANGE)
     _tuples = experiments_filtering.by_band(_tuples)
     print('Total experiments:', len(_tuples))
 
