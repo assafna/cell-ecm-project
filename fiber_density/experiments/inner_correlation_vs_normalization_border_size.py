@@ -132,7 +132,7 @@ def main(_real_cells=True, _static=False, _band=True, _high_temporal_resolution=
                 'tickangle': -90
             },
             showscale=True,
-            zmin=-1,
+            zmin=0,
             zmax=1
         ),
         layout={
