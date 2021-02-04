@@ -235,7 +235,7 @@ def window_fiber_density(_experiment, _series_id, _group, _time_frame, _window, 
     _fiber_density = np.mean(_window_pixels[_non_zero_mask])
 
     # subtract border
-    if _subtract_border:
+    if _subtract_border and (_padding_y_by > 0 or _padding_z_by > 0 or _space_y_by > 0 or _space_z_by > 0):
         _padding_x, _padding_y, _padding_z = \
             0, int(round((_y2 - _y1) * _padding_y_by)), int(round((_z2 - _z1) * _padding_z_by))
         _space_x, _space_y, _space_z = \
