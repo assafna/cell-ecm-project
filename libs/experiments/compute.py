@@ -235,17 +235,33 @@ def window_fiber_density(_experiment, _series_id, _group, _time_frame, _window, 
     _fiber_density = np.mean(_window_pixels[_non_zero_mask])
 
     # subtract border
-    if _subtract_border and (_padding_y_by > 0 or _padding_z_by > 0 or _space_y_by > 0 or _space_z_by > 0):
+    if _subtract_border and (_padding_y_by > 0 or _padding_z_by > 0):
+
+        # calculate padding of the quantification window
         _padding_x, _padding_y, _padding_z = \
             0, int(round((_y2 - _y1) * _padding_y_by)), int(round((_z2 - _z1) * _padding_z_by))
         _space_x, _space_y, _space_z = \
             0, int(round((_y2 - _y1) * _space_y_by)), int(round((_z2 - _z1) * _space_z_by))
+
+        # quantification window + space + padding
         _padding_x1, _padding_y1, _padding_z1 = max(0, _x1 - _space_x - _padding_x), max(0, _y1 - _space_y - _padding_y), max(0, _z1 - _space_z - _padding_z)
         _padding_x2, _padding_y2, _padding_z2 = min(_x2 + _space_x + _padding_x, _x_shape), min(_y2 + _space_y + _padding_y, _y_shape), min(_z2 + _space_z + _padding_z, _z_shape)
-        _subtract_window = _time_frame_image[_padding_z1:_padding_z2, _padding_y1:_padding_y2, _padding_x1:_padding_x2].copy()
-        _subtract_window[_padding_z:-_padding_z, _padding_y:-_padding_y, _padding_x:-_padding_x] = 0
-        _subtract_value = np.mean(_subtract_window[np.nonzero(_subtract_window)])
-        _fiber_density -= _subtract_value
+        _padding_window = _time_frame_image[_padding_z1:_padding_z2, _padding_y1:_padding_y2, _padding_x1:_padding_x2].copy()
+        _padding_window_non_zero = _padding_window[np.nonzero(_padding_window)]
+
+        # quantification window + space
+        _padding_x1, _padding_y1, _padding_z1 = max(0, _x1 - _space_x), max(0, _y1 - _space_y), max(0, _z1 - _space_z)
+        _padding_x2, _padding_y2, _padding_z2 = min(_x2 + _space_x, _x_shape), min(_y2 + _space_y, _y_shape), min(_z2 + _space_z, _z_shape)
+        _space_window = _time_frame_image[_padding_z1:_padding_z2, _padding_y1:_padding_y2, _padding_x1:_padding_x2].copy()
+
+        # mean of border (padding without space + quantification window)
+        _border_sum = (np.sum(_padding_window_non_zero) - np.sum(_space_window))
+        _border_size = (_padding_window_non_zero.size - _space_window.size)
+
+        # make sure there is a border
+        if _border_size > 0:
+            _subtract_value = _border_sum / _border_size
+            _fiber_density -= _subtract_value
 
     # subtract border in 3d
     # _normalized_fiber_density = window_fiber_density_normalized_3d(_time_frame_image, _x1, _x2, _y1, _y2, _z1, _z2)
