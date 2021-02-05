@@ -19,7 +19,8 @@ PAIR_DISTANCE_RANGE = [4, 10]
 
 
 def compute_fiber_densities(_real_cells=True, _static=False, _band=True, _high_temporal_resolution=False,
-                            _pair_distance_range=None, _offset_y=0.5, _offset_z=0):
+                            _pair_distance_range=None, _offset_y=0.5, _offset_z=0, _padding_y_by=0.25,
+                            _padding_z_by=0.25, _space_y_by=0.25, _space_z_by=0.25):
     if _pair_distance_range is None:
         _pair_distance_range = PAIR_DISTANCE_RANGE
 
@@ -62,7 +63,8 @@ def compute_fiber_densities(_real_cells=True, _static=False, _band=True, _high_t
 
     _windows_dictionary, _windows_to_compute = compute.windows(_arguments,
                                                                _keys=['experiment', 'series_id', 'group', 'cell_id'])
-    _fiber_densities = compute.fiber_densities(_windows_to_compute, _subtract_border=True)
+    _fiber_densities = compute.fiber_densities(_windows_to_compute, _subtract_border=True, _padding_y_by=_padding_y_by,
+                                               _padding_z_by=_padding_z_by, _space_y_by=_space_y_by, _space_z_by=_space_z_by)
 
     _experiments_fiber_densities = {
         _key: [_fiber_densities[_tuple] for _tuple in _windows_dictionary[_key]]
