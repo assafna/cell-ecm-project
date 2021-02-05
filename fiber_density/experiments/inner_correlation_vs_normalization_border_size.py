@@ -115,7 +115,7 @@ def main(_real_cells=True, _static=False, _band=True, _high_temporal_resolution=
         print('Padding by: ', _padding_by, ', space by: ', _space_by)
         _correlation = compute_data(_tuples, _arguments, _padding_y_by=_padding_by, _padding_z_by=_padding_by,
                                     _space_y_by=_space_by, _space_z_by=_space_by)
-        _z_array[_padding_index, _space_index] = _correlation
+        _z_array[_space_index, _padding_index] = _correlation
 
     # plot
     _colors_array = ['white', config.colors(1)]
