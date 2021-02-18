@@ -253,10 +253,11 @@ def window_fiber_density(_experiment, _series_id, _group, _time_frame, _window, 
         _padding_x1, _padding_y1, _padding_z1 = max(0, _x1 - _space_x), max(0, _y1 - _space_y), max(0, _z1 - _space_z)
         _padding_x2, _padding_y2, _padding_z2 = min(_x2 + _space_x, _x_shape), min(_y2 + _space_y, _y_shape), min(_z2 + _space_z, _z_shape)
         _space_window = _time_frame_image[_padding_z1:_padding_z2, _padding_y1:_padding_y2, _padding_x1:_padding_x2].copy()
+        _space_window_non_zero = _space_window[np.nonzero(_space_window)]
 
         # mean of border (padding without space + quantification window)
-        _border_sum = (np.sum(_padding_window_non_zero) - np.sum(_space_window))
-        _border_size = (_padding_window_non_zero.size - _space_window.size)
+        _border_sum = (np.sum(_padding_window_non_zero) - np.sum(_space_window_non_zero))
+        _border_size = (_padding_window_non_zero.size - _space_window_non_zero.size)
 
         # make sure there is a border
         if _border_size > 0:
