@@ -199,8 +199,8 @@ def window_fiber_density_normalized_3d(_time_frame_image, _x1, _x2, _y1, _y2, _z
 
 
 def window_fiber_density(_experiment, _series_id, _group, _time_frame, _window, _time_frame_image=None,
-                         _subtract_border=False, _padding_y_by=0.25, _padding_z_by=0.25, _space_y_by=0.25,
-                         _space_z_by=0.25):
+                         _subtract_border=False, _padding_y_by=0.5, _padding_z_by=0.0, _space_y_by=0.25,
+                         _space_z_by=0.0):
     if _time_frame_image is None:
         _time_frame_image = load.structured_image(_experiment, _series_id, _group, _time_frame)
     _x1, _y1, _z1, _x2, _y2, _z2 = [int(round(_value)) for _value in _window]
@@ -435,8 +435,8 @@ def windows_fiber_densities(_tuple):
     }
 
 
-def fiber_densities(_tuples, _saturation=False, _subtract_border=False, _padding_y_by=0.25, _padding_z_by=0.25,
-                    _space_y_by=0.25, _space_z_by=0.25):
+def fiber_densities(_tuples, _saturation=False, _subtract_border=False, _padding_y_by=0.5, _padding_z_by=0.0,
+                    _space_y_by=0.25, _space_z_by=0.0):
     _organized_tuples = {}
     for _tuple in _tuples:
         _experiment, _series_id, _group, _time_frame, _window = _tuple
