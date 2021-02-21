@@ -19,8 +19,8 @@ PAIR_DISTANCE_RANGE = [4, 10]
 
 
 def compute_fiber_densities(_real_cells=True, _static=False, _band=True, _high_temporal_resolution=False,
-                            _pair_distance_range=None, _offset_y=0.5, _offset_z=0, _padding_y_by=0.25,
-                            _padding_z_by=0.25, _space_y_by=0.25, _space_z_by=0.25):
+                            _pair_distance_range=None, _offset_y=0.5, _offset_z=0, _padding_y_by=0.5,
+                            _padding_z_by=0.0, _space_y_by=0.25, _space_z_by=0.0):
     if _pair_distance_range is None:
         _pair_distance_range = PAIR_DISTANCE_RANGE
 
