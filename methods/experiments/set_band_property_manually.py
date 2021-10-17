@@ -6,8 +6,13 @@ from libs.experiments import load, paths
 
 def main():
     _tuples = [
-        ('LiveDead_201220', 7, 'cells_0_1', True),
-        ('LiveDead_201220', 19, 'cells_0_2', True)
+        ('Metastasis_Airyscan_210401_sgAXL', 2, 'cells_1_2', True),
+        ('Metastasis_Airyscan_210401_sgAXL', 3, 'cells_1_3', True),
+        ('Metastasis_Airyscan_210401_sgAXL', 5, 'cells_0_1', True),
+        ('Metastasis_Airyscan_210401_sgAXL', 9, 'cells_0_5', True),
+        ('Metastasis_Airyscan_210401_sgAXL', 11, 'cells_1_2', True),
+        ('Metastasis_Airyscan_210401_sgAXL', 14, 'cells_0_1', True),
+        ('Metastasis_Airyscan_210401_sgAXL', 15, 'cells_1_2', True)
     ]
 
     for _tuple in _tuples:
