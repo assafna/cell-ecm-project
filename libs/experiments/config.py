@@ -15,7 +15,9 @@ CELL_PAIRS = [
     # 'LiveLive_201207',
     'DeadDead_201208',
     # 'BeadBead_201209',
-    'LiveDead_201220'
+    'LiveDead_201220',
+    # 'Metastasis_Airyscan_210202',
+    # 'Metastasis_Airyscan_210207'
 ]
 
 DEAD_LIVE = [
