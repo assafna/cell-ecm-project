@@ -2,14 +2,8 @@ import fiber_density
 
 
 def figure_1_main():
-    print('\nPanel D')
-    fiber_density.inner_density_vs_window_distance_single_cells.main(_low_connectivity=False)
-
-    print('\nPanel F')
-    fiber_density.inner_density_vs_window_distance_cell_pairs.main(_low_connectivity=False)
-
-    print('\nPanel G')
-    fiber_density.inner_density_vs_window_distance_differences.main(_low_connectivity=False)
+    print('\nPanel C')
+    fiber_density.simulations.inner_density_vs_window_distance_with_single_cells.main(_low_connectivity=False)
 
 
 def figure_si_1_distances():
