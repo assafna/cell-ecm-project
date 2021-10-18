@@ -50,7 +50,7 @@ def compute_fiber_densities(_simulations, _offsets_x, _low_connectivity):
     return _fiber_densities
 
 
-def main(_low_connectivity=False):
+def compute_cell_pairs(_low_connectivity):
     _x_array = []
     _y_array = []
     _names_array = []
@@ -96,6 +96,11 @@ def main(_low_connectivity=False):
         _x_array.append(_offsets_x)
         _y_array.append(_pair_distance_fiber_densities)
         _names_array.append('Pair distance ' + str(_distance))
+    return _names_array, _x_array, _y_array
+
+
+def main(_low_connectivity=False):
+    _names_array, _x_array, _y_array = compute_cell_pairs(_low_connectivity)
 
     # plot
     _colors_array = config.colors(3)
