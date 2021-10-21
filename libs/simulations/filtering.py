@@ -29,6 +29,14 @@ def by_heterogeneity(_simulations, _std):
             or (_std == 0.75 and 'std_075' in _simulation)]
 
 
+def by_heterogeneities(_simulations, _stds):
+    _result = []
+    for _std in _stds:
+        _result += by_heterogeneity(_simulations, _std)
+
+    return _result
+
+
 def is_single_cell(_simulation):
     return 'single_cell' in _simulation
 
