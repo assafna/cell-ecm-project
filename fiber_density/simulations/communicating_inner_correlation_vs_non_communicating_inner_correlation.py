@@ -2,9 +2,8 @@ import os
 from itertools import product
 from multiprocessing.pool import Pool
 
-import numpy as np
 import plotly.graph_objs as go
-from scipy.stats import wilcoxon
+from scipy.stats import ranksums
 from tqdm import tqdm
 
 from libs import compute_lib
@@ -19,7 +18,7 @@ OFFSET_X = 0
 OFFSET_Y = 0
 DERIVATIVE = 2
 STDS = [0, 0.25, 0.5, 0.75]
-PAIR_DISTANCES = [5, 7, 9]
+PAIR_DISTANCE = 5
 
 
 def compute_fiber_densities(_simulations):
@@ -63,117 +62,95 @@ def main():
         _is_fibrin=False
     )
     _simulations = filtering.by_heterogeneities(_simulations, _stds=STDS)
-    _simulations = filtering.by_pair_distances(_simulations, _distances=PAIR_DISTANCES)
+    _simulations = filtering.by_pair_distance(_simulations, _distance=PAIR_DISTANCE)
     print('Total simulations:', len(_simulations))
 
     _fiber_densities = compute_fiber_densities(_simulations)
 
-    for _std in STDS:
+    # stds loop
+    _std_communicating = [[] for _i in STDS]
+    _std_non_communicating = [[] for _i in STDS]
+    for _std_index, _std in enumerate(STDS):
         print('Std:', _std)
         _simulations_std = filtering.by_heterogeneity(_simulations, _std=_std)
-        _communicating_correlations = []
-        _non_communicating_correlations = []
-        _y_arrays = [[] for _i in PAIR_DISTANCES]
-        for _pair_distance_index, _pair_distance in enumerate(PAIR_DISTANCES):
-            print('Pair distance:', _pair_distance)
-            _simulations_std_pair_distance = filtering.by_pair_distance(_simulations_std, _distance=_pair_distance)
-            print('Total simulations:', len(_simulations_std_pair_distance))
-            _communicating_correlations_array = []
-            _non_communicating_correlations_array = []
-            for _communicating_index in tqdm(range(len(_simulations_std_pair_distance)), desc='Main loop'):
-                _communicating_simulation = _simulations_std_pair_distance[_communicating_index]
-                _communicating_left_cell_fiber_densities = _fiber_densities[(_communicating_simulation, 'left_cell')]
-                _communicating_right_cell_fiber_densities = _fiber_densities[(_communicating_simulation, 'right_cell')]
-                _communicating_correlation = compute_lib.correlation(
-                    compute_lib.derivative(_communicating_left_cell_fiber_densities, _n=DERIVATIVE),
-                    compute_lib.derivative(_communicating_right_cell_fiber_densities, _n=DERIVATIVE)
-                )
+        print('Total simulations:', len(_simulations_std))
 
-                # non-communicating
-                _simulations_indices = range(len(_simulations_std_pair_distance))
-                for _simulation_index_1 in _simulations_indices:
-                    # not the same as the communicating pair
-                    if _simulation_index_1 == _communicating_index:
-                        continue
-                    _simulation_1 = _simulations_std_pair_distance[_simulation_index_1]
-                    # after simulation 1 index
-                    for _simulation_index_2 in _simulations_indices[_simulation_index_1 + 1:]:
-                        # and not the same as the communicating pair
-                        if _simulation_index_2 == _communicating_index:
-                            continue
-                        _simulation_2 = _simulations_std_pair_distance[_simulation_index_2]
-                        for _simulation_1_cell_id, _simulation_2_cell_id in product(['left_cell', 'right_cell'],
-                                                                                    ['left_cell', 'right_cell']):
-                            _simulation_1_fiber_densities = _fiber_densities[(_simulation_1, _simulation_1_cell_id)]
-                            _simulation_2_fiber_densities = _fiber_densities[(_simulation_2, _simulation_2_cell_id)]
-                            _non_communicating_correlations_array.append(compute_lib.correlation(
-                                compute_lib.derivative(_simulation_1_fiber_densities, _n=DERIVATIVE),
-                                compute_lib.derivative(_simulation_2_fiber_densities, _n=DERIVATIVE)
-                            ))
-                            _communicating_correlations_array.append(_communicating_correlation)
+        # communicating loop
+        for _simulation in tqdm(_simulations_std, desc='Communicating pairs loop'):
+            _left_cell_fiber_densities = _fiber_densities[(_simulation, 'left_cell')]
+            _right_cell_fiber_densities = _fiber_densities[(_simulation, 'right_cell')]
+            _correlation = compute_lib.correlation(
+                compute_lib.derivative(_left_cell_fiber_densities, _n=DERIVATIVE),
+                compute_lib.derivative(_right_cell_fiber_densities, _n=DERIVATIVE)
+            )
+            _std_communicating[_std_index].append(_correlation)
 
-            if len(_communicating_correlations_array) > 0:
-                print('Total points:', len(_communicating_correlations_array))
-                _communicating_minus_non_communicating = \
-                    np.array(_communicating_correlations_array) - np.array(_non_communicating_correlations_array)
-                print('Wilcoxon of communicating minus non-communicating around the zero:')
-                print(wilcoxon(_communicating_minus_non_communicating))
-                print('Higher communicating amount:', (_communicating_minus_non_communicating > 0).sum() /
-                      len(_communicating_minus_non_communicating))
+        # non-communicating loop
+        _simulations_indices = range(len(_simulations_std))
+        for _simulation_1_index in tqdm(_simulations_indices, desc='Non-communicating pairs loop'):
+            _simulation_1 = _simulations_std[_simulation_1_index]
+            for _simulation_2_index in _simulations_indices[_simulation_1_index + 1:]:
+                _simulation_2 = _simulations_std[_simulation_2_index]
+                for _simulation_1_cell_id, _simulation_2_cell_id in product(['left_cell', 'right_cell'],
+                                                                            ['left_cell', 'right_cell']):
+                    _simulation_1_fiber_densities = _fiber_densities[(_simulation_1, _simulation_1_cell_id)]
+                    _simulation_2_fiber_densities = _fiber_densities[(_simulation_2, _simulation_2_cell_id)]
+                    _correlation = compute_lib.correlation(
+                        compute_lib.derivative(_simulation_1_fiber_densities, _n=DERIVATIVE),
+                        compute_lib.derivative(_simulation_2_fiber_densities, _n=DERIVATIVE)
+                    )
+                    _std_non_communicating[_std_index].append(_correlation)
 
-            _communicating_correlations.append(_communicating_correlations_array)
-            _non_communicating_correlations.append(_non_communicating_correlations_array)
+        print('Wilcoxon rank-sum test:', ranksums(_std_communicating[_std_index], _std_non_communicating[_std_index]))
 
-        # box plot
-        _box_y_arrays = [[] for _i in PAIR_DISTANCES]
-        for _communicating_correlations_array, _non_communicating_correlations_array, _pair_distance_index in \
-                zip(_communicating_correlations, _non_communicating_correlations, range(len(PAIR_DISTANCES))):
-            for _x, _y in zip(_communicating_correlations_array, _non_communicating_correlations_array):
-                _point_distance = compute_lib.distance_from_a_point_to_a_line(_line=[-1, -1, 1, 1], _point=[_x, _y])
-                if _x > _y:
-                    _box_y_arrays[_pair_distance_index].append(_point_distance)
-                else:
-                    _box_y_arrays[_pair_distance_index].append(-_point_distance)
-
-        _colors_array = config.colors(len(PAIR_DISTANCES))
+    # histogram plot, once with and once without the legend
+    _colors_array = config.colors(len(STDS))
+    for _show_legend in [True, False]:
         _fig = go.Figure(
             data=[
-                go.Box(
-                    y=_y,
-                    name=_pair_distance,
-                    boxpoints=False,
-                    jitter=1,
-                    pointpos=0,
-                    line={
-                        'width': 1
-                    },
-                    fillcolor='white',
-                    marker={
-                        'size': 10,
-                        'color': _color
-                    },
-                    showlegend=False
-                ) for _y, _pair_distance, _color in zip(_box_y_arrays, PAIR_DISTANCES, _colors_array)
+                *[
+                    go.Histogram(
+                        x=_non_communicating,
+                        name='STD ' + str(_std),
+                        marker={
+                            'color': _color
+                        },
+                        nbinsx=10,
+                        histnorm='probability',
+                        showlegend=_show_legend
+                    ) for _std, _non_communicating, _color in zip(STDS, _std_non_communicating, _colors_array)
+                ],
+                *[
+                    go.Scatter(
+                        x=_communicating,
+                        y=[0.5 - 0.02 * _std_index for _i in range(len(_communicating))],
+                        mode='text',
+                        text='●',
+                        textfont={
+                          'color': _color,
+                          'size': 15
+                        },
+                        showlegend=False
+                    ) for _std_index, _communicating, _color in zip(range(len(STDS)), _std_communicating, _colors_array)
+                ]
             ],
             layout={
                 'xaxis': {
-                    'title': 'Pair distance (cell diameter)',
+                    'title': 'Correlation',
                     'zeroline': False
                 },
                 'yaxis': {
-                    'title': 'Communicating minus non-communicating correlation',
-                    'zeroline': False,
-                    'range': [-1, 1],
-                    'tickmode': 'array',
-                    'tickvals': [-0.8, -0.4, 0, 0.4, 0.8]
-                }
+                    'title': 'Fraction',
+                    'zeroline': False
+                },
+                'bargap': 0.1
             }
         )
 
         save.to_html(
             _fig=_fig,
             _path=os.path.join(paths.PLOTS, save.get_module_name()),
-            _filename='plot_std_' + str(_std)
+            _filename='plot_legend_' + str(_show_legend)
         )
 
 
