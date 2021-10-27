@@ -111,12 +111,6 @@ def main():
         layout={
             'xaxis': {
                 'title': 'Cell contraction (%)',
-                'titlefont': {
-                    'color': '#005b96'
-                },
-                'tickfont': {
-                    'color': '#005b96'
-                },
                 'zeroline': False,
                 'tickmode': 'array',
                 'tickvals': [0, 25, 50]
