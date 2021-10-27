@@ -143,6 +143,12 @@ def main():
                     'title': 'Fraction',
                     'zeroline': False
                 },
+                'legend': {
+                    'xanchor': 'right',
+                    'yanchor': 'top',
+                    'bordercolor': 'black',
+                    'borderwidth': 2
+                },
                 'bargap': 0.1
             }
         )
