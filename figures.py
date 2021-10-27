@@ -6,20 +6,28 @@ def figure_1_main():
     fiber_density.simulations.inner_density_vs_window_distance_with_single_cells.main(_low_connectivity=False)
 
 
-def figure_si_1_distances():
+def figure_si_1():
     print('\nPanel A')
-    fiber_density.simulations.inner_density_vs_window_distance.main(_low_connectivity=False)
+    fiber_density.simulations.inner_correlation_communicating_vs_non_communicating_vs_derivatives.main()
 
     print('\nPanel B')
-    fiber_density.experiments.inner_density_vs_window_distance.main()
+    fiber_density.simulations.inner_density_vs_change_in_inner_density.main()
 
 
-def figure_si_1_correlation_distance_density_offset():
-    print('\nPanels B (main panel) & C')
-    fiber_density.experiments.inner_density_vs_pair_distance_correlations_vs_window_distance.main()
-
-    print('\nPanel B (secondary panels)')
-    fiber_density.experiments.inner_density_vs_pair_distance.main()
+# def figure_si_1_distances():
+#     print('\nPanel A')
+#     fiber_density.simulations.inner_density_vs_window_distance.main(_low_connectivity=False)
+#
+#     print('\nPanel B')
+#     fiber_density.experiments.inner_density_vs_window_distance.main()
+#
+#
+# def figure_si_1_correlation_distance_density_offset():
+#     print('\nPanels B (main panel) & C')
+#     fiber_density.experiments.inner_density_vs_pair_distance_correlations_vs_window_distance.main()
+#
+#     print('\nPanel B (secondary panels)')
+#     fiber_density.experiments.inner_density_vs_pair_distance.main()
 
 
 def figure_1_all():
@@ -27,11 +35,14 @@ def figure_1_all():
     figure_1_main()
 
     print('\nFigure SI 1')
-    print('\nFigure SI 1 - Distances (S2)')
-    figure_si_1_distances()
+    figure_si_1()
 
-    print('\nFigure SI 1 - Correlation Distance Density Offset (S3)')
-    figure_si_1_correlation_distance_density_offset()
+    # print('\nFigure SI 1')
+    # print('\nFigure SI 1 - Distances (S2)')
+    # figure_si_1_distances()
+    #
+    # print('\nFigure SI 1 - Correlation Distance Density Offset (S3)')
+    # figure_si_1_correlation_distance_density_offset()
 
 
 def figure_2_main():
