@@ -35,17 +35,11 @@ def figure_1_all():
 
 
 def figure_2_main():
-    print('\nPanel B')
-    fiber_density.inner_density_vs_time_single_cells.main()
-
-    print('\nPanel D')
-    fiber_density.inner_density_vs_time_cell_pairs.main()
-
-    print('\nPanel E')
-    fiber_density.simulations.inner_density_vs_change_in_inner_density.main()
+    print('\nPanel A')
+    fiber_density.simulations.inner_density_vs_time_cell_pairs.main()
 
     print('\nPanel F')
-    fiber_density.experiments.inner_density_vs_change_in_inner_density.main(_early_time_frames=True)
+    fiber_density.simulations.communicating_inner_correlation_vs_non_communicating_inner_correlation.main()
 
 
 def figure_si_2_density_vs_change_in_density_in_late_time_points():

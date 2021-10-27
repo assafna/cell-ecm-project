@@ -8,7 +8,8 @@ from fiber_density.simulations import inner_density_vs_window_distance, \
     same_inner_correlation_vs_different_inner_correlation_cross_correlation, \
     same_inner_correlation_vs_different_inner_correlation_cross_correlation_alphas_betas, \
     inner_density_vs_offsets_in_axes, same_inner_correlation_vs_different_inner_correlation_offsets_in_axes, \
-    inner_density_vs_window_distance_with_single_cells
+    inner_density_vs_window_distance_with_single_cells, \
+    communicating_inner_correlation_vs_non_communicating_inner_correlation, inner_density_vs_time_cell_pairs
 
 __all__ = [
     inner_density_vs_window_distance,
@@ -27,5 +28,7 @@ __all__ = [
     same_inner_correlation_vs_different_inner_correlation_cross_correlation_alphas_betas,
     inner_density_vs_offsets_in_axes,
     same_inner_correlation_vs_different_inner_correlation_offsets_in_axes,
-    inner_density_vs_window_distance_with_single_cells
+    inner_density_vs_window_distance_with_single_cells,
+    communicating_inner_correlation_vs_non_communicating_inner_correlation,
+    inner_density_vs_time_cell_pairs
 ]
