@@ -104,7 +104,7 @@ def main():
 
     # plot
     _data = []
-    _colors_array = config.colors(len(PAIR_DISTANCES))
+    _colors_array = config.colors(2)
     for _communicating, _communicating_text, _pair_distances, _color in \
             zip([True, False], ['Communicating', 'Non-communicating'],
                 [_pair_distances_communicating, _pair_distances_non_communicating],
@@ -134,7 +134,6 @@ def main():
             )
         )
 
-    _colors_array = config.colors(2)
     _fig = go.Figure(
         data=_data,
         layout={
