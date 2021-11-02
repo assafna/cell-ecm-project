@@ -10,7 +10,8 @@ from fiber_density.simulations import inner_density_vs_window_distance, \
     inner_density_vs_offsets_in_axes, same_inner_correlation_vs_different_inner_correlation_offsets_in_axes, \
     inner_density_vs_window_distance_with_single_cells, \
     communicating_inner_correlation_vs_non_communicating_inner_correlation, inner_density_vs_time_cell_pairs, \
-    inner_correlation_communicating_vs_non_communicating_vs_derivatives
+    inner_correlation_communicating_vs_non_communicating_vs_derivatives, \
+    inner_correlation_communicating_vs_non_communicating_vs_pair_distance
 
 __all__ = [
     inner_density_vs_window_distance,
@@ -32,5 +33,6 @@ __all__ = [
     inner_density_vs_window_distance_with_single_cells,
     communicating_inner_correlation_vs_non_communicating_inner_correlation,
     inner_density_vs_time_cell_pairs,
-    inner_correlation_communicating_vs_non_communicating_vs_derivatives
+    inner_correlation_communicating_vs_non_communicating_vs_derivatives,
+    inner_correlation_communicating_vs_non_communicating_vs_pair_distance
 ]

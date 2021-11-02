@@ -13,6 +13,9 @@ def figure_si_1():
     print('\nPanel B')
     fiber_density.simulations.inner_density_vs_change_in_inner_density.main()
 
+    print('\nPanel C')
+    fiber_density.simulations.inner_correlation_communicating_vs_non_communicating_vs_pair_distance.main()
+
 
 # def figure_si_1_distances():
 #     print('\nPanel A')
