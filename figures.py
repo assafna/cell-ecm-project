@@ -73,11 +73,16 @@ def figure_2_all():
 
 
 def figure_3_main():
-    print('\nPanels B & C')
-    fiber_density.simulations.inner_correlation_by_derivatives_cell_pairs.main()
+    print('\nPanel C')
+    fiber_density.experiments.inner_density_vs_window_distance_with_single_cells.main()
 
-    print('\nPanels D & E')
-    fiber_density.simulations.inner_correlation_vs_outer_correlation_heterogeneity.main()
+
+# def figure_3_main():
+#     print('\nPanels B & C')
+#     fiber_density.simulations.inner_correlation_by_derivatives_cell_pairs.main()
+#
+#     print('\nPanels D & E')
+#     fiber_density.simulations.inner_correlation_vs_outer_correlation_heterogeneity.main()
 
 
 def figure_si_3_detrending_simulations():
