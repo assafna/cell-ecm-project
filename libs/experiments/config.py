@@ -83,5 +83,7 @@ def colors(_n):
         return ['#844b00', '#ea8500']
     elif _n == 3:
         return ['#844b00', '#ea8500', '#edbc80']
+    elif _n == 4:
+        return ['#6d3b00', '#aa5d00', '#ea8500', '#edbc80']
     else:
         raise Exception('No colors encoded')
