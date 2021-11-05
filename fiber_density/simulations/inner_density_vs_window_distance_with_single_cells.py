@@ -10,11 +10,6 @@ from plotting import save
 
 
 def main(_low_connectivity=False):
-    _x_array = []
-    _y_array = []
-    _names_array = []
-    _max_offsets_x = []
-
     print('Single cells')
     _single_cells_fiber_densities = inner_density_vs_window_distance_single_cells.compute_simulations_data(_low_connectivity)
 
@@ -22,7 +17,7 @@ def main(_low_connectivity=False):
     _names_array, _x_array, _y_array = inner_density_vs_window_distance.compute_cell_pairs(_low_connectivity)
 
     # plot
-    _colors_array = config.colors(4)
+    _colors_array = config.colors(len(_names_array) + 1)
     _fig = go.Figure(
         data=[
             go.Scatter(
