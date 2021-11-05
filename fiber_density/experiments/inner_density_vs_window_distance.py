@@ -16,7 +16,7 @@ OFFSET_Z = 0
 OFFSET_Y = 0
 
 
-def main():
+def compute_cell_pairs():
     _x_array = []
     _y_array = []
     _names_array = []
@@ -29,7 +29,7 @@ def main():
             _is_high_temporal_resolution=False,
             _is_bleb=False,
             _is_bleb_from_start=False,
-        _is_dead_live=False
+            _is_dead_live=False
         )
 
         _tuples = load.experiments_groups_as_tuples(_experiments)
@@ -97,6 +97,11 @@ def main():
         _x_array.append(_max_offsets_x)
         _y_array.append(_pair_distance_fiber_densities)
         _names_array.append('Pair distance ' + str(_distances_range[0]) + '-' + str(_distances_range[1]))
+    return _names_array, _x_array, _y_array
+
+
+def main():
+    _names_array, _x_array, _y_array = compute_cell_pairs()
 
     # plot
     _colors_array = config.colors(3)
