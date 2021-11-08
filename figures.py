@@ -87,31 +87,39 @@ def figure_3_main():
 #     fiber_density.simulations.inner_correlation_vs_outer_correlation_heterogeneity.main()
 
 
-def figure_si_3_detrending_simulations():
-    print('\nPanels A, B & C')
-    fiber_density.simulations.inner_density_vs_time_derivatives.main()
+def figure_3_si():
+    print('\nPanels B (main panel) & C')
+    fiber_density.experiments.inner_density_vs_pair_distance_correlations_vs_window_distance.main()
 
-    print('\nPanel D')
-    fiber_density.simulations.inner_correlation_by_derivatives_cell_pairs.main(_directions=['inside'])
-
-    print('\nPanels E & F')
-    fiber_density.simulations.stationary_vs_inner_dynamics_derivatives_cell_pairs.main()
-
-    print('\nPanel G')
-    fiber_density.simulations.inner_correlation_by_derivatives_single_cells.main()
-
-    print('\nPanels H & I')
-    fiber_density.simulations.stationary_vs_inner_dynamics_derivatives_single_cells.main()
+    print('\nPanel B (secondary panels)')
+    fiber_density.experiments.inner_density_vs_pair_distance.main()
 
 
-def figure_si_3_insides_vs_outsides_distances():
-    print('\nPanels A & B')
-    fiber_density.simulations.inner_correlation_vs_outer_correlation_pair_distance.main()
-
-
-def figure_si_3_insides_vs_outsides_offsets():
-    print('\nPanels A & B')
-    fiber_density.simulations.inner_correlation_vs_outer_correlation_offsets.main()
+# def figure_si_3_detrending_simulations():
+#     print('\nPanels A, B & C')
+#     fiber_density.simulations.inner_density_vs_time_derivatives.main()
+#
+#     print('\nPanel D')
+#     fiber_density.simulations.inner_correlation_by_derivatives_cell_pairs.main(_directions=['inside'])
+#
+#     print('\nPanels E & F')
+#     fiber_density.simulations.stationary_vs_inner_dynamics_derivatives_cell_pairs.main()
+#
+#     print('\nPanel G')
+#     fiber_density.simulations.inner_correlation_by_derivatives_single_cells.main()
+#
+#     print('\nPanels H & I')
+#     fiber_density.simulations.stationary_vs_inner_dynamics_derivatives_single_cells.main()
+#
+#
+# def figure_si_3_insides_vs_outsides_distances():
+#     print('\nPanels A & B')
+#     fiber_density.simulations.inner_correlation_vs_outer_correlation_pair_distance.main()
+#
+#
+# def figure_si_3_insides_vs_outsides_offsets():
+#     print('\nPanels A & B')
+#     fiber_density.simulations.inner_correlation_vs_outer_correlation_offsets.main()
 
 
 def figure_3_all():
@@ -119,14 +127,15 @@ def figure_3_all():
     figure_3_main()
 
     print('\nFigure SI 3')
-    print('\nFigure SI 3 - Detrending Simulations (S5)')
-    figure_si_3_detrending_simulations()
-
-    print('\nFigure SI 3 - Insides vs. Outsides Distances (S6)')
-    figure_si_3_insides_vs_outsides_distances()
-
-    print('\nFigure SI 3 - Insides vs. Outsides Offsets (S7)')
-    figure_si_3_insides_vs_outsides_offsets()
+    # print('\nFigure SI 3 - Detrending Simulations (S5)')
+    # figure_si_3_detrending_simulations()
+    #
+    # print('\nFigure SI 3 - Insides vs. Outsides Distances (S6)')
+    # figure_si_3_insides_vs_outsides_distances()
+    #
+    # print('\nFigure SI 3 - Insides vs. Outsides Offsets (S7)')
+    # figure_si_3_insides_vs_outsides_offsets()
+    figure_3_si()
 
 
 def figure_4_main():
