@@ -59,23 +59,25 @@ def figure_2_main():
     fiber_density.simulations.communicating_inner_correlation_vs_non_communicating_inner_correlation.main()
 
 
-def figure_si_2_density_vs_change_in_density_in_late_time_points():
-    fiber_density.experiments.inner_density_vs_change_in_inner_density.main(_early_time_frames=False)
+# def figure_si_2_density_vs_change_in_density_in_late_time_points():
+#     fiber_density.experiments.inner_density_vs_change_in_inner_density.main(_early_time_frames=False)
 
 
 def figure_2_all():
     print('\nFigure 2 - Main Figure')
     figure_2_main()
 
-    print('\nFigure SI 2')
-    print('\nFigure SI 2 - Density vs. Change in Density in Late Time-points (S4)')
-    figure_si_2_density_vs_change_in_density_in_late_time_points()
+    # print('\nFigure SI 2')
+    # print('\nFigure SI 2 - Density vs. Change in Density in Late Time-points (S4)')
+    # figure_si_2_density_vs_change_in_density_in_late_time_points()
 
 
 def figure_3_main():
     print('\nPanel C')
     fiber_density.experiments.inner_density_vs_window_distance_with_single_cells.main()
 
+    print('\nPanel E')
+    fiber_density.experiments.inner_density_vs_time_with_single_cells.main()
 
 # def figure_3_main():
 #     print('\nPanels B & C')
