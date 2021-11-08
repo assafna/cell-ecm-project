@@ -32,6 +32,73 @@ SIMULATIONS_TIME_POINTS = 50
 SIMULATIONS_STEP = int(round(SIMULATIONS_TIME_POINTS / EXPERIMENTS_TIME_FRAMES))
 
 
+def compute_experiments_fiber_densities():
+    _experiments = all_experiments()
+    _experiments = experiments_filtering.by_categories(
+        _experiments=_experiments,
+        _is_single_cell=True,
+        _is_high_temporal_resolution=False,
+        _is_bleb=False,
+        _is_bleb_from_start=False,
+        _is_dead_live=False
+    )
+    _tuples = experiments_load.experiments_groups_as_tuples(_experiments)
+    _tuples = experiments_filtering.by_time_frames_amount(_tuples, EXPERIMENTS_TIME_FRAMES)
+    _tuples = experiments_filtering.by_main_cell(_tuples)
+    _arguments = []
+    for _tuple in _tuples:
+        _experiment, _series_id, _group = _tuple
+        for _direction in ['left', 'right']:
+            _arguments.append({
+                'experiment': _experiment,
+                'series_id': _series_id,
+                'group': _group,
+                'length_x': experiments_config.QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER,
+                'length_y': experiments_config.QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER,
+                'length_z': experiments_config.QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER,
+                'offset_x': OFFSET_X,
+                'offset_y': OFFSET_Y,
+                'offset_z': OFFSET_Z,
+                'cell_id': 'cell',
+                'direction': _direction,
+                'time_points': EXPERIMENTS_TIME_FRAMES
+            })
+    _windows_dictionary, _windows_to_compute = \
+        experiments_compute.windows(_arguments, _keys=['experiment', 'series_id', 'group', 'direction'])
+    _fiber_densities = experiments_compute.fiber_densities(_windows_to_compute)
+    _tuples = experiments_organize.by_single_cell_id(_tuples)
+    print('Total experiments:', len(_tuples))
+    _experiments_fiber_densities = [[] for _i in range(EXPERIMENTS_TIME_FRAMES)]
+    for _tuple in tqdm(_tuples, desc='Experiments loop'):
+        _experiment, _series_id, _ = _tuple
+        _normalization = experiments_load.normalization_series_file_data(_experiment, _series_id)
+
+        for _time_frame in range(EXPERIMENTS_TIME_FRAMES):
+            _cell_fiber_densities = []
+            for _cell_tuple in _tuples[_tuple]:
+                _, _, _group = _cell_tuple
+                for _direction in ['left', 'right']:
+                    _window_tuple = _windows_dictionary[(_experiment, _series_id, _group, _direction)][_time_frame]
+                    _fiber_density = _fiber_densities[_window_tuple]
+
+                    if not OUT_OF_BOUNDARIES and _fiber_density[1]:
+                        continue
+
+                    _normalized_fiber_density = compute_lib.z_score(
+                        _x=_fiber_density[0],
+                        _average=_normalization['average'],
+                        _std=_normalization['std']
+                    )
+
+                    if not np.isnan(_normalized_fiber_density):
+                        _cell_fiber_densities.append(_normalized_fiber_density)
+
+            if len(_cell_fiber_densities) > 0:
+                _experiments_fiber_densities[_time_frame].append(np.mean(_cell_fiber_densities))
+    print('Total experiments cells:', len(_experiments_fiber_densities[0]))
+    return _experiments_fiber_densities
+
+
 def compute_simulations_fiber_densities(_simulations):
     _arguments = []
     for _simulation in _simulations:
@@ -101,75 +168,7 @@ def main():
 
     # experiments
     print('Experiments')
-    _experiments = all_experiments()
-    _experiments = experiments_filtering.by_categories(
-        _experiments=_experiments,
-        _is_single_cell=True,
-        _is_high_temporal_resolution=False,
-        _is_bleb=False,
-        _is_bleb_from_start=False,
-        _is_dead_live=False
-    )
-
-    _tuples = experiments_load.experiments_groups_as_tuples(_experiments)
-    _tuples = experiments_filtering.by_time_frames_amount(_tuples, EXPERIMENTS_TIME_FRAMES)
-    _tuples = experiments_filtering.by_main_cell(_tuples)
-
-    _arguments = []
-    for _tuple in _tuples:
-        _experiment, _series_id, _group = _tuple
-        for _direction in ['left', 'right']:
-            _arguments.append({
-                'experiment': _experiment,
-                'series_id': _series_id,
-                'group': _group,
-                'length_x': experiments_config.QUANTIFICATION_WINDOW_LENGTH_IN_CELL_DIAMETER,
-                'length_y': experiments_config.QUANTIFICATION_WINDOW_HEIGHT_IN_CELL_DIAMETER,
-                'length_z': experiments_config.QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER,
-                'offset_x': OFFSET_X,
-                'offset_y': OFFSET_Y,
-                'offset_z': OFFSET_Z,
-                'cell_id': 'cell',
-                'direction': _direction,
-                'time_points': EXPERIMENTS_TIME_FRAMES
-            })
-
-    _windows_dictionary, _windows_to_compute = \
-        experiments_compute.windows(_arguments, _keys=['experiment', 'series_id', 'group', 'direction'])
-    _fiber_densities = experiments_compute.fiber_densities(_windows_to_compute)
-
-    _tuples = experiments_organize.by_single_cell_id(_tuples)
-    print('Total experiments:', len(_tuples))
-
-    _experiments_fiber_densities = [[] for _i in range(EXPERIMENTS_TIME_FRAMES)]
-    for _tuple in tqdm(_tuples, desc='Experiments loop'):
-        _experiment, _series_id, _ = _tuple
-        _normalization = experiments_load.normalization_series_file_data(_experiment, _series_id)
-
-        for _time_frame in range(EXPERIMENTS_TIME_FRAMES):
-            _cell_fiber_densities = []
-            for _cell_tuple in _tuples[_tuple]:
-                _, _, _group = _cell_tuple
-                for _direction in ['left', 'right']:
-                    _window_tuple = _windows_dictionary[(_experiment, _series_id, _group, _direction)][_time_frame]
-                    _fiber_density = _fiber_densities[_window_tuple]
-
-                    if not OUT_OF_BOUNDARIES and _fiber_density[1]:
-                        continue
-
-                    _normalized_fiber_density = compute_lib.z_score(
-                        _x=_fiber_density[0],
-                        _average=_normalization['average'],
-                        _std=_normalization['std']
-                    )
-
-                    if not np.isnan(_normalized_fiber_density):
-                        _cell_fiber_densities.append(_normalized_fiber_density)
-
-            if len(_cell_fiber_densities) > 0:
-                _experiments_fiber_densities[_time_frame].append(np.mean(_cell_fiber_densities))
-
-    print('Total experiments cells:', len(_experiments_fiber_densities[0]))
+    _experiments_fiber_densities = compute_experiments_fiber_densities()
 
     # plot
     _fig = go.Figure(
