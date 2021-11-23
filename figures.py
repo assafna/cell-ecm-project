@@ -138,26 +138,49 @@ def figure_3_all():
     figure_3_si()
 
 
+# def figure_4_main():
+#     print('\nPanel B')
+#     fiber_density.simulations.same_inner_correlation_vs_different_inner_correlation.main(_low_connectivity=False)
+#
+#     print('\nPanel C')
+#     fiber_density.simulations.same_inner_correlation_vs_different_inner_correlation_pair_distance.main(
+#         _low_connectivity=False)
+#
+#     print('\nPanel D')
+#     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(_band=True,
+#                                                                                          _high_temporal_resolution=False)
+#
+#     print('\nPanel E')
+#     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_vs_pair_distance.main(
+#         _band=True, _high_temporal_resolution=False)
+#
+#     print('\nPanel G')
+#     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_triplet.main()
+#
+#     print('\nPanel H')
+#     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_triplets.main()
+
+
 def figure_4_main():
-    print('\nPanel B')
+    print('\nPanel B - left')
     fiber_density.simulations.same_inner_correlation_vs_different_inner_correlation.main(_low_connectivity=False)
 
-    print('\nPanel C')
+    print('\nPanel B - right')
     fiber_density.simulations.same_inner_correlation_vs_different_inner_correlation_pair_distance.main(
         _low_connectivity=False)
 
-    print('\nPanel D')
-    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(_band=True,
-                                                                                         _high_temporal_resolution=False)
+    print('\nPanel D - top')
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(
+        _band=True, _high_temporal_resolution=False)
 
-    print('\nPanel E')
+    print('\nPanel D - bottom')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_vs_pair_distance.main(
         _band=True, _high_temporal_resolution=False)
 
-    print('\nPanel G')
+    print('\nPanel E - left')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_triplet.main()
 
-    print('\nPanel H')
+    print('\nPanel E - right')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_triplets.main()
 
 
