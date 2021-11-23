@@ -21,23 +21,6 @@ def main(_low_connectivity=False):
     _fig = go.Figure(
         data=[
             go.Scatter(
-                x=inner_density_vs_window_distance_single_cells.OFFSETS_X,
-                y=[np.mean(_array) for _array in _single_cells_fiber_densities],
-                name='Single cells',
-                error_y={
-                    'type': 'data',
-                    'array': [np.std(_array) for _array in _single_cells_fiber_densities],
-                    'thickness': 1,
-                    'color': _colors_array[0]
-                },
-                mode='markers',
-                marker={
-                    'size': 15,
-                    'color': _colors_array[0]
-                },
-                opacity=0.7
-            )] + [
-            go.Scatter(
                 x=_x,
                 y=[np.mean(_array) for _array in _y],
                 name=_name,
@@ -53,7 +36,25 @@ def main(_low_connectivity=False):
                     'color': _color
                 },
                 opacity=0.7
-            ) for _x, _y, _name, _color in zip(_x_array, _y_array, _names_array, _colors_array[1:])
+            ) for _x, _y, _name, _color in zip(_x_array, _y_array, _names_array, _colors_array[:-1])
+        ] + [
+            go.Scatter(
+                x=inner_density_vs_window_distance_single_cells.OFFSETS_X,
+                y=[np.mean(_array) for _array in _single_cells_fiber_densities],
+                name='Single cells',
+                error_y={
+                    'type': 'data',
+                    'array': [np.std(_array) for _array in _single_cells_fiber_densities],
+                    'thickness': 1,
+                    'color': _colors_array[-1]
+                },
+                mode='markers',
+                marker={
+                    'size': 15,
+                    'color': _colors_array[-1]
+                },
+                opacity=0.7
+            )
         ],
         layout={
             'xaxis': {
