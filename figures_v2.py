@@ -91,6 +91,35 @@ def main():
     print('\nBottom panel')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(_offset_y=-0.5, _offset_z=0)
 
+    # figure s7
+    print('\nPanel A')
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(
+        _band=True, _high_temporal_resolution=False, _pair_distance_range=[4, 6])
+
+    print('\nPanel B')
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(
+        _band=True, _high_temporal_resolution=False, _pair_distance_range=[6, 8])
+
+    print('\nPanel C')
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(
+        _band=True, _high_temporal_resolution=False, _pair_distance_range=[8, 10])
+
+    # figure 5
+    print('\nPanel B')
+    fiber_density.experiments.real_real_inner_correlation_vs_real_fake_inner_correlation.main()
+
+    print('\nPanels D & E')
+    fiber_density.experiments.matchmaking_by_inner_correlation.main(
+        _real_cells=True, _offset_y=0.5, _high_temporal_resolution=False)
+
+    print('\nPanel F')
+    fiber_density.experiments.matchmaking_by_inner_correlation.main(
+        _real_cells=True, _offset_y=0, _high_temporal_resolution=False)
+
+    print('\nPanel G')
+    fiber_density.experiments.matchmaking_by_inner_correlation.main(
+        _real_cells=False, _offset_y=0.5, _high_temporal_resolution=False)
+
 
 if __name__ == '__main__':
     main()
