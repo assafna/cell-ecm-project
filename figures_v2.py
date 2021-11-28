@@ -120,6 +120,27 @@ def main():
     fiber_density.experiments.matchmaking_by_inner_correlation.main(
         _real_cells=False, _offset_y=0.5, _high_temporal_resolution=False)
 
+    # figure s8
+    print('\nPanel B')
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(
+        _real_cells=False, _static=False, _band=True, _high_temporal_resolution=False)
+
+    print('\nPanels C')
+    fiber_density.experiments.same_real_inner_correlation_vs_different_fake_inner_correlation.main(
+        _offset_y=0, _high_temporal_resolution=False)
+
+    print('\nPanels D')
+    fiber_density.experiments.same_real_inner_correlation_vs_different_fake_inner_correlation.main(
+        _offset_y=0.5, _high_temporal_resolution=False)
+
+    print('\nPanels E')
+    fiber_density.experiments.same_real_inner_correlation_vs_different_fake_inner_correlation.main(
+        _offset_y=0, _high_temporal_resolution=True)
+
+    print('\nPanels F')
+    fiber_density.experiments.same_real_inner_correlation_vs_different_fake_inner_correlation.main(
+        _offset_y=0.5, _high_temporal_resolution=True)
+
 
 if __name__ == '__main__':
     main()
