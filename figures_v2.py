@@ -141,6 +141,24 @@ def main():
     fiber_density.experiments.same_real_inner_correlation_vs_different_fake_inner_correlation.main(
         _offset_y=0.5, _high_temporal_resolution=True)
 
+    # figure s9
+    print('\nPanel A')
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(_high_temporal_resolution=True)
+
+    print('\nPanel B - left')
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_temporal_assessment.main(
+        _high_temporal_resolution=False)
+
+    print('\nPanel B - right')
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_temporal_assessment.main()
+
+    print('\nPanel C')
+    fiber_density.experiments.real_real_inner_correlation_vs_real_fake_inner_correlation.main(
+        _high_temporal_resolution=True)
+
+    print('\nPanel D')
+    fiber_density.experiments.matchmaking_by_inner_correlation.main(_high_temporal_resolution=True)
+
 
 if __name__ == '__main__':
     main()
