@@ -22,7 +22,8 @@ MAX_RANK = 7
 POTENTIAL_MATCHES = 50
 
 
-def main(_real_cells=True, _offset_y=0.5, _high_temporal_resolution=False, _band=True):
+def main(_real_cells=True, _static=False, _dead=False, _live=True, _bead=False, _metastasis=False, _band=True,
+         _high_temporal_resolution=False, _offset_y=0.5):
     _experiments = all_experiments()
     _experiments = filtering.by_categories(
         _experiments=_experiments,
@@ -30,15 +31,17 @@ def main(_real_cells=True, _offset_y=0.5, _high_temporal_resolution=False, _band
         _is_high_temporal_resolution=_high_temporal_resolution,
         _is_bleb=False,
         _is_bleb_from_start=False,
-        _is_dead_live=False,
-        _is_bead=False,
-        _is_metastasis=False
+        _is_dead_live=_dead,
+        _is_bead=_bead,
+        _is_metastasis=_metastasis
     )
 
     _tuples = load.experiments_groups_as_tuples(_experiments)
     _tuples = filtering.by_pair_distance_range(_tuples, PAIR_DISTANCE_RANGE)
     _tuples = filtering.by_real_pairs(_tuples, _real_pairs=_real_cells)
-    _tuples = filtering.by_fake_static_pairs(_tuples, _fake_static_pairs=STATIC)
+    _tuples = filtering.by_fake_static_pairs(_tuples, _fake_static_pairs=_static)
+    if _dead is not False:
+        _tuples = filtering.by_dead_live(_tuples, _dead=_dead, _live=_live)
     _tuples = filtering.by_band(_tuples, _band=_band)
     print('Total tuples:', len(_tuples))
 
@@ -230,8 +233,9 @@ def main(_real_cells=True, _offset_y=0.5, _high_temporal_resolution=False, _band
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        _filename='plot_real_' + str(_real_cells) + '_offset_z_' + str(_offset_y) + '_high_time_' +
-                  str(_high_temporal_resolution) + '_band_' + str(_band)
+        _filename='plot_real_' + str(_real_cells) + '_static_' + str(_static) + '_dead_' + str(_dead) + '_live_' +
+                  str(_live) + '_bead_' + str(_bead) + '_metastasis_' + str(_metastasis) + '_band_' + str(_band) +
+                  '_high_time_' + str(_high_temporal_resolution) + '_y_' + str(_offset_y)
     )
 
     # correct match probability plot
@@ -265,8 +269,9 @@ def main(_real_cells=True, _offset_y=0.5, _high_temporal_resolution=False, _band
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        _filename='plot_real_' + str(_real_cells) + '_offset_z_' + str(_offset_y) + '_high_time_' +
-                  str(_high_temporal_resolution) + '_band_' + str(_band) + '_correct_match_prob'
+        _filename='plot_real_' + str(_real_cells) + '_static_' + str(_static) + '_dead_' + str(_dead) + '_live_' +
+                  str(_live) + '_bead_' + str(_bead) + '_metastasis_' + str(_metastasis) + '_band_' + str(_band) +
+                  '_high_time_' + str(_high_temporal_resolution) + '_y_' + str(_offset_y) + '_correct_match_prob'
     )
 
 

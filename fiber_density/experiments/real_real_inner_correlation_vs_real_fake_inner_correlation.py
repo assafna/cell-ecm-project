@@ -33,6 +33,7 @@ def main(_real_cells=True, _static=False, _dead=False, _live=True, _bead=False, 
     )
 
     _tuples = load.experiments_groups_as_tuples(_experiments)
+    _tuples = filtering.by_pair_distance_range(_tuples, PAIR_DISTANCE_RANGE)
     _tuples = filtering.by_real_pairs(_tuples, _real_pairs=_real_cells)
     _tuples = filtering.by_fake_static_pairs(_tuples, _fake_static_pairs=_static)
     if _dead is not False:
