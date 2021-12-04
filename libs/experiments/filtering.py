@@ -1,5 +1,6 @@
 from libs.experiments import load, compute
-from libs.experiments.config import SINGLE_CELL, BLEB, BLEB_FROM_START, HIGH_TEMPORAL_RESOLUTION_IN_MINUTES, DEAD_LIVE
+from libs.experiments.config import SINGLE_CELL, BLEB, BLEB_FROM_START, HIGH_TEMPORAL_RESOLUTION_IN_MINUTES, \
+    DEAD_LIVE, BEAD, METASTASIS
 
 
 def is_single_cell(_experiment):
@@ -18,13 +19,25 @@ def is_dead_live(_experiment):
     return _experiment in DEAD_LIVE
 
 
+def is_bead(_experiment):
+    return _experiment in BEAD
+
+
+def is_metastasis(_experiment):
+    return _experiment in METASTASIS
+
+
 def by_categories(_experiments, _is_single_cell=None, _is_high_temporal_resolution=None, _is_bleb=None,
-                  _is_bleb_from_start=None, _is_dead_live=None):
+                  _is_bleb_from_start=None, _is_dead_live=None, _is_bead=None, _is_metastasis=None):
     return [_experiment for _experiment in _experiments if
             (_is_single_cell is None or _is_single_cell == is_single_cell(_experiment)) and
-            (_is_high_temporal_resolution is None or _is_high_temporal_resolution == is_high_temporal_resolution(_experiment)) and
-            (_is_bleb is None or (_is_bleb and is_bleb(_experiment, _is_bleb_from_start)) or (not _is_bleb and not is_bleb(_experiment))) and
-            (_is_dead_live is None or _is_dead_live == is_dead_live(_experiment))
+            (_is_high_temporal_resolution is None or _is_high_temporal_resolution == is_high_temporal_resolution(
+                _experiment)) and
+            (_is_bleb is None or (_is_bleb and is_bleb(_experiment, _is_bleb_from_start)) or (
+                        not _is_bleb and not is_bleb(_experiment))) and
+            (_is_dead_live is None or _is_dead_live == is_dead_live(_experiment)) and
+            (_is_bead is None or _is_bead == is_bead(_experiment)) and
+            (_is_metastasis is None or _is_metastasis == is_metastasis(_experiment))
             ]
 
 

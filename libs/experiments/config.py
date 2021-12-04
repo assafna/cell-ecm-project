@@ -10,14 +10,14 @@ CELL_PAIRS = [
     'SN20_Bleb_fromStart',
     'SN26_BlebAdded',
     'Bleb_150',
-    # 'LiveDead_201115',
-    # 'LiveDead_201117',
-    # 'LiveLive_201207',
+    'LiveDead_201115',
+    'LiveDead_201117',
+    'LiveLive_201207',
     'DeadDead_201208',
-    # 'BeadBead_201209',
+    'BeadBead_201209',
     'LiveDead_201220',
     # 'Metastasis_Airyscan_210202',
-    # 'Metastasis_Airyscan_210207'
+    'Metastasis_Airyscan_210207'
 ]
 
 DEAD_LIVE = [
@@ -43,6 +43,15 @@ AFTER_BLEB_INJECTION_FIRST_TIME_FRAME = {
     'SN26_BlebAdded': 9,
     'Bleb_150': 0
 }
+
+BEAD = [
+    'BeadBead_201209'
+]
+
+METASTASIS = [
+    # 'Metastasis_Airyscan_210202',
+    'Metastasis_Airyscan_210207'
+]
 
 MINIMUM_TIME_FRAMES_CORRELATION = {
     'regular_temporal_resolution': 15,

@@ -26,7 +26,9 @@ def main(_band=True, _offset_y=0):
         _is_high_temporal_resolution=None,
         _is_bleb=True,
         _is_bleb_from_start=False,
-        _is_dead_live=False
+        _is_dead_live=False,
+        _is_bead=False,
+        _is_metastasis=False
     )
 
     _tuples = load.experiments_groups_as_tuples(_experiments)

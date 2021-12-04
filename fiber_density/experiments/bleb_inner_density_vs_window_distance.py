@@ -178,7 +178,9 @@ def main():
         _is_high_temporal_resolution=False,
         _is_bleb=False,
         _is_bleb_from_start=False,
-        _is_dead_live=False
+        _is_dead_live=False,
+        _is_bead=False,
+        _is_metastasis=False
     )
     _regular_experiments, _regular_offsets_x = compute_fiber(_experiments)
 
@@ -190,7 +192,9 @@ def main():
         _is_high_temporal_resolution=False,
         _is_bleb=True,
         _is_bleb_from_start=True,
-        _is_dead_live=False
+        _is_dead_live=False,
+        _is_bead=False,
+        _is_metastasis=False
     )
     _bleb_experiments_real, _bleb_experiments_fake, _bleb_offsets_x = compute_matched_fiber(_experiments)
 
