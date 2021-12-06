@@ -159,6 +159,60 @@ def main():
     print('\nPanel D')
     fiber_density.experiments.matchmaking_by_inner_correlation.main(_high_temporal_resolution=True)
 
+    # figure 6
+    print('\nPanel A - left')
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main()
+
+    print('\nPanel A - middle')
+    fiber_density.experiments.real_real_inner_correlation_vs_real_fake_inner_correlation.main()
+
+    print('\nPanel A - right')
+    fiber_density.experiments.matchmaking_by_inner_correlation.main()
+
+    print('\nPanel B - left')
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(_bead=True, _band=False)
+
+    print('\nPanel B - middle')
+    fiber_density.experiments.real_real_inner_correlation_vs_real_fake_inner_correlation.main(_bead=True, _band=False)
+
+    print('\nPanel B - right')
+    fiber_density.experiments.matchmaking_by_inner_correlation.main(_bead=True, _band=False)
+
+    print('\nPanel C - left')
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(
+        _dead_dead=True, _dead=True, _band=False)
+
+    print('\nPanel C - middle')
+    fiber_density.experiments.real_real_inner_correlation_vs_real_fake_inner_correlation.main(
+        _dead_dead=True, _dead=True, _band=False)
+
+    print('\nPanel C - right')
+    fiber_density.experiments.matchmaking_by_inner_correlation.main(
+        _dead_dead=True, _dead=True, _band=False)
+
+    print('\nPanel D - left')
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(
+        _live_dead=True, _dead=True, _band=False)
+
+    print('\nPanel D - middle')
+    fiber_density.experiments.real_real_inner_correlation_vs_real_fake_inner_correlation.main(
+        _live_dead=True, _dead=True, _band=False)
+
+    print('\nPanel D - right')
+    fiber_density.experiments.matchmaking_by_inner_correlation.main(_live_dead=True, _dead=True, _band=False)
+
+    print('\nPanel E - left')
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(
+        _live_dead=True, _dead=True, _live=True, _band=False)
+
+    print('\nPanel E - middle')
+    fiber_density.experiments.real_real_inner_correlation_vs_real_fake_inner_correlation.main(
+        _live_dead=True, _dead=True, _live=True, _band=False)
+
+    print('\nPanel E - right')
+    fiber_density.experiments.matchmaking_by_inner_correlation.main(
+        _live_dead=True, _dead=True, _live=True, _band=False)
+
 
 if __name__ == '__main__':
     main()
