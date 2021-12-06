@@ -18,9 +18,10 @@ OFFSET_X = 0
 PAIR_DISTANCE_RANGE = [4, 10]
 
 
-def compute_fiber_densities(_real_cells=True, _static=False, _dead=False, _live=True, _bead=False, _metastasis=False,
-                            _band=True, _high_temporal_resolution=False, _pair_distance_range=None, _offset_y=0.5,
-                            _offset_z=0, _padding_y_by=0.5, _padding_z_by=0.0, _space_y_by=0.25, _space_z_by=0.0):
+def compute_fiber_densities(_real_cells=True, _static=False, _dead_dead=False, _live_dead=False, _dead=False,
+                            _live=False, _bead=False, _metastasis=False, _band=True, _high_temporal_resolution=False,
+                            _pair_distance_range=None, _offset_y=0.5, _offset_z=0, _padding_y_by=0.5, _padding_z_by=0.0,
+                            _space_y_by=0.25, _space_z_by=0.0):
     if _pair_distance_range is None:
         _pair_distance_range = PAIR_DISTANCE_RANGE
 
@@ -31,7 +32,8 @@ def compute_fiber_densities(_real_cells=True, _static=False, _dead=False, _live=
         _is_high_temporal_resolution=_high_temporal_resolution,
         _is_bleb=False,
         _is_bleb_from_start=False,
-        _is_dead_live=_dead,
+        _is_dead_dead=_dead_dead,
+        _is_live_dead=_live_dead,
         _is_bead=_bead,
         _is_metastasis=_metastasis
     )
@@ -40,7 +42,7 @@ def compute_fiber_densities(_real_cells=True, _static=False, _dead=False, _live=
     _tuples = filtering.by_pair_distance_range(_tuples, _pair_distance_range)
     _tuples = filtering.by_real_pairs(_tuples, _real_pairs=_real_cells)
     _tuples = filtering.by_fake_static_pairs(_tuples, _fake_static_pairs=_static)
-    if _dead is not False:
+    if _dead_dead is not False or _live_dead is not False:
         _tuples = filtering.by_dead_live(_tuples, _dead=_dead, _live=_live)
     _tuples = filtering.by_band(_tuples, _band=_band)
     print('Total tuples:', len(_tuples))
@@ -195,15 +197,16 @@ def compute_fiber_densities(_real_cells=True, _static=False, _dead=False, _live=
     return _same_correlations_array, _different_correlations_array
 
 
-def main(_real_cells=True, _static=False, _dead=False, _live=True, _bead=False, _metastasis=False, _band=True,
-         _high_temporal_resolution=False, _pair_distance_range=None, _offset_y=0.5, _offset_z=0):
+def main(_real_cells=True, _static=False, _dead_dead=False, _live_dead=False, _dead=False, _live=False, _bead=False,
+         _metastasis=False, _band=True, _high_temporal_resolution=False, _pair_distance_range=None, _offset_y=0.5,
+         _offset_z=0):
     if _pair_distance_range is None:
         _pair_distance_range = PAIR_DISTANCE_RANGE
 
     _same_correlations_array, _different_correlations_array = \
         compute_fiber_densities(
-            _real_cells, _static, _dead, _live, _bead, _metastasis, _band, _high_temporal_resolution,
-            _pair_distance_range, _offset_y, _offset_z)
+            _real_cells, _static, _dead_dead, _live_dead, _dead, _live, _bead, _metastasis, _band,
+            _high_temporal_resolution, _pair_distance_range, _offset_y, _offset_z)
 
     # plot
     _fig = go.Figure(
@@ -273,11 +276,12 @@ def main(_real_cells=True, _static=False, _dead=False, _live=True, _bead=False, 
     save.to_html(
         _fig=_fig,
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
-        _filename='plot_real_' + str(_real_cells) + '_static_' + str(_static) + '_dead_' + str(_dead) + '_live_' +
-                  str(_live) + '_bead_' + str(_bead) + '_metastasis_' + str(_metastasis) + '_band_' + str(_band) +
-                  '_high_time_' + str(_high_temporal_resolution) + '_range_' +
-                  '_'.join([str(_distance) for _distance in _pair_distance_range]) + '_y_' + str(_offset_y) + '_z_'
-                  + str(_offset_z)
+        _filename='plot_real_' + str(_real_cells) + '_static_' + str(_static) + '_dead_dead_' + str(_dead_dead) +
+                  '_live_dead_' + str(_live_dead) + '_dead_' + str(_dead) + '_live_' + str(_live) + '_bead_' +
+                  str(_bead) + '_metastasis_' + str(_metastasis) + '_band_' + str(_band) + '_high_time_' +
+                  str(_high_temporal_resolution) + '_range_' +
+                  '_'.join([str(_distance) for _distance in _pair_distance_range]) + '_y_' + str(_offset_y) + '_z_' +
+                  str(_offset_z)
     )
 
 

@@ -20,10 +20,13 @@ CELL_PAIRS = [
     'Metastasis_Airyscan_210207'
 ]
 
-DEAD_LIVE = [
-    'LiveDead_201115',
+DEAD_DEAD = [
+    'DeadDead_201208'
+]
+
+LIVE_DEAD = [
+    # 'LiveDead_201115',
     'LiveDead_201117',
-    'DeadDead_201208',
     'LiveDead_201220'
 ]
 

@@ -22,7 +22,8 @@ def main():
         _is_high_temporal_resolution=None,
         _is_bleb=False,
         _is_bleb_from_start=False,
-        _is_dead_live=False,
+        _is_dead_dead=False,
+        _is_live_dead=False,
         _is_bead=False,
         _is_metastasis=False
     )
