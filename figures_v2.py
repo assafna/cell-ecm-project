@@ -213,6 +213,40 @@ def main():
     fiber_density.experiments.matchmaking_by_inner_correlation.main(
         _live_dead=True, _dead=True, _live=True, _band=False)
 
+    # figure 7
+    print('\nPanel B')
+    fiber_density.experiments.inner_density_vs_offsets_in_axes.main()
+
+    print('\nPanel C')
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_offsets_in_axes.main()
+
+    print('\nPanel D')
+    fiber_density.experiments.inner_density_vs_same_inner_correlation_vs_different_inner_correlation_vs_z_offset.main()
+
+    print('\nPanel G')
+    fiber_density.experiments.inner_density_vs_time_tuple.compute_tuples([('SN16', 3, 'cells_0_1')])
+
+    print('\nPanel H')
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(_band=False)
+
+    print('\nPanel I')
+    fiber_density.experiments.real_real_inner_correlation_vs_real_fake_inner_correlation.main(_band=False)
+
+    print('\nPanel J')
+    fiber_density.experiments.matchmaking_by_inner_correlation.main(_band=False)
+
+    print('\nPanel K')
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(
+        _band=False, _high_temporal_resolution=True)
+
+    print('\nPanel L')
+    fiber_density.experiments.real_real_inner_correlation_vs_real_fake_inner_correlation.main(
+        _band=False, _high_temporal_resolution=True)
+
+    print('\nPanel M')
+    fiber_density.experiments.matchmaking_by_inner_correlation.main(
+        _band=False, _high_temporal_resolution=True)
+
 
 if __name__ == '__main__':
     main()
