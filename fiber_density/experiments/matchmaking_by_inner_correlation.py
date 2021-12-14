@@ -23,13 +23,14 @@ POTENTIAL_MATCHES = 50
 
 
 def main(_real_cells=True, _static=False, _dead_dead=False, _live_dead=False, _dead=False, _live=False, _bead=False,
-         _metastasis=False, _band=True, _high_temporal_resolution=False, _offset_y=0.5):
+         _metastasis=False, _bleb=False, _bleb_amount_um=None, _band=True, _high_temporal_resolution=False,
+         _offset_y=0.5):
     _experiments = all_experiments()
     _experiments = filtering.by_categories(
         _experiments=_experiments,
         _is_single_cell=False,
         _is_high_temporal_resolution=_high_temporal_resolution,
-        _is_bleb=False,
+        _is_bleb=_bleb,
         _is_dead_dead=_dead_dead,
         _is_live_dead=_live_dead,
         _is_bead=_bead,
@@ -43,6 +44,8 @@ def main(_real_cells=True, _static=False, _dead_dead=False, _live_dead=False, _d
     if _dead_dead is not False or _live_dead is not False:
         _tuples = filtering.by_dead_live(_tuples, _dead=_dead, _live=_live)
     _tuples = filtering.by_band(_tuples, _band=_band)
+    if _bleb:
+        _tuples = filtering.by_bleb_amount_um(_tuples, _amount_um=_bleb_amount_um)
     print('Total tuples:', len(_tuples))
 
     _arguments = []
@@ -235,8 +238,8 @@ def main(_real_cells=True, _static=False, _dead_dead=False, _live_dead=False, _d
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
         _filename='plot_real_' + str(_real_cells) + '_static_' + str(_static) + '_dead_dead_' + str(_dead_dead) +
                   '_live_dead_' + str(_live_dead) + '_dead_' + str(_dead) + '_live_' + str(_live) + '_bead_' +
-                  str(_bead) + '_metastasis_' + str(_metastasis) + '_band_' + str(_band) + '_high_time_' +
-                  str(_high_temporal_resolution) + '_y_' + str(_offset_y)
+                  str(_bead) + '_metastasis_' + str(_metastasis) + '_bleb_' + str(_bleb) + str(_bleb_amount_um) +
+                  '_band_' + str(_band) + '_high_time_' + str(_high_temporal_resolution) + '_y_' + str(_offset_y)
     )
 
     # correct match probability plot
@@ -272,8 +275,9 @@ def main(_real_cells=True, _static=False, _dead_dead=False, _live_dead=False, _d
         _path=os.path.join(paths.PLOTS, save.get_module_name()),
         _filename='plot_real_' + str(_real_cells) + '_static_' + str(_static) + '_dead_dead_' + str(_dead_dead) +
                   '_live_dead_' + str(_live_dead) + '_dead_' + str(_dead) + '_live_' + str(_live) + '_bead_' +
-                  str(_bead) + '_metastasis_' + str(_metastasis) + '_band_' + str(_band) + '_high_time_' +
-                  str(_high_temporal_resolution) + '_y_' + str(_offset_y) + '_correct_match_prob'
+                  str(_bead) + '_metastasis_' + str(_metastasis) + '_bleb_' + str(_bleb) + str(_bleb_amount_um) +
+                  '_band_' + str(_band) + '_high_time_' + str(_high_temporal_resolution) + '_y_' + str(_offset_y) +
+                  '_correct_match_prob'
     )
 
 
