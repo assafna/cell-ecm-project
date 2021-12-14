@@ -269,6 +269,29 @@ def main():
     print('\nPanel B')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_offsets_in_axes.main(_band=False)
 
+    # figure s13
+    print('\nPanel A')
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(
+        _band=False, _bleb=True, _bleb_amount_um=85)
+
+    print('\nPanel B')
+    fiber_density.experiments.real_real_inner_correlation_vs_real_fake_inner_correlation.main(
+        _band=False, _bleb=True, _bleb_amount_um=85)
+
+    print('\nPanel C')
+    fiber_density.experiments.matchmaking_by_inner_correlation.main(_band=False, _bleb=True, _bleb_amount_um=85)
+
+    print('\nPanel D')
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(
+        _band=False, _bleb=True, _bleb_amount_um=150)
+
+    print('\nPanel E')
+    fiber_density.experiments.real_real_inner_correlation_vs_real_fake_inner_correlation.main(
+        _band=False, _bleb=True, _bleb_amount_um=150)
+
+    print('\nPanel F')
+    fiber_density.experiments.matchmaking_by_inner_correlation.main(_band=False, _bleb=True, _bleb_amount_um=150)
+
 
 if __name__ == '__main__':
     main()
