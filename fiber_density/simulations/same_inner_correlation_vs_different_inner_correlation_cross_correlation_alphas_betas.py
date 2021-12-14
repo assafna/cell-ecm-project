@@ -113,9 +113,10 @@ def main(_type='alpha', _low_connectivity=False, _plots=None, _plot_types=None):
                             },
                             'barmode': 'stack',
                             'legend': {
+                                'xanchor': 'right',
+                                'yanchor': 'top',
                                 'bordercolor': 'black',
-                                'borderwidth': 2,
-                                'bgcolor': 'white'
+                                'borderwidth': 2
                             },
                         }
                     )
