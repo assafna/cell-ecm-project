@@ -346,6 +346,19 @@ def main():
     fiber_density.simulations.same_inner_correlation_vs_different_inner_correlation_cross_correlation_alphas_betas.main(
         _type='beta', _plots=['same'], _plot_types=['box'])
 
+    # figure s16
+    print('\nPanel A')
+    fiber_density.simulations.same_inner_correlation_vs_different_inner_correlation_cross_correlation.main(
+        _plots=['same'], _plot_types=['bar'])
+
+    print('\nPanel B')
+    fiber_density.simulations.same_inner_correlation_vs_different_inner_correlation_cross_correlation_alphas_betas.main(
+        _plots=['same'], _plot_types=['bar'])
+
+    print('\nPanel C')
+    fiber_density.simulations.same_inner_correlation_vs_different_inner_correlation_cross_correlation_alphas_betas.main(
+        _type='beta', _plots=['same'], _plot_types=['bar'])
+
 
 if __name__ == '__main__':
     main()
