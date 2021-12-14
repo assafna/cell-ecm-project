@@ -247,6 +247,28 @@ def main():
     fiber_density.experiments.matchmaking_by_inner_correlation.main(
         _band=False, _high_temporal_resolution=True)
 
+    # figure s10
+    print('\nPanel A')
+    fiber_density.experiments.inner_correlation_vs_saturation.main()
+
+    print('\nPanel B')
+    fiber_density.experiments.inner_correlation_vs_saturation.main(_offset_y=0.5)
+
+    # figure S11
+    print('\nPanel A')
+    fiber_density.experiments.inner_density_vs_offsets_in_axes.main(_high_temporal_resolution=True)
+
+    print('\nPanel B')
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_offsets_in_axes.main(
+        _high_temporal_resolution=True)
+
+    # figure S12
+    print('\nPanel A')
+    fiber_density.experiments.inner_density_vs_offsets_in_axes.main(_band=False)
+
+    print('\nPanel B')
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_offsets_in_axes.main(_band=False)
+
 
 if __name__ == '__main__':
     main()
