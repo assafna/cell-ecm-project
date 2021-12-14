@@ -292,7 +292,7 @@ def main():
     print('\nPanel F')
     fiber_density.experiments.matchmaking_by_inner_correlation.main(_band=False, _bleb=True, _bleb_amount_um=150)
 
-    # figure s13
+    # figure s14
     print('\nPanel A')
     fiber_density.experiments.inner_density_vs_same_inner_correlation_vs_different_inner_correlation_offsets_in_axes.\
         main()
