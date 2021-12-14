@@ -1,6 +1,6 @@
 from libs.experiments import load, compute
 from libs.experiments.config import SINGLE_CELL, BLEB, BLEB_FROM_START, HIGH_TEMPORAL_RESOLUTION_IN_MINUTES, \
-    LIVE_DEAD, BEAD, METASTASIS, DEAD_DEAD
+    LIVE_DEAD, BEAD, METASTASIS, DEAD_DEAD, BLEB_AMOUNT_UM
 
 
 def is_single_cell(_experiment):
@@ -11,8 +11,8 @@ def is_high_temporal_resolution(_experiment):
     return compute.temporal_resolution_in_minutes(_experiment) == HIGH_TEMPORAL_RESOLUTION_IN_MINUTES
 
 
-def is_bleb(_experiment, _from_start=None):
-    return _experiment in BLEB and (_from_start is None or _from_start == (_experiment in BLEB_FROM_START))
+def is_bleb(_experiment):
+    return _experiment in BLEB
 
 
 def is_dead_dead(_experiment):
@@ -32,13 +32,12 @@ def is_metastasis(_experiment):
 
 
 def by_categories(_experiments, _is_single_cell=None, _is_high_temporal_resolution=None, _is_bleb=None,
-                  _is_bleb_from_start=None, _is_dead_dead=None, _is_live_dead=None, _is_bead=None, _is_metastasis=None):
+                  _is_dead_dead=None, _is_live_dead=None, _is_bead=None, _is_metastasis=None):
     return [_experiment for _experiment in _experiments if
             (_is_single_cell is None or _is_single_cell == is_single_cell(_experiment)) and
             (_is_high_temporal_resolution is None or _is_high_temporal_resolution == is_high_temporal_resolution(
                 _experiment)) and
-            (_is_bleb is None or (_is_bleb and is_bleb(_experiment, _is_bleb_from_start)) or (
-                        not _is_bleb and not is_bleb(_experiment))) and
+            (_is_bleb is None or (_is_bleb and is_bleb(_experiment)) or (not _is_bleb and not is_bleb(_experiment))) and
             (_is_dead_dead is None or _is_dead_dead == is_dead_dead(_experiment)) and
             (_is_live_dead is None or _is_live_dead == is_live_dead(_experiment)) and
             (_is_bead is None or _is_bead == is_bead(_experiment)) and
@@ -241,5 +240,31 @@ def by_dead_live(_experiments_tuples, _dead=None, _live=None):
         # return all
         elif _dead is None and _live is None:
             return _experiments_tuples
+
+    return _experiments_tuples_filtered
+
+
+def by_bleb_from_start(_experiments_tuples, _from_start=None):
+    if _from_start is None:
+        return _experiments_tuples
+
+    _experiments_tuples_filtered = []
+    for _tuple in _experiments_tuples:
+        _experiment, _, _ = _tuple
+        if _from_start == _experiment in BLEB_FROM_START:
+            _experiments_tuples_filtered.append(_tuple)
+
+    return _experiments_tuples_filtered
+
+
+def by_bleb_amount_um(_experiments_tuples, _amount_um=None):
+    if _amount_um is None:
+        return _experiments_tuples
+
+    _experiments_tuples_filtered = []
+    for _tuple in _experiments_tuples:
+        _experiment, _, _ = _tuple
+        if _amount_um == BLEB_AMOUNT_UM[_amount_um]:
+            _experiments_tuples_filtered.append(_tuple)
 
     return _experiments_tuples_filtered

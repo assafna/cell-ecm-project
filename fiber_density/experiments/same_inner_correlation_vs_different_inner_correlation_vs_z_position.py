@@ -26,7 +26,6 @@ def compute_fiber_densities(_band=True, _high_temporal_resolution=False):
         _is_single_cell=False,
         _is_high_temporal_resolution=_high_temporal_resolution,
         _is_bleb=False,
-        _is_bleb_from_start=False,
         _is_dead_dead=False,
         _is_live_dead=False,
         _is_bead=False,

@@ -41,6 +41,12 @@ BLEB_FROM_START = [
     'Bleb_150'
 ]
 
+BLEB_AMOUNT_UM = {
+    'SN20_Bleb_fromStart': 85,
+    'SN26_BlebAdded': 85,
+    'Bleb_150': 150
+}
+
 AFTER_BLEB_INJECTION_FIRST_TIME_FRAME = {
     'SN20_Bleb_fromStart': 0,
     'SN26_BlebAdded': 9,

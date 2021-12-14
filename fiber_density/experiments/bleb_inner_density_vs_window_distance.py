@@ -18,9 +18,8 @@ OFFSET_Z = 0
 OFFSET_Y = 0
 
 
-def compute_fiber(_experiments):
-    _tuples = load.experiments_groups_as_tuples(_experiments)
-    _tuples = filtering.by_time_frames_amount(_tuples, compute.density_time_frame(_experiments[0]))
+def compute_fiber(_tuples):
+    _tuples = filtering.by_time_frames_amount(_tuples, compute.density_time_frame(_tuples[0]))
     _tuples = filtering.by_real_pairs(_tuples)
     _tuples = filtering.by_pair_distance_range(_tuples, PAIR_DISTANCE_RANGE)
     print('Total tuples:', len(_tuples))
@@ -84,9 +83,8 @@ def compute_fiber(_experiments):
     return _experiments_fiber_densities, _max_offsets_x
 
 
-def compute_matched_fiber(_experiments):
-    _tuples = load.experiments_groups_as_tuples(_experiments)
-    _tuples = filtering.by_time_frames_amount(_tuples, compute.density_time_frame(_experiments[0]))
+def compute_matched_fiber(_tuples):
+    _tuples = filtering.by_time_frames_amount(_tuples, compute.density_time_frame(_tuples[0]))
     _tuples = filtering.by_pair_distance_range(_tuples, PAIR_DISTANCE_RANGE)
     _experiments_matched = organize.by_matched_real_and_fake(_tuples)
     print('Total matched pairs:', len(_experiments_matched))
@@ -177,13 +175,14 @@ def main():
         _is_single_cell=False,
         _is_high_temporal_resolution=False,
         _is_bleb=False,
-        _is_bleb_from_start=False,
         _is_dead_dead=False,
         _is_live_dead=False,
         _is_bead=False,
         _is_metastasis=False
     )
-    _regular_experiments, _regular_offsets_x = compute_fiber(_experiments)
+    _tuples = load.experiments_groups_as_tuples(_experiments)
+    _tuples = filtering.by_bleb_from_start(_experiments, _from_start=False)
+    _regular_experiments, _regular_offsets_x = compute_fiber(_tuples)
 
     print('Bleb experiments')
     _experiments = all_experiments()
@@ -192,13 +191,14 @@ def main():
         _is_single_cell=False,
         _is_high_temporal_resolution=False,
         _is_bleb=True,
-        _is_bleb_from_start=True,
         _is_dead_dead=False,
         _is_live_dead=False,
         _is_bead=False,
         _is_metastasis=False
     )
-    _bleb_experiments_real, _bleb_experiments_fake, _bleb_offsets_x = compute_matched_fiber(_experiments)
+    _tuples = load.experiments_groups_as_tuples(_experiments)
+    _tuples = filtering.by_bleb_from_start(_experiments, _from_start=True)
+    _bleb_experiments_real, _bleb_experiments_fake, _bleb_offsets_x = compute_matched_fiber(_tuples)
 
     print('\nWindow distance (cell diameter)', 'Regular # of cells', 'Regular Wilcoxon p-value', 'Bleb # of cells',
           'Bleb "real" Wilcoxon p-value', 'Bleb "fake" Wilcoxon p-value', sep='\t')

@@ -25,7 +25,6 @@ def main(_band=True, _offset_y=0):
         _is_single_cell=False,
         _is_high_temporal_resolution=None,
         _is_bleb=True,
-        _is_bleb_from_start=False,
         _is_dead_dead=False,
         _is_live_dead=False,
         _is_bead=False,
@@ -37,6 +36,7 @@ def main(_band=True, _offset_y=0):
     _tuples = filtering.by_real_pairs(_tuples, _real_pairs=REAL_CELLS)
     _tuples = filtering.by_fake_static_pairs(_tuples, _fake_static_pairs=STATIC)
     _tuples = filtering.by_band(_tuples, _band=_band)
+    _tuples = filtering.by_bleb_from_start(_tuples, _from_start=False)
     print('Total tuples:', len(_tuples))
 
     _arguments = []
