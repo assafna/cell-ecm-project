@@ -16,7 +16,8 @@ from fiber_density.experiments import inner_density_vs_window_distance, \
     inner_density_vs_same_inner_correlation_vs_different_inner_correlation_vs_z_offset, \
     inner_correlation_vs_saturation, inner_dynamics_granger_causality, \
     inner_density_vs_window_distance_with_single_cells, inner_density_vs_time_with_single_cells, \
-    real_real_inner_correlation_vs_real_fake_inner_correlation
+    real_real_inner_correlation_vs_real_fake_inner_correlation, bleb_before_vs_after_inner_density, \
+    bleb_before_vs_after_inner_density_change, inner_density_change_vs_offsets_in_axes
 
 __all__ = [
     inner_density_vs_window_distance,
@@ -45,5 +46,8 @@ __all__ = [
     inner_dynamics_granger_causality,
     inner_density_vs_window_distance_with_single_cells,
     inner_density_vs_time_with_single_cells,
-    real_real_inner_correlation_vs_real_fake_inner_correlation
+    real_real_inner_correlation_vs_real_fake_inner_correlation,
+    bleb_before_vs_after_inner_density,
+    bleb_before_vs_after_inner_density_change,
+    inner_density_change_vs_offsets_in_axes
 ]

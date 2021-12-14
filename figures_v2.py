@@ -292,6 +292,42 @@ def main():
     print('\nPanel F')
     fiber_density.experiments.matchmaking_by_inner_correlation.main(_band=False, _bleb=True, _bleb_amount_um=150)
 
+    # figure s13
+    print('\nPanel A')
+    fiber_density.experiments.inner_density_vs_same_inner_correlation_vs_different_inner_correlation_offsets_in_axes.\
+        main()
+
+    print('\nPanel B - top left')
+    fiber_density.experiments.bleb_before_vs_after_inner_density.main()
+
+    print('\nPanel B - top right')
+    fiber_density.experiments.bleb_before_vs_after_inner_density.main(_offset_y=0.5)
+
+    print('\nPanel B - bottom left')
+    fiber_density.experiments.bleb_before_vs_after_inner_density_change.main()
+
+    print('\nPanel B - bottom right')
+    fiber_density.experiments.bleb_before_vs_after_inner_density_change.main(_offset_y=0.5)
+
+    print('\nPanel C - top left')
+    fiber_density.experiments.inner_density_vs_offsets_in_axes.main()
+
+    print('\nPanel C - top middle')
+    fiber_density.experiments.inner_density_change_vs_offsets_in_axes.main()
+
+    print('\nPanel C - top right')
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_offsets_in_axes.main()
+
+    print('\nPanel C - bottom left')
+    fiber_density.experiments.inner_density_vs_offsets_in_axes.main(_high_temporal_resolution=True)
+
+    print('\nPanel C - bottom middle')
+    fiber_density.experiments.inner_density_change_vs_offsets_in_axes.main(_high_temporal_resolution=True)
+
+    print('\nPanel C - bottom right')
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_offsets_in_axes.main(
+        _high_temporal_resolution=True)
+
 
 if __name__ == '__main__':
     main()
