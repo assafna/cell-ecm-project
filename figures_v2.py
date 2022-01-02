@@ -226,24 +226,24 @@ def main():
     print('\nPanel G')
     fiber_density.experiments.inner_density_vs_time_tuple.compute_tuples([('SN16', 3, 'cells_0_1')])
 
-    print('\nPanel H')
+    print('\nPanel H - left')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(_band=False)
 
-    print('\nPanel I')
+    print('\nPanel H - middle')
     fiber_density.experiments.real_real_inner_correlation_vs_real_fake_inner_correlation.main(_band=False)
 
-    print('\nPanel J')
+    print('\nPanel H - right')
     fiber_density.experiments.matchmaking_by_inner_correlation.main(_band=False)
 
-    print('\nPanel K')
+    print('\nPanel I - left')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(
         _band=False, _high_temporal_resolution=True)
 
-    print('\nPanel L')
+    print('\nPanel I - middle')
     fiber_density.experiments.real_real_inner_correlation_vs_real_fake_inner_correlation.main(
         _band=False, _high_temporal_resolution=True)
 
-    print('\nPanel M')
+    print('\nPanel I - right')
     fiber_density.experiments.matchmaking_by_inner_correlation.main(
         _band=False, _high_temporal_resolution=True)
 
@@ -270,26 +270,26 @@ def main():
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_offsets_in_axes.main(_band=False)
 
     # figure s13
-    print('\nPanel A')
+    print('\nPanel A - left')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(
         _band=False, _bleb=True, _bleb_amount_um=85)
 
-    print('\nPanel B')
+    print('\nPanel A - middle')
     fiber_density.experiments.real_real_inner_correlation_vs_real_fake_inner_correlation.main(
         _band=False, _bleb=True, _bleb_amount_um=85)
 
-    print('\nPanel C')
+    print('\nPanel A - right')
     fiber_density.experiments.matchmaking_by_inner_correlation.main(_band=False, _bleb=True, _bleb_amount_um=85)
 
-    print('\nPanel D')
+    print('\nPanel B - left')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(
         _band=False, _bleb=True, _bleb_amount_um=150)
 
-    print('\nPanel E')
+    print('\nPanel B - middle')
     fiber_density.experiments.real_real_inner_correlation_vs_real_fake_inner_correlation.main(
         _band=False, _bleb=True, _bleb_amount_um=150)
 
-    print('\nPanel F')
+    print('\nPanel B - right')
     fiber_density.experiments.matchmaking_by_inner_correlation.main(_band=False, _bleb=True, _bleb_amount_um=150)
 
     # figure s14
