@@ -35,7 +35,7 @@ def main(_real_cells=True, _static=False, _dead_dead=False, _live_dead=False, _d
 
     _tuples = load.experiments_groups_as_tuples(_experiments)
     _tuples = filtering.by_pair_distance_range(_tuples, PAIR_DISTANCE_RANGE)
-    _tuples = filtering.by_real_pairs(_tuples, _real_pairs=_real_cells)
+    _tuples = filtering.by_real_fake_pairs(_tuples, _real_fake_pairs=_real_cells)
     _tuples = filtering.by_fake_static_pairs(_tuples, _fake_static_pairs=_static)
     if _dead_dead is not False or _live_dead is not False:
         _tuples = filtering.by_dead_live(_tuples, _dead=_dead, _live=_live)
