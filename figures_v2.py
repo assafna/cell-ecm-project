@@ -48,15 +48,15 @@ def main():
     fiber_density.simulations.same_inner_correlation_vs_different_inner_correlation_pair_distance.main(
         _low_connectivity=False)
 
-    print('\nPanel D - top')
+    print('\nPanel D - left')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(
         _band=True, _high_temporal_resolution=False)
 
-    print('\nPanel D - bottom')
+    print('\nPanel D - right')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_vs_pair_distance.main(
         _band=True, _high_temporal_resolution=False)
 
-    print('\nPanel E - left')
+    print('\nPanel E - middle')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_triplet.main()
 
     print('\nPanel E - right')
