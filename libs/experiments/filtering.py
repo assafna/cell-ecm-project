@@ -264,7 +264,7 @@ def by_bleb_amount_um(_experiments_tuples, _amount_um=None):
     _experiments_tuples_filtered = []
     for _tuple in _experiments_tuples:
         _experiment, _, _ = _tuple
-        if _amount_um == BLEB_AMOUNT_UM[_amount_um]:
+        if _amount_um == BLEB_AMOUNT_UM[_experiment]:
             _experiments_tuples_filtered.append(_tuple)
 
     return _experiments_tuples_filtered
