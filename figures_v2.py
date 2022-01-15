@@ -106,7 +106,6 @@ def main():
 
     # figure 5
     print('\nPanel B')
-    # TODO: set experiment to SN16 only
     fiber_density.experiments.real_real_inner_correlation_vs_real_fake_inner_correlation.main()
 
     print('\nPanels D & E')
