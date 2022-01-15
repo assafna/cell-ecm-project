@@ -249,10 +249,10 @@ def main():
 
     # figure s10
     print('\nPanel A')
-    fiber_density.experiments.inner_correlation_vs_saturation.main()
+    fiber_density.experiments.inner_correlation_vs_saturation.main(_offset_y=0)
 
     print('\nPanel B')
-    fiber_density.experiments.inner_correlation_vs_saturation.main(_offset_y=0.5)
+    fiber_density.experiments.inner_correlation_vs_saturation.main()
 
     # figure S11
     print('\nPanel A')
