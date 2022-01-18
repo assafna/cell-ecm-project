@@ -10,7 +10,7 @@ def main():
     print('\nPanel A')
     fiber_density.simulations.inner_density_vs_time_cell_pairs.main()
 
-    print('\nPanel F')
+    print('\nPanel C')
     fiber_density.simulations.communicating_inner_correlation_vs_non_communicating_inner_correlation.main()
 
     # figure s1
