@@ -251,7 +251,7 @@ def by_bleb_from_start(_experiments_tuples, _from_start=None):
     _experiments_tuples_filtered = []
     for _tuple in _experiments_tuples:
         _experiment, _, _ = _tuple
-        if _from_start == _experiment in BLEB_FROM_START:
+        if _from_start == (_experiment in BLEB_FROM_START):
             _experiments_tuples_filtered.append(_tuple)
 
     return _experiments_tuples_filtered
