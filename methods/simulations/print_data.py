@@ -2,7 +2,7 @@ from itertools import product
 
 from libs.simulations import load, filtering
 
-DISTANCES = [5, 7, 9]
+DISTANCES = [4, 5, 7, 9]
 STDS = [0.25, 0.5, 0.75]
 ALPHAS = [0, 0.25, 0.5, 0.75, 1]
 BETAS = [1, 1.05, 1.1, 1.2]
