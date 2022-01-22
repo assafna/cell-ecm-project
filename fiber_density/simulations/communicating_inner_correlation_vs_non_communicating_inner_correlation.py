@@ -3,7 +3,7 @@ from itertools import product
 from multiprocessing.pool import Pool
 
 import plotly.graph_objs as go
-from scipy.stats import ranksums
+from scipy.stats import ranksums, wilcoxon
 from tqdm import tqdm
 
 from libs import compute_lib
@@ -101,46 +101,58 @@ def main():
                     )
                     _std_non_communicating[_std_index].append(_correlation)
 
-        print('Wilcoxon rank-sum test:', ranksums(_std_communicating[_std_index], _std_non_communicating[_std_index]))
+        print('Wilcoxon rank-sum test com non-com:', ranksums(_std_communicating[_std_index], _std_non_communicating[_std_index]))
+        print('Wilcoxon around the zero com: ', wilcoxon(_std_communicating[_std_index]))
+        print('Wilcoxon around the zero non-com: ', wilcoxon(_std_non_communicating[_std_index]))
 
-    # histogram plot, once with and once without the legend
+    # plot
     _colors_array = config.colors(len(STDS))
     for _show_legend in [True, False]:
         _fig = go.Figure(
             data=[
                 *[
-                    go.Histogram(
-                        x=_non_communicating,
-                        name='STD ' + str(_std),
+                    go.Box(
+                        y=_y,
+                        name=_name,
+                        boxpoints=False,
+                        line={
+                            'width': 1
+                        },
+                        fillcolor='white',
                         marker={
                             'color': _color
                         },
-                        nbinsx=10,
-                        histnorm='probability',
+                        # opacity=0.7,
                         showlegend=_show_legend
-                    ) for _std, _non_communicating, _color in zip(STDS, _std_non_communicating, _colors_array)
+                    ) for _y, _name, _color in zip(_std_non_communicating, STDS, _colors_array)
                 ],
                 *[
-                    go.Scatter(
-                        x=_communicating,
-                        y=[0.5 - 0.02 * _std_index for _i in range(len(_communicating))],
-                        mode='text',
-                        text='●',
-                        textfont={
-                          'color': _color,
-                          'size': 15
+                    go.Box(
+                        y=_y,
+                        name=_name,
+                        boxpoints='all',
+                        jitter=1,
+                        pointpos=0,
+                        line={
+                            'width': 0
                         },
+                        fillcolor='white',
+                        marker={
+                            'size': 10,
+                            'color': _color
+                        },
+                        # opacity=0.7,
                         showlegend=False
-                    ) for _std_index, _communicating, _color in zip(range(len(STDS)), _std_communicating, _colors_array)
+                    ) for _y, _name, _color in zip(_std_communicating, STDS, _colors_array)
                 ]
             ],
             layout={
                 'xaxis': {
-                    'title': 'Correlation',
+                    'title': 'Std.',
                     'zeroline': False
                 },
                 'yaxis': {
-                    'title': 'Fraction',
+                    'title': 'Correlation',
                     'zeroline': False
                 },
                 'legend': {
@@ -148,8 +160,7 @@ def main():
                     'yanchor': 'top',
                     'bordercolor': 'black',
                     'borderwidth': 2
-                },
-                'bargap': 0.1
+                }
             }
         )
 
