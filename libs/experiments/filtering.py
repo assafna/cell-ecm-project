@@ -31,6 +31,18 @@ def is_metastasis(_experiment):
     return _experiment in METASTASIS
 
 
+def is_real(_tuple, _real=True):
+    _experiment, _series_id, _group = _tuple
+    _group_properties = load.group_properties(_experiment, _series_id, _group)
+    return _real == ('real_fake' not in _group_properties)
+
+
+def is_band(_tuple, _band=True):
+    _experiment, _series_id, _group = _tuple
+    _group_properties = load.group_properties(_experiment, _series_id, _group)
+    return _band == _group_properties['band']
+
+
 def by_categories(_experiments, _is_single_cell=None, _is_high_temporal_resolution=None, _is_bleb=None,
                   _is_dead_dead=None, _is_live_dead=None, _is_bead=None, _is_metastasis=None):
     return [_experiment for _experiment in _experiments if
