@@ -16,7 +16,7 @@ TIME_POINT = {
     False: 50,
     True: 35
 }
-PAIR_DISTANCE = [5, 7, 9]
+PAIR_DISTANCE = [4, 5, 7, 9]
 OFFSET_X_STEP = 0.2
 OFFSET_Y = 0
 
@@ -69,6 +69,8 @@ def compute_cell_pairs(_low_connectivity):
         )
         _simulations = filtering.by_pair_distance(_simulations, _distance=_distance)
         _simulations = filtering.by_time_points_amount(_simulations, _time_points=TIME_POINT[_low_connectivity])
+
+        print('N = ', len(_simulations))
 
         _offsets_x = np.arange(start=0, stop=_distance / 2 - 0.25 - QUANTIFICATION_WINDOW_WIDTH_IN_CELL_DIAMETER,
                                step=OFFSET_X_STEP)
