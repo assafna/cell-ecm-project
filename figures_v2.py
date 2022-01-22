@@ -297,6 +297,7 @@ def main():
     fiber_density.experiments.inner_density_vs_same_inner_correlation_vs_different_inner_correlation_offsets_in_axes.\
         main()
 
+    # TODO: fix red line for panel B graphs
     print('\nPanel B - top left')
     fiber_density.experiments.bleb_before_vs_after_inner_density.main()
 
