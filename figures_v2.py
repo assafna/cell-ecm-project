@@ -42,11 +42,10 @@ def main():
 
     # figure 4
     print('\nPanel B - left')
-    fiber_density.simulations.same_inner_correlation_vs_different_inner_correlation.main(_low_connectivity=False)
+    fiber_density.simulations.same_inner_correlation_vs_different_inner_correlation.main()
 
     print('\nPanel B - right')
-    fiber_density.simulations.same_inner_correlation_vs_different_inner_correlation_pair_distance.main(
-        _low_connectivity=False)
+    fiber_density.simulations.same_inner_correlation_vs_different_inner_correlation_pair_distance.main()
 
     print('\nPanel D - left')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(

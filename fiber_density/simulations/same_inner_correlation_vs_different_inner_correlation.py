@@ -27,7 +27,7 @@ STD = {
     False: 0.5,
     True: 0.25
 }
-PAIR_DISTANCE = [5, 7, 9]
+PAIR_DISTANCE = [4, 5, 7, 9]
 
 
 def compute_fiber_densities(_simulations, _low_connectivity):
