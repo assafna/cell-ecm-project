@@ -136,7 +136,6 @@ def main():
             )
         )
 
-    _colors_array = config.colors(2)
     _fig = go.Figure(
         data=_data,
         layout={
