@@ -106,69 +106,66 @@ def main():
         print('Wilcoxon around the zero non-com: ', wilcoxon(_std_non_communicating[_std_index]))
 
     # plot
-    _colors_array = config.colors(len(STDS))
-    for _show_legend in [True, False]:
-        _fig = go.Figure(
-            data=[
-                *[
-                    go.Box(
-                        y=_y,
-                        name=_name,
-                        boxpoints=False,
-                        line={
-                            'width': 1
-                        },
-                        fillcolor='white',
-                        marker={
-                            'color': _color
-                        },
-                        # opacity=0.7,
-                        showlegend=_show_legend
-                    ) for _y, _name, _color in zip(_std_non_communicating, STDS, _colors_array)
-                ],
-                *[
-                    go.Box(
-                        y=_y,
-                        name=_name,
-                        boxpoints='all',
-                        jitter=1,
-                        pointpos=0,
-                        line={
-                            'width': 0
-                        },
-                        fillcolor='white',
-                        marker={
-                            'size': 10,
-                            'color': _color
-                        },
-                        # opacity=0.7,
-                        showlegend=False
-                    ) for _y, _name, _color in zip(_std_communicating, STDS, _colors_array)
-                ]
-            ],
-            layout={
-                'xaxis': {
-                    'title': 'Std.',
-                    'zeroline': False
+    _data = []
+    _colors_array = config.colors(2)
+    for _communicating, _communicating_text, _stds, _color in \
+            zip([True, False], ['Communicating', 'Non-communicating'],
+                [_std_communicating, _std_non_communicating],
+                _colors_array):
+        _y = []
+        _x = []
+        for _std_index, _std in enumerate(STDS):
+            _y += _stds[_std_index]
+            _x += [_std for _i in _stds[_std_index]]
+        _data.append(
+            go.Box(
+                y=_y,
+                x=_x,
+                name=_communicating_text,
+                boxpoints='all' if _communicating else False,
+                jitter=1,
+                pointpos=0,
+                line={
+                    'width': 1
                 },
-                'yaxis': {
-                    'title': 'Correlation',
-                    'zeroline': False
+                fillcolor='white',
+                marker={
+                    'size': 10,
+                    'color': _color
                 },
-                'legend': {
-                    'xanchor': 'right',
-                    'yanchor': 'top',
-                    'bordercolor': 'black',
-                    'borderwidth': 2
-                }
-            }
+                opacity=0.7
+            )
         )
 
-        save.to_html(
-            _fig=_fig,
-            _path=os.path.join(paths.PLOTS, save.get_module_name()),
-            _filename='plot_legend_' + str(_show_legend)
-        )
+    _fig = go.Figure(
+        data=_data,
+        layout={
+            'xaxis': {
+                'title': 'Std.',
+                'zeroline': False
+            },
+            'yaxis': {
+                'title': 'Correlation',
+                'range': [-1, 1],
+                'zeroline': False,
+                'tickmode': 'array',
+                'tickvals': [-1, -0.5, 0, 0.5, 1]
+            },
+            'boxmode': 'group',
+            'legend': {
+                'xanchor': 'right',
+                'yanchor': 'top',
+                'bordercolor': 'black',
+                'borderwidth': 2
+            }
+        }
+    )
+
+    save.to_html(
+        _fig=_fig,
+        _path=os.path.join(paths.PLOTS, save.get_module_name()),
+        _filename='plot'
+    )
 
 
 if __name__ == '__main__':
