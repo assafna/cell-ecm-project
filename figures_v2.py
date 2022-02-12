@@ -141,6 +141,9 @@ def main():
         _offset_y=0.5, _high_temporal_resolution=True)
 
     # figure s9
+    # TODO: add new figure
+
+    # figure s10
     print('\nPanel A')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(_high_temporal_resolution=True)
 
@@ -246,14 +249,14 @@ def main():
     fiber_density.experiments.matchmaking_by_inner_correlation.main(
         _band=False, _high_temporal_resolution=True)
 
-    # figure s10
+    # figure s11
     print('\nPanel A')
     fiber_density.experiments.inner_correlation_vs_saturation.main(_offset_y=0)
 
     print('\nPanel B')
     fiber_density.experiments.inner_correlation_vs_saturation.main()
 
-    # figure S11
+    # figure s12
     print('\nPanel A')
     fiber_density.experiments.inner_density_vs_offsets_in_axes.main(_high_temporal_resolution=True)
 
@@ -261,14 +264,14 @@ def main():
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_offsets_in_axes.main(
         _high_temporal_resolution=True)
 
-    # figure S12
+    # figure s13
     print('\nPanel A')
     fiber_density.experiments.inner_density_vs_offsets_in_axes.main(_band=False)
 
     print('\nPanel B')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_offsets_in_axes.main(_band=False)
 
-    # figure s13
+    # figure s15
     print('\nPanel A - left')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(
         _band=False, _bleb=True, _bleb_amount_um=85)
@@ -328,7 +331,7 @@ def main():
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_offsets_in_axes.main(
         _high_temporal_resolution=True)
 
-    # figure s15
+    # figure s16
     print('\nPanel B')
     fiber_density.simulations.same_inner_correlation_vs_different_inner_correlation_cross_correlation.main(
         _plots=['same'], _plot_types=['box'])
@@ -346,7 +349,7 @@ def main():
     fiber_density.simulations.same_inner_correlation_vs_different_inner_correlation_cross_correlation_alphas_betas.main(
         _type='beta', _plots=['same'], _plot_types=['box'])
 
-    # figure s16
+    # figure s17
     print('\nPanel A')
     fiber_density.simulations.same_inner_correlation_vs_different_inner_correlation_cross_correlation.main(
         _plots=['same'], _plot_types=['bar'])
@@ -359,7 +362,7 @@ def main():
     fiber_density.simulations.same_inner_correlation_vs_different_inner_correlation_cross_correlation_alphas_betas.main(
         _type='beta', _plots=['same'], _plot_types=['bar'])
 
-    # figure s17
+    # figure s18
     print('\nPanels A & B')
     fiber_density.simulations.same_inner_correlation_vs_different_inner_correlation_cross_correlation.main(
         _plots=['different'])
@@ -372,7 +375,7 @@ def main():
     fiber_density.simulations.same_inner_correlation_vs_different_inner_correlation_cross_correlation_alphas_betas.main(
         _type='beta', _plots=['different'])
 
-    # figure s18
+    # figure s19
     print('\nAll panels')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_cross_correlation.main(
         _plots=['same', 'different'], _plot_types=['box', 'bar'])
