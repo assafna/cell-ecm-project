@@ -174,7 +174,7 @@ def main(_offset_y=0.5):
                 'tickvals': [0, 0.05, 0.1]
             },
             'yaxis': {
-                'title': 'Inner windows correlation',
+                'title': 'Correlation',
                 'zeroline': False,
                 'range': [-1.1, 1.2],
                 'tickmode': 'array',
