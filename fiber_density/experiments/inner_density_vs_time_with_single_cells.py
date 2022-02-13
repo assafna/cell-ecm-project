@@ -2,6 +2,7 @@ import os
 
 import numpy as np
 import plotly.graph_objs as go
+from scipy.stats import ranksums
 
 from fiber_density import inner_density_vs_time_cell_pairs, inner_density_vs_time_single_cells
 from libs.experiments import config, paths
@@ -14,6 +15,15 @@ def main():
 
     print('Cell pairs')
     _cell_pairs_fiber_densities = inner_density_vs_time_cell_pairs.compute_experiments_data()
+
+    # wilcoxon
+    print('Wilcoxon rank sums test between single cells and cell pairs for every time point:')
+    for _index, _time in enumerate(np.array(range(inner_density_vs_time_cell_pairs.EXPERIMENTS_TIME_FRAMES)) * 15):
+        if _index == len(_single_cells_fiber_densities) or _index == len(_cell_pairs_fiber_densities):
+            break
+        _result = ranksums(_single_cells_fiber_densities[_index], _cell_pairs_fiber_densities[_index])
+        print('Time: ', _time)
+        print(_result)
 
     # plot
     _colors = config.colors(2)
