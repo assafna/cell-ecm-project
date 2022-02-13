@@ -7,11 +7,14 @@ def main():
     fiber_density.simulations.inner_density_vs_window_distance_with_single_cells.main(_low_connectivity=False)
 
     # figure 2
-    print('\nPanel A')
+    print('\nPanel B')
     fiber_density.simulations.inner_density_vs_time_cell_pairs.main()
 
-    print('\nPanel C')
+    print('\nPanel D')
     fiber_density.simulations.communicating_inner_correlation_vs_non_communicating_inner_correlation.main()
+
+    print('\nPanel E')
+    fiber_density.simulations.inner_correlation_communicating_vs_non_communicating_vs_pair_distance.main()
 
     # figure s1
     print('\nPanel A')
@@ -21,9 +24,6 @@ def main():
     fiber_density.simulations.inner_density_vs_change_in_inner_density.main()
 
     print('\nPanel C')
-    fiber_density.simulations.inner_correlation_communicating_vs_non_communicating_vs_pair_distance.main()
-
-    print('\nPanel D')
     fiber_density.simulations.inner_correlation_communicating_vs_non_communicating_vs_window_distance.main()
 
     # figure 3
