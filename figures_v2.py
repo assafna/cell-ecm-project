@@ -30,7 +30,7 @@ def main():
     print('\nPanel C')
     fiber_density.experiments.inner_density_vs_window_distance_with_single_cells.main()
 
-    print('\nPanel E')
+    print('\nPanel D')
     fiber_density.experiments.inner_density_vs_time_with_single_cells.main()
 
     # figure s3
