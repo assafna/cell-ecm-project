@@ -220,7 +220,7 @@ def main(_alpha=1, _beta=1, _low_connectivity=False, _plots=None, _plot_types=No
                                 'tickvals': TIME_LAGS
                             },
                             'yaxis': {
-                                'title': 'Inner correlation' if _name == 'same' else 'Different network correlation',
+                                'title': 'Correlation' if _name == 'same' else 'Different network correlation',
                                 'range': [-1, 1.1],
                                 'zeroline': False,
                                 'tickmode': 'array',
