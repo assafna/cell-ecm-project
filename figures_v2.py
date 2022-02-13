@@ -124,19 +124,19 @@ def main():
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(
         _real_cells=False, _static=False, _band=True, _high_temporal_resolution=False)
 
-    print('\nPanels C')
+    print('\nPanel C')
     fiber_density.experiments.same_real_inner_correlation_vs_different_fake_inner_correlation.main(
         _offset_y=0, _high_temporal_resolution=False)
 
-    print('\nPanels D')
+    print('\nPanel D')
     fiber_density.experiments.same_real_inner_correlation_vs_different_fake_inner_correlation.main(
         _offset_y=0.5, _high_temporal_resolution=False)
 
-    print('\nPanels E')
+    print('\nPanel E')
     fiber_density.experiments.same_real_inner_correlation_vs_different_fake_inner_correlation.main(
         _offset_y=0, _high_temporal_resolution=True)
 
-    print('\nPanels F')
+    print('\nPanel F')
     fiber_density.experiments.same_real_inner_correlation_vs_different_fake_inner_correlation.main(
         _offset_y=0.5, _high_temporal_resolution=True)
 
