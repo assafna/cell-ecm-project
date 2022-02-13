@@ -141,7 +141,14 @@ def main():
         _offset_y=0.5, _high_temporal_resolution=True)
 
     # figure s9
-    # TODO: add new figure
+    print('\nPanel left')
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main()
+
+    print('\nPanel middle')
+    fiber_density.experiments.real_real_inner_correlation_vs_real_fake_inner_correlation.main()
+
+    print('\nPanel right')
+    fiber_density.experiments.matchmaking_by_inner_correlation.main()
 
     # figure s10
     print('\nPanel A')
@@ -163,55 +170,46 @@ def main():
 
     # figure 6
     print('\nPanel A - left')
-    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main()
-
-    print('\nPanel A - middle')
-    fiber_density.experiments.real_real_inner_correlation_vs_real_fake_inner_correlation.main()
-
-    print('\nPanel A - right')
-    fiber_density.experiments.matchmaking_by_inner_correlation.main()
-
-    print('\nPanel B - left')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(_bead=True, _band=False)
 
-    print('\nPanel B - middle')
+    print('\nPanel A - middle')
     fiber_density.experiments.real_real_inner_correlation_vs_real_fake_inner_correlation.main(_bead=True, _band=False)
 
-    print('\nPanel B - right')
+    print('\nPanel A - right')
     fiber_density.experiments.matchmaking_by_inner_correlation.main(_bead=True, _band=False)
 
-    print('\nPanel C - left')
+    print('\nPanel B - left')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(
         _dead_dead=True, _dead=True, _band=False)
 
-    print('\nPanel C - middle')
+    print('\nPanel B - middle')
     fiber_density.experiments.real_real_inner_correlation_vs_real_fake_inner_correlation.main(
         _dead_dead=True, _dead=True, _band=False)
 
-    print('\nPanel C - right')
+    print('\nPanel B - right')
     fiber_density.experiments.matchmaking_by_inner_correlation.main(
         _dead_dead=True, _dead=True, _band=False)
 
-    print('\nPanel D - left')
+    print('\nPanel C - left')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(
         _live_dead=True, _dead=True, _band=False)
+
+    print('\nPanel C - middle')
+    fiber_density.experiments.real_real_inner_correlation_vs_real_fake_inner_correlation.main(
+        _live_dead=True, _dead=True, _band=False)
+
+    print('\nPanel C - right')
+    fiber_density.experiments.matchmaking_by_inner_correlation.main(_live_dead=True, _dead=True, _band=False)
+
+    print('\nPanel D - left')
+    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(
+        _live_dead=True, _dead=True, _live=True, _band=False)
 
     print('\nPanel D - middle')
     fiber_density.experiments.real_real_inner_correlation_vs_real_fake_inner_correlation.main(
-        _live_dead=True, _dead=True, _band=False)
+        _live_dead=True, _dead=True, _live=True, _band=False)
 
     print('\nPanel D - right')
-    fiber_density.experiments.matchmaking_by_inner_correlation.main(_live_dead=True, _dead=True, _band=False)
-
-    print('\nPanel E - left')
-    fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation.main(
-        _live_dead=True, _dead=True, _live=True, _band=False)
-
-    print('\nPanel E - middle')
-    fiber_density.experiments.real_real_inner_correlation_vs_real_fake_inner_correlation.main(
-        _live_dead=True, _dead=True, _live=True, _band=False)
-
-    print('\nPanel E - right')
     fiber_density.experiments.matchmaking_by_inner_correlation.main(
         _live_dead=True, _dead=True, _live=True, _band=False)
 
@@ -299,35 +297,22 @@ def main():
     fiber_density.experiments.inner_density_vs_same_inner_correlation_vs_different_inner_correlation_offsets_in_axes.\
         main()
 
-    # TODO: fix red line for panel B graphs
     print('\nPanel B - top left')
-    fiber_density.experiments.bleb_before_vs_after_inner_density.main()
-
-    print('\nPanel B - top right')
-    fiber_density.experiments.bleb_before_vs_after_inner_density.main(_offset_y=0.5)
-
-    print('\nPanel B - bottom left')
-    fiber_density.experiments.bleb_before_vs_after_inner_density_change.main()
-
-    print('\nPanel B - bottom right')
-    fiber_density.experiments.bleb_before_vs_after_inner_density_change.main(_offset_y=0.5)
-
-    print('\nPanel C - top left')
     fiber_density.experiments.inner_density_vs_offsets_in_axes.main()
 
-    print('\nPanel C - top middle')
+    print('\nPanel B - top middle')
     fiber_density.experiments.inner_density_change_vs_offsets_in_axes.main()
 
-    print('\nPanel C - top right')
+    print('\nPanel B - top right')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_offsets_in_axes.main()
 
-    print('\nPanel C - bottom left')
+    print('\nPanel B - bottom left')
     fiber_density.experiments.inner_density_vs_offsets_in_axes.main(_high_temporal_resolution=True)
 
-    print('\nPanel C - bottom middle')
+    print('\nPanel B - bottom middle')
     fiber_density.experiments.inner_density_change_vs_offsets_in_axes.main(_high_temporal_resolution=True)
 
-    print('\nPanel C - bottom right')
+    print('\nPanel B - bottom right')
     fiber_density.experiments.same_inner_correlation_vs_different_inner_correlation_offsets_in_axes.main(
         _high_temporal_resolution=True)
 
