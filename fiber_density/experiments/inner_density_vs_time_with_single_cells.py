@@ -21,8 +21,10 @@ def main():
     for _index, _time in enumerate(np.array(range(inner_density_vs_time_cell_pairs.EXPERIMENTS_TIME_FRAMES)) * 15):
         if _index == len(_single_cells_fiber_densities) or _index == len(_cell_pairs_fiber_densities):
             break
-        _result = ranksums(_single_cells_fiber_densities[_index], _cell_pairs_fiber_densities[_index])
         print('Time: ', _time)
+        print('N single cells: ', len(_single_cells_fiber_densities))
+        print('N cell pairs: ', len(_cell_pairs_fiber_densities))
+        _result = ranksums(_single_cells_fiber_densities[_index], _cell_pairs_fiber_densities[_index])
         print(_result)
 
     # plot
