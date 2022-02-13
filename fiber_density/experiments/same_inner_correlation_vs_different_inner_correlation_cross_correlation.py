@@ -323,7 +323,7 @@ def main(_band=True, _high_temporal_resolution=True, _plots=None, _plot_types=No
                                 'tickvals': np.array(TIME_LAGS[_high_temporal_resolution]) * 5 if _high_temporal_resolution else 15
                             },
                             'yaxis': {
-                                'title': 'Inner correlation' if _name == 'same' else 'Different network correlation',
+                                'title': 'Correlation' if _name == 'same' else 'Different network correlation',
                                 'range': [-1, 1.1],
                                 'zeroline': False,
                                 'tickmode': 'array',
